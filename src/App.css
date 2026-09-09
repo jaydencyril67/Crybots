@@ -300,14 +300,13 @@ h2 {
 
   .topbar,
   .hero-card,
-  .panel {
+  .panel,
+  .hero-panel {
     padding: 20px;
   }
 
-  .topbar,
   .hero-card,
-  .panel,
-  .asset-row {
+  .stats-grid {
     grid-template-columns: 1fr;
   }
 
@@ -324,11 +323,55 @@ h2 {
     text-align: left;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
   .hero-stats {
     grid-template-columns: 1fr;
   }
+}
+
+.runtime-error-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.runtime-error-card {
+  width: min(720px, 100%);
+  padding: 28px;
+  border-radius: 28px;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(17, 24, 39, 0.9);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.runtime-error-eyebrow {
+  margin: 0 0 12px;
+  color: #fca5a5;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.runtime-error-card h1 {
+  margin: 0;
+  color: #fff1f2;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.05;
+}
+
+.runtime-error-text {
+  margin: 16px 0 0;
+  color: #e2e8f0;
+  line-height: 1.7;
+}
+
+.runtime-error-box {
+  margin: 20px 0 0;
+  padding: 16px;
+  border-radius: 18px;
+  overflow: auto;
+  color: #fecaca;
+  background: rgba(15, 23, 42, 0.95);
+  white-space: pre-wrap;
 }
