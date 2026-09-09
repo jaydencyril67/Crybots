@@ -1,4 +1,4 @@
-import { Component, StrictMode, type ReactNode } from 'react'
+import { Component, StrictMode, type ReactNode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
@@ -6,7 +6,22 @@ import App from './App.tsx'
 const buildInfo = {
   version: '2026.09.09',
   route: window.location.pathname,
-  userAgent: navigator.userAgent,
+}
+
+function DebugFooter() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  return (
+    <div className="debug-footer debug-footer--mounted">
+      <span>Build {buildInfo.version}</span>
+      <span>Route {buildInfo.route}</span>
+      <span>{mounted ? 'Mounted' : 'Loading'}</span>
+    </div>
+  )
 }
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
@@ -63,11 +78,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <ErrorBoundary>
       <App />
-      <div className="debug-footer debug-footer--mounted">
-        <span>Build {buildInfo.version}</span>
-        <span>Route {buildInfo.route}</span>
-        <span>Mounted</span>
-      </div>
+      <DebugFooter />
     </ErrorBoundary>
   </StrictMode>,
 )
