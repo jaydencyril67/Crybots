@@ -8,6 +8,8 @@ const buildInfo = {
   route: window.location.pathname,
 }
 
+const shouldEnableEruda = new URLSearchParams(window.location.search).has('debug')
+
 function DebugFooter() {
   const [mounted, setMounted] = useState(false)
 
@@ -15,11 +17,39 @@ function DebugFooter() {
     setMounted(true)
   }, [])
 
+  useEffect(() => {
+    if (!shouldEnableEruda) {
+      return
+    }
+
+    let cancelled = false
+
+    async function loadEruda() {
+      try {
+        const eruda = await import('https://cdn.jsdelivr.net/npm/eruda')
+
+        if (!cancelled && typeof eruda.default?.init === 'function') {
+          eruda.default.init()
+          console.info('Eruda enabled for KINGSHALL EXCHANGE debug mode')
+        }
+      } catch (error) {
+        console.error('Failed to load Eruda:', error)
+      }
+    }
+
+    void loadEruda()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <div className="debug-footer debug-footer--mounted">
       <span>Build {buildInfo.version}</span>
       <span>Route {buildInfo.route}</span>
       <span>{mounted ? 'Mounted' : 'Loading'}</span>
+      <span>{shouldEnableEruda ? 'Debug on' : 'Debug off'}</span>
     </div>
   )
 }
