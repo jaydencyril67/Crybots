@@ -3,6 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+declare global {
+  interface Window {
+    eruda?: {
+      init: () => void
+    }
+  }
+}
+
 const buildInfo = {
   version: '2026.09.09',
   route: window.location.pathname,
@@ -26,12 +34,23 @@ function DebugFooter() {
 
     async function loadEruda() {
       try {
-        const eruda = await import('https://cdn.jsdelivr.net/npm/eruda')
+        const erudaScript = document.createElement('script')
+        erudaScript.src = 'https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.min.js'
+        erudaScript.async = true
+        erudaScript.onload = () => {
+          if (cancelled) {
+            return
+          }
 
-        if (!cancelled && typeof eruda.default?.init === 'function') {
-          eruda.default.init()
-          console.info('Eruda enabled for KINGSHALL EXCHANGE debug mode')
+          if (window.eruda && typeof window.eruda.init === 'function') {
+            window.eruda.init()
+            console.info('Eruda enabled for KINGSHALL EXCHANGE debug mode')
+          }
         }
+        erudaScript.onerror = () => {
+          console.error('Failed to load Eruda script')
+        }
+        document.body.appendChild(erudaScript)
       } catch (error) {
         console.error('Failed to load Eruda:', error)
       }
