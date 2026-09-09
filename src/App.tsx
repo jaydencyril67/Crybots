@@ -1,121 +1,85 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
+const portfolioHighlights = [
+  {
+    value: '$128.4k',
+    label: 'Portfolio value',
+    change: '+12.8% this month',
+  },
+  {
+    value: '18',
+    label: 'Assets tracked',
+    change: '5 watchlisted for alerts',
+  },
+  {
+    value: '24/7',
+    label: 'Market monitoring',
+    change: 'Auto alerts for price moves',
+  },
+]
+
+const watchlist = [
+  { symbol: 'BTC', name: 'Bitcoin', price: '$63,240', change: '+4.2%' },
+  { symbol: 'ETH', name: 'Ethereum', price: '$3,510', change: '+2.1%' },
+  { symbol: 'SOL', name: 'Solana', price: '$142', change: '+7.8%' },
+]
+
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <main className="app-shell">
+      <section className="hero-card">
+        <p className="eyebrow">Crypto investment dashboard</p>
+        <h1>Track your digital assets with confidence.</h1>
+        <p className="lead">
+          Start with a clean React + TypeScript foundation for portfolio tracking,
+          watchlists, and market insights.
+        </p>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+        <div className="hero-actions">
+          <button type="button" className="primary-action">
+            Create portfolio
+          </button>
+          <button type="button" className="secondary-action">
+            View watchlist
+          </button>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <section className="stats-grid" aria-label="Portfolio summary">
+        {portfolioHighlights.map((item) => (
+          <article key={item.label} className="stat-card">
+            <p className="stat-value">{item.value}</p>
+            <p className="stat-label">{item.label}</p>
+            <p className="stat-change">{item.change}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="panel">
+        <div className="panel-header">
+          <div>
+            <p className="eyebrow">Market watchlist</p>
+            <h2>Top assets to monitor</h2>
+          </div>
+          <p className="panel-note">Live pricing and alerts will be added next.</p>
+        </div>
+
+        <div className="asset-list">
+          {watchlist.map((asset) => (
+            <article key={asset.symbol} className="asset-row">
+              <div>
+                <p className="asset-symbol">{asset.symbol}</p>
+                <p className="asset-name">{asset.name}</p>
+              </div>
+              <div className="asset-metrics">
+                <p className="asset-price">{asset.price}</p>
+                <p className="asset-change">{asset.change}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
   )
 }
 
