@@ -1,6 +1,6 @@
 import './App.css'
 
-const portfolioHighlights = [
+const marketHighlights = [
   {
     value: '$128.4k',
     label: 'Portfolio value',
@@ -24,29 +24,88 @@ const watchlist = [
   { symbol: 'SOL', name: 'Solana', price: '$142', change: '+7.8%' },
 ]
 
+const features = [
+  'Real-time portfolio tracking',
+  'Custom price alerts',
+  'Clean risk overview',
+]
+
 function App() {
   return (
     <main className="app-shell">
-      <section className="hero-card">
-        <p className="eyebrow">Crypto investment dashboard</p>
-        <h1>Track your digital assets with confidence.</h1>
-        <p className="lead">
-          Start with a clean React + TypeScript foundation for portfolio tracking,
-          watchlists, and market insights.
-        </p>
-
-        <div className="hero-actions">
-          <button type="button" className="primary-action">
-            Create portfolio
+      <header className="topbar">
+        <div className="brand">
+          <span className="brand-mark">K</span>
+          <div>
+            <p className="brand-name">KINGSHALL EXCHANGE</p>
+            <p className="brand-tagline">Modern crypto investing, built simple</p>
+          </div>
+        </div>
+        <div className="topbar-actions">
+          <button type="button" className="ghost-button">
+            Sign in
           </button>
-          <button type="button" className="secondary-action">
-            View watchlist
+          <button type="button" className="primary-action">
+            Get started
           </button>
         </div>
+      </header>
+
+      <section className="hero-card">
+        <div className="hero-copy">
+          <p className="eyebrow">Trusted digital asset platform</p>
+          <h1>Invest in crypto with clarity and confidence.</h1>
+          <p className="lead">
+            KINGSHALL EXCHANGE gives you a premium, streamlined home for managing your
+            portfolio, monitoring the market, and staying ahead with organized insights.
+          </p>
+
+          <ul className="feature-list">
+            {features.map((feature) => (
+              <li key={feature}>{feature}</li>
+            ))}
+          </ul>
+
+          <div className="hero-actions">
+            <button type="button" className="primary-action">
+              Start investing
+            </button>
+            <button type="button" className="secondary-action">
+              Explore markets
+            </button>
+          </div>
+        </div>
+
+        <aside className="hero-panel">
+          <div className="hero-panel-header">
+            <p className="eyebrow">Live overview</p>
+            <span className="status-pill">Market open</span>
+          </div>
+          <div className="hero-metric">
+            <p className="hero-metric-label">Portfolio growth</p>
+            <p className="hero-metric-value">+18.4%</p>
+            <p className="hero-metric-note">Consistent performance over the last 30 days.</p>
+          </div>
+          <div className="mini-chart" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="hero-stats">
+            {marketHighlights.slice(0, 2).map((item) => (
+              <article key={item.label}>
+                <p className="stat-value">{item.value}</p>
+                <p className="stat-label">{item.label}</p>
+              </article>
+            ))}
+          </div>
+        </aside>
       </section>
 
       <section className="stats-grid" aria-label="Portfolio summary">
-        {portfolioHighlights.map((item) => (
+        {marketHighlights.map((item) => (
           <article key={item.label} className="stat-card">
             <p className="stat-value">{item.value}</p>
             <p className="stat-label">{item.label}</p>
@@ -61,7 +120,7 @@ function App() {
             <p className="eyebrow">Market watchlist</p>
             <h2>Top assets to monitor</h2>
           </div>
-          <p className="panel-note">Live pricing and alerts will be added next.</p>
+          <p className="panel-note">A crisp, organized list for high-priority opportunities.</p>
         </div>
 
         <div className="asset-list">
