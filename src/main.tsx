@@ -3,6 +3,12 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+const buildInfo = {
+  version: '2026.09.09',
+  route: window.location.pathname,
+  userAgent: navigator.userAgent,
+}
+
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
   state = { error: null }
 
@@ -26,6 +32,10 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
               directly from the page.
             </p>
             <pre className="runtime-error-box">{this.state.error}</pre>
+            <div className="debug-footer">
+              <span>Build {buildInfo.version}</span>
+              <span>Route {buildInfo.route}</span>
+            </div>
           </section>
         </main>
       )
@@ -53,6 +63,11 @@ createRoot(rootElement).render(
   <StrictMode>
     <ErrorBoundary>
       <App />
+      <div className="debug-footer debug-footer--mounted">
+        <span>Build {buildInfo.version}</span>
+        <span>Route {buildInfo.route}</span>
+        <span>Mounted</span>
+      </div>
     </ErrorBoundary>
   </StrictMode>,
 )

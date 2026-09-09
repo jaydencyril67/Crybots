@@ -375,3 +375,19 @@ h2 {
   background: rgba(15, 23, 42, 0.95);
   white-space: pre-wrap;
 }
+
+.debug-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 18px;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.debug-footer--mounted {
+  justify-content: flex-end;
+  padding: 0 4px;
+}
