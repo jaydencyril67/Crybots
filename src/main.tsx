@@ -1,5 +1,4 @@
 import { Component, StrictMode, createElement, type ReactNode, useEffect, useState } from 'react'
-import { jsx as _jsx, jsxs as _jsxs } from 'react/jsx-runtime'
 import { createRoot } from 'react-dom/client'
 
 import './index.css'
@@ -69,14 +68,13 @@ function DebugFooter() {
     }
   }, [])
 
-  return _jsxs('div', {
-    className: 'debug-footer debug-footer--mounted',
-    children: [
-      _jsx('span', { children: `Build ${buildInfo.version}` }),
-      _jsx('span', { children: mounted ? 'Mounted' : 'Loading' }),
-      _jsx('span', { children: shouldEnableEruda ? 'Debug on' : 'Debug off' }),
-    ],
-  })
+  return createElement(
+    'div',
+    { className: 'debug-footer debug-footer--mounted' },
+    createElement('span', null, `Build ${buildInfo.version}`),
+    createElement('span', null, mounted ? 'Mounted' : 'Loading'),
+    createElement('span', null, shouldEnableEruda ? 'Debug on' : 'Debug off'),
+  )
 }
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
