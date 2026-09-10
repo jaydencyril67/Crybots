@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "bun run server.ts",
+    "dev": "node server.mjs",
     "build": "tsc -b",
     "lint": "eslint .",
-    "serve": "bun run server.ts"
+    "serve": "node server.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

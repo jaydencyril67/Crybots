@@ -1,12 +1,12 @@
 # React + TypeScript
 
-This project is a plain React + TypeScript app with a lightweight Bun-powered dev server and no Vite dependency.
+This project is a plain React + TypeScript app with a lightweight Node-powered dev server and no Vite dependency.
 
 ## Scripts
 
-- `bun run dev` — start the local server on `http://localhost:3000`
-- `bun run build` — type-check the app
-- `bun run lint` — run ESLint
+- `npm run dev` — start the local server on `http://localhost:3000`
+- `npm run build` — type-check the app
+- `npm run lint` — run ESLint
 
 ## Expanding the ESLint configuration
 
