@@ -18,16 +18,28 @@ const marketHighlights = [
   },
 ]
 
+const trustSignals = ['Institutional-grade security', 'Deep liquidity pools', 'Instant portfolio sync']
+
+const features = [
+  {
+    title: 'Smart portfolio control',
+    description: 'Track allocation, gains, and exposure in one sleek command center.',
+  },
+  {
+    title: 'Live market intelligence',
+    description: 'Follow fast-moving assets with a focused watchlist and actionable alerts.',
+  },
+  {
+    title: 'Built for confident investing',
+    description: 'A refined experience that keeps the data readable, calm, and easy to scan.',
+  },
+]
+
 const watchlist = [
   { symbol: 'BTC', name: 'Bitcoin', price: '$63,240', change: '+4.2%' },
   { symbol: 'ETH', name: 'Ethereum', price: '$3,510', change: '+2.1%' },
   { symbol: 'SOL', name: 'Solana', price: '$142', change: '+7.8%' },
-]
-
-const features = [
-  'Real-time portfolio tracking',
-  'Custom price alerts',
-  'Clean risk overview',
+  { symbol: 'AVAX', name: 'Avalanche', price: '$38.12', change: '+5.1%' },
 ]
 
 function App() {
@@ -54,15 +66,15 @@ function App() {
       <section className="hero-card">
         <div className="hero-copy">
           <p className="eyebrow">Trusted digital asset platform</p>
-          <h1>Invest in crypto with clarity and confidence.</h1>
+          <h1>Invest in crypto with clarity, speed, and confidence.</h1>
           <p className="lead">
-            KINGSHALL EXCHANGE gives you a premium, streamlined home for managing your
-            portfolio, monitoring the market, and staying ahead with organized insights.
+            KINGSHALL EXCHANGE delivers a premium home for your portfolio with real-time market
+            visibility, intelligent watchlists, and a polished experience built for modern traders.
           </p>
 
-          <ul className="feature-list">
-            {features.map((feature) => (
-              <li key={feature}>{feature}</li>
+          <ul className="trust-list" aria-label="Trust signals">
+            {trustSignals.map((signal) => (
+              <li key={signal}>{signal}</li>
             ))}
           </ul>
 
@@ -112,6 +124,28 @@ function App() {
             <p className="stat-change">{item.change}</p>
           </article>
         ))}
+      </section>
+
+      <section className="panel panel-grid">
+        <div className="panel-header">
+          <div>
+            <p className="eyebrow">Why Kingshall</p>
+            <h2>Everything you need for a sharp crypto experience</h2>
+          </div>
+          <p className="panel-note">
+            A modern design system that puts important signals first and keeps the interface calm.
+          </p>
+        </div>
+
+        <div className="feature-grid">
+          {features.map((feature) => (
+            <article key={feature.title} className="feature-card">
+              <p className="feature-index">0{features.indexOf(feature) + 1}</p>
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="panel">
