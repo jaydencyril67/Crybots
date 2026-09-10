@@ -1,4 +1,3 @@
-import { createElement } from 'react'
 
 import './App.css'
 
@@ -45,12 +44,9 @@ const watchlist = [
 ]
 
 function App() {
-  return createElement(
-    'main',
-    { className: 'app-shell' },
-    createElement(
-      'header',
-      { className: 'topbar' },
+  return (
+    <main className="app-shell">
+      <header className="topbar">
         <div className="brand">
           <span className="brand-mark">K</span>
           <div>
