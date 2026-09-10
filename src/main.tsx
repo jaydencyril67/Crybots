@@ -52,7 +52,12 @@ function DebugFooter() {
         }
         document.body.appendChild(erudaScript)
       } catch (error) {
-        console.error('Failed to load Eruda:', error)
+        console.error('KINGSHALL EXCHANGE eruda bootstrap failure:', {
+          error,
+          name: error instanceof Error ? error.name : undefined,
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        })
       }
     }
 
@@ -79,8 +84,14 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
     return { error: error.message }
   }
 
-  componentDidCatch(error: Error) {
-    console.error('KINGSHALL EXCHANGE render error:', error)
+  componentDidCatch(error: Error, errorInfo: { componentStack: string }) {
+    console.error('KINGSHALL EXCHANGE render error:', {
+      error,
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+    })
   }
 
   render() {
@@ -115,11 +126,23 @@ if (!rootElement) {
 }
 
 window.addEventListener('error', (event) => {
-  console.error('KINGSHALL EXCHANGE runtime error:', event.error ?? event.message)
+  console.error('KINGSHALL EXCHANGE runtime error:', {
+    error: event.error,
+    message: event.message,
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno,
+    stack: event.error instanceof Error ? event.error.stack : undefined,
+  })
 })
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('KINGSHALL EXCHANGE unhandled rejection:', event.reason)
+  console.error('KINGSHALL EXCHANGE unhandled rejection:', {
+    reason: event.reason,
+    name: event.reason instanceof Error ? event.reason.name : undefined,
+    message: event.reason instanceof Error ? event.reason.message : String(event.reason),
+    stack: event.reason instanceof Error ? event.reason.stack : undefined,
+  })
 })
 
 createRoot(rootElement).render(
