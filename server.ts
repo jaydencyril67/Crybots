@@ -5,6 +5,8 @@ import { extname, join } from 'node:path'
 const port = Number(process.env.PORT ?? 3000)
 const root = process.cwd()
 const indexHtml = await readFile(join(root, 'index.html'), 'utf8')
+const bundleJs = await readFile(join(root, 'dist/bundle.js'), 'utf8')
+const appCss = await readFile(join(root, 'src/index.css'), 'utf8')
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`)
@@ -13,6 +15,18 @@ const server = createServer(async (req, res) => {
   if (pathname === '/' || pathname === '/index.html') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
     res.end(indexHtml)
+    return
+  }
+
+  if (pathname === '/dist/bundle.js' || pathname === '/bundle.js') {
+    res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8' })
+    res.end(bundleJs)
+    return
+  }
+
+  if (pathname === '/index.css') {
+    res.writeHead(200, { 'Content-Type': 'text/css; charset=utf-8' })
+    res.end(appCss)
     return
   }
 

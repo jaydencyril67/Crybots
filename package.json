@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node server.mjs",
+    "dev": "node server.ts",
     "build": "tsc -b",
     "lint": "eslint .",
-    "serve": "node server.mjs"
+    "serve": "node server.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
