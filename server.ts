@@ -31,19 +31,15 @@ server.listen(port, () => {
   console.log(`KINGSHALL EXCHANGE running on http://localhost:${port}`)
 })
 
-function getContentType(filePath) {
+function getContentType(filePath: string) {
   switch (extname(filePath)) {
     case '.css':
       return 'text/css; charset=utf-8'
     case '.html':
       return 'text/html; charset=utf-8'
     case '.js':
-      return 'text/javascript; charset=utf-8'
     case '.mjs':
       return 'text/javascript; charset=utf-8'
-    case '.ts':
-    case '.tsx':
-      return 'application/octet-stream'
     case '.png':
       return 'image/png'
     case '.svg':
