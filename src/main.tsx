@@ -1,12 +1,76 @@
-import { Component, StrictMode, type ReactNode } from 'react'
+import { Component, StrictMode, type ReactNode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+declare global {
+  interface Window {
+    eruda?: {
+      init: () => void
+    }
+  }
+}
+
 const buildInfo = {
   version: '2026.09.09',
   route: window.location.pathname,
-  userAgent: navigator.userAgent,
+}
+
+const shouldEnableEruda = new URLSearchParams(window.location.search).has('debug')
+
+function DebugFooter() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!shouldEnableEruda) {
+      return
+    }
+
+    let cancelled = false
+
+    async function loadEruda() {
+      try {
+        const erudaScript = document.createElement('script')
+        erudaScript.src = 'https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.min.js'
+        erudaScript.async = true
+        erudaScript.onload = () => {
+          if (cancelled) {
+            return
+          }
+
+          if (window.eruda && typeof window.eruda.init === 'function') {
+            window.eruda.init()
+            console.info('Eruda enabled for KINGSHALL EXCHANGE debug mode')
+          }
+        }
+        erudaScript.onerror = () => {
+          console.error('Failed to load Eruda script')
+        }
+        document.body.appendChild(erudaScript)
+      } catch (error) {
+        console.error('Failed to load Eruda:', error)
+      }
+    }
+
+    void loadEruda()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return (
+    <div className="debug-footer debug-footer--mounted">
+      <span>Build {buildInfo.version}</span>
+      <span>Route {buildInfo.route}</span>
+      <span>{mounted ? 'Mounted' : 'Loading'}</span>
+      <span>{shouldEnableEruda ? 'Debug on' : 'Debug off'}</span>
+    </div>
+  )
 }
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null }> {
@@ -63,11 +127,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <ErrorBoundary>
       <App />
-      <div className="debug-footer debug-footer--mounted">
-        <span>Build {buildInfo.version}</span>
-        <span>Route {buildInfo.route}</span>
-        <span>Mounted</span>
-      </div>
+      <DebugFooter />
     </ErrorBoundary>
   </StrictMode>,
 )
