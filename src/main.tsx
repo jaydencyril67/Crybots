@@ -1,7 +1,7 @@
 import { Component, StrictMode, type ReactNode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.tsx'
+import App from './App'
 
 declare global {
   interface Window {
@@ -13,7 +13,6 @@ declare global {
 
 const buildInfo = {
   version: '2026.09.09',
-  route: window.location.pathname,
 }
 
 const shouldEnableEruda = new URLSearchParams(window.location.search).has('debug')
@@ -66,7 +65,6 @@ function DebugFooter() {
   return (
     <div className="debug-footer debug-footer--mounted">
       <span>Build {buildInfo.version}</span>
-      <span>Route {buildInfo.route}</span>
       <span>{mounted ? 'Mounted' : 'Loading'}</span>
       <span>{shouldEnableEruda ? 'Debug on' : 'Debug off'}</span>
     </div>
@@ -98,7 +96,6 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
             <pre className="runtime-error-box">{this.state.error}</pre>
             <div className="debug-footer">
               <span>Build {buildInfo.version}</span>
-              <span>Route {buildInfo.route}</span>
             </div>
           </section>
         </main>
