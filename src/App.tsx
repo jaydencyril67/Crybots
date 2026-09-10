@@ -1,3 +1,5 @@
+import { createElement } from 'react'
+
 import './App.css'
 
 const marketHighlights = [
@@ -43,9 +45,12 @@ const watchlist = [
 ]
 
 function App() {
-  return (
-    <main className="app-shell">
-      <header className="topbar">
+  return createElement(
+    'main',
+    { className: 'app-shell' },
+    createElement(
+      'header',
+      { className: 'topbar' },
         <div className="brand">
           <span className="brand-mark">K</span>
           <div>
