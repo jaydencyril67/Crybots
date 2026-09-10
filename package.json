@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.ts",
-    "build": "tsc -b && esbuild src/main.tsx --bundle --format=esm --platform=browser --outfile=dist/bundle.js",
+    "build": "tsc -b && esbuild src/main.tsx --bundle --format=esm --platform=browser --sourcemap --outfile=dist/bundle.js",
     "lint": "eslint .",
     "serve": "node server.ts"
   },
