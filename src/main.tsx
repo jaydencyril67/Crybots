@@ -1,4 +1,4 @@
-import { Component, StrictMode, createElement, type ReactNode, useEffect, useState } from 'react'
+import { Component, StrictMode, type ReactNode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
@@ -84,21 +84,22 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
 
   render() {
     if (this.state.error) {
-      return (
-        <main className="runtime-error-shell">
-          <section className="runtime-error-card">
-            <p className="runtime-error-eyebrow">Application error</p>
-            <h1>Something went wrong while loading KINGSHALL EXCHANGE.</h1>
-            <p className="runtime-error-text">
-              The app hit a render issue. Here is the error message so you can debug it
-              directly from the page.
-            </p>
-            <pre className="runtime-error-box">{this.state.error}</pre>
-            <div className="debug-footer">
-              <span>Build {buildInfo.version}</span>
-            </div>
-          </section>
-        </main>
+      return React.createElement(
+        'main',
+        { className: 'runtime-error-shell' },
+        React.createElement(
+          'section',
+          { className: 'runtime-error-card' },
+          React.createElement('p', { className: 'runtime-error-eyebrow' }, 'Application error'),
+          React.createElement('h1', null, 'Something went wrong while loading KINGSHALL EXCHANGE.'),
+          React.createElement(
+            'p',
+            { className: 'runtime-error-text' },
+            'The app hit a render issue. Here is the error message so you can debug it directly from the page.',
+          ),
+          React.createElement('pre', { className: 'runtime-error-box' }, this.state.error),
+          React.createElement('div', { className: 'debug-footer' }, React.createElement('span', null, `Build ${buildInfo.version}`)),
+        ),
       )
     }
 
@@ -121,14 +122,10 @@ window.addEventListener('unhandledrejection', (event) => {
 })
 
 createRoot(rootElement).render(
-  createElement(
-    StrictMode,
-    null,
-    createElement(
-      ErrorBoundary,
-      null,
-      createElement(App, null),
-      createElement(DebugFooter, null),
-    ),
-  ),
+  <StrictMode>
+    <ErrorBoundary>
+      <App />
+      <DebugFooter />
+    </ErrorBoundary>
+  </StrictMode>,
 )
