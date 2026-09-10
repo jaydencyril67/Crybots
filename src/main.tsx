@@ -1,4 +1,4 @@
-import { Component, StrictMode, createElement, type ReactNode, useEffect, useState } from 'react'
+import { Component, StrictMode, type ReactNode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import './index.css'
@@ -68,12 +68,12 @@ function DebugFooter() {
     }
   }, [])
 
-  return createElement(
-    'div',
-    { className: 'debug-footer debug-footer--mounted' },
-    createElement('span', null, `Build ${buildInfo.version}`),
-    createElement('span', null, mounted ? 'Mounted' : 'Loading'),
-    createElement('span', null, shouldEnableEruda ? 'Debug on' : 'Debug off'),
+  return (
+    <div className="debug-footer debug-footer--mounted">
+      <span>Build {buildInfo.version}</span>
+      <span>{mounted ? 'Mounted' : 'Loading'}</span>
+      <span>{shouldEnableEruda ? 'Debug on' : 'Debug off'}</span>
+    </div>
   )
 }
 
