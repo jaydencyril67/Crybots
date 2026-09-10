@@ -1,4 +1,4 @@
-import { Component, StrictMode, type ReactNode, useEffect, useState } from 'react'
+import { Component, StrictMode, createElement, type ReactNode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
@@ -84,21 +84,21 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
 
   render() {
     if (this.state.error) {
-      return React.createElement(
+      return createElement(
         'main',
         { className: 'runtime-error-shell' },
-        React.createElement(
+        createElement(
           'section',
           { className: 'runtime-error-card' },
-          React.createElement('p', { className: 'runtime-error-eyebrow' }, 'Application error'),
-          React.createElement('h1', null, 'Something went wrong while loading KINGSHALL EXCHANGE.'),
-          React.createElement(
+          createElement('p', { className: 'runtime-error-eyebrow' }, 'Application error'),
+          createElement('h1', null, 'Something went wrong while loading KINGSHALL EXCHANGE.'),
+          createElement(
             'p',
             { className: 'runtime-error-text' },
             'The app hit a render issue. Here is the error message so you can debug it directly from the page.',
           ),
-          React.createElement('pre', { className: 'runtime-error-box' }, this.state.error),
-          React.createElement('div', { className: 'debug-footer' }, React.createElement('span', null, `Build ${buildInfo.version}`)),
+          createElement('pre', { className: 'runtime-error-box' }, this.state.error),
+          createElement('div', { className: 'debug-footer' }, createElement('span', null, `Build ${buildInfo.version}`)),
         ),
       )
     }
