@@ -1,12 +1,12 @@
 # React + TypeScript
 
-This project provides a minimal React app built with TypeScript and ESLint.
+This project is a plain React + TypeScript app with a lightweight Bun-powered dev server and no Vite dependency.
 
-The app is intentionally lightweight and does not depend on a Vite-specific runtime or plugin setup.
+## Scripts
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `bun run dev` — start the local server on `http://localhost:3000`
+- `bun run build` — type-check the app
+- `bun run lint` — run ESLint
 
 ## Expanding the ESLint configuration
 
