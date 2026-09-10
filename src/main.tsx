@@ -175,9 +175,9 @@ window.addEventListener('unhandledrejection', (event) => {
   })
 })
 
-function renderApp() {
+function renderApp(root: HTMLElement) {
   try {
-    createRoot(rootElement).render(
+    createRoot(root).render(
       <StrictMode>
         <ErrorBoundary>
           <App />
@@ -191,4 +191,4 @@ function renderApp() {
   }
 }
 
-renderApp()
+renderApp(rootElement)
