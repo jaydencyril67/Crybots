@@ -12,6 +12,50 @@ declare global {
   }
 }
 
+function stringifyError(error: unknown) {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause,
+    }
+  }
+
+  if (typeof error === 'object' && error !== null) {
+    try {
+      return JSON.parse(JSON.stringify(error))
+    } catch {
+      return String(error)
+    }
+  }
+
+  return String(error)
+}
+
+function logError(scope: string, error: unknown, details: Record<string, unknown> = {}) {
+  const payload = {
+    scope,
+    error: stringifyError(error),
+    details,
+    href: window.location.href,
+    userAgent: window.navigator.userAgent,
+    build: buildInfo.version,
+    timestamp: new Date().toISOString(),
+  }
+
+  console.error(`KINGSHALL EXCHANGE ${scope}:`, payload)
+}
+
+function logDomErrorEvent(scope: string, event: ErrorEvent) {
+  logError(scope, event.error ?? event.message, {
+    filename: event.filename,
+    lineno: event.lineno,
+    colno: event.colno,
+    defaultPrevented: event.defaultPrevented,
+  })
+}
+
 const buildInfo = {
   version: '2026.09.09',
 }
@@ -81,15 +125,12 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
   state = { error: null }
 
   static getDerivedStateFromError(error: Error) {
+    logError('getDerivedStateFromError', error)
     return { error: error.message }
   }
 
   componentDidCatch(error: Error, errorInfo: { componentStack: string }) {
-    console.error('KINGSHALL EXCHANGE render error:', {
-      error,
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
+    logError('render error', error, {
       componentStack: errorInfo.componentStack,
     })
   }
@@ -124,30 +165,30 @@ if (!rootElement) {
 }
 
 window.addEventListener('error', (event) => {
-  console.error('KINGSHALL EXCHANGE runtime error:', {
-    error: event.error,
-    message: event.message,
-    filename: event.filename,
-    lineno: event.lineno,
-    colno: event.colno,
-    stack: event.error instanceof Error ? event.error.stack : undefined,
-  })
+  logDomErrorEvent('runtime error', event)
 })
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('KINGSHALL EXCHANGE unhandled rejection:', {
-    reason: event.reason,
-    name: event.reason instanceof Error ? event.reason.name : undefined,
-    message: event.reason instanceof Error ? event.reason.message : String(event.reason),
-    stack: event.reason instanceof Error ? event.reason.stack : undefined,
+  logError('unhandled rejection', event.reason, {
+    promise: event.promise,
+    defaultPrevented: event.defaultPrevented,
   })
 })
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <App />
-      <DebugFooter />
-    </ErrorBoundary>
-  </StrictMode>,
-)
+function renderApp() {
+  try {
+    createRoot(rootElement).render(
+      <StrictMode>
+        <ErrorBoundary>
+          <App />
+          <DebugFooter />
+        </ErrorBoundary>
+      </StrictMode>,
+    )
+  } catch (error) {
+    logError('bootstrap render failure', error)
+    throw error
+  }
+}
+
+renderApp()
