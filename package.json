@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "node server.ts",
-    "build": "tsc -b",
+    "build": "tsc -b && esbuild src/main.tsx --bundle --format=esm --platform=browser --outfile=dist/bundle.js",
     "lint": "eslint .",
     "serve": "node server.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "esbuild": "^0.25.12"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
