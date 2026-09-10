@@ -2,7 +2,6 @@ import { spawnSync } from 'node:child_process'
 
 const steps = [
   { name: 'TypeScript check', command: 'npx', args: ['tsc', '-b'] },
-  { name: 'Vite build', command: 'npm', args: ['run', 'build:vite'] },
 ]
 
 for (const step of steps) {
