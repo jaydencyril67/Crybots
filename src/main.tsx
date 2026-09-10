@@ -1,4 +1,4 @@
-import { Component, StrictMode, type ReactNode, useEffect, useState } from 'react'
+import { Component, StrictMode, createElement, type ReactNode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
@@ -121,10 +121,14 @@ window.addEventListener('unhandledrejection', (event) => {
 })
 
 createRoot(rootElement).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <App />
-      <DebugFooter />
-    </ErrorBoundary>
-  </StrictMode>,
+  createElement(
+    StrictMode,
+    null,
+    createElement(
+      ErrorBoundary,
+      null,
+      createElement(App, null),
+      createElement(DebugFooter, null),
+    ),
+  ),
 )
