@@ -242,16 +242,35 @@ const NotificationPreferences: React.FC = () => {
           </div>
         )}
 
-        {/* Tab Filter */}
-        <TabFilter
-          tabs={[
-            { id: 'email', label: '📧 Email' },
-            { id: 'push', label: '🔔 Push' },
-            { id: 'inApp', label: '💬 In-App' }
-          ]}
-          activeTab={activeTab}
-          onTabChange={(tabId) => setActiveTab(tabId as typeof activeTab)}
-        />
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          flexWrap: 'wrap',
+          marginBottom: '20px'
+        }}>
+          {[
+            { id: 'email' as const, label: '📧 Email' },
+            { id: 'push' as const, label: '🔔 Push' },
+            { id: 'inApp' as const, label: '💬 In-App' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '10px 16px',
+                borderRadius: '999px',
+                border: activeTab === tab.id ? '1px solid var(--primary)' : '1px solid var(--border)',
+                background: activeTab === tab.id ? 'var(--primary)' : 'var(--card-bg)',
+                color: activeTab === tab.id ? '#fff' : 'var(--text)',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
         {/* Tab Content */}
         {activeTab === 'email' && (
