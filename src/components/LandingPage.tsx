@@ -48,7 +48,7 @@ const styles = {
     position: 'relative' as const,
     maxWidth: '1200px',
     margin: '0 auto',
-    padding: '32px 24px 40px',
+    padding: 'clamp(20px, 3vw, 32px) clamp(16px, 2.5vw, 24px) 40px',
   },
   glow: {
     position: 'absolute' as const,
@@ -77,6 +77,11 @@ const styles = {
     WebkitBackdropFilter: 'blur(20px)',
     position: 'relative' as const,
     zIndex: 1,
+    flexWrap: 'wrap' as const,
+  },
+  brandBlock: {
+    minWidth: 0,
+    flex: '1 1 220px',
   },
   brandKicker: {
     fontSize: '12px',
@@ -99,6 +104,7 @@ const styles = {
     fontWeight: 700,
     cursor: 'pointer',
     boxShadow: '0 12px 40px rgba(255,255,255,0.08)',
+    width: 'fit-content',
   },
   buttonSecondary: {
     border: '1px solid rgba(255,255,255,0.14)',
@@ -108,13 +114,14 @@ const styles = {
     padding: '12px 20px',
     fontWeight: 700,
     cursor: 'pointer',
+    width: 'fit-content',
   },
   heroGrid: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 0.9fr)',
-    gap: '56px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+    gap: 'clamp(28px, 5vw, 56px)',
     alignItems: 'center',
-    padding: '72px 0 56px',
+    padding: 'clamp(44px, 6vw, 72px) 0 clamp(36px, 5vw, 56px)',
     position: 'relative' as const,
     zIndex: 1,
   },
@@ -129,13 +136,15 @@ const styles = {
     padding: '10px 16px',
     fontSize: '14px',
     marginBottom: '24px',
+    maxWidth: '100%',
   },
   heading: {
-    fontSize: 'clamp(3rem, 6vw, 5rem)',
+    fontSize: 'clamp(2.6rem, 6vw, 5rem)',
     lineHeight: 1.02,
     margin: 0,
     fontWeight: 700,
     letterSpacing: '-0.04em',
+    wordBreak: 'break-word' as const,
   },
   gradientText: {
     display: 'block',
@@ -147,7 +156,7 @@ const styles = {
   lead: {
     marginTop: '24px',
     maxWidth: '680px',
-    fontSize: '18px',
+    fontSize: 'clamp(16px, 2vw, 18px)',
     lineHeight: 1.8,
     color: 'rgba(255,255,255,0.72)',
   },
@@ -159,7 +168,7 @@ const styles = {
   },
   statsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
     gap: '16px',
     marginTop: '48px',
   },
@@ -170,11 +179,13 @@ const styles = {
     padding: '20px',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
+    minWidth: 0,
   },
   statValue: {
-    fontSize: '28px',
+    fontSize: 'clamp(22px, 3vw, 28px)',
     fontWeight: 700,
     margin: 0,
+    wordBreak: 'break-word' as const,
   },
   statLabel: {
     margin: '10px 0 0',
@@ -212,6 +223,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: '16px',
+    flexWrap: 'wrap' as const,
   },
   smallText: {
     margin: 0,
@@ -220,8 +232,9 @@ const styles = {
   },
   bigText: {
     margin: '6px 0 0',
-    fontSize: 'clamp(2rem, 3vw, 2.6rem)',
+    fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
     fontWeight: 700,
+    wordBreak: 'break-word' as const,
   },
   badge: {
     borderRadius: '999px',
@@ -234,7 +247,7 @@ const styles = {
   },
   cardGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
     gap: '16px',
     marginTop: '24px',
   },
@@ -243,6 +256,7 @@ const styles = {
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.05)',
     padding: '18px',
+    minWidth: 0,
   },
   miniLabel: {
     margin: 0,
@@ -270,13 +284,15 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: '12px',
     borderRadius: '18px',
     background: 'rgba(255,255,255,0.05)',
     padding: '14px 16px',
+    flexWrap: 'wrap' as const,
   },
   sectionGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '16px',
     position: 'relative' as const,
     zIndex: 1,
@@ -289,6 +305,7 @@ const styles = {
     padding: '24px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
+    minWidth: 0,
   },
   featureTitle: {
     margin: '18px 0 0',
@@ -314,7 +331,7 @@ const styles = {
   },
   howGrid: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '32px',
     alignItems: 'start',
   },
@@ -335,6 +352,8 @@ const styles = {
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(10,16,32,0.72)',
     padding: '18px',
+    minWidth: 0,
+    flexWrap: 'wrap' as const,
   },
   stepNum: {
     width: '42px',
@@ -359,11 +378,13 @@ const styles = {
     color: '#67e8f9',
     width: '24px',
     height: '24px',
+    flexShrink: 0,
   },
   checkIcon: {
     color: '#67e8f9',
     width: '26px',
     height: '26px',
+    flexShrink: 0,
   },
 };
 
@@ -384,7 +405,7 @@ const LandingPage = () => (
 
         <div style={styles.shell}>
           <header style={styles.header}>
-            <div>
+            <div style={styles.brandBlock}>
               <p style={styles.brandKicker}>KingsHall Exchange</p>
               <p style={styles.brandSub}>Crypto exchange & investment platform</p>
             </div>
