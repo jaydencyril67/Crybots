@@ -29,7 +29,6 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-redux": "^7.2.5",
-    "react-router-dom": "^6.30.1",
     "react-scripts": "^5.0.1",
     "recharts": "^2.15.4",
     "redux": "^4.1.0",
@@ -44,7 +43,6 @@
     "@types/qrcode.react": "^1.0.5",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.18",
-    "@types/react-router-dom": "^5.3.3",
     "@types/socket.io": "^3.0.1",
     "@types/socket.io-client": "^3.0.0",
     "typescript": "^4.9.5"
