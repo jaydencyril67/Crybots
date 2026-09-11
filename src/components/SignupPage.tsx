@@ -462,7 +462,7 @@ const SignupPage = () => {
                   <div style={styles.progressBar}>
                     <div style={{ ...styles.progressFill, width: `${progress}%` }} />
                   </div>
-                  <div style={styles.badge}>
+                  <div>
                     Step {stepIndex + 1} of {steps.length}
                   </div>
                 </div>
