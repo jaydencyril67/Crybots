@@ -181,7 +181,7 @@ const styles = {
     color: '#ffffff',
     fontWeight: 700,
     textAlign: 'right' as const,
-    overflowWrap: 'anywhere',
+    overflowWrap: 'anywhere' as const,
   },
   panel: {
     borderRadius: '32px',
