@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ArrowRight, CheckCircle2, CircleUser, CreditCard, Lock, Mail, Shield } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, CircleUser, CreditCard, Lock, Mail } from 'lucide-react';
 
 const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
@@ -433,10 +433,6 @@ const SignupPage = () => {
 
             <div style={styles.grid}>
               <article style={styles.heroCard}>
-                <div style={styles.badge}>
-                  <Shield style={styles.icon} />
-                  KingsHall onboarding
-                </div>
                 <h1 style={styles.title}>
                   Join the platform.
                   <span style={styles.titleAccent}>One step at a time.</span>
