@@ -351,15 +351,34 @@ const Transfer: React.FC = () => {
                     </div>
                 )}
 
-                {/* Tab Navigation */}
-                <TabFilter
-                    tabs={[
-                        { id: 'transfer', label: '💸 Transfer' },
-                        { id: 'convert', label: '🔄 Convert' }
-                    ]}
-                    activeTab={activeTab}
-                    onTabChange={(tabId) => setActiveTab(tabId as 'transfer' | 'convert')}
-                />
+                <div style={{
+                    display: 'flex',
+                    gap: '8px',
+                    flexWrap: 'wrap',
+                    marginBottom: '12px'
+                }}>
+                    {[
+                        { id: 'transfer' as const, label: '💸 Transfer' },
+                        { id: 'convert' as const, label: '🔄 Convert' }
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setActiveTab(tab.id)}
+                            style={{
+                                padding: '10px 16px',
+                                borderRadius: '999px',
+                                border: activeTab === tab.id ? '1px solid var(--primary)' : '1px solid var(--border)',
+                                background: activeTab === tab.id ? 'var(--primary)' : 'var(--card-bg)',
+                                color: activeTab === tab.id ? '#fff' : 'var(--text)',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                            }}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
 
                 <div style={{
                     marginTop: '12px'
