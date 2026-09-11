@@ -1,121 +1,111 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
+const marketStats = [
+  {
+    label: 'Portfolio value',
+    value: '$128,540',
+    change: '+18.4% this month',
+  },
+  {
+    label: 'Assets tracked',
+    value: '24',
+    change: 'Across spot and staking',
+  },
+  {
+    label: 'Monitoring',
+    value: '24/7',
+    change: 'Alerts for moves and risk',
+  },
+]
+
+const watchlist = [
+  { symbol: 'BTC', name: 'Bitcoin', price: '$68,420', change: '+4.8%' },
+  { symbol: 'ETH', name: 'Ethereum', price: '$3,740', change: '+3.2%' },
+  { symbol: 'SOL', name: 'Solana', price: '$182', change: '+6.1%' },
+]
+
+const features = [
+  'Smart diversification across leading digital assets',
+  'Real-time risk signals and portfolio alerts',
+  'Simple recurring investments and auto rebalancing',
+]
+
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <main className="app-shell">
+      <section className="hero">
+        <div className="hero-copy">
+          <p className="eyebrow">Kingshall Exchange</p>
+          <h1>Build wealth with a modern crypto portfolio.</h1>
+          <p className="hero-text">
+            Track assets, monitor market shifts, and invest with clarity from a
+            single streamlined dashboard.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+          <div className="hero-actions">
+            <a className="primary-action" href="#watchlist">
+              Start investing
+            </a>
+            <a className="secondary-action" href="#features">
+              Explore features
+            </a>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
+          <ul className="stats-grid" aria-label="Portfolio highlights">
+            {marketStats.map((stat) => (
+              <li key={stat.label} className="stat-card">
+                <span>{stat.label}</span>
+                <strong>{stat.value}</strong>
+                <small>{stat.change}</small>
+              </li>
+            ))}
           </ul>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+
+        <div className="hero-panel">
+          <div className="panel-header">
+            <span>Live portfolio</span>
+            <span className="status-pill">Monitoring active</span>
+          </div>
+
+          <div className="portfolio-summary">
+            <p>Net gain today</p>
+            <strong>+$4,210.88</strong>
+            <span>+3.86% since market open</span>
+          </div>
+
+          <div className="panel-section" id="watchlist">
+            <h2>Watchlist</h2>
+            <ul className="watchlist">
+              {watchlist.map((asset) => (
+                <li key={asset.symbol} className="watchlist-item">
+                  <div>
+                    <strong>{asset.symbol}</strong>
+                    <span>{asset.name}</span>
+                  </div>
+                  <div>
+                    <strong>{asset.price}</strong>
+                    <span className="positive">{asset.change}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <section className="features" id="features">
+        <div>
+          <p className="eyebrow">Why traders choose us</p>
+          <h2>Everything you need to manage a crypto strategy.</h2>
+        </div>
+        <ul className="feature-list">
+          {features.map((feature) => (
+            <li key={feature}>{feature}</li>
+          ))}
+        </ul>
+      </section>
+    </main>
   )
 }
 
