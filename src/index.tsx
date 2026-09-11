@@ -1,9 +1,6 @@
 import React from 'react';
-import './theme.css';
 import ReactDOM from 'react-dom/client';
-import { ThemeProvider } from './ThemeContext';
 import { HelmetProvider } from 'react-helmet-async';
-import { NetworkStatusProvider } from './NetworkStatusProvider';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root container missing in index.html');
@@ -35,10 +32,6 @@ const AppLoader = () => {
 root.render(
   <React.StrictMode>
     <AppLoader />
-    <NetworkStatusProvider>
-      <ThemeProvider>
-        <HelmetProvider />
-      </ThemeProvider>
-    </NetworkStatusProvider>
+    <HelmetProvider />
   </React.StrictMode>
 );
