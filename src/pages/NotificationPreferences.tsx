@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../ThemeContext';
-import TabFilter from '../components/TabFilter';
 import pushNotificationManager, { NotificationPreferences as NotificationPreferencesType } from '../services/pushNotificationManager';
 
 const NotificationPreferences: React.FC = () => {

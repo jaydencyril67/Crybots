@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../ThemeContext';
 import { transferUSDT, convertCurrency } from '../services/api';
 import { useExchangeRates } from '../hooks/usePrices';
-import TabFilter from '../components/TabFilter';
 
 interface TransferHistory {
     transfers: Array<{
