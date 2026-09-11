@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ArrowRight, CheckCircle2, CircleUser, CreditCard, Lock, Mail, Shield, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, CircleUser, CreditCard, Lock, Mail, Shield } from 'lucide-react';
 
 const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
@@ -77,18 +77,6 @@ const styles = {
     margin: '6px 0 0',
     fontSize: 'clamp(13px, 1.5vw, 15px)',
     color: 'rgba(255,255,255,0.62)',
-  },
-  badge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    borderRadius: '999px',
-    border: '1px solid rgba(34,211,238,0.18)',
-    background: 'rgba(34,211,238,0.1)',
-    padding: '10px 14px',
-    color: '#cffafe',
-    fontSize: '14px',
-    fontWeight: 600,
   },
   backButton: {
     border: '1px solid rgba(255,255,255,0.12)',
@@ -440,10 +428,6 @@ const SignupPage = () => {
               <div style={styles.brandBlock}>
                 <p style={styles.brandKicker}>KingsHall Exchange</p>
                 <p style={styles.brandSub}>Secure signup experience, no auth wired yet.</p>
-              </div>
-              <div style={styles.badge}>
-                <Sparkles style={styles.icon} />
-                Progressive signup
               </div>
             </header>
 
