@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ArrowRight, CheckCircle2, CircleUser, CreditCard, Lock, Mail } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
 
 const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
@@ -100,18 +100,18 @@ const styles = {
     zIndex: 1,
   },
   heroCard: {
-    borderRadius: '32px',
+    borderRadius: '24px',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.05)',
-    padding: 'clamp(22px, 4vw, 32px)',
+    padding: '18px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
   },
   title: {
-    margin: '18px 0 0',
-    fontSize: 'clamp(2.2rem, 4vw, 3.8rem)',
-    lineHeight: 1.02,
-    letterSpacing: '-0.04em',
+    margin: '12px 0 0',
+    fontSize: 'clamp(1.6rem, 2.8vw, 2.4rem)',
+    lineHeight: 1.08,
+    letterSpacing: '-0.03em',
   },
   titleAccent: {
     display: 'block',
@@ -121,37 +121,17 @@ const styles = {
     color: 'transparent',
   },
   lead: {
-    margin: '18px 0 0',
-    fontSize: 'clamp(15px, 2vw, 18px)',
-    lineHeight: 1.8,
-    color: 'rgba(255,255,255,0.72)',
-  },
-  featureList: {
-    display: 'grid',
-    gap: '14px',
-    marginTop: '28px',
-  },
-  featureItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '14px',
-    borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(10,16,32,0.72)',
-    padding: '16px 18px',
-  },
-  featureText: {
-    margin: 0,
-    color: 'rgba(255,255,255,0.8)',
+    margin: '10px 0 0',
     fontSize: '14px',
     lineHeight: 1.6,
+    color: 'rgba(255,255,255,0.68)',
   },
   summaryBox: {
     display: 'grid',
-    gap: '10px',
-    marginTop: '20px',
-    padding: '16px',
-    borderRadius: '20px',
+    gap: '8px',
+    marginTop: '16px',
+    padding: '12px',
+    borderRadius: '16px',
     border: '1px solid rgba(255,255,255,0.1)',
     background: 'rgba(255,255,255,0.04)',
   },
@@ -162,14 +142,15 @@ const styles = {
     alignItems: 'center',
   },
   summaryKey: {
-    color: 'rgba(255,255,255,0.62)',
-    fontSize: '13px',
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: '12px',
   },
   summaryValue: {
     color: '#ffffff',
     fontWeight: 700,
     textAlign: 'right' as const,
     overflowWrap: 'anywhere' as const,
+    fontSize: '12px',
   },
   panel: {
     borderRadius: '32px',
@@ -434,27 +415,10 @@ const SignupPage = () => {
             <div style={styles.grid}>
               <article style={styles.heroCard}>
                 <h1 style={styles.title}>
-                  Join the platform.
-                  <span style={styles.titleAccent}>One step at a time.</span>
+                  Quick signup.
+                  <span style={styles.titleAccent}>Simple start.</span>
                 </h1>
-                <p style={styles.lead}>
-                  Complete your profile in a guided flow. We will not authenticate anything yet — this is just the signup page structure.
-                </p>
-
-                <div style={styles.featureList}>
-                  <div style={styles.featureItem}>
-                    <CircleUser style={styles.iconLarge} />
-                    <p style={styles.featureText}>Simple fields arranged in a smooth progression.</p>
-                  </div>
-                  <div style={styles.featureItem}>
-                    <Mail style={styles.iconLarge} />
-                    <p style={styles.featureText}>Email and password are saved only in local page state for now.</p>
-                  </div>
-                  <div style={styles.featureItem}>
-                    <CreditCard style={styles.iconLarge} />
-                    <p style={styles.featureText}>Designed to be easy to connect to backend auth later.</p>
-                  </div>
-                </div>
+                <p style={styles.lead}>Just a short guided flow.</p>
               </article>
 
               <article style={styles.panel}>
