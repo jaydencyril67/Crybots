@@ -449,11 +449,13 @@ const LandingPage = () => (
               <div style={styles.buttonRow}>
                 <a href="/signup" style={styles.buttonLink}>
                   <div style={styles.buttonPrimary}>
-                    Sign up / Get started
+                    Get started
                     <ArrowRight size={18} />
                   </div>
                 </a>
-                <button style={styles.buttonSecondary}>Explore the platform</button>
+                <a href="/signin" style={styles.buttonLink}>
+                  <div style={styles.buttonSecondary}>Sign in</div>
+                </a>
               </div>
 
               <div style={styles.statsGrid}>
