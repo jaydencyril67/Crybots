@@ -84,15 +84,16 @@ const styles = {
     flex: '1 1 220px',
   },
   brandKicker: {
-    fontSize: '12px',
+    fontSize: 'clamp(14px, 1.6vw, 16px)',
     textTransform: 'uppercase' as const,
-    letterSpacing: '0.35em',
+    letterSpacing: '0.22em',
     color: '#67e8f9',
     margin: 0,
+    fontWeight: 800,
   },
   brandSub: {
     margin: '6px 0 0',
-    fontSize: '14px',
+    fontSize: 'clamp(13px, 1.5vw, 15px)',
     color: 'rgba(255,255,255,0.62)',
   },
   buttonPrimary: {
@@ -409,7 +410,7 @@ const LandingPage = () => (
               <p style={styles.brandKicker}>KingsHall Exchange</p>
               <p style={styles.brandSub}>Crypto exchange & investment platform</p>
             </div>
-            <button style={styles.buttonPrimary}>Get Started</button>
+
           </header>
 
           <div style={styles.heroGrid}>
