@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
 
 const API = process.env.REACT_APP_API_BASE_URL;
 
@@ -148,7 +147,6 @@ const ResetPassword: React.FC = () => {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'
     }}>
       {/* Header */}
-      <Header />
 
       {/* Main Content */}
       <div style={{

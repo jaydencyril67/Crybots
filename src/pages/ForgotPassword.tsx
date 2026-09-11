@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTheme } from '../ThemeContext';
-import Header from '../components/Header';
 import '../theme.css';
 
 const API = process.env.REACT_APP_API_BASE_URL;
@@ -48,7 +47,6 @@ const ForgotPassword: React.FC = () => {
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'
     }}>
       {/* Header */}
-      <Header />
 
       {/* Main Content */}
       <div style={{
