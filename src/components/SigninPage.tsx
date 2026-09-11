@@ -83,7 +83,7 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    cursor: 'pointer',
+    cursor: 'default',
     flexShrink: 0,
   },
   grid: {
@@ -236,7 +236,7 @@ const styles = {
   buttonPrimary: {
     background: '#ffffff',
     color: '#050816',
-    boxShadow: '0 12px 40px rgba(255,255,255,0.08)',
+    boxShadow: 'none',
   },
   footerNote: {
     margin: '18px 0 0',
