@@ -489,7 +489,7 @@ const SignupPage = () => {
                         cursor: canContinue ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      Next <ArrowRight style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
+                      Next
                     </button>
                   ) : (
                     <button

@@ -173,6 +173,12 @@ const styles = {
     marginTop: '40px',
     alignItems: 'center',
   },
+  buttonGroup: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '12px',
+    alignItems: 'center',
+  },
   buttonLink: {
     textDecoration: 'none',
   },
