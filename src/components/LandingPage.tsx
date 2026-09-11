@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { ArrowRight, CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 
 const stats = [
   { value: '$2.4B+', label: '24h trading volume' },
@@ -99,13 +99,17 @@ const styles = {
   buttonPrimary: {
     border: 'none',
     borderRadius: '999px',
-    background: '#ffffff',
+    background: 'linear-gradient(135deg, #67e8f9 0%, #c4b5fd 100%)',
     color: '#050816',
     padding: '12px 20px',
-    fontWeight: 700,
+    fontWeight: 800,
     cursor: 'pointer',
-    boxShadow: '0 12px 40px rgba(255,255,255,0.08)',
+    boxShadow: '0 16px 40px rgba(103,232,249,0.18)',
     width: 'fit-content',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '10px',
+    textDecoration: 'none',
   },
   buttonSecondary: {
     border: '1px solid rgba(255,255,255,0.14)',
@@ -116,6 +120,7 @@ const styles = {
     fontWeight: 700,
     cursor: 'pointer',
     width: 'fit-content',
+    textDecoration: 'none',
   },
   heroGrid: {
     display: 'grid',
@@ -166,6 +171,10 @@ const styles = {
     flexWrap: 'wrap' as const,
     gap: '16px',
     marginTop: '40px',
+    alignItems: 'center',
+  },
+  buttonLink: {
+    textDecoration: 'none',
   },
   statsGrid: {
     display: 'grid',
@@ -212,6 +221,12 @@ const styles = {
     boxShadow: '0 25px 80px rgba(34, 211, 238, 0.08)',
     backdropFilter: 'blur(24px)',
     WebkitBackdropFilter: 'blur(24px)',
+  },
+  signupPreviewWrap: {
+    marginTop: '24px',
+    overflow: 'hidden',
+    borderRadius: '24px',
+    border: '1px solid rgba(255,255,255,0.08)',
   },
   panelInner: {
     borderRadius: '24px',
@@ -429,7 +444,12 @@ const LandingPage = () => (
               </p>
 
               <div style={styles.buttonRow}>
-                <button style={styles.buttonPrimary}>Start trading</button>
+                <a href="/signup" style={styles.buttonLink}>
+                  <div style={styles.buttonPrimary}>
+                    Sign up / Get started
+                    <ArrowRight size={18} />
+                  </div>
+                </a>
                 <button style={styles.buttonSecondary}>Explore the platform</button>
               </div>
 
@@ -443,7 +463,7 @@ const LandingPage = () => (
               </div>
             </div>
 
-            <div style={styles.panelWrap}>
+            <div id="signup" style={styles.panelWrap}>
               <div style={styles.panelGlow} />
               <div style={styles.panel}>
                 <div style={styles.panelInner}>
