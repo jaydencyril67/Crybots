@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+
+    <!-- Set theme before React loads to prevent flicker -->
+    <script>
+      document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+    </script>
+
+    <!-- 🔥 SEO & Branding Meta -->
+    <title>TradeSpot | Secure Crypto Investing Platform</title>
+    <meta name="description" content="TradeSpot is a modern crypto investment platform built for fast, safe, and smart crypto investment. Join a trusted community of investors.">
+    <meta name="keywords" content="TradeSpot, crypto, crypto investment, bitcoin, ethereum, secure trading, passive income, blockchain platform">
+    <meta name="author" content="TradeSpot Inc.">
+    <meta name="robots" content="index, follow" />
+
+    <!-- 📱 Social Sharing (OG Tags) -->
+    <meta property="og:title" content="TradeSpot Global Application" />
+    <meta property="og:description" content="Invest smarter with TradeSpot. Verified crypto platform with fast deposits, withdrawals, and AI support." />
+    <meta property="og:image" content="%PUBLIC_URL%/tradespot.jpeg" />
+    <meta property="og:url" content="https://www.tradespot.online" />
+    <meta property="og:type" content="website" />
+
+    <!-- 🐦 Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TradeSpot Global Application" />
+    <meta name="twitter:description" content="Invest smarter with TradeSpot. Trusted crypto platform with AI, security, and fast withdrawals." />
+    <meta name="twitter:image" content="%PUBLIC_URL%/tradespot.jpeg" />
+
+    <!-- ✅ JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "TradeSpot",
+      "url": "https://www.tradespot.online",
+      "logo": "https://www.tradespot.online/tradespot.jpeg",
+      "sameAs": [
+        "https://twitter.com/yourTwitterHandle",
+        "https://www.instagram.com/yourInstagramHandle",
+        "https://www.linkedin.com/company/yourLinkedInHandle"
+      ]
+    }
+    </script>
+
+    <!-- 👋 Favicon -->
+    <link rel="icon" href="%PUBLIC_URL%/tradespot.jpeg" />
+
+    <!-- TrustBox script -->
+    <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+    <!-- End TrustBox script -->
+
+    <!-- Loading Screen Styles -->
+    <style>
+      #tradespot-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.3s ease-out;
+      }
+
+      #tradespot-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #tradespot-loader img {
+        width: 70px;
+        height: 70px;
+        border-radius: 20%;
+        object-fit: cover;
+        animation: fadeIn 0.5s ease-in;
+        margin-bottom: 12px;
+      }
+
+      #tradespot-loader .powered-by {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 4px;
+        animation: fadeIn 0.5s ease-in 0.2s;
+        animation-fill-mode: both;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <!-- Loading Screen -->
+    <div id="tradespot-loader">
+      <img src="%PUBLIC_URL%/tradespot.jpeg" alt="TradeSpot" />
+      <div class="powered-by">Powered by S.P.O.T</div>
+    </div>
+    <div id="root"></div>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+/* Trading Page - Flat Design with Theme Variables */
+
+/* Remove all hardcoded colors and use theme variables */
+.trading-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
+.trading-ticker-bar {
+  background: var(--card-bg);
+  padding: 8px 16px;
+}
+
+.trading-pair-header {
+  background: var(--card-bg);
+  padding: 16px;
+}
+
+.trading-main-grid {
+  background: var(--bg);
+}
+
+.trading-chart-area,
+.trading-orderbook-area {
+  background: var(--card-bg);
+}
+
+.trading-tab-active {
+  color: var(--text);
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.trading-tab-inactive {
+  color: var(--text-secondary);
+}
+
+.trading-text-secondary {
+  color: var(--text-secondary);
+}
+
+.trading-bg-secondary {
+  background: var(--bg-secondary);
+}
+
+.trading-input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text);
+}
+
+/* Remove all shadows and borders for flat design */
+.no-shadow {
+  box-shadow: none !important;
+}
+
+.no-border {
+  border: none !important;
+}
+
+/* Mobile Responsive Base Styles */
+@media (max-width: 768px) {
+  .trading-page {
+    font-size: 14px;
+  }
+  
+  .trading-ticker-bar {
+    padding: 8px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .trading-ticker-bar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .trading-pair-header {
+    padding: 12px 16px;
+  }
+  
+  .trading-main-grid {
+    overflow: hidden;
+  }
+  
+  /* Ensure inputs don't cause zoom on iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Better touch targets */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

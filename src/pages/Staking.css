@@ -1,0 +1,947 @@
+/* Staking Dashboard - Matching App Design System */
+
+.staking-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px;
+  background: var(--bg);
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.staking-header {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--text);
+  padding: 0 8px;
+}
+
+.staking-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  text-shadow: none;
+  line-height: 1.2;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.staking-header p {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin: 0;
+  color: var(--text);
+}
+.staking-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 3px;
+  box-shadow: var(--card-shadow);
+  border: none;
+  gap: 1px;
+}
+
+.staking-tabs button {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: none;
+  min-height: 28px;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+}
+
+/* Notice card at top of packages - center on desktop, softer on mobile */
+.staking-notice {
+  display: block;
+  max-width: 720px;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: var(--text);
+  margin: 8px auto 12px auto; /* small top margin and bottom spacing */
+  text-align: center; /* center notice on desktop */
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-sizing: border-box;
+  background: var(--card-bg);
+  border: none;
+  box-shadow: var(--card-shadow);
+}
+
+.staking-tabs button.active {
+  background: var(--primary);
+  color: var(--button-text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Staking Sections */
+.staking-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Packages Grid (Card Layout) - Always Horizontal Scrollable */
+.staking-packages-grid {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.staking-packages-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.staking-packages-grid::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+.staking-package-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 240px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+
+.package-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--secondary);
+}
+
+.package-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.package-currency {
+  background: var(--secondary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.package-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.package-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.detail-value.highlight {
+  font-size: 1rem;
+}
+
+/* Remove any other text color: var(--primary); to use the default text color */
+.type-badge.liquid, .type-badge.fixed, .risk-badge, .section-title, .package-currency, .detail-value {
+  color: var(--text);
+}
+
+.stake-button {
+  background: var(--primary);
+  color: var(--button-text);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 36px;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+
+/* Type badge styles (for future use if needed) */
+.type-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.type-badge.liquid {
+  background: #10B981;
+  color: white;
+}
+
+.type-badge.fixed {
+  background: #3B82F6;
+  color: white;
+}
+
+.risk-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  display: inline-block;
+}
+
+/* Contracts Grid (Card Layout) - Always Horizontal Scrollable */
+.staking-contracts-grid {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.staking-contracts-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.staking-contracts-grid::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+.staking-contract-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+
+.contract-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--secondary);
+}
+
+.contract-card-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+
+.contract-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contract-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contract-currency {
+  background: var(--secondary);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-badge.active {
+  background: #10B981;
+  color: white;
+}
+
+.status-badge.completed {
+  background: #3B82F6;
+  color: white;
+}
+
+.status-badge.cancelled {
+  background: #EF4444;
+  color: white;
+}
+
+.status-badge.withdrawn {
+  background: #6B7280;
+  color: white;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 80px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--secondary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.contract-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 100px;
+}
+
+.withdraw-button, .cancel-button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: none;
+  font-size: 0.75rem;
+  min-height: 28px;
+  white-space: nowrap;
+}
+
+.withdraw-button {
+  background: #10B981;
+  color: white;
+}
+
+.cancel-button {
+  background: #EF4444;
+  color: white;
+}
+
+/* Stats Grid - Always Horizontal Scrollable */
+.staking-stats-grid {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.staking-stats-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.staking-stats-grid::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+.staking-stats-grid .stat-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  border: none;
+  min-width: 180px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+/* Legacy class name support */
+.stats-grid {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.stats-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.stats-grid::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  border: none;
+  min-width: 160px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.stat-card h3 {
+  color: var(--text);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* Modal display is handled inline in the Staking component to match Buy/Sell modal styling. */
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: none;
+  background: var(--card-bg);
+  color: var(--text);
+  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-group input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
+}
+
+.stake-summary, .withdraw-info {
+  background: transparent; /* remove ghost box look */
+  padding: 6px 0 0 0; /* tighten spacing */
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.stake-summary h4 {
+  margin-bottom: 6px;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+  padding: 2px 0;
+  border-bottom: 1px dashed rgba(0,0,0,0.06);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+  font-weight: 600;
+  color: var(--text);
+}
+
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: none;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.modal-footer button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: none;
+  min-height: 36px;
+  font-size: 0.9rem;
+}
+
+.modal-footer button:first-child {
+  background: var(--secondary);
+  color: var(--text);
+}
+
+.confirm-button {
+  background: var(--primary);
+  color: var(--button-text);
+}
+
+/* Disabled state for confirm button */
+.confirm-button[disabled], .confirm-button:disabled {
+  background: var(--secondary);
+  color: rgba(255,255,255,0.7);
+  cursor: not-allowed;
+  opacity: 0.95;
+}
+
+/* Loading and No Data States */
+.loading-spinner {
+  text-align: center;
+  padding: 50px;
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.no-contracts {
+  text-align: center;
+  padding: 50px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  color: var(--text);
+  box-shadow: var(--card-shadow);
+  border: none;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.staking-packages-grid .no-contracts,
+.staking-contracts-grid .no-contracts {
+  flex-shrink: 0;
+  min-width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .modal {
+    max-width: 300px;
+    max-height: 80vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal {
+    max-width: 280px;
+    max-height: 75vh;
+    width: 95%;
+  }
+
+  /* Make staking notice less bold and slightly smaller on mobile */
+  .staking-notice {
+    font-size: 0.75rem;
+    font-weight: 400;
+    text-align: left; /* align left for easier reading on narrow screens */
+    padding: 8px 10px;
+  }
+  
+  .modal-header {
+    padding: 12px;
+  }
+  
+  .modal-header h3 {
+    font-size: 0.9rem;
+  }
+  
+  .modal-body {
+    padding: 12px;
+  }
+  
+  .form-group input {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .stake-summary, .withdraw-info {
+    padding: 8px;
+  }
+  
+  .summary-row {
+    font-size: 0.8rem;
+    margin-bottom: 3px;
+  }
+  
+  .modal-footer {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .modal-footer button {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .staking-container {
+    padding: 8px;
+  }
+  
+  .packages-table, .contracts-table {
+    font-size: 0.8rem;
+  }
+  
+  .packages-table th, .contracts-table th {
+    padding: 10px 6px;
+    font-size: 0.75rem;
+  }
+  
+  .packages-table td, .contracts-table td {
+    padding: 10px 6px;
+  }
+  
+  .contract-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    min-width: auto;
+    gap: 4px;
+  }
+  
+  .stats-grid {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .staking-container {
+    padding: 8px;
+  }
+  
+  .staking-header {
+    margin-bottom: 16px;
+  }
+  
+  .staking-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .staking-header p {
+    font-size: 0.9rem;
+  }
+  
+  .staking-tabs {
+    margin-bottom: 16px;
+    flex-direction: row;
+    gap: 2px;
+  }
+  
+  /* Force slim button heights on mobile - same as order page */
+  .staking-tabs button {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  .stake-button {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  .withdraw-button, .cancel-button {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  .staking-package-card {
+    min-width: 220px !important;
+    padding: 14px;
+  }
+
+  .staking-contract-card {
+    min-width: 240px !important;
+    padding: 14px;
+  }
+  
+  .type-badge, .risk-badge, .status-badge {
+    font-size: 0.65rem;
+    padding: 3px 6px;
+  }
+
+  .stake-button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .withdraw-button, .cancel-button {
+    padding: 4px 6px;
+    font-size: 0.7rem;
+  }
+  
+  .contract-actions {
+    flex-direction: column;
+    gap: 4px;
+    min-width: 80px;
+  }
+  
+  .progress-container {
+    min-width: 60px;
+  }
+  
+  .stats-grid {
+    gap: 8px;
+  }
+  
+  .stat-card {
+    padding: 12px;
+    min-width: 140px;
+  }
+  
+  .stat-card h3 {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+  }
+  
+  .stat-value {
+    font-size: 1.4rem;
+  }
+  
+  .modal {
+    width: 95%;
+    margin: 8px;
+    max-height: 95vh;
+  }
+  
+  .modal-header {
+    padding: 12px;
+  }
+  
+  .modal-body {
+    padding: 12px;
+  }
+  
+  .modal-footer {
+    padding: 12px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .modal-footer button {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .staking-container {
+    padding: 6px;
+  }
+  
+  .staking-header h1 {
+    font-size: 1rem;
+  }
+  
+  .staking-header p {
+    font-size: 0.85rem;
+  }
+  
+  /* Force slim button heights on small mobile - same as order page */
+  .staking-tabs button {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  .stake-button {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  .withdraw-button, .cancel-button {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  
+  .staking-packages-grid,
+  .staking-contracts-grid,
+  .staking-stats-grid {
+    gap: 10px !important;
+    padding-bottom: 6px;
+  }
+
+  .staking-package-card {
+    min-width: 200px !important;
+    padding: 12px;
+  }
+
+  .staking-contract-card {
+    min-width: 220px !important;
+    padding: 12px;
+  }
+
+  .staking-stats-grid .stat-card {
+    min-width: 140px !important;
+    padding: 12px;
+  }
+
+  .package-card-header h3,
+  .contract-card-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .package-currency,
+  .contract-currency {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+
+  .detail-label {
+    font-size: 0.75rem;
+  }
+
+  .detail-value {
+    font-size: 0.85rem;
+  }
+
+  .detail-value.highlight {
+    font-size: 0.95rem;
+  }
+  
+  .type-badge, .risk-badge, .status-badge {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+  }
+  
+  .stake-button {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .withdraw-button, .cancel-button {
+    padding: 3px 5px;
+    font-size: 0.65rem;
+  }
+  
+  .contract-actions {
+    min-width: 70px;
+  }
+  
+  .progress-container {
+    min-width: 50px;
+  }
+  
+  .stats-grid {
+    gap: 6px;
+  }
+  
+  .stat-card {
+    padding: 10px;
+    min-width: 120px;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .modal {
+    margin: 4px;
+    width: calc(100% - 8px);
+  }
+}
+
+/* Compact modal variants */
+.compact-modal {
+  max-width: 360px;
+}
+
+.with-summary {
+  max-width: 380px;
+}
+
+@media (min-width: 769px) {
+  .modal-footer {
+    flex-direction: row;
+  }
+  .modal-footer button {
+    width: auto;
+  }
+}

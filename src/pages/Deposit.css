@@ -1,0 +1,584 @@
+/* Base Styles */
+.deposit-container {
+    padding: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Grid Layout - Matches Settings Pages */
+.deposit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* Main Card */
+.main-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.card-header h2 {
+    color: var(--text);
+    font-size: 0.8rem;
+    margin: 0 0 2px 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.coin-badge, .network-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.coin-badge {
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--info-color);
+}
+
+.network-badge {
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--warning-color);
+}
+
+.address-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.address-text {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    word-break: break-all;
+    color: var(--text);
+    line-height: 1.4;
+}
+
+.copy-btn {
+    background: var(--info-color);
+    color: var(--button-text);
+    border: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.66rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    min-width: 1rem;
+}
+
+
+.copy-btn.copied {
+    background: var(--success-color);
+}
+
+/* Info Cards */
+.info-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.info-card.warning {
+    background: rgba(248, 113, 113, 0.1);
+    box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
+}
+
+.info-card h3 {
+    color: var(--text);
+    font-size: 0.8rem;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.info-card h3:hover {
+    opacity: 0.8;
+}
+
+.info-card ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.info-card li {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    position: relative;
+    padding-left: 12px;
+}
+
+.info-card li:before {
+    content: "•";
+    color: var(--text-secondary);
+    position: absolute;
+    left: 0;
+    font-weight: 600;
+}
+
+.info-card.warning li {
+    color: var(--error-color);
+}
+
+/* Payment Created Section */
+.payment-created-box {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.payment-created-title {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #10b981;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.payment-created-text {
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--text);
+}
+
+.payment-address-box {
+    background: var(--bg);
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.payment-status-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.payment-status-text strong {
+    color: var(--text);
+}
+
+.payment-checking-text {
+    font-size: 0.75rem;
+    color: #10b981;
+    margin-top: 6px;
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+/* Method Selector */
+.method-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+}
+
+.method-btn {
+    padding: 6px 12px;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.method-btn.active {
+    background: var(--primary);
+    color: var(--button-text);
+    border-color: var(--primary);
+}
+
+/* Deposit History */
+.deposit-history {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    grid-column: 1 / -1;
+}
+
+.deposit-history h2 {
+    color: var(--text);
+    font-size: 0.8rem;
+    margin: 0 0 12px 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Scrollbar styling for history grid */
+.history-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-grid::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.history-grid::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+
+.deposit-item {
+    background: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+}
+
+.deposit-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.amount {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.status {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.05);
+    line-height: 1.2;
+}
+
+.deposit-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.2;
+}
+
+.network {
+    font-weight: 500;
+}
+
+.date {
+    opacity: 0.8;
+}
+
+/* No Deposits */
+.no-deposits {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-deposits h3 {
+    color: var(--text);
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+}
+
+.no-deposits p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+/* Error Message */
+.error-message {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(248, 113, 113, 0.1);
+    border: none;
+    border-radius: 12px;
+    color: var(--error-color);
+    box-shadow: 0 2px 8px rgba(248, 113, 113, 0.3);
+}
+
+.error-message h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.25rem;
+}
+
+.retry-btn {
+    background: var(--error-color);
+    color: var(--button-text);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+
+/* Responsive Design */
+@media (min-width: 640px) {
+    .deposit-container {
+        padding: 0;
+    }
+    
+    .deposit-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 8px;
+    }
+    
+    .main-card {
+        padding: 12px;
+    }
+    
+    .card-header h2 {
+        font-size: 0.8rem;
+    }
+    
+    .address-text {
+        font-size: 0.8rem;
+    }
+    
+    .copy-btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.6rem;
+    }
+    
+    .info-cards {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .info-card {
+        padding: 12px;
+    }
+    
+    .info-card h3 {
+        font-size: 0.8rem;
+    }
+    
+    .info-card li {
+        font-size: 0.75rem;
+    }
+    
+    .deposit-history {
+        padding: 12px;
+    }
+    
+    .deposit-history h2 {
+        font-size: 0.8rem;
+    }
+    
+    .amount {
+        font-size: 0.85rem;
+    }
+    
+    .deposit-details {
+        font-size: 0.75rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .deposit-container {
+        padding: 0;
+        max-width: 1200px;
+    }
+    
+    .deposit-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 8px;
+    }
+    
+    .info-cards {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .deposit-history {
+        grid-column: 1 / -1;
+        padding: 12px;
+    }
+    
+    .history-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 300px;
+    }
+}
+
+/* Currency Select Styling */
+.currency-select {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", sans-serif;
+}
+
+.currency-select option {
+    padding: 10px 12px;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.currency-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+@media (max-width: 768px) {
+    .deposit-container {
+        padding: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .deposit-container {
+        padding: 0.125rem;
+    }
+    
+    .method-selector {
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    .method-btn {
+        flex: 1;
+        padding: 8px;
+    }
+    
+    .main-card {
+        padding: 1rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .address-section {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .copy-btn {
+        align-self: center;
+        min-width: auto;
+        padding: 0.2rem 0.3rem;
+        font-size: 0.6rem;
+        min-width: 1.2rem;
+        height: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .info-cards {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+    
+    .info-card {
+        padding: 0.75rem;
+    }
+    
+    .info-card h3 {
+        font-size: 0.8rem;
+    }
+    
+    .info-card li {
+        font-size: 0.7rem;
+    }
+    
+    .deposit-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .deposit-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+}
