@@ -37,6 +37,336 @@ const steps = [
   'Trade, invest, and track your growth in one elegant dashboard.',
 ];
 
+const styles = {
+  page: {
+    minHeight: '100vh',
+    background: '#050816',
+    color: '#ffffff',
+    overflow: 'hidden',
+  },
+  shell: {
+    position: 'relative' as const,
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '32px 24px 40px',
+  },
+  glow: {
+    position: 'absolute' as const,
+    inset: 0,
+    background:
+      'radial-gradient(circle at top, rgba(34,211,238,0.18), transparent 35%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.22), transparent 30%), linear-gradient(180deg, #09111f 0%, #050816 100%)',
+    pointerEvents: 'none' as const,
+  },
+  topLine: {
+    position: 'absolute' as const,
+    insetInline: 0,
+    top: 0,
+    height: '1px',
+    background: 'linear-gradient(to right, transparent, rgba(34,211,238,0.7), transparent)',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '16px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.06)',
+    padding: '14px 20px',
+    borderRadius: '999px',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    position: 'relative' as const,
+    zIndex: 1,
+  },
+  brandKicker: {
+    fontSize: '12px',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.35em',
+    color: '#67e8f9',
+    margin: 0,
+  },
+  brandSub: {
+    margin: '6px 0 0',
+    fontSize: '14px',
+    color: 'rgba(255,255,255,0.62)',
+  },
+  buttonPrimary: {
+    border: 'none',
+    borderRadius: '999px',
+    background: '#ffffff',
+    color: '#050816',
+    padding: '12px 20px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 12px 40px rgba(255,255,255,0.08)',
+  },
+  buttonSecondary: {
+    border: '1px solid rgba(255,255,255,0.14)',
+    borderRadius: '999px',
+    background: 'rgba(255,255,255,0.05)',
+    color: '#ffffff',
+    padding: '12px 20px',
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+  heroGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 0.9fr)',
+    gap: '56px',
+    alignItems: 'center',
+    padding: '72px 0 56px',
+    position: 'relative' as const,
+    zIndex: 1,
+  },
+  pill: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '10px',
+    borderRadius: '999px',
+    border: '1px solid rgba(34,211,238,0.2)',
+    background: 'rgba(34,211,238,0.1)',
+    color: '#cffafe',
+    padding: '10px 16px',
+    fontSize: '14px',
+    marginBottom: '24px',
+  },
+  heading: {
+    fontSize: 'clamp(3rem, 6vw, 5rem)',
+    lineHeight: 1.02,
+    margin: 0,
+    fontWeight: 700,
+    letterSpacing: '-0.04em',
+  },
+  gradientText: {
+    display: 'block',
+    background: 'linear-gradient(90deg, #67e8f9 0%, #ffffff 45%, #c4b5fd 100%)',
+    WebkitBackgroundClip: 'text',
+    backgroundClip: 'text',
+    color: 'transparent',
+  },
+  lead: {
+    marginTop: '24px',
+    maxWidth: '680px',
+    fontSize: '18px',
+    lineHeight: 1.8,
+    color: 'rgba(255,255,255,0.72)',
+  },
+  buttonRow: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '16px',
+    marginTop: '40px',
+  },
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+    gap: '16px',
+    marginTop: '48px',
+  },
+  statCard: {
+    borderRadius: '28px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.05)',
+    padding: '20px',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+  },
+  statValue: {
+    fontSize: '28px',
+    fontWeight: 700,
+    margin: 0,
+  },
+  statLabel: {
+    margin: '10px 0 0',
+    fontSize: '14px',
+    color: 'rgba(255,255,255,0.62)',
+  },
+  panelWrap: {
+    position: 'relative' as const,
+  },
+  panelGlow: {
+    position: 'absolute' as const,
+    inset: '-24px',
+    borderRadius: '32px',
+    background: 'linear-gradient(135deg, rgba(34,211,238,0.22), rgba(168,85,247,0.18), transparent)',
+    filter: 'blur(42px)',
+  },
+  panel: {
+    position: 'relative' as const,
+    borderRadius: '32px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.06)',
+    padding: '24px',
+    boxShadow: '0 25px 80px rgba(34, 211, 238, 0.08)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+  },
+  panelInner: {
+    borderRadius: '24px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(11,18,32,0.82)',
+    padding: '24px',
+  },
+  panelTop: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '16px',
+  },
+  smallText: {
+    margin: 0,
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: '14px',
+  },
+  bigText: {
+    margin: '6px 0 0',
+    fontSize: 'clamp(2rem, 3vw, 2.6rem)',
+    fontWeight: 700,
+  },
+  badge: {
+    borderRadius: '999px',
+    background: 'rgba(52,211,153,0.14)',
+    color: '#86efac',
+    padding: '8px 14px',
+    fontSize: '14px',
+    fontWeight: 600,
+    whiteSpace: 'nowrap' as const,
+  },
+  cardGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gap: '16px',
+    marginTop: '24px',
+  },
+  miniCard: {
+    borderRadius: '22px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.05)',
+    padding: '18px',
+  },
+  miniLabel: {
+    margin: 0,
+    fontSize: '12px',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.25em',
+    color: 'rgba(255,255,255,0.4)',
+  },
+  miniValue: {
+    margin: '12px 0 0',
+    fontSize: '24px',
+    fontWeight: 700,
+  },
+  miniDesc: {
+    margin: '10px 0 0',
+    fontSize: '14px',
+    color: 'rgba(255,255,255,0.62)',
+  },
+  assetList: {
+    marginTop: '24px',
+    display: 'grid',
+    gap: '12px',
+  },
+  assetItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: '18px',
+    background: 'rgba(255,255,255,0.05)',
+    padding: '14px 16px',
+  },
+  sectionGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gap: '16px',
+    position: 'relative' as const,
+    zIndex: 1,
+    paddingBottom: '32px',
+  },
+  featureCard: {
+    borderRadius: '28px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.05)',
+    padding: '24px',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+  },
+  featureTitle: {
+    margin: '18px 0 0',
+    fontSize: '18px',
+    fontWeight: 700,
+  },
+  featureDesc: {
+    margin: '12px 0 0',
+    fontSize: '14px',
+    lineHeight: 1.7,
+    color: 'rgba(255,255,255,0.66)',
+  },
+  howSection: {
+    borderRadius: '32px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.05)',
+    padding: '28px',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    position: 'relative' as const,
+    zIndex: 1,
+    marginBottom: '16px',
+  },
+  howGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 0.9fr) minmax(0, 1.1fr)',
+    gap: '32px',
+    alignItems: 'start',
+  },
+  howHeading: {
+    margin: '12px 0 0',
+    fontSize: 'clamp(2rem, 3vw, 3rem)',
+    lineHeight: 1.1,
+  },
+  stepsGrid: {
+    display: 'grid',
+    gap: '14px',
+  },
+  stepItem: {
+    display: 'flex',
+    gap: '16px',
+    alignItems: 'flex-start',
+    borderRadius: '22px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(10,16,32,0.72)',
+    padding: '18px',
+  },
+  stepNum: {
+    width: '42px',
+    height: '42px',
+    minWidth: '42px',
+    display: 'grid',
+    placeItems: 'center',
+    borderRadius: '999px',
+    background: 'rgba(34,211,238,0.12)',
+    color: '#67e8f9',
+    fontWeight: 700,
+    fontSize: '14px',
+  },
+  stepText: {
+    margin: 0,
+    paddingTop: '8px',
+    fontSize: '14px',
+    lineHeight: 1.75,
+    color: 'rgba(255,255,255,0.75)',
+  },
+  icon: {
+    color: '#67e8f9',
+    width: '24px',
+    height: '24px',
+  },
+  checkIcon: {
+    color: '#67e8f9',
+    width: '26px',
+    height: '26px',
+  },
+};
+
 const LandingPage = () => (
   <>
     <Helmet>
@@ -47,93 +377,83 @@ const LandingPage = () => (
       />
     </Helmet>
 
-    <main className="min-h-screen bg-[#050816] text-white">
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.18),_transparent_35%),radial-gradient(circle_at_80%_20%,_rgba(168,85,247,0.22),_transparent_30%),linear-gradient(180deg,_#09111f_0%,_#050816_100%)]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
+    <main style={styles.page}>
+      <section style={{ position: 'relative', overflow: 'hidden' }}>
+        <div style={styles.glow} />
+        <div style={styles.topLine} />
 
-        <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8 lg:px-10">
-          <header className="flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-5 py-3 backdrop-blur-xl">
+        <div style={styles.shell}>
+          <header style={styles.header}>
             <div>
-              <p className="text-xs uppercase tracking-[0.35em] text-cyan-300">KingsHall Exchange</p>
-              <p className="text-sm text-white/60">Crypto exchange & investment platform</p>
+              <p style={styles.brandKicker}>KingsHall Exchange</p>
+              <p style={styles.brandSub}>Crypto exchange & investment platform</p>
             </div>
-            <button className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/15">
-              Get Started
-            </button>
+            <button style={styles.buttonPrimary}>Get Started</button>
           </header>
 
-          <div className="grid flex-1 items-center gap-14 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:py-0">
-            <div className="max-w-3xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-200">
-                <Sparkles className="h-4 w-4" />
+          <div style={styles.heroGrid}>
+            <div>
+              <div style={styles.pill}>
+                <Sparkles style={styles.icon} />
                 Premium trading experience for modern investors
               </div>
-              <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+              <h1 style={styles.heading}>
                 Trade smarter.
-                <span className="block bg-gradient-to-r from-cyan-300 via-white to-violet-300 bg-clip-text text-transparent">
-                  Invest with confidence.
-                </span>
+                <span style={styles.gradientText}>Invest with confidence.</span>
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/70 sm:text-xl">
+              <p style={styles.lead}>
                 KingsHall Exchange brings together crypto trading, portfolio growth, staking, and instant transfers in a clean,
                 modern experience built for serious users.
               </p>
 
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <button className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#050816] transition hover:scale-[1.02]">
-                  Start trading
-                </button>
-                <button className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
-                  Explore the platform
-                </button>
+              <div style={styles.buttonRow}>
+                <button style={styles.buttonPrimary}>Start trading</button>
+                <button style={styles.buttonSecondary}>Explore the platform</button>
               </div>
 
-              <div className="mt-12 grid gap-4 sm:grid-cols-3">
+              <div style={styles.statsGrid}>
                 {stats.map((stat) => (
-                  <div key={stat.label} className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-md">
-                    <div className="text-2xl font-semibold text-white">{stat.value}</div>
-                    <div className="mt-2 text-sm text-white/60">{stat.label}</div>
+                  <div key={stat.label} style={styles.statCard}>
+                    <div style={styles.statValue}>{stat.value}</div>
+                    <div style={styles.statLabel}>{stat.label}</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-cyan-400/20 via-violet-500/20 to-transparent blur-3xl" />
-              <div className="relative rounded-[2rem] border border-white/10 bg-white/8 p-6 shadow-2xl shadow-cyan-500/10 backdrop-blur-2xl">
-                <div className="rounded-[1.5rem] border border-white/10 bg-[#0b1220]/80 p-5">
-                  <div className="flex items-center justify-between">
+            <div style={styles.panelWrap}>
+              <div style={styles.panelGlow} />
+              <div style={styles.panel}>
+                <div style={styles.panelInner}>
+                  <div style={styles.panelTop}>
                     <div>
-                      <p className="text-sm text-white/50">Portfolio value</p>
-                      <p className="mt-1 text-3xl font-semibold text-white">$128,480.22</p>
+                      <p style={styles.smallText}>Portfolio value</p>
+                      <p style={styles.bigText}>$128,480.22</p>
                     </div>
-                    <div className="rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-medium text-emerald-300">
-                      +18.4% this month
-                    </div>
+                    <div style={styles.badge}>+18.4% this month</div>
                   </div>
 
-                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.25em] text-white/40">Active balance</p>
-                      <p className="mt-3 text-2xl font-semibold text-white">4.82 BTC</p>
-                      <p className="mt-2 text-sm text-white/60">Diversified across spot and staking.</p>
+                  <div style={styles.cardGrid}>
+                    <div style={styles.miniCard}>
+                      <p style={styles.miniLabel}>Active balance</p>
+                      <p style={styles.miniValue}>4.82 BTC</p>
+                      <p style={styles.miniDesc}>Diversified across spot and staking.</p>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-[0.25em] text-white/40">Security score</p>
-                      <div className="mt-3 flex items-center gap-2 text-2xl font-semibold text-white">
-                        <CheckCircle2 className="h-6 w-6 text-cyan-300" />
+                    <div style={styles.miniCard}>
+                      <p style={styles.miniLabel}>Security score</p>
+                      <div style={{ ...styles.miniValue, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <CheckCircle2 style={styles.checkIcon} />
                         98/100
                       </div>
-                      <p className="mt-2 text-sm text-white/60">Encrypted, verified, and monitored.</p>
+                      <p style={styles.miniDesc}>Encrypted, verified, and monitored.</p>
                     </div>
                   </div>
 
-                  <div className="mt-6 space-y-3">
+                  <div style={styles.assetList}>
                     {['Bitcoin', 'Ethereum', 'Solana'].map((asset, index) => (
-                      <div key={asset} className="flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3">
-                        <span className="text-sm font-medium text-white">{asset}</span>
-                        <span className="text-sm text-emerald-300">{['+12.2%', '+8.5%', '+15.1%'][index]}</span>
+                      <div key={asset} style={styles.assetItem}>
+                        <span style={{ fontSize: '14px', fontWeight: 600 }}>{asset}</span>
+                        <span style={{ fontSize: '14px', color: '#86efac' }}>{['+12.2%', '+8.5%', '+15.1%'][index]}</span>
                       </div>
                     ))}
                   </div>
@@ -142,32 +462,32 @@ const LandingPage = () => (
             </div>
           </div>
 
-          <section className="grid gap-4 pb-8 lg:grid-cols-4">
+          <section style={styles.sectionGrid}>
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <article key={feature.title} className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-                  <Icon className="h-6 w-6 text-cyan-300" />
-                  <h2 className="mt-4 text-lg font-semibold text-white">{feature.title}</h2>
-                  <p className="mt-3 text-sm leading-6 text-white/65">{feature.description}</p>
+                <article key={feature.title} style={styles.featureCard}>
+                  <Icon style={styles.icon} />
+                  <h2 style={styles.featureTitle}>{feature.title}</h2>
+                  <p style={styles.featureDesc}>{feature.description}</p>
                 </article>
               );
             })}
           </section>
 
-          <section className="mb-10 rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl lg:p-8">
-            <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <section style={styles.howSection}>
+            <div style={styles.howGrid}>
               <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">How it works</p>
-                <h2 className="mt-3 text-3xl font-semibold text-white">A smooth path from signup to growth.</h2>
+                <p style={{ ...styles.smallText, textTransform: 'uppercase', letterSpacing: '0.3em', color: '#67e8f9' }}>
+                  How it works
+                </p>
+                <h2 style={styles.howHeading}>A smooth path from signup to growth.</h2>
               </div>
-              <div className="grid gap-4">
+              <div style={styles.stepsGrid}>
                 {steps.map((step, index) => (
-                  <div key={step} className="flex gap-4 rounded-2xl border border-white/10 bg-[#0a1020]/70 p-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-sm font-semibold text-cyan-300">
-                      0{index + 1}
-                    </div>
-                    <p className="pt-2 text-sm leading-6 text-white/75">{step}</p>
+                  <div key={step} style={styles.stepItem}>
+                    <div style={styles.stepNum}>0{index + 1}</div>
+                    <p style={styles.stepText}>{step}</p>
                   </div>
                 ))}
               </div>
