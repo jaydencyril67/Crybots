@@ -7,6 +7,7 @@ import SignupConfirmationSentPage from './components/SignupConfirmationSentPage'
 import AccountConfirmedPage from './components/AccountConfirmedPage';
 import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
+import DashboardPage from './components/DashboardPage';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root container missing in index.html');
@@ -20,11 +21,12 @@ const isSignupConfirmationSentRoute = pathname === '/signup-confirmation-sent' |
 const isVerifyEmailRoute = pathname === '/verify-email' || hash === '#/verify-email';
 const isAccountConfirmedRoute = pathname === '/account-confirmed' || hash === '#/account-confirmed';
 const isSigninRoute = pathname === '/signin' || hash === '#/signin';
+const isDashboardRoute = pathname === '/dashboard' || hash === '#/dashboard' || pathname === '/' || hash === '#/';
 
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : <LandingPage />}
+      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isDashboardRoute ? <DashboardPage /> : <LandingPage />}
     </HelmetProvider>
   </React.StrictMode>
 );
