@@ -640,7 +640,6 @@ const SignupPage = () => {
               </p>
             </article>
           </div>
-          </div>
         </section>
       </main>
     </>
