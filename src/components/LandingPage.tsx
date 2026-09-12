@@ -422,7 +422,7 @@ const LandingPage = () => (
       <title>KingsHall Exchange | Modern Crypto Trading & Investing</title>
       <meta
         name="description"
-        content="KingsHall Exchange is a sleek crypto exchange and investment app with secure trading, fast transfers, and premium portfolio tools."
+        content="KingsHall Exchange is a sleek crypto exchange and investment app with secure trading, fast transfers, and premium portfolio tools. "
       />
     </Helmet>
 
