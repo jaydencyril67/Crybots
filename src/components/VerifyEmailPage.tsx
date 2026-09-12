@@ -6,50 +6,77 @@ import api from '../api/axios';
 const styles = {
   page: {
     minHeight: '100vh',
-    background: '#050816',
     color: '#ffffff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '24px',
+    background:
+      'radial-gradient(circle at top, rgba(103,232,249,0.18), transparent 34%), radial-gradient(circle at bottom right, rgba(196,181,253,0.16), transparent 30%), linear-gradient(180deg, #071022 0%, #050816 100%)',
+    position: 'relative' as const,
+    overflow: 'hidden',
+  },
+  backdrop: {
+    position: 'absolute' as const,
+    inset: 0,
+    background:
+      'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.03) 100%)',
+    pointerEvents: 'none' as const,
   },
   card: {
     width: '100%',
     maxWidth: '560px',
-    borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
-    padding: '32px',
+    borderRadius: '32px',
+    border: '1px solid rgba(255,255,255,0.14)',
+    background: 'rgba(8,15,33,0.72)',
+    padding: '36px',
     textAlign: 'center' as const,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    backdropFilter: 'blur(22px)',
+    WebkitBackdropFilter: 'blur(22px)',
+    boxShadow: '0 24px 80px rgba(0,0,0,0.35)',
+    position: 'relative' as const,
+    zIndex: 1,
   },
   button: {
-    marginTop: '24px',
+    marginTop: '28px',
     border: 'none',
     borderRadius: '999px',
     background: 'linear-gradient(135deg, #67e8f9 0%, #c4b5fd 100%)',
     color: '#050816',
-    padding: '12px 20px',
+    padding: '13px 22px',
     fontWeight: 800,
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: '10px',
     textDecoration: 'none',
+    boxShadow: '0 12px 30px rgba(103,232,249,0.2)',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   },
   iconWrap: {
-    width: '64px',
-    height: '64px',
+    width: '72px',
+    height: '72px',
     borderRadius: '50%',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: '20px',
+    marginBottom: '22px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
   },
-  title: { margin: 0, fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', lineHeight: 1.1 },
-  text: { margin: '12px 0 0', color: 'rgba(255,255,255,0.72)', lineHeight: 1.7, fontSize: '15px' },
-  meta: { marginTop: '20px', fontSize: '14px', color: '#67e8f9', fontWeight: 700 },
+  title: {
+    margin: 0,
+    fontSize: 'clamp(1.9rem, 4vw, 2.8rem)',
+    lineHeight: 1.05,
+    letterSpacing: '-0.03em',
+  },
+  text: {
+    margin: '14px 0 0',
+    color: 'rgba(255,255,255,0.72)',
+    lineHeight: 1.75,
+    fontSize: '15px',
+  },
+  meta: { marginTop: '22px', fontSize: '14px', color: '#67e8f9', fontWeight: 700 },
 };
 
 const VerifyEmailPage = () => {
@@ -110,6 +137,7 @@ const VerifyEmailPage = () => {
         <title>KingsHall Exchange | Verify email</title>
       </Helmet>
       <main style={styles.page}>
+        <div style={styles.backdrop} />
         <section style={styles.card}>
           <div style={{ ...styles.iconWrap, background: iconBackground, color: iconColor }}>{icon}</div>
           <h1 style={styles.title}>{status === 'success' ? 'Account confirmed' : status === 'error' ? 'Verification failed' : 'Verifying account'}</h1>
@@ -117,7 +145,18 @@ const VerifyEmailPage = () => {
           {status !== 'loading' ? (
             <>
               <p style={styles.meta}>Redirecting to sign in in {secondsLeft} seconds...</p>
-              <a href="/signin" style={styles.button}>
+              <a
+                href="/signin"
+                style={styles.button}
+                onMouseEnter={(event) => {
+                  event.currentTarget.style.transform = 'translateY(-1px)';
+                  event.currentTarget.style.boxShadow = '0 16px 34px rgba(103,232,249,0.28)';
+                }}
+                onMouseLeave={(event) => {
+                  event.currentTarget.style.transform = 'translateY(0)';
+                  event.currentTarget.style.boxShadow = '0 12px 30px rgba(103,232,249,0.2)';
+                }}
+              >
                 Continue to sign in
                 <ArrowRight size={18} />
               </a>
