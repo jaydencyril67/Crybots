@@ -265,6 +265,7 @@ const styles = {
 const SigninPage = () => {
   const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState<FormState>(initialState);
+  const [submitError, setSubmitError] = useState('');
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
