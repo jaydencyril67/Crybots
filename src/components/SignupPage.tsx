@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
 
@@ -303,6 +304,8 @@ const SignupPage = () => {
   const [form, setForm] = useState<FormState>(initialState);
   const [dobError, setDobError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -327,6 +330,7 @@ const SignupPage = () => {
     if (field === 'dob') {
       setDobError('');
     }
+    setSubmitError('');
   };
 
   const emailInputStyle =
@@ -373,6 +377,47 @@ const SignupPage = () => {
     setPasswordError('');
     if (!canContinue || !dobMeetsRequirement) return;
     setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+  };
+
+  const handleFinish = async () => {
+    if (!passwordMeetsRequirement) {
+      setPasswordError(passwordNotice);
+      return;
+    }
+
+    if (!isAtLeast18(form.dob)) {
+      setDobError('You must be at least 18 years old to continue.');
+      return;
+    }
+
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post('/api/auth/signup', {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        gender: form.gender,
+        dob: form.dob,
+        email: form.email,
+        password: form.password,
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+
+      setSubmitError('');
+      setStepIndex(steps.length - 1);
+      window.location.pathname = '/signup-confirmation-sent';
+    } catch (error) {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Unable to create your account right now. Please try again.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -479,7 +524,7 @@ const SignupPage = () => {
               </button>
               <div style={styles.brandBlock}>
                 <p style={styles.brandKicker}>KingsHall Exchange</p>
-                <p style={styles.brandSub}>Secure signup experience, no auth wired yet.</p>
+                <p style={styles.brandSub}>Secure signup experience. Accounts require email confirmation before sign in.</p>
               </div>
             </header>
 
@@ -565,21 +610,23 @@ const SignupPage = () => {
                   ) : (
                     <button
                       type="button"
-                      disabled={!canContinue}
+                      onClick={handleFinish}
+                      disabled={!canContinue || isSubmitting}
                       style={{
                         ...styles.button,
                         ...styles.buttonPrimary,
-                        opacity: canContinue ? 1 : 0.55,
-                        cursor: canContinue ? 'pointer' : 'not-allowed',
+                        opacity: canContinue && !isSubmitting ? 1 : 0.55,
+                        cursor: canContinue && !isSubmitting ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      Finish <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
+                      {isSubmitting ? 'Finishing...' : 'Finish'} <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
                     </button>
                   )}
                 </div>
 
+                {submitError ? <p style={styles.inlineError}>{submitError}</p> : null}
                 <p style={styles.footerNote}>
-                  This page currently stores form data locally only. Next we can connect it to your actual signup/auth flow.
+                  Your account will be created on the Kingshalls backend when you finish signup.
                 </p>
               </article>
             </div>

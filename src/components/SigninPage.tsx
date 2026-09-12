@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
+import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CheckCircle2, KeyRound, Mail, Shield } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, KeyRound } from 'lucide-react';
 
 const steps = [
   { title: 'Email', description: 'Enter the email connected to your KingsHall account.', field: 'email', placeholder: 'Enter your email', type: 'email' },
@@ -13,11 +14,13 @@ type StepField = (typeof steps)[number]['field'];
 type FormState = {
   email: string;
   method: string;
+  password: string;
 };
 
 const initialState: FormState = {
   email: '',
-  method: '',
+  method: 'password',
+  password: '',
 };
 
 const styles = {
@@ -283,6 +286,7 @@ const SigninPage = () => {
 
   const updateField = (field: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    setSubmitError('');
   };
 
   const emailInputStyle =
@@ -297,6 +301,31 @@ const SigninPage = () => {
 
   const handleBack = () => {
     setStepIndex((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleSignIn = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post('/api/auth/signin', {
+        email: form.email,
+        password: form.password,
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+
+      window.location.pathname = '/';
+    } catch (error) {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Unable to sign you in right now. Please try again.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const currentField = (() => {
@@ -321,32 +350,16 @@ const SigninPage = () => {
       case 'method':
         return (
           <div style={styles.field}>
-            <label style={styles.label}>Choose a sign-in method</label>
-            <div style={styles.optionGrid}>
-              {[
-                { value: 'email-code', title: 'Email one-time code', description: 'We’ll send a secure code to your inbox.', icon: Mail },
-                { value: 'password', title: 'Password', description: 'Sign in with your account password.', icon: KeyRound },
-              ].map(({ value, title, description, icon: Icon }) => {
-                const active = form.method === value;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => updateField('method', value)}
-                    style={{
-                      ...styles.optionCard,
-                      ...(active ? styles.optionCardActive : null),
-                    }}
-                  >
-                    <Icon style={styles.iconLarge} />
-                    <span>
-                      <strong style={{ display: 'block', marginBottom: '4px' }}>{title}</strong>
-                      <span style={{ color: 'rgba(255,255,255,0.68)', fontSize: '13px', lineHeight: 1.5 }}>{description}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            <label style={styles.label}>Password</label>
+            <input
+              style={styles.input}
+              type="password"
+              value={form.password}
+              onChange={(event) => updateField('password', event.target.value)}
+              placeholder="Enter your password"
+              autoComplete="current-password"
+            />
+            {submitError ? <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p> : null}
           </div>
         );
       default:
@@ -373,7 +386,7 @@ const SigninPage = () => {
               </button>
               <div style={styles.brandBlock}>
                 <p style={styles.brandKicker}>KingsHall Exchange</p>
-                <p style={styles.brandSub}>Secure sign-in flow, no auth wired yet.</p>
+                <p style={styles.brandSub}>Accounts must be confirmed by email before sign in.</p>
               </div>
             </header>
 
@@ -383,7 +396,7 @@ const SigninPage = () => {
                   Welcome back.
                   <span style={styles.titleAccent}>Sign in fast.</span>
                 </h1>
-                <p style={styles.lead}>A simple guided sign-in flow built to connect to backend auth later.</p>
+                <p style={styles.lead}>Enter your email and password. Unconfirmed accounts are blocked until their email is verified.</p>
               </article>
 
               <article style={styles.panel}>
