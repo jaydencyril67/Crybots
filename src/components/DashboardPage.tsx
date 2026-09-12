@@ -21,6 +21,7 @@ type MarketCoin = {
   price: number;
   change24h: number;
   color: string;
+  id: string;
 };
 
 type AdviceCard = {
@@ -31,14 +32,14 @@ type AdviceCard = {
 };
 
 const marketCoins: MarketCoin[] = [
-  { symbol: 'BTC', name: 'Bitcoin', price: 68421.42, change24h: 2.14, color: '#f59e0b' },
-  { symbol: 'ETH', name: 'Ethereum', price: 3528.17, change24h: 1.88, color: '#a78bfa' },
-  { symbol: 'BNB', name: 'BNB', price: 598.26, change24h: 0.96, color: '#fbbf24' },
-  { symbol: 'SOL', name: 'Solana', price: 178.32, change24h: 4.61, color: '#22d3ee' },
-  { symbol: 'XRP', name: 'XRP', price: 0.62, change24h: -0.84, color: '#60a5fa' },
-  { symbol: 'ADA', name: 'Cardano', price: 0.74, change24h: 3.12, color: '#38bdf8' },
-  { symbol: 'DOGE', name: 'Dogecoin', price: 0.14, change24h: 5.04, color: '#fde68a' },
-  { symbol: 'MATIC', name: 'Polygon', price: 0.96, change24h: 1.25, color: '#c084fc' },
+  { symbol: 'BTC', name: 'Bitcoin', price: 0, change24h: 0, color: '#f59e0b', id: 'bitcoin' },
+  { symbol: 'ETH', name: 'Ethereum', price: 0, change24h: 0, color: '#a78bfa', id: 'ethereum' },
+  { symbol: 'BNB', name: 'BNB', price: 0, change24h: 0, color: '#fbbf24', id: 'binancecoin' },
+  { symbol: 'SOL', name: 'Solana', price: 0, change24h: 0, color: '#22d3ee', id: 'solana' },
+  { symbol: 'XRP', name: 'XRP', price: 0, change24h: 0, color: '#60a5fa', id: 'ripple' },
+  { symbol: 'ADA', name: 'Cardano', price: 0, change24h: 0, color: '#38bdf8', id: 'cardano' },
+  { symbol: 'DOGE', name: 'Dogecoin', price: 0, change24h: 0, color: '#fde68a', id: 'dogecoin' },
+  { symbol: 'MATIC', name: 'Polygon', price: 0, change24h: 0, color: '#c084fc', id: 'polygon-pos' },
 ];
 
 const dashboardMetrics = [
@@ -422,7 +423,8 @@ const getGreeting = () => {
   return 'Good evening';
 };
 
-const getFirstName = () => {
+const getFirstName = (fullName?: string) => {
+  if (fullName?.trim()) return fullName.trim().split(/\s+/)[0];
   const stored = window.localStorage.getItem('kingshall_first_name') || window.localStorage.getItem('firstName');
   if (stored?.trim()) return stored.trim().split(/\s+/)[0];
   return 'Trader';
@@ -433,6 +435,10 @@ const getAdviceIndex = () => Math.floor(Date.now() / (1000 * 60 * 60)) % adviceP
 const DashboardPage = () => {
   const [now, setNow] = useState(new Date());
   const [hourlyAdviceIndex, setHourlyAdviceIndex] = useState(getAdviceIndex());
+  const [authName, setAuthName] = useState('');
+  const [isAuthNameLoaded, setIsAuthNameLoaded] = useState(false);
+  const [liveCoins, setLiveCoins] = useState(marketCoins);
+  const [isCoinsLoaded, setIsCoinsLoaded] = useState(false);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 30_000);
@@ -445,12 +451,67 @@ const DashboardPage = () => {
   }, []);
 
   const greeting = useMemo(() => getGreeting(), [now]);
-  const firstName = useMemo(() => getFirstName(), []);
+  const firstName = useMemo(() => getFirstName(authName), [authName]);
+
+  useEffect(() => {
+    try {
+      const profile = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
+      if (profile) {
+        const parsed = JSON.parse(profile) as { firstName?: string; lastName?: string; fullName?: string };
+        setAuthName(parsed.firstName || parsed.fullName || '');
+      } else {
+        setAuthName('');
+      }
+    } catch {
+      setAuthName('');
+    } finally {
+      setIsAuthNameLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLiveCoins = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin,polygon-pos&vs_currencies=usd&include_24hr_change=true');
+        if (!response.ok) throw new Error('Failed to load live prices');
+
+        const data = await response.json() as Record<string, { usd?: number; usd_24h_change?: number }>;
+        const updatedCoins = marketCoins.map((coin) => {
+          const live = data[coin.id];
+          return {
+            ...coin,
+            price: live?.usd ?? coin.price,
+            change24h: live?.usd_24h_change ?? coin.change24h,
+          };
+        });
+
+        if (!cancelled) {
+          setLiveCoins(updatedCoins);
+          setIsCoinsLoaded(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setLiveCoins(marketCoins);
+          setIsCoinsLoaded(true);
+        }
+      }
+    };
+
+    loadLiveCoins();
+    const interval = window.setInterval(loadLiveCoins, 60_000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, []);
   const advice = advicePool[hourlyAdviceIndex];
   const marketSummary = useMemo(() => {
-    const winners = marketCoins.filter((coin) => coin.change24h >= 0).length;
-    const avgMove = marketCoins.reduce((sum, coin) => sum + coin.change24h, 0) / marketCoins.length;
-    const topMover = [...marketCoins].sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h))[0];
+    const winners = liveCoins.filter((coin) => coin.change24h >= 0).length;
+    const avgMove = liveCoins.reduce((sum, coin) => sum + coin.change24h, 0) / liveCoins.length;
+    const topMover = [...liveCoins].sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h))[0];
 
     return {
       winners,
@@ -485,7 +546,7 @@ const DashboardPage = () => {
               <p style={styles.greeting}>{greeting}</p>
               <h1 style={styles.title}>
                 Welcome back,
-                <span style={styles.titleAccent}> {firstName}</span>
+                <span style={styles.titleAccent}> {isAuthNameLoaded ? firstName : 'Trader'}</span>
               </h1>
               <p style={styles.lead}>
                 This is your market home base — live prices, market context, and a fresh hourly insight to help you stay sharp without showing personal account details.
@@ -505,7 +566,7 @@ const DashboardPage = () => {
                 <div style={styles.metricCard}>
                   <ChartNoAxesColumnIncreasing style={styles.iconLarge} />
                   <p style={styles.metricLabel}>Coins tracking</p>
-                  <p style={styles.metricValue}>{marketCoins.length}</p>
+                  <p style={styles.metricValue}>{isCoinsLoaded ? liveCoins.length : 'Loading...'}</p>
                 </div>
                 <div style={styles.metricCard}>
                   <Wallet style={styles.iconLarge} />
@@ -534,7 +595,7 @@ const DashboardPage = () => {
               </div>
 
               <div style={styles.coinGrid}>
-                {marketCoins.map((coin) => (
+                {liveCoins.map((coin) => (
                   <article key={coin.symbol} style={styles.coinCard}>
                     <div style={{ ...styles.coinBadge, background: `linear-gradient(135deg, ${coin.color}, rgba(255,255,255,0.15))` }}>
                       {coin.symbol.slice(0, 1)}
@@ -564,7 +625,7 @@ const DashboardPage = () => {
                 <div style={styles.featureItem}>
                   <TrendingUp style={styles.icon} />
                   <p style={styles.featureText}>
-                    {marketSummary.winners} of {marketCoins.length} coins are positive over the last 24 hours.
+                    {marketSummary.winners} of {liveCoins.length} coins are positive over the last 24 hours.
                   </p>
                 </div>
                 <div style={styles.featureItem}>
