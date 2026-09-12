@@ -272,6 +272,7 @@ const SigninPage = () => {
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
+  const [isCodeLocked, setIsCodeLocked] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
 
   const progress = step === 'email' ? 25 : step === 'method' ? 50 : step === 'password' || step === 'code' ? 75 : 100;
