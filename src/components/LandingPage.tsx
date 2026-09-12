@@ -185,7 +185,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-  }
+  },
   buttonLink: {
     textDecoration: 'none',
   },
