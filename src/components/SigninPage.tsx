@@ -9,8 +9,6 @@ const steps = [
 
 type StepField = (typeof steps)[number]['field'];
 
-const isValidEmail = (value: string) => /[^\s@]+@[^\s@]+\.[^\s@]+/.test(value);
-
 type FormState = {
   email: string;
   method: string;
@@ -285,6 +283,8 @@ const SigninPage = () => {
   const updateField = (field: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
+
+  const isValidEmail = (value: string) => /[^\s@]+@[^\s@]+\.[^\s@]+/.test(value);
 
   const emailInputStyle =
     form.email && !isValidEmail(form.email)
