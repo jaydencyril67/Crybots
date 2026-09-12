@@ -638,22 +638,6 @@ const SignupPage = () => {
               <p style={styles.footerNote}>
                 Use the recovery flow to verify your email, confirm your name, and reset your password safely.
               </p>
-              <a
-                href="/forgot-password"
-                style={{
-                  ...styles.button,
-                  ...styles.buttonPrimary,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  marginTop: '12px',
-                  minHeight: '48px',
-                  paddingInline: '20px',
-                }}
-              >
-                Forgot password?
-              </a>
             </article>
           </div>
           </div>
