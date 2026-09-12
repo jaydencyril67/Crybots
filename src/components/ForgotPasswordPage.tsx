@@ -107,7 +107,7 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    cursor: 'pointer',
+    cursor: 'default',
     flexShrink: 0,
   },
   grid: {
@@ -267,7 +267,7 @@ const styles = {
     borderRadius: '999px',
     padding: '13px 18px',
     fontWeight: 700,
-    cursor: 'pointer',
+    cursor: 'default',
     minWidth: '120px',
   },
   buttonGhost: {
