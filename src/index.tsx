@@ -7,6 +7,7 @@ import SignupConfirmationSentPage from './components/SignupConfirmationSentPage'
 import AccountConfirmedPage from './components/AccountConfirmedPage';
 import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -22,12 +23,13 @@ const isSignupConfirmationSentRoute = pathname === '/signup-confirmation-sent' |
 const isVerifyEmailRoute = pathname === '/verify-email' || hash === '#/verify-email';
 const isAccountConfirmedRoute = pathname === '/account-confirmed' || hash === '#/account-confirmed';
 const isSigninRoute = pathname === '/signin' || hash === '#/signin';
+const isForgotPasswordRoute = pathname === '/forgot-password' || hash === '#/forgot-password';
 const isDashboardRoute = pathname === '/dashboard' || hash === '#/dashboard';
 
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isDashboardRoute ? <ProtectedRoute><DashboardPage /></ProtectedRoute> : <LandingPage />}
+      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isForgotPasswordRoute ? <ForgotPasswordPage /> : isDashboardRoute ? <ProtectedRoute><DashboardPage /></ProtectedRoute> : <LandingPage />}
     </HelmetProvider>
   </React.StrictMode>
 );
