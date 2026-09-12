@@ -6,7 +6,7 @@ const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
   { title: 'Last name', description: 'Add your family name.', field: 'lastName', placeholder: 'Enter your last name' },
   { title: 'Gender', description: 'Choose the option that fits you best.', field: 'gender' },
-  { title: 'Date of birth', description: 'We use this for account verification.', field: 'dob' },
+  { title: 'Date of birth', description: 'You must be at least 18 years old to create an account.', field: 'dob' },
   { title: 'Email', description: 'This will be your login and notification email.', field: 'email', placeholder: 'Enter your email' },
   { title: 'Password', description: 'Create a strong password for your account.', field: 'password', placeholder: 'Create a password' },
 ] as const;
@@ -152,6 +152,12 @@ const styles = {
     overflowWrap: 'anywhere' as const,
     fontSize: '12px',
   },
+  inlineError: {
+    margin: '10px 0 0',
+    color: '#f87171',
+    fontSize: '12px',
+    fontWeight: 600,
+  },
   panel: {
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.12)',
@@ -289,6 +295,7 @@ const styles = {
 const SignupPage = () => {
   const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState<FormState>(initialState);
+  const [dobError, setDobError] = useState('');
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -310,6 +317,9 @@ const SignupPage = () => {
 
   const updateField = (field: StepField, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (field === 'dob') {
+      setDobError('');
+    }
   };
 
   const emailInputStyle =
@@ -317,8 +327,28 @@ const SignupPage = () => {
       ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
       : styles.input;
 
+  const isAtLeast18 = (value: string) => {
+    if (!value) return false;
+
+    const dob = new Date(value);
+    if (Number.isNaN(dob.getTime())) return false;
+
+    const today = new Date();
+    const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+
+    return dob <= eighteenYearsAgo;
+  };
+
+  const dobMeetsRequirement = current.field === 'dob' ? isAtLeast18(form.dob) : true;
+
   const handleNext = () => {
-    if (!canContinue) return;
+    if (current.field === 'dob' && !isAtLeast18(form.dob)) {
+      setDobError('You must be at least 18 years old to continue.');
+      return;
+    }
+
+    setDobError('');
+    if (!canContinue || !dobMeetsRequirement) return;
     setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
   };
 
@@ -380,11 +410,22 @@ const SignupPage = () => {
             </label>
             <input
               id={current.field}
-              style={styles.input}
+              style={{
+                ...styles.input,
+                ...(form.dob && !dobMeetsRequirement
+                  ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+                  : null),
+              }}
               type="date"
               value={form.dob}
               onChange={(event) => updateField('dob', event.target.value)}
+              max={(() => {
+                const date = new Date();
+                date.setFullYear(date.getFullYear() - 18);
+                return date.toISOString().split('T')[0];
+              })()}
             />
+            {dobError ? <p style={styles.inlineError}>{dobError}</p> : null}
           </div>
         );
       default:
