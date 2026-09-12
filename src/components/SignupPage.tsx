@@ -564,7 +564,7 @@ const SignupPage = () => {
                         cursor: canContinue ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      Finish setup <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
+                      Finish <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
                     </button>
                   )}
                 </div>
