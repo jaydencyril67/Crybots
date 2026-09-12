@@ -311,6 +311,11 @@ const SignupPage = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const emailInputStyle =
+    form.email && !isValidEmail(form.email)
+      ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+      : styles.input;
+
   const handleNext = () => {
     if (!canContinue) return;
     setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
@@ -333,7 +338,7 @@ const SignupPage = () => {
             </label>
             <input
               id={current.field}
-              style={styles.input}
+              style={current.field === 'email' ? emailInputStyle : styles.input}
               type={current.field === 'password' ? 'password' : current.field === 'email' ? 'email' : 'text'}
               value={form[current.field]}
               onChange={(event) => updateField(current.field, event.target.value)}

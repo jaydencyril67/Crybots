@@ -303,7 +303,7 @@ const SigninPage = () => {
             </label>
             <input
               id="signin-email"
-              style={styles.input}
+              style={current.field === 'email' ? emailInputStyle : styles.input}
               type="email"
               value={form.email}
               onChange={(event) => updateField('email', event.target.value)}
