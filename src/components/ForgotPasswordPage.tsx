@@ -383,7 +383,10 @@ const ForgotPasswordPage = () => {
 
     try {
       if (field === 'email') {
-        const response = await api.post('/auth/forgot-password/verify-email', { email: normalizeEmail(form.email) });
+        const response = await api.post('/auth/forgot-password/start', {
+          email: normalizeEmail(form.email),
+          fullName: normalizeFullName(form.fullName),
+        });
         const message = response.data?.message;
         setStatus(message || 'Email accepted. Continue with your full name.');
         setStep(1);
@@ -391,12 +394,7 @@ const ForgotPasswordPage = () => {
       }
 
       if (field === 'fullName') {
-        const response = await api.post('/auth/forgot-password/verify-name', {
-          email: normalizeEmail(form.email),
-          fullName: normalizeFullName(form.fullName),
-        });
-        const message = response.data?.message;
-        setStatus(message || 'Full name matched. We sent a 3-digit code to your email.');
+        setStatus('Full name matched. We sent a 3-digit code to your email.');
         setStep(2);
         return;
       }
