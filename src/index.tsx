@@ -21,12 +21,13 @@ const isSignupConfirmationSentRoute = pathname === '/signup-confirmation-sent' |
 const isVerifyEmailRoute = pathname === '/verify-email' || hash === '#/verify-email';
 const isAccountConfirmedRoute = pathname === '/account-confirmed' || hash === '#/account-confirmed';
 const isSigninRoute = pathname === '/signin' || hash === '#/signin';
-const isDashboardRoute = pathname === '/dashboard' || hash === '#/dashboard' || pathname === '/' || hash === '#/';
+const isDashboardRoute = pathname === '/dashboard' || hash === '#/dashboard';
+const isSignedIn = Boolean(localStorage.getItem('token'));
 
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isDashboardRoute ? <DashboardPage /> : <LandingPage />}
+      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isDashboardRoute ? (isSignedIn ? <DashboardPage /> : <SigninPage />) : <LandingPage />}
     </HelmetProvider>
   </React.StrictMode>
 );
