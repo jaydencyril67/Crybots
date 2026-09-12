@@ -530,6 +530,28 @@ const SigninPage = () => {
                     <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   ) : null}
                 </div>
+                <div style={{ marginTop: '2px' }}>
+                  <a
+                    href="/forgot-password"
+                    style={{
+                      ...styles.button,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '42px',
+                      padding: '0 16px',
+                      borderRadius: '14px',
+                      border: '1px solid rgba(103,232,249,0.35)',
+                      background: 'rgba(103,232,249,0.08)',
+                      color: '#67e8f9',
+                      textDecoration: 'none',
+                      fontWeight: 700,
+                      boxShadow: '0 8px 24px rgba(103,232,249,0.14)',
+                    }}
+                  >
+                    Forgot password?
+                  </a>
+                </div>
               </article>
             </div>
           </div>
