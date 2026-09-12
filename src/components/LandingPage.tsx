@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 
 const stats = [
   { value: '$2.4B+', label: '24h trading volume' },
@@ -459,13 +459,11 @@ const LandingPage = () => (
                 <a href="/signup" style={styles.buttonLink}>
                   <div style={styles.buttonPrimary}>
                     Get started
-                    <ArrowRight size={18} />
                   </div>
                 </a>
                 <a href="/signin" style={styles.buttonLink}>
                   <div style={styles.buttonSecondary}>
                     Dashboard
-                    <ArrowRight size={18} />
                   </div>
                 </a>
               </div>
