@@ -296,6 +296,7 @@ const SignupPage = () => {
   const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState<FormState>(initialState);
   const [dobError, setDobError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -320,12 +321,19 @@ const SignupPage = () => {
     if (field === 'dob') {
       setDobError('');
     }
+    if (field === 'password') {
+      setPasswordError('');
+    }
   };
 
   const emailInputStyle =
     form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
       ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
       : styles.input;
+
+  const passwordHasLetter = /[A-Za-z]/.test(form.password);
+  const passwordHasNumber = /\d/.test(form.password);
+  const passwordMeetsRequirement = passwordHasLetter && passwordHasNumber;
 
   const isAtLeast18 = (value: string) => {
     if (!value) return false;
@@ -347,7 +355,13 @@ const SignupPage = () => {
       return;
     }
 
+    if (current.field === 'password' && !passwordMeetsRequirement) {
+      setPasswordError('Password must contain at least 1 letter and 1 number.');
+      return;
+    }
+
     setDobError('');
+    setPasswordError('');
     if (!canContinue || !dobMeetsRequirement) return;
     setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
   };
@@ -376,6 +390,7 @@ const SignupPage = () => {
               placeholder={current.placeholder}
               autoComplete={current.field}
             />
+            {passwordError ? <p style={styles.inlineError}>{passwordError}</p> : null}
           </div>
         );
       case 'gender':
