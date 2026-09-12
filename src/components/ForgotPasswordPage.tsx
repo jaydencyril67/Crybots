@@ -458,13 +458,13 @@ const ForgotPasswordPage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
           <header style={styles.header}>
+            <button type="button" style={styles.backButton} onClick={goBack} aria-label="Go back">
+              <ArrowLeft style={styles.icon} />
+            </button>
             <div style={styles.brandBlock}>
               <p style={styles.brandKicker}>Kingshall</p>
               <p style={styles.brandSub}>Secure recovery flow</p>
             </div>
-            <button type="button" style={styles.backButton} onClick={goBack} aria-label="Go back">
-              <ArrowLeft style={styles.icon} />
-            </button>
           </header>
 
           <div style={styles.grid}>
