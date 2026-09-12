@@ -632,6 +632,30 @@ const SignupPage = () => {
                 </p>
               </article>
             </div>
+            <article style={styles.heroCard}>
+              <p style={styles.greeting}>Need help getting back in?</p>
+              <h2 style={styles.sectionTitle}>Forgot your password?</h2>
+              <p style={styles.footerNote}>
+                Use the recovery flow to verify your email, confirm your name, and reset your password safely.
+              </p>
+              <a
+                href="/forgot-password"
+                style={{
+                  ...styles.button,
+                  ...styles.buttonPrimary,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textDecoration: 'none',
+                  marginTop: '12px',
+                  minHeight: '48px',
+                  paddingInline: '20px',
+                }}
+              >
+                Forgot password?
+              </a>
+            </article>
+          </div>
           </div>
         </section>
       </main>
