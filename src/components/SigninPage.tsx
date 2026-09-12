@@ -3,24 +3,23 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, CheckCircle2, KeyRound } from 'lucide-react';
 
-const steps = [
-  { title: 'Email', description: 'Enter the email connected to your KingsHall account.', field: 'email', placeholder: 'Enter your email', type: 'email' },
-  { title: 'Sign-in method', description: 'Choose how you want to sign in today.', field: 'method' },
+const signInMethods = [
+  { value: 'password', title: 'Password', description: 'Use your account password to sign in.' },
+  { value: 'code', title: 'Email sign-in code', description: 'Receive a 3-digit code by email.' },
 ] as const;
 
-type StepField = (typeof steps)[number]['field'];
-
+type SignInMethod = (typeof signInMethods)[number]['value'];
 
 type FormState = {
   email: string;
-  method: string;
   password: string;
+  code: string;
 };
 
 const initialState: FormState = {
   email: '',
-  method: 'password',
   password: '',
+  code: '',
 };
 
 const styles = {
@@ -132,6 +131,10 @@ const styles = {
     padding: 'clamp(22px, 4vw, 30px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
+  },
+  headerCopy: {
+    display: 'grid',
+    gap: '10px',
   },
   progressWrap: {
     display: 'flex',
@@ -263,14 +266,15 @@ const styles = {
 };
 
 const SigninPage = () => {
-  const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState<FormState>(initialState);
+  const [method, setMethod] = useState<SignInMethod | null>(null);
+  const [step, setStep] = useState<'email' | 'method' | 'password' | 'code'>('email');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
+  const [attemptsLeft, setAttemptsLeft] = useState(5);
 
-  const current = steps[stepIndex];
-  const progress = ((stepIndex + 1) / steps.length) * 100;
-  const isLastStep = stepIndex === steps.length - 1;
+  const progress = step === 'email' ? 25 : step === 'method' ? 50 : step === 'password' || step === 'code' ? 75 : 100;
 
   const handleReturn = () => {
     if (window.history.length > 1) {
@@ -278,13 +282,10 @@ const SigninPage = () => {
       return;
     }
 
-    window.location.pathname = '/';
+    window.location.pathname = '/dashboard';
   };
 
-  const canContinue = useMemo(() => {
-    const value = form[current.field];
-    return value.trim().length > 0;
-  }, [current.field, form]);
+  const canContinue = useMemo(() => form.email.trim().length > 0, [form.email]);
 
   const updateField = (field: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -296,16 +297,68 @@ const SigninPage = () => {
       ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
       : styles.input;
 
+  const signInDisabled = isSubmitting || !canContinue || (step === 'code' && !form.code.trim()) || (step === 'password' && !form.password.trim());
+
   const handleNext = () => {
     if (!canContinue) return;
-    setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+    setStep('method');
   };
 
   const handleBack = () => {
-    setStepIndex((prev) => Math.max(prev - 1, 0));
+    if (step === 'method') {
+      setStep('email');
+      setMethod(null);
+      setSubmitError('');
+      return;
+    }
+
+    if (step === 'password' || step === 'code') {
+      setStep('method');
+      setSubmitError('');
+      return;
+    }
+
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.pathname = '/dashboard';
+    }
   };
 
-  const handleSignIn = async () => {
+  const handleStartSignin = async (selectedMethod: SignInMethod) => {
+    setSubmitError('');
+    setIsSubmitting(true);
+    setMethod(selectedMethod);
+
+    try {
+      const response = await api.post('/api/auth/signin/start', {
+        email: form.email,
+        method: selectedMethod,
+      });
+
+      if (selectedMethod === 'password') {
+        setStep('password');
+        return;
+      }
+
+      setCodeSent(true);
+      setStep('code');
+      setIsCodeLocked(false);
+      setAttemptsLeft(5 - (response.data?.attemptsUsed || 0));
+    } catch (error) {
+      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const message = response?.data?.message || 'Unable to start sign in right now. Please try again.';
+      setSubmitError(message);
+      if (response?.status === 423) {
+        setIsCodeLocked(true);
+      }
+      setMethod(null);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePasswordSignin = async () => {
     setSubmitError('');
     setIsSubmitting(true);
 
@@ -319,55 +372,44 @@ const SigninPage = () => {
         localStorage.setItem('token', response.data.token);
       }
 
-      window.location.pathname = '/';
+      window.location.pathname = '/dashboard';
     } catch (error) {
-      const message =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Unable to sign you in right now. Please try again.';
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Unable to sign you in right now. Please try again.';
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const currentField = (() => {
-    switch (current.field) {
-      case 'email':
-        return (
-          <div style={styles.field}>
-            <label style={styles.label} htmlFor="signin-email">
-              Email
-            </label>
-            <input
-              id="signin-email"
-              style={current.field === 'email' ? emailInputStyle : styles.input}
-              type="email"
-              value={form.email}
-              onChange={(event) => updateField('email', event.target.value)}
-              placeholder={current.placeholder}
-              autoComplete="email"
-            />
-          </div>
-        );
-      case 'method':
-        return (
-          <div style={styles.field}>
-            <label style={styles.label}>Password</label>
-            <input
-              style={styles.input}
-              type="password"
-              value={form.password}
-              onChange={(event) => updateField('password', event.target.value)}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-            />
-            {submitError ? <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p> : null}
-          </div>
-        );
-      default:
-        return null;
+  const handleCodeSignin = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post('/api/auth/signin/verify-code', {
+        email: form.email,
+        code: form.code,
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+
+      window.location.pathname = '/dashboard';
+    } catch (error) {
+      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const message = response?.data?.message || 'Unable to verify code right now. Please try again.';
+      setSubmitError(message);
+      if (response?.status === 423) {
+        setIsCodeLocked(true);
+      }
+      if (response?.status === 400 && message.toLowerCase().includes('attempt')) {
+        setAttemptsLeft((currentLeft) => Math.max(0, currentLeft - 1));
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  })();
+  };
 
   return (
     <>
@@ -398,7 +440,7 @@ const SigninPage = () => {
                   Welcome back.
                   <span style={styles.titleAccent}>Sign in fast.</span>
                 </h1>
-                <p style={styles.lead}>Enter your email and password. Unconfirmed accounts are blocked until their email is verified.</p>
+                <p style={styles.lead}>Enter your email once, then choose password or email code to continue. Email-code sign in is protected with a 5-attempt lockout.</p>
               </article>
 
               <article style={styles.panel}>
@@ -406,69 +448,87 @@ const SigninPage = () => {
                   <div style={styles.progressBar}>
                     <div style={{ ...styles.progressFill, width: `${progress}%` }} />
                   </div>
-                  <div>Step {stepIndex + 1} of {steps.length}</div>
+                  <div>{step === 'email' ? 'Step 1 of 3' : step === 'method' ? 'Step 2 of 3' : 'Step 3 of 3'}</div>
                 </div>
 
-                <p style={styles.stepLabel}>{current.title}</p>
-                <h2 style={styles.stepTitle}>Let’s verify your access</h2>
-                <p style={styles.stepDesc}>{current.description}</p>
-
-                <div style={styles.form}>{currentField}</div>
-
-                {stepIndex === steps.length - 1 ? (
-                  <div style={styles.footerNote}>
-                    Your email is already captured above. Choose the method you want to continue with.
-                  </div>
-                ) : null}
-
-                <div style={styles.navRow}>
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    disabled={stepIndex === 0}
-                    style={{
-                      ...styles.button,
-                      ...styles.buttonGhost,
-                      opacity: stepIndex === 0 ? 0.45 : 1,
-                      cursor: stepIndex === 0 ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    Back
-                  </button>
-
-                  {!isLastStep ? (
-                    <button
-                      type="button"
-                      onClick={handleNext}
-                      disabled={!canContinue}
-                      style={{
-                        ...styles.button,
-                        ...styles.buttonPrimary,
-                        opacity: canContinue ? 1 : 0.55,
-                        cursor: canContinue ? 'pointer' : 'not-allowed',
-                      }}
-                    >
-                      Next
-                    </button>
+                <div style={styles.headerCopy}>
+                  {step === 'email' ? (
+                    <>
+                      <p style={styles.stepLabel}>Email</p>
+                      <h2 style={styles.stepTitle}>Start with your account email</h2>
+                      <p style={styles.stepDesc}>We’ll use this to show your sign-in choices and keep the flow secure.</p>
+                    </>
+                  ) : step === 'method' ? (
+                    <>
+                      <p style={styles.stepLabel}>Choose method</p>
+                      <h2 style={styles.stepTitle}>Pick how you want to sign in</h2>
+                      <p style={styles.stepDesc}>Password is instant if you remember it. Code sign-in sends a 3-digit email code through Resend.</p>
+                    </>
+                  ) : step === 'password' ? (
+                    <>
+                      <p style={styles.stepLabel}>Password</p>
+                      <h2 style={styles.stepTitle}>Enter your password</h2>
+                      <p style={styles.stepDesc}>This is your standard sign-in route.</p>
+                    </>
                   ) : (
-                    <button
-                      type="button"
-                      disabled={!canContinue}
-                      style={{
-                        ...styles.button,
-                        ...styles.buttonPrimary,
-                        opacity: canContinue ? 1 : 0.55,
-                        cursor: canContinue ? 'pointer' : 'not-allowed',
-                      }}
-                    >
-                      Continue
-                    </button>
+                    <>
+                      <p style={styles.stepLabel}>Email code</p>
+                      <h2 style={styles.stepTitle}>Enter the 3-digit code</h2>
+                      <p style={styles.stepDesc}>{codeSent ? 'We sent the code to your email. Check your inbox and spam folder if needed.' : 'Request a code to continue.'}</p>
+                    </>
                   )}
                 </div>
 
-                <p style={styles.footerNote}>
-                  This sign-in page currently stores values in local page state only.
-                </p>
+                <div style={styles.form}>
+                  {step === 'email' ? (
+                    <div style={styles.field}>
+                      <label style={styles.label} htmlFor="signin-email">Email</label>
+                      <input id="signin-email" style={emailInputStyle} type="email" value={form.email} onChange={(event) => updateField('email', event.target.value)} placeholder="Enter your email" autoComplete="email" />
+                    </div>
+                  ) : null}
+
+                  {step === 'method' ? (
+                    <div style={styles.optionGrid}>
+                      {signInMethods.map((option) => (
+                        <button key={option.value} type="button" style={{ ...styles.optionCard, ...(method === option.value ? styles.optionCardActive : {}) }} onClick={() => handleStartSignin(option.value)} disabled={isSubmitting}>
+                          <KeyRound size={20} />
+                          <div>
+                            <div style={{ fontWeight: 700 }}>{option.title}</div>
+                            <div style={{ color: 'rgba(255,255,255,0.68)', fontSize: '13px', lineHeight: 1.5 }}>{option.description}</div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {step === 'password' ? (
+                    <div style={styles.field}>
+                      <label style={styles.label} htmlFor="signin-password">Password</label>
+                      <input id="signin-password" style={styles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
+                    </div>
+                  ) : null}
+
+                  {step === 'code' ? (
+                    <div style={styles.field}>
+                      <label style={styles.label} htmlFor="signin-code">Sign-in code</label>
+                      <input id="signin-code" style={styles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
+                      <div style={styles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
+                    </div>
+                  ) : null}
+
+                  {submitError ? <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p> : null}
+                </div>
+
+                <div style={styles.navRow}>
+                  <button type="button" onClick={handleBack} style={{ ...styles.button, ...styles.buttonGhost }}>Back</button>
+                  {step === 'email' ? (
+                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={!canContinue}>Continue</button>
+                  ) : step === 'password' ? (
+                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Sign in</button>
+                  ) : step === 'code' ? (
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
+                  ) : null}
+                </div>
               </article>
             </div>
           </div>
