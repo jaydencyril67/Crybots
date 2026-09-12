@@ -1,37 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
+import LandingPage from './components/LandingPage';
+import SignupPage from './components/SignupPage';
+import SigninPage from './components/SigninPage';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Root container missing in index.html');
 const root = ReactDOM.createRoot(container);
 
-// Hide loading screen when React is ready
-const hideLoader = () => {
-  const loader = document.getElementById('tradespot-loader');
-  if (loader) {
-    loader.classList.add('hidden');
-    setTimeout(() => {
-      loader.remove();
-    }, 300);
-  }
-};
+const pathname = window.location.pathname;
+const hash = window.location.hash;
 
-const AppLoader = () => {
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      hideLoader();
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  return null;
-};
+const isSignupRoute = pathname === '/signup' || hash === '#/signup';
+const isSigninRoute = pathname === '/signin' || hash === '#/signin';
 
 root.render(
   <React.StrictMode>
-    <AppLoader />
-    <HelmetProvider />
+    <HelmetProvider>{isSignupRoute ? <SignupPage /> : isSigninRoute ? <SigninPage /> : <LandingPage />}</HelmetProvider>
   </React.StrictMode>
 );
