@@ -383,7 +383,7 @@ const SignupPage = () => {
           <div style={styles.field}>
             <label style={styles.label}>Gender</label>
             <div style={styles.radioRow}>
-              {['Male', 'Female', 'Other', 'Prefer not to say'].map((option) => {
+              {['Male', 'Female'].map((option) => {
                 const active = form.gender === option;
                 return (
                   <button
