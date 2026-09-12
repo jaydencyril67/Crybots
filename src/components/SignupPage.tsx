@@ -158,6 +158,12 @@ const styles = {
     fontSize: '12px',
     fontWeight: 600,
   },
+  inlineNote: {
+    margin: '8px 0 0',
+    color: 'rgba(255,255,255,0.62)',
+    fontSize: '11px',
+    lineHeight: 1.5,
+  },
   panel: {
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.12)',
@@ -330,11 +336,13 @@ const SignupPage = () => {
 
   const passwordHasLetter = /[A-Za-z]/.test(form.password);
   const passwordHasNumber = /\d/.test(form.password);
-  const passwordMeetsRequirement = passwordHasLetter && passwordHasNumber;
+  const passwordHasMinLength = form.password.length >= 8;
+  const passwordMeetsRequirement = passwordHasLetter && passwordHasNumber && passwordHasMinLength;
   const passwordInputStyle =
     form.password && !passwordMeetsRequirement
       ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
       : styles.input;
+  const passwordNotice = 'Password must be at least 8 characters and include at least 1 letter and 1 number.';
 
   const isAtLeast18 = (value: string) => {
     if (!value) return false;
@@ -357,7 +365,7 @@ const SignupPage = () => {
     }
 
     if (current.field === 'password' && !passwordMeetsRequirement) {
-      setPasswordError('Password must contain at least 1 letter and 1 number.');
+      setPasswordError(passwordNotice);
       return;
     }
 
@@ -391,6 +399,7 @@ const SignupPage = () => {
               placeholder={current.placeholder}
               autoComplete={current.field}
             />
+            {current.field === 'password' ? <p style={styles.inlineNote}>{passwordNotice}</p> : null}
           </div>
         );
       case 'gender':
