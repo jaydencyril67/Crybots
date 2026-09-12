@@ -233,6 +233,7 @@ const styles = {
     borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(10,16,32,0.72)',
+    color: '#ffffff',
     padding: '14px 16px',
     cursor: 'pointer',
   },
