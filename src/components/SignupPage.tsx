@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
 
@@ -6,7 +7,7 @@ const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
   { title: 'Last name', description: 'Add your family name.', field: 'lastName', placeholder: 'Enter your last name' },
   { title: 'Gender', description: 'Choose the option that fits you best.', field: 'gender' },
-  { title: 'Date of birth', description: 'We use this for account verification.', field: 'dob' },
+  { title: 'Date of birth', description: 'You must be at least 18 years old to create an account.', field: 'dob' },
   { title: 'Email', description: 'This will be your login and notification email.', field: 'email', placeholder: 'Enter your email' },
   { title: 'Password', description: 'Create a strong password for your account.', field: 'password', placeholder: 'Create a password' },
 ] as const;
@@ -152,6 +153,18 @@ const styles = {
     overflowWrap: 'anywhere' as const,
     fontSize: '12px',
   },
+  inlineError: {
+    margin: '10px 0 0',
+    color: '#f87171',
+    fontSize: '12px',
+    fontWeight: 600,
+  },
+  inlineNote: {
+    margin: '8px 0 0',
+    color: 'rgba(255,255,255,0.62)',
+    fontSize: '11px',
+    lineHeight: 1.5,
+  },
   panel: {
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.12)',
@@ -233,6 +246,7 @@ const styles = {
     borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(10,16,32,0.72)',
+    color: '#ffffff',
     padding: '14px 16px',
     cursor: 'pointer',
   },
@@ -288,6 +302,10 @@ const styles = {
 const SignupPage = () => {
   const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState<FormState>(initialState);
+  const [dobError, setDobError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -309,6 +327,10 @@ const SignupPage = () => {
 
   const updateField = (field: StepField, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (field === 'dob') {
+      setDobError('');
+    }
+    setSubmitError('');
   };
 
   const emailInputStyle =
@@ -316,9 +338,86 @@ const SignupPage = () => {
       ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
       : styles.input;
 
+  const passwordHasLetter = /[A-Za-z]/.test(form.password);
+  const passwordHasNumber = /\d/.test(form.password);
+  const passwordHasMinLength = form.password.length >= 8;
+  const passwordMeetsRequirement = passwordHasLetter && passwordHasNumber && passwordHasMinLength;
+  const passwordInputStyle =
+    form.password && !passwordMeetsRequirement
+      ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+      : styles.input;
+  const passwordNotice = 'Password must be at least 8 characters and include at least 1 letter and 1 number.';
+
+  const isAtLeast18 = (value: string) => {
+    if (!value) return false;
+
+    const dob = new Date(value);
+    if (Number.isNaN(dob.getTime())) return false;
+
+    const today = new Date();
+    const eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+
+    return dob <= eighteenYearsAgo;
+  };
+
+  const dobMeetsRequirement = current.field === 'dob' ? isAtLeast18(form.dob) : true;
+
   const handleNext = () => {
-    if (!canContinue) return;
+    if (current.field === 'dob' && !isAtLeast18(form.dob)) {
+      setDobError('You must be at least 18 years old to continue.');
+      return;
+    }
+
+    if (current.field === 'password' && !passwordMeetsRequirement) {
+      setPasswordError(passwordNotice);
+      return;
+    }
+
+    setDobError('');
+    setPasswordError('');
+    if (!canContinue || !dobMeetsRequirement) return;
     setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+  };
+
+  const handleFinish = async () => {
+    if (!passwordMeetsRequirement) {
+      setPasswordError(passwordNotice);
+      return;
+    }
+
+    if (!isAtLeast18(form.dob)) {
+      setDobError('You must be at least 18 years old to continue.');
+      return;
+    }
+
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post('/api/auth/signup', {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        gender: form.gender,
+        dob: form.dob,
+        email: form.email,
+        password: form.password,
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+
+      setSubmitError('');
+      setStepIndex(steps.length - 1);
+      window.location.pathname = '/signup-confirmation-sent';
+    } catch (error) {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Unable to create your account right now. Please try again.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -338,13 +437,14 @@ const SignupPage = () => {
             </label>
             <input
               id={current.field}
-              style={current.field === 'email' ? emailInputStyle : styles.input}
+              style={current.field === 'email' ? emailInputStyle : current.field === 'password' ? passwordInputStyle : styles.input}
               type={current.field === 'password' ? 'password' : current.field === 'email' ? 'email' : 'text'}
               value={form[current.field]}
               onChange={(event) => updateField(current.field, event.target.value)}
               placeholder={current.placeholder}
               autoComplete={current.field}
             />
+            {current.field === 'password' ? <p style={styles.inlineNote}>{passwordNotice}</p> : null}
           </div>
         );
       case 'gender':
@@ -352,7 +452,7 @@ const SignupPage = () => {
           <div style={styles.field}>
             <label style={styles.label}>Gender</label>
             <div style={styles.radioRow}>
-              {['Male', 'Female', 'Other', 'Prefer not to say'].map((option) => {
+              {['Male', 'Female'].map((option) => {
                 const active = form.gender === option;
                 return (
                   <button
@@ -379,11 +479,22 @@ const SignupPage = () => {
             </label>
             <input
               id={current.field}
-              style={styles.input}
+              style={{
+                ...styles.input,
+                ...(form.dob && !dobMeetsRequirement
+                  ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+                  : null),
+              }}
               type="date"
               value={form.dob}
               onChange={(event) => updateField('dob', event.target.value)}
+              max={(() => {
+                const date = new Date();
+                date.setFullYear(date.getFullYear() - 18);
+                return date.toISOString().split('T')[0];
+              })()}
             />
+            {dobError ? <p style={styles.inlineError}>{dobError}</p> : null}
           </div>
         );
       default:
@@ -413,7 +524,7 @@ const SignupPage = () => {
               </button>
               <div style={styles.brandBlock}>
                 <p style={styles.brandKicker}>KingsHall Exchange</p>
-                <p style={styles.brandSub}>Secure signup experience, no auth wired yet.</p>
+                <p style={styles.brandSub}>Secure signup experience. Accounts require email confirmation before sign in.</p>
               </div>
             </header>
 
@@ -499,21 +610,23 @@ const SignupPage = () => {
                   ) : (
                     <button
                       type="button"
-                      disabled={!canContinue}
+                      onClick={handleFinish}
+                      disabled={!canContinue || isSubmitting}
                       style={{
                         ...styles.button,
                         ...styles.buttonPrimary,
-                        opacity: canContinue ? 1 : 0.55,
-                        cursor: canContinue ? 'pointer' : 'not-allowed',
+                        opacity: canContinue && !isSubmitting ? 1 : 0.55,
+                        cursor: canContinue && !isSubmitting ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      Finish setup <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
+                      {isSubmitting ? 'Finishing...' : 'Finish'} <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
                     </button>
                   )}
                 </div>
 
+                {submitError ? <p style={styles.inlineError}>{submitError}</p> : null}
                 <p style={styles.footerNote}>
-                  This page currently stores form data locally only. Next we can connect it to your actual signup/auth flow.
+                  Your account will be created on the Kingshalls backend when you finish signup.
                 </p>
               </article>
             </div>

@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import LandingPage from './components/LandingPage';
 import SignupPage from './components/SignupPage';
+import SignupConfirmationSentPage from './components/SignupConfirmationSentPage';
+import AccountConfirmedPage from './components/AccountConfirmedPage';
 import SigninPage from './components/SigninPage';
 
 const container = document.getElementById('root');
@@ -13,10 +15,14 @@ const pathname = window.location.pathname;
 const hash = window.location.hash;
 
 const isSignupRoute = pathname === '/signup' || hash === '#/signup';
+const isSignupConfirmationSentRoute = pathname === '/signup-confirmation-sent' || hash === '#/signup-confirmation-sent';
+const isAccountConfirmedRoute = pathname === '/account-confirmed' || hash === '#/account-confirmed';
 const isSigninRoute = pathname === '/signin' || hash === '#/signin';
 
 root.render(
   <React.StrictMode>
-    <HelmetProvider>{isSignupRoute ? <SignupPage /> : isSigninRoute ? <SigninPage /> : <LandingPage />}</HelmetProvider>
+    <HelmetProvider>
+      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : <LandingPage />}
+    </HelmetProvider>
   </React.StrictMode>
 );

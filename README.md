@@ -1,93 +1,32 @@
-# Crypto Investment Platform
+# KingsHall Exchange
 
-## Overview
-The Crypto Investment Platform is a web application designed to help users manage their cryptocurrency investments. It provides features for tracking portfolios, executing trades, and viewing market trends.
+## Environment variables
 
-## Features
-- **Dashboard**: An overview of user investments and market trends.
-- **Portfolio**: Detailed view of current crypto holdings, including quantity and value.
-- **Trade**: Functionality to buy and sell cryptocurrencies with user input handling.
-- **User Authentication**: Login and registration pages for user management.
-- **API Integration**: Fetch market data and manage user portfolios through API calls.
+### Client
 
-## Getting Started
+Create a `.env` file in the frontend project root with:
 
-### Prerequisites
-- Node.js (version 14 or higher)
-- npm (Node package manager)
-
-### Installation
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/crypto-investment-platform.git
-   ```
-2. Navigate to the project directory:
-   ```
-   cd crypto-investment-platform
-   ```
-3. Install the dependencies:
-   ```
-   npm install
-   ```
-
-### Running the Application
-To start the development server, run:
-```
-npm start
-```
-The application will be available at `http://localhost:3000`.
-
-### Building for Production
-To create a production build, run:
-```
-npm run build
+```bash
+REACT_APP_API_URL=https://kingshalls.onrender.com
 ```
 
-## Contributing
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+If you are running the app locally, point `REACT_APP_API_URL` to your local backend instead.
 
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+### Server
 
-## SEO and sitemap guidance
+Create a `.env` file in the backend project root with:
 
-Follow these steps to help Google index your pages:
-
-1) Install new dependency
-
-Open a terminal in `client/` and run:
-
-```powershell
-npm install
+```bash
+PORT=3001
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_long_random_jwt_secret
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=KingsHall <noreply@yourdomain.com>
+APP_URL=https://your-frontend-domain.com
 ```
 
-This will install `react-helmet-async` which is used for setting per-page metadata.
-
-2) Regenerate sitemap
-
-Run the sitemap generator to update `public/sitemap.xml`:
-
-```powershell
-node sitemap-generator.js
-```
-
-3) Build and deploy
-
-After installing deps and regenerating the sitemap, build the app and deploy your `client/build` (or however you host the site). Example:
-
-```powershell
-npm run build
-```
-
-4) Submit to Google Search Console
-
-- Verify your site (https://www.tradespot.online) in Google Search Console using DNS/HTML file/method you prefer.
-- In Search Console, open "Sitemaps" and submit: `https://www.tradespot.online/sitemap.xml`.
-- Optionally, use "URL Inspection" to request indexing for individual important pages (e.g. `/f`, `/co`).
-
-Notes & recommendations
-
-- Because this app uses client-side routing (React Router), search engines will index static content and metadata they can access. Adding `react-helmet-async` ensures each route has distinct titles/descriptions when crawled.
-- For better coverage consider using server-side rendering (Next.js) or prerendering critical pages if you need richer SEO for many pages.
-- Ensure `robots.txt` is present and references `/sitemap.xml` (already configured).
-- Monitor Search Console for crawling/indexing errors and fix any blocked resources or 404s.
+Notes:
+- `RESEND_API_KEY` is required to send confirmation emails.
+- `EMAIL_FROM` must be a verified sender in Resend.
+- `APP_URL` is used to build the email confirmation link that sends users back to the app.
+- `JWT_SECRET` should be a strong random string.
