@@ -103,9 +103,11 @@ const styles = {
     color: '#050816',
     padding: '12px 20px',
     fontWeight: 800,
-    width: 'fit-content',
+    width: '100%',
+    minWidth: '180px',
     display: 'inline-flex',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: '10px',
     textDecoration: 'none',
   },
@@ -116,9 +118,14 @@ const styles = {
     color: '#ffffff',
     padding: '12px 20px',
     fontWeight: 700,
-    width: 'fit-content',
+    width: '100%',
+    minWidth: '180px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
     textDecoration: 'none',
-  },
+  }
   heroGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
@@ -165,17 +172,20 @@ const styles = {
   },
   buttonRow: {
     display: 'flex',
-    flexWrap: 'nowrap' as const,
+    flexWrap: 'wrap' as const,
     gap: '12px',
     marginTop: '40px',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonGroup: {
     display: 'flex',
-    flexWrap: 'nowrap' as const,
+    flexWrap: 'wrap' as const,
     gap: '12px',
     alignItems: 'center',
-  },
+    justifyContent: 'center',
+    width: '100%',
+  }
   buttonLink: {
     textDecoration: 'none',
   },
@@ -454,7 +464,10 @@ const LandingPage = () => (
                   </div>
                 </a>
                 <a href="/signin" style={styles.buttonLink}>
-                  <div style={styles.buttonSecondary}>Sign in</div>
+                  <div style={styles.buttonSecondary}>
+                    Dashboard
+                    <ArrowRight size={18} />
+                  </div>
                 </a>
               </div>
 
