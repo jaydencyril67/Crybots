@@ -251,6 +251,17 @@ const styles = {
     fontSize: '13px',
     lineHeight: 1.6,
   },
+  linkButton: {
+    marginTop: '10px',
+    padding: 0,
+    border: 'none',
+    background: 'transparent',
+    color: '#67e8f9',
+    fontSize: '13px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: 'none',
+  },
   icon: {
     width: '20px',
     height: '20px',
