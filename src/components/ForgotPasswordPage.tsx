@@ -474,21 +474,6 @@ const ForgotPasswordPage = () => {
                 <span style={styles.titleAccent}>Reset your password safely.</span>
                 Confirm your identity, receive a 3-digit code, and set a new password.
               </h1>
-              <p style={styles.lead}>
-                This flow verifies your email first, then checks the full name on the account before sending a code.
-              </p>
-
-              <div style={styles.summaryBox}>
-                <div style={styles.summaryRow}>
-                  <span style={styles.summaryKey}>Email</span>
-                  <span style={styles.summaryValue}>{displaySummary.email || '—'}</span>
-                </div>
-                <div style={styles.summaryRow}>
-                  <span style={styles.summaryKey}>Account name</span>
-                  <span style={styles.summaryValue}>{displaySummary.fullName || '—'}</span>
-                </div>
-              </div>
-
               {completed ? (
                 <div style={styles.successBox}>
                   <CheckCircle2 style={styles.icon} />
