@@ -84,7 +84,7 @@ const SignupConfirmationSentPage = () => {
           </div>
           <h1 style={styles.title}>Account created</h1>
           <p style={styles.text}>
-            We sent a confirmation link to your email. Please confirm your account before signing in.
+            We sent a confirmation link to your email. Open it within 15 minutes to verify your account before signing in.
           </p>
           <p style={styles.countdown}>Redirecting to sign in in {secondsLeft} seconds...</p>
         </section>
