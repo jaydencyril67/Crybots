@@ -632,6 +632,14 @@ const SignupPage = () => {
                 </p>
               </article>
             </div>
+            <article style={styles.heroCard}>
+              <p style={styles.greeting}>Need help getting back in?</p>
+              <h2 style={styles.sectionTitle}>Forgot your password?</h2>
+              <p style={styles.footerNote}>
+                Use the recovery flow to verify your email, confirm your name, and reset your password safely.
+              </p>
+            </article>
+          </div>
           </div>
         </section>
       </main>
