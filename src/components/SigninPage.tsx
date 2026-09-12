@@ -273,6 +273,7 @@ const SigninPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
   const [isCodeLocked, setIsCodeLocked] = useState(false);
+  const [isResendingCode, setIsResendingCode] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
 
   const progress = step === 'email' ? 25 : step === 'method' ? 50 : step === 'password' || step === 'code' ? 75 : 100;
@@ -412,6 +413,34 @@ const SigninPage = () => {
     }
   };
 
+  const handleResendCode = async () => {
+    if (!form.email.trim() || isResendingCode) return;
+
+    setSubmitError('');
+    setIsResendingCode(true);
+
+    try {
+      const response = await api.post('/api/auth/signin/start', {
+        email: form.email,
+        method: 'code',
+      });
+
+      setCodeSent(true);
+      setStep('code');
+      setIsCodeLocked(false);
+      setAttemptsLeft(5 - (response.data?.attemptsUsed || 0));
+    } catch (error) {
+      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const message = response?.data?.message || 'Unable to resend code right now. Please try again.';
+      setSubmitError(message);
+      if (response?.status === 423) {
+        setIsCodeLocked(true);
+      }
+    } finally {
+      setIsResendingCode(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -514,6 +543,9 @@ const SigninPage = () => {
                       <label style={styles.label} htmlFor="signin-code">Sign-in code</label>
                       <input id="signin-code" style={styles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
                       <div style={styles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
+                      <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={{ ...styles.linkButton, marginTop: '10px' }}>
+                        {isResendingCode ? 'Resending code…' : 'Resend code'}
+                      </button>
                     </div>
                   ) : null}
 
