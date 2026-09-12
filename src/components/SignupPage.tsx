@@ -415,6 +415,8 @@ const SignupPage = () => {
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
         'Unable to create your account right now. Please try again.';
       setSubmitError(message);
+
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
