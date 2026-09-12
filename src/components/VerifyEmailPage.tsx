@@ -51,7 +51,7 @@ const styles = {
     gap: '10px',
     textDecoration: 'none',
     boxShadow: '0 12px 30px rgba(103,232,249,0.2)',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+
   },
   iconWrap: {
     width: '72px',
@@ -148,14 +148,7 @@ const VerifyEmailPage = () => {
               <a
                 href="/signin"
                 style={styles.button}
-                onMouseEnter={(event) => {
-                  event.currentTarget.style.transform = 'translateY(-1px)';
-                  event.currentTarget.style.boxShadow = '0 16px 34px rgba(103,232,249,0.28)';
-                }}
-                onMouseLeave={(event) => {
-                  event.currentTarget.style.transform = 'translateY(0)';
-                  event.currentTarget.style.boxShadow = '0 12px 30px rgba(103,232,249,0.2)';
-                }}
+
               >
                 Continue to sign in
                 <ArrowRight size={18} />
