@@ -125,7 +125,7 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
     textDecoration: 'none',
-  }
+  },
   heroGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
