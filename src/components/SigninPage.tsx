@@ -284,6 +284,11 @@ const SigninPage = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const emailInputStyle =
+    form.email && !isValidEmail(form.email)
+      ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+      : styles.input;
+
   const handleNext = () => {
     if (!canContinue) return;
     setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
