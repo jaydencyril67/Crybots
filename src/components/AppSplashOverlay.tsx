@@ -51,7 +51,7 @@ const AppSplashOverlay = () => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const revealDelay = 2000;
+    const revealDelay = 3000;
     const timer = window.setTimeout(() => setReady(true), revealDelay);
 
     return () => window.clearTimeout(timer);
