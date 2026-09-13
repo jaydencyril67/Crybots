@@ -608,6 +608,12 @@ const SigninPage = () => {
                     <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   ) : null}
                 </div>
+                <div style={styles.switchRow}>
+                  <span style={styles.switchText}>New to KingsHall?</span>
+                  <button type="button" onClick={() => { window.location.pathname = '/signup'; }} style={styles.switchLink}>
+                    Signup here
+                  </button>
+                </div>
               </article>
               <article style={styles.heroCard}>
                 <p style={styles.stepLabel}>Need help?</p>

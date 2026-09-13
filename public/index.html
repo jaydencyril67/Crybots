@@ -8,6 +8,7 @@
     <!-- Set theme before React loads to prevent flicker -->
     <script>
       document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+      window.__kingshallRefreshSplash = performance.getEntriesByType('navigation')[0]?.type === 'reload';
     </script>
 
     <!-- 🔥 SEO & Branding Meta -->
@@ -56,8 +57,20 @@
     <!-- End TrustBox script -->
   </head>
   <body style="margin: 0; background: #050816; overflow-x: hidden;">
+    <script>
+      if (window.__kingshallRefreshSplash) {
+        document.body.style.visibility = 'hidden';
+      }
+    </script>
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root" style="min-height: 100vh;"></div>
+    <script>
+      if (window.__kingshallRefreshSplash) {
+        requestAnimationFrame(() => {
+          document.body.style.visibility = 'visible';
+        });
+      }
+    </script>
   </body>
 </html>

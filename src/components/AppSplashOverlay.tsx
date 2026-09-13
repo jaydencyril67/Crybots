@@ -47,28 +47,22 @@ const styles = {
   },
 };
 
-const AppSplashOverlay = () => {
+const AppSplashOverlay = ({ active }: { active: boolean }) => {
   const [ready, setReady] = useState(false);
-  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    const navigationEntry = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
-    const isRefreshNavigation = navigationEntry?.entryType === 'navigation' && navigationEntry?.type === 'reload';
-
-    if (!isRefreshNavigation) {
-      setEnabled(false);
+    if (!active) {
       setReady(true);
       return;
     }
 
-    setEnabled(true);
     const revealDelay = 3000;
     const timer = window.setTimeout(() => setReady(true), revealDelay);
 
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [active]);
 
-  if (!enabled) {
+  if (!active) {
     return null;
   }
 
