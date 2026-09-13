@@ -24,44 +24,12 @@ const styles = {
     gap: '18px',
     textAlign: 'center' as const,
   },
-  badge: {
-    width: '112px',
-    height: '112px',
-    borderRadius: '34px',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: 'linear-gradient(180deg, rgba(6,11,22,0.95) 0%, rgba(17,24,39,0.98) 100%)',
-    border: '1px solid rgba(255,255,255,0.14)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 20px 42px rgba(0,0,0,0.34)',
-  },
-  badgeInner: {
-    width: '68px',
-    height: '68px',
-    borderRadius: '22px',
-    position: 'relative' as const,
-    background: 'linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(167,139,250,0.82) 55%, rgba(103,232,249,0.9) 100%)',
-    boxShadow: '0 0 0 1px rgba(255,255,255,0.22), 0 16px 30px rgba(139,92,246,0.18)',
-    overflow: 'hidden',
-  },
-  badgeCut: {
-    position: 'absolute' as const,
-    inset: '16px 14px 16px 14px',
-    borderRadius: '14px',
-    background: 'linear-gradient(180deg, rgba(6,11,22,0.96) 0%, rgba(17,24,39,0.96) 100%)',
-    clipPath: 'polygon(0 0, 58% 0, 58% 38%, 100% 38%, 100% 62%, 58% 62%, 58% 100%, 0 100%, 0 62%, 42% 62%, 42% 38%, 0 38%)',
-    opacity: 0.98,
-  },
-  title: {
-    margin: 0,
-    fontSize: '16px',
-    fontWeight: 900,
-    letterSpacing: '0.18em',
-    textTransform: 'uppercase' as const,
-    background: 'linear-gradient(135deg, #F8FAFC 0%, #C7D2FE 22%, #A78BFA 52%, #67E8F9 82%, #E2E8F0 100%)',
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: 'transparent',
+  logo: {
+    width: '132px',
+    height: '132px',
+    objectFit: 'contain' as const,
+    display: 'block',
+    filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.38))',
   },
   subtitle: {
     margin: 0,
@@ -92,11 +60,7 @@ const AppSplashOverlay = () => {
   return (
     <div style={{ ...styles.overlay, ...(ready ? styles.hidden : {}) }} aria-hidden={ready}>
       <div style={styles.card}>
-        <div style={styles.badge}>
-          <div style={styles.badgeInner}>
-            <div style={styles.badgeCut} />
-          </div>
-        </div>
+        <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.logo} />
         <div>
           <p style={styles.subtitle}>KingsHall Exchange</p>
         </div>
