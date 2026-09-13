@@ -47,7 +47,7 @@ const styles = {
   },
 };
 
-const AppSplashOverlay = ({ active }: { active: boolean }) => {
+const AppSplashOverlay = ({ active = false }: { active?: boolean }) => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
