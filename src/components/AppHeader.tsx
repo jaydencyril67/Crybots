@@ -17,8 +17,8 @@ const styles = {
     zIndex: 2,
   },
   headerIcon: {
-    width: '26px',
-    height: '26px',
+    width: '16px',
+    height: '16px',
     display: 'block',
     objectFit: 'contain' as const,
     flexShrink: 0,
