@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react';
+import AppHeader from './AppHeader';
 
 type MarketCoin = {
   symbol: string;
@@ -50,42 +51,26 @@ const dashboardMetrics = [
 ];
 
 const advicePool: AdviceCard[] = [
-  {
-    title: 'Keep dry powder ready',
-    text: 'A portion of your capital should always stay liquid so you can act when the market gives a clean setup instead of chasing spikes.',
-    accent: '#22c55e',
-    icon: <ShieldCheck />,
-  },
-  {
-    title: 'Scale into positions',
-    text: 'Consider splitting entries into smaller tranches. It smooths emotional decisions and reduces the pressure of timing one perfect price.',
-    accent: '#38bdf8',
-    icon: <TrendingUp />,
-  },
-  {
-    title: 'Watch volatility windows',
-    text: 'Big moves often cluster around major session opens, macro data, or exchange-specific catalysts. Plan around events, not just candles.',
-    accent: '#c084fc',
-    icon: <CandlestickChart />,
-  },
-  {
-    title: 'Protect winners',
-    text: 'If a trade is moving in your favor, move part of the risk off the table. Locking some gains can keep your account growing steadily.',
-    accent: '#f59e0b',
-    icon: <Coins />,
-  },
-  {
-    title: 'Prefer high-conviction setups',
-    text: 'Trade fewer ideas, but make sure the ones you take have a strong thesis, a clear invalidation point, and enough upside to justify risk.',
-    accent: '#67e8f9',
-    icon: <Activity />,
-  },
-  {
-    title: 'Respect the trend',
-    text: 'The market pays the most to traders who align with momentum. When the trend is strong, fighting it usually costs more than waiting.',
-    accent: '#fb7185',
-    icon: <ArrowUpRight />,
-  },
+  { title: 'Keep dry powder ready', text: 'Keep some capital liquid so you can act when a clean setup appears instead of chasing noise.', accent: '#22c55e', icon: <ShieldCheck /> },
+  { title: 'Scale into positions', text: 'Split entries into smaller tranches to reduce emotional pressure and avoid chasing one perfect price.', accent: '#38bdf8', icon: <TrendingUp /> },
+  { title: 'Watch volatility windows', text: 'Big moves often cluster around major session opens, macro data, or exchange-specific catalysts.', accent: '#c084fc', icon: <CandlestickChart /> },
+  { title: 'Protect winners', text: 'When a trade works in your favor, reduce some risk so gains can compound more steadily.', accent: '#f59e0b', icon: <Coins /> },
+  { title: 'Prefer high-conviction setups', text: 'Take fewer ideas, but make sure each one has a strong thesis, a clear invalidation point, and real upside.', accent: '#67e8f9', icon: <Activity /> },
+  { title: 'Respect the trend', text: 'Momentum often pays more than prediction. When the trend is strong, patience can be more profitable than fighting it.', accent: '#fb7185', icon: <ArrowUpRight /> },
+  { title: 'Manage risk first', text: 'A good trade idea still needs a hard stop and a clear sizing plan before capital goes in.', accent: '#f97316', icon: <ShieldCheck /> },
+  { title: 'Let winners breathe', text: 'If your plan allows it, avoid cutting strong trades too early just because the next candle looks noisy.', accent: '#14b8a6', icon: <TrendingUp /> },
+  { title: 'Track catalysts', text: 'Earnings, unlocks, and macro headlines can matter more than short-term chart patterns.', accent: '#8b5cf6', icon: <CandlestickChart /> },
+  { title: 'Avoid revenge trading', text: 'If you take a loss, step back and reset before forcing the next position.', accent: '#ef4444', icon: <Coins /> },
+  { title: 'Use confirmations', text: 'Wait for structure, volume, or momentum to confirm the thesis before committing size.', accent: '#06b6d4', icon: <Activity /> },
+  { title: 'Keep a watchlist', text: 'A focused watchlist helps you spot the best setups without staring at everything at once.', accent: '#f43f5e', icon: <ArrowUpRight /> },
+  { title: 'Be patient with entries', text: 'The market gives multiple chances. Sometimes the best move is waiting for your zone.', accent: '#84cc16', icon: <ShieldCheck /> },
+  { title: 'Take profits in layers', text: 'Partial exits can balance upside participation with real gains in the account.', accent: '#0ea5e9', icon: <TrendingUp /> },
+  { title: 'Favor quality over quantity', text: 'One well-planned trade can beat several random ones that were taken out of boredom.', accent: '#d946ef', icon: <Coins /> },
+  { title: 'Use structure breaks', text: 'When price breaks important levels, let the market prove the move before you size up.', accent: '#f59e0b', icon: <CandlestickChart /> },
+  { title: 'Stay consistent', text: 'The edge comes from repeating the same risk rules, not from trying to catch every move.', accent: '#22c55e', icon: <Activity /> },
+  { title: 'Avoid crowded entries', text: 'If everyone is talking about the same move, wait for a better risk-reward window.', accent: '#38bdf8', icon: <ArrowUpRight /> },
+  { title: 'Protect mental capital', text: 'If the day gets choppy, stepping away can preserve both focus and discipline.', accent: '#c084fc', icon: <ShieldCheck /> },
+  { title: 'Think in scenarios', text: 'Before entering, know what you’ll do if price breaks up, fails, or goes sideways.', accent: '#fb7185', icon: <Coins /> },
 ];
 
 const styles = {
@@ -427,10 +412,26 @@ const getFirstName = (fullName?: string) => {
   if (fullName?.trim()) return fullName.trim().split(/\s+/)[0];
   const stored = window.localStorage.getItem('kingshall_first_name') || window.localStorage.getItem('firstName');
   if (stored?.trim()) return stored.trim().split(/\s+/)[0];
-  return 'Trader';
+  return '';
 };
 
-const getAdviceIndex = () => Math.floor(Date.now() / (1000 * 60 * 60)) % advicePool.length;
+const getSeededAdviceOrder = (hourKey: number) => {
+  const order = advicePool.map((_, index) => index);
+  let seed = hourKey;
+
+  for (let index = order.length - 1; index > 0; index -= 1) {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    const swapIndex = seed % (index + 1);
+    [order[index], order[swapIndex]] = [order[swapIndex], order[index]];
+  }
+
+  return order;
+};
+
+const getAdviceIndex = () => {
+  const hourKey = Math.floor(Date.now() / (1000 * 60 * 60));
+  return getSeededAdviceOrder(hourKey)[hourKey % advicePool.length];
+};
 
 const DashboardPage = () => {
   const [now, setNow] = useState(new Date());
@@ -546,7 +547,7 @@ const DashboardPage = () => {
               <p style={styles.greeting}>{greeting}</p>
               <h1 style={styles.title}>
                 Welcome back,
-                <span style={styles.titleAccent}> {isAuthNameLoaded ? firstName : 'Trader'}</span>
+                <span style={styles.titleAccent}> {isAuthNameLoaded && firstName ? firstName : 'Trader'}</span>
               </h1>
               <p style={styles.lead}>
                 This is your market home base — live prices, market context, and a fresh hourly insight to help you stay sharp without showing personal account details.
@@ -650,8 +651,8 @@ const DashboardPage = () => {
             </section>
 
             <section style={styles.panel}>
-              <p style={styles.panelTitle}>Hourly financial advice</p>
-              <p style={styles.panelSub}>A rotating insight updates every hour to keep the guidance fresh and relevant.</p>
+              <p style={styles.panelTitle}>Financial advice</p>
+              <p style={styles.panelSub}>A rotating insight keeps the guidance fresh and relevant.</p>
 
               <div style={styles.adviceWrap}>
                 <article style={styles.adviceCard}>
@@ -661,7 +662,6 @@ const DashboardPage = () => {
                     </div>
                     <div>
                       <p style={styles.adviceTitle}>{advice.title}</p>
-                      <p style={{ ...styles.panelSub, marginTop: '4px' }}>{new Date().toLocaleString([], { hour: 'numeric', minute: '2-digit' })} update</p>
                     </div>
                   </div>
                   <p style={styles.adviceText}>{advice.text}</p>
@@ -676,29 +676,6 @@ const DashboardPage = () => {
               </div>
             </section>
 
-            <section style={styles.panel}>
-              <p style={styles.panelTitle}>What’s next</p>
-              <p style={styles.panelSub}>Useful shortcuts for the next step in the app, without exposing user-specific data.</p>
-
-              <div style={styles.featureList}>
-                <div style={styles.featureItem}>
-                  <ShieldCheck style={styles.icon} />
-                  <p style={styles.featureText}>Complete identity and security setup once you wire the full auth flow.</p>
-                </div>
-                <div style={styles.featureItem}>
-                  <Globe2 style={styles.icon} />
-                  <p style={styles.featureText}>Add Google sign-in as an alternate entry path for faster onboarding.</p>
-                </div>
-                <div style={styles.featureItem}>
-                  <Wallet style={styles.icon} />
-                  <p style={styles.featureText}>Keep this page as a neutral home screen that can lead into trading, deposits, and portfolio features later.</p>
-                </div>
-              </div>
-
-              <p style={styles.footerNote}>
-                This dashboard is intentionally clean: it gives users a market overview, a personal-feeling greeting, and a rotating insight — without showing balances, profile data, or account history.
-              </p>
-            </section>
           </div>
         </div>
       </main>
