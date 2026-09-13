@@ -516,6 +516,11 @@ const SigninPage = () => {
                       <p style={styles.stepLabel}>Email code</p>
                       <h2 style={styles.stepTitle}>Enter the 3-digit code</h2>
                       <p style={styles.stepDesc}>{codeSent ? 'We sent the code to your email. Check your inbox and spam folder if needed.' : 'Request a code to continue.'}</p>
+                      {codeSent ? (
+                        <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
+                          {isResendingCode ? 'Resending code…' : 'Resend code'}
+                        </button>
+                      ) : null}
                     </>
                   )}
                 </div>
@@ -554,9 +559,7 @@ const SigninPage = () => {
                       <label style={styles.label} htmlFor="signin-code">Sign-in code</label>
                       <input id="signin-code" style={styles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
                       <div style={styles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
-                      <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={{ ...styles.linkButton, marginTop: '10px' }}>
-                        {isResendingCode ? 'Resending code…' : 'Resend code'}
-                      </button>
+
                     </div>
                   ) : null}
 
