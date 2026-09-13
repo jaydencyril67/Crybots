@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react';
+import AppHeader from './AppHeader';
 
 type MarketCoin = {
   symbol: string;

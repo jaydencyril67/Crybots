@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
+import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 
 const steps = [
