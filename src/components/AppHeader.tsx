@@ -19,20 +19,26 @@ const styles = {
     minWidth: 0,
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '3px',
+    gap: '2px',
   },
   brandTitle: {
     margin: 0,
-    fontSize: '15px',
-    fontWeight: 800,
-    letterSpacing: '0.08em',
+    fontSize: '16px',
+    fontWeight: 900,
+    letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
-    color: '#ffffff',
+    background: 'linear-gradient(135deg, #F8FAFC 0%, #C7D2FE 18%, #A78BFA 48%, #67E8F9 78%, #E2E8F0 100%)',
+    WebkitBackgroundClip: 'text',
+    backgroundClip: 'text',
+    color: 'transparent',
+    textShadow: '0 0 14px rgba(139,92,246,0.16)',
   },
   brandSub: {
     margin: 0,
-    fontSize: '12px',
-    color: 'rgba(255,255,255,0.68)',
+    fontSize: '11px',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase' as const,
+    color: 'rgba(255,255,255,0.62)',
   },
   logoutButton: {
     display: 'inline-flex',
@@ -62,8 +68,8 @@ const AppHeader = () => {
   return (
     <header style={styles.header}>
       <div style={styles.brand}>
-        <p style={styles.brandTitle}>KingsHall Exchange</p>
-        <p style={styles.brandSub}>Modern crypto trading & investing</p>
+        <p style={styles.brandTitle}>KE</p>
+        <p style={styles.brandSub}>KingsHall Exchange</p>
       </div>
 
       <button type="button" aria-label="Log out" title="Log out" onClick={handleLogout} style={styles.logoutButton}>
