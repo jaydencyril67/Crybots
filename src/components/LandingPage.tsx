@@ -3,15 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 import AppHeader from './AppHeader';
 import InstallAppButton from './InstallAppButton';
-
-const isTokenValid = (token: string) => {
-  try {
-    const payload = JSON.parse(window.atob(token.split('.')[1]));
-    return typeof payload.exp === 'number' ? payload.exp * 1000 > Date.now() : false;
-  } catch {
-    return false;
-  }
-};
+import { isTokenValid } from '../utils/auth';
 
 const stats = [
   { value: '$2.4B+', label: '24h trading volume' },
