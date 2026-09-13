@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CheckCircle2, KeyRound } from 'lucide-react';
+import { ArrowLeft, KeyRound } from 'lucide-react';
+import NotificationBanner from './NotificationBanner';
 
 const signInMethods = [
   { value: 'password', title: 'Password', description: 'Use your account password to sign in.' },
@@ -575,8 +576,8 @@ const SigninPage = () => {
 
                   {submitError || resendStatus ? (
                     <div>
-                      {submitError ? <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p> : null}
-                      {resendStatus ? <p style={{ color: '#4ade80', fontSize: '13px', margin: 0 }}>{resendStatus}</p> : null}
+                      {submitError ? <NotificationBanner tone="warning" title="Action required" message={submitError} /> : null}
+                      {resendStatus ? <NotificationBanner tone="success" title="Update received" message={resendStatus} /> : null}
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
                           {isResendingCode ? 'Resending code…' : 'Resend confirmation code'}

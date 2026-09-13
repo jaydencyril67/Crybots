@@ -496,7 +496,7 @@ const SignupPage = () => {
                 return date.toISOString().split('T')[0];
               })()}
             />
-            {dobError ? <p style={styles.inlineError}>{dobError}</p> : null}
+            {dobError ? <NotificationBanner tone="error" title="Check your details" message={dobError} /> : null}
           </div>
         );
       default:
@@ -626,7 +626,7 @@ const SignupPage = () => {
                   )}
                 </div>
 
-                {submitError ? <p style={styles.inlineError}>{submitError}</p> : null}
+                {submitError ? <NotificationBanner tone="warning" title="One more step" message={submitError} /> : null}
                 <p style={styles.footerNote}>
                   Your account will be created on the Kingshalls backend when you finish signup.
                 </p>
