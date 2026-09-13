@@ -10,6 +10,7 @@ import SigninPage from './components/SigninPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppSplashOverlay from './components/AppSplashOverlay';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -37,6 +38,7 @@ const isDashboardRoute = pathname === '/dashboard' || hash === '#/dashboard';
 root.render(
   <React.StrictMode>
     <HelmetProvider>
+      <AppSplashOverlay />
       {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isForgotPasswordRoute ? <ForgotPasswordPage /> : isDashboardRoute ? <ProtectedRoute><DashboardPage /></ProtectedRoute> : <LandingPage />}
     </HelmetProvider>
   </React.StrictMode>
