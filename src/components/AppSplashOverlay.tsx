@@ -10,7 +10,7 @@ const styles = {
     justifyContent: 'center',
     background: 'radial-gradient(circle at top, rgba(34,211,238,0.16), transparent 34%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.18), transparent 28%), linear-gradient(180deg, #050816 0%, #0b1220 100%)',
     color: '#ffffff',
-    transition: 'opacity 220ms ease, visibility 220ms ease',
+    transition: 'opacity 320ms ease, visibility 320ms ease',
   },
   hidden: {
     opacity: 0,
@@ -83,13 +83,15 @@ const AppSplashOverlay = () => {
   const [ready, setReady] = useState(document.readyState === 'complete');
 
   useEffect(() => {
+    const revealDelay = 1200;
+
     if (document.readyState === 'complete') {
-      const timer = window.setTimeout(() => setReady(true), 300);
+      const timer = window.setTimeout(() => setReady(true), revealDelay);
       return () => window.clearTimeout(timer);
     }
 
     const handleLoad = () => {
-      window.setTimeout(() => setReady(true), 300);
+      window.setTimeout(() => setReady(true), revealDelay);
     };
 
     window.addEventListener('load', handleLoad);
