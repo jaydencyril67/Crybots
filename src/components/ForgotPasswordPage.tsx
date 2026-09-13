@@ -374,7 +374,11 @@ const ForgotPasswordPage = () => {
 
     try {
       if (field === 'email') {
-        setStatus('Email accepted. Continue with your full name.');
+        const response = await api.post('/api/auth/forgot-password/check-email', {
+          email: normalizeEmail(form.email),
+        });
+        const message = response.data?.message;
+        setStatus(message || 'Email found. Continue with your full name.');
         setStep(1);
         return;
       }
