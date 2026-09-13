@@ -52,7 +52,8 @@ const AppSplashOverlay = () => {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    const isRefreshNavigation = window.performance.getEntriesByType('navigation')[0]?.type === 'reload';
+    const navigationEntry = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    const isRefreshNavigation = navigationEntry?.entryType === 'navigation' && navigationEntry?.type === 'reload';
 
     if (!isRefreshNavigation) {
       setEnabled(false);
