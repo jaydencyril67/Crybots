@@ -229,6 +229,26 @@ const styles = {
     flexWrap: 'wrap' as const,
     marginTop: '6px',
   },
+  switchRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap' as const,
+    marginTop: '18px',
+  },
+  switchText: {
+    color: 'rgba(255,255,255,0.72)',
+    fontSize: '14px',
+  },
+  switchLink: {
+    border: 'none',
+    background: 'transparent',
+    color: '#67e8f9',
+    fontSize: '14px',
+    fontWeight: 700,
+    padding: 0,
+    cursor: 'pointer',
+  },
   button: {
     border: 'none',
     borderRadius: '999px',
