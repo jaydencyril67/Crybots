@@ -434,13 +434,7 @@ const LandingPage = () => (
         <div style={styles.topLine} />
 
         <div style={styles.shell}>
-          <header style={styles.header}>
-            <div style={styles.brandBlock}>
-              <p style={styles.brandKicker}>KingsHall Exchange</p>
-              <p style={styles.brandSub}>Crypto exchange & investment platform</p>
-            </div>
-
-          </header>
+          <AppHeader />
 
           <div style={styles.heroGrid}>
             <div>

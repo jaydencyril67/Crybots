@@ -528,12 +528,7 @@ const DashboardPage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
 
-          <header style={styles.header}>
-            <div style={styles.brandBlock}>
-              <p style={styles.brandKicker}>KingsHall Exchange</p>
-              <p style={styles.brandSub}>Your market home for fast checks, clear context, and focused execution.</p>
-            </div>
-          </header>
+          <AppHeader />
 
           <div style={styles.heroGrid}>
             <section style={styles.heroCard}>

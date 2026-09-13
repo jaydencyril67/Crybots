@@ -479,15 +479,7 @@ const SigninPage = () => {
           <div style={styles.topLine} />
 
           <div style={styles.shell}>
-            <header style={styles.header}>
-              <button type="button" aria-label="Go back" onClick={handleReturn} style={styles.backButton}>
-                <ArrowLeft size={18} />
-              </button>
-              <div style={styles.brandBlock}>
-                <p style={styles.brandKicker}>KingsHall Exchange</p>
-                <p style={styles.brandSub}>Accounts must be confirmed by email before sign in.</p>
-              </div>
-            </header>
+            <AppHeader />
 
             <div style={styles.grid}>
               <article style={styles.heroCard}>
