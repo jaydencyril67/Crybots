@@ -385,7 +385,7 @@ const ForgotPasswordPage = () => {
           fullName: normalizeFullName(form.fullName),
         });
         const message = response.data?.message;
-        setStatus(message || 'Full name matched. We sent a 3-digit code to your email.');
+        setStatus(message || 'Email found. We sent a 3-digit code to your email.');
         setStep(2);
         return;
       }
