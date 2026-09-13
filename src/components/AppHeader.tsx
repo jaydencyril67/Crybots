@@ -79,9 +79,7 @@ const AppHeader = () => {
         </div>
       </div>
 
-      <button type="button" aria-label="Log out" title="Log out" onClick={handleLogout} style={styles.logoutButton}>
-        <LogOut size={16} />
-      </button>
+      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
     </header>
   );
 };

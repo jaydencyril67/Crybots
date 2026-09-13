@@ -49,7 +49,7 @@ const styles = {
 
 const AppSplashOverlay = () => {
   const [ready, setReady] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
 
   useEffect(() => {
     const navigationEntry = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
@@ -67,10 +67,6 @@ const AppSplashOverlay = () => {
 
     return () => window.clearTimeout(timer);
   }, []);
-
-  if (!enabled) {
-    return null;
-  }
 
   return (
     <div style={{ ...styles.overlay, ...(ready ? styles.hidden : {}) }} aria-hidden={ready}>
