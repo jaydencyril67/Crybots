@@ -6,10 +6,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: '12px',
-    padding: '12px 18px',
-    marginBottom: '12px',
-    borderRadius: '16px',
+    gap: '10px',
+    padding: '10px 16px',
+    marginBottom: '10px',
+    borderRadius: '14px',
     border: '1px solid rgba(255,255,255,0.16)',
     background: 'linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(8,14,26,0.92) 100%)',
     boxShadow: '0 14px 30px rgba(0,0,0,0.24)',
@@ -31,7 +31,7 @@ const styles = {
   },
   brandTitle: {
     margin: 0,
-    fontSize: '15px',
+    fontSize: '14px',
     fontWeight: 900,
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
@@ -41,8 +41,8 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '40px',
-    height: '40px',
+    width: '36px',
+    height: '36px',
     borderRadius: '999px',
     border: '1px solid rgba(255,255,255,0.18)',
     background: 'rgba(255,255,255,0.08)',
@@ -71,7 +71,7 @@ const AppHeader = () => {
       </div>
 
       <button type="button" aria-label="Log out" title="Log out" onClick={handleLogout} style={styles.logoutButton}>
-        <LogOut size={17} />
+        <LogOut size={16} />
       </button>
     </header>
   );
