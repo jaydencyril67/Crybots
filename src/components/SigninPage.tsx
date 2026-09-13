@@ -569,7 +569,7 @@ const SigninPage = () => {
                       <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p>
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
-                          {isResendingCode ? 'Resending confirmation code…' : 'Resend confirmation code'}
+                          {isResendingCode ? 'Resending code…' : 'Resend confirmation code'}
                         </button>
                       ) : null}
                     </div>
