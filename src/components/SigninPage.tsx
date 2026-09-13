@@ -393,6 +393,14 @@ const SigninPage = () => {
         localStorage.setItem('token', response.data.token);
       }
 
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
+          localStorage.setItem('firstName', response.data.user.firstName.trim());
+          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
+        }
+      }
+
       window.location.pathname = '/dashboard';
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
@@ -415,6 +423,14 @@ const SigninPage = () => {
 
       if (response.data?.token) {
         localStorage.setItem('token', response.data.token);
+      }
+
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
+          localStorage.setItem('firstName', response.data.user.firstName.trim());
+          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
+        }
       }
 
       window.location.pathname = '/dashboard';

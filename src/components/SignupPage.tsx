@@ -433,6 +433,14 @@ const SignupPage = () => {
         localStorage.setItem('token', response.data.token);
       }
 
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
+          localStorage.setItem('firstName', response.data.user.firstName.trim());
+          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
+        }
+      }
+
       setSubmitError('');
       setStepIndex(steps.length - 1);
       window.location.pathname = '/signup-confirmation-sent';

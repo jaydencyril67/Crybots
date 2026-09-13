@@ -410,8 +410,25 @@ const getGreeting = () => {
 
 const getFirstName = (fullName?: string) => {
   if (fullName?.trim()) return fullName.trim().split(/\s+/)[0];
-  const stored = window.localStorage.getItem('kingshall_first_name') || window.localStorage.getItem('firstName');
-  if (stored?.trim()) return stored.trim().split(/\s+/)[0];
+
+  const storedName = window.localStorage.getItem('kingshall_first_name') || window.localStorage.getItem('firstName');
+  if (storedName?.trim()) return storedName.trim().split(/\s+/)[0];
+
+  const profile = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
+  if (profile) {
+    try {
+      const parsed = JSON.parse(profile) as {
+        firstName?: string;
+        fullName?: string;
+        name?: string;
+      };
+      const candidate = parsed.firstName || parsed.fullName || parsed.name;
+      if (candidate?.trim()) return candidate.trim().split(/\s+/)[0];
+    } catch {
+      // ignore malformed profile payloads
+    }
+  }
+
   return '';
 };
 
@@ -455,8 +472,8 @@ const DashboardPage = () => {
     try {
       const profile = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
       if (profile) {
-        const parsed = JSON.parse(profile) as { firstName?: string; lastName?: string; fullName?: string };
-        setAuthName(parsed.firstName || parsed.fullName || '');
+        const parsed = JSON.parse(profile) as { firstName?: string; lastName?: string; fullName?: string; name?: string };
+        setAuthName(parsed.firstName || parsed.fullName || parsed.name || '');
       } else {
         setAuthName('');
       }
