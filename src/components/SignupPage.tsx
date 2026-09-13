@@ -341,12 +341,15 @@ const SignupPage = () => {
   const passwordHasLetter = /[A-Za-z]/.test(form.password);
   const passwordHasNumber = /\d/.test(form.password);
   const passwordHasMinLength = form.password.length >= 8;
-  const passwordMeetsRequirement = passwordHasLetter && passwordHasNumber && passwordHasMinLength;
+  const passwordHasUppercase = /[A-Z]/.test(form.password);
+  const passwordHasLowercase = /[a-z]/.test(form.password);
+  const passwordHasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(form.password);
+  const passwordMeetsRequirement = passwordHasLetter && passwordHasNumber && passwordHasMinLength && passwordHasUppercase && passwordHasLowercase && passwordHasSymbol;
   const passwordInputStyle =
     form.password && !passwordMeetsRequirement
       ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
       : styles.input;
-  const passwordNotice = 'Password must be at least 8 characters and include at least 1 letter and 1 number.';
+  const passwordNotice = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.';
 
   const isAtLeast18 = (value: string) => {
     if (!value) return false;
@@ -496,7 +499,7 @@ const SignupPage = () => {
                 return date.toISOString().split('T')[0];
               })()}
             />
-            {dobError ? <p style={styles.inlineError}>{dobError}</p> : null}
+            {dobError ? <NotificationBanner tone="error" title="Check your details" message={dobError} /> : null}
           </div>
         );
       default:
@@ -626,7 +629,7 @@ const SignupPage = () => {
                   )}
                 </div>
 
-                {submitError ? <p style={styles.inlineError}>{submitError}</p> : null}
+                {submitError ? <NotificationBanner tone="warning" title="One more step" message={submitError} /> : null}
                 <p style={styles.footerNote}>
                   Your account will be created on the Kingshalls backend when you finish signup.
                 </p>

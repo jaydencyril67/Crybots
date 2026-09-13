@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import NotificationBanner from './NotificationBanner';
 
 const steps = [
   {
@@ -350,6 +351,7 @@ const ForgotPasswordPage = () => {
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [redirectCountdown, setRedirectCountdown] = useState(8);
 
   const currentStep = steps[step];
   const progress = ((step + 1) / steps.length) * 100;
@@ -421,8 +423,12 @@ const ForgotPasswordPage = () => {
         password: form.password,
       });
       const message = response.data?.message;
+      setForm(initialState);
+      setConfirmPassword('');
+      setErrors({});
       setStatus(message || 'Password updated successfully.');
       setCompleted(true);
+      setRedirectCountdown(8);
     } catch (error) {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
@@ -441,6 +447,21 @@ const ForgotPasswordPage = () => {
     }
     window.location.href = '/signin';
   };
+
+  useEffect(() => {
+    if (!completed) return;
+
+    if (redirectCountdown <= 0) {
+      window.location.href = '/signin';
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setRedirectCountdown((currentCountdown) => currentCountdown - 1);
+    }, 1000);
+
+    return () => window.clearTimeout(timer);
+  }, [completed, redirectCountdown]);
 
   const activeError = currentStep.field === 'password' ? errors.password || (confirmPassword && confirmPassword !== form.password ? 'Passwords do not match.' : '') : errors[currentStep.field];
 
@@ -481,6 +502,9 @@ const ForgotPasswordPage = () => {
                     <strong>Password reset complete.</strong>
                     <p style={{ margin: '6px 0 0', color: 'rgba(255,255,255,0.78)', fontSize: '13px', lineHeight: 1.6 }}>
                       Your new password has been saved. You can now sign in with it.
+                    </p>
+                    <p style={{ margin: '6px 0 0', color: 'rgba(255,255,255,0.62)', fontSize: '12px', lineHeight: 1.5 }}>
+                      Redirecting to sign in in {redirectCountdown} second{redirectCountdown === 1 ? '' : 's'}...
                     </p>
                   </div>
                 </div>
@@ -542,18 +566,8 @@ const ForgotPasswordPage = () => {
                   <p style={styles.inlineNote}>Live validation checks password length, uppercase, lowercase, number, symbol, and confirmation match.</p>
                 ) : null}
 
-                {activeError ? <p style={styles.inlineError}>{activeError}</p> : null}
-                {status ? (
-                  <div style={styles.successBox}>
-                    <ShieldCheck style={styles.icon} />
-                    <div>
-                      <strong>Recovery update</strong>
-                      <p style={{ margin: '6px 0 0', color: 'rgba(255,255,255,0.78)', fontSize: '13px', lineHeight: 1.6 }}>
-                        {status}
-                      </p>
-                    </div>
-                  </div>
-                ) : null}
+                {activeError ? <NotificationBanner tone="error" title="Check your details" message={activeError} /> : null}
+                {status ? <NotificationBanner tone="success" title="Recovery update" message={status} /> : null}
 
                 <div style={styles.navRow}>
                   <button
