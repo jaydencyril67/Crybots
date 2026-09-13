@@ -434,7 +434,6 @@ const getAdviceIndex = () => {
 };
 
 const DashboardPage = () => {
-  const [now, setNow] = useState(new Date());
   const [hourlyAdviceIndex, setHourlyAdviceIndex] = useState(getAdviceIndex());
   const [authName, setAuthName] = useState('');
   const [isAuthNameLoaded, setIsAuthNameLoaded] = useState(false);
@@ -442,16 +441,14 @@ const DashboardPage = () => {
   const [isCoinsLoaded, setIsCoinsLoaded] = useState(false);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 30_000);
     const adviceTimer = window.setInterval(() => setHourlyAdviceIndex(getAdviceIndex()), 60_000);
 
     return () => {
-      window.clearInterval(timer);
       window.clearInterval(adviceTimer);
     };
   }, []);
 
-  const greeting = useMemo(() => getGreeting(), [now]);
+  const greeting = useMemo(() => getGreeting(), []);
   const firstName = useMemo(() => getFirstName(authName), [authName]);
 
   useEffect(() => {
@@ -535,10 +532,6 @@ const DashboardPage = () => {
             <div style={styles.brandBlock}>
               <p style={styles.brandKicker}>KingsHall Exchange</p>
               <p style={styles.brandSub}>Your market home for fast checks, clear context, and focused execution.</p>
-            </div>
-            <div style={styles.headerMeta}>
-              <Clock3 style={styles.icon} />
-              <span>{now.toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' })}</span>
             </div>
           </header>
 
