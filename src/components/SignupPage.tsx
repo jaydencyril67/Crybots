@@ -166,6 +166,26 @@ const styles = {
     fontSize: '11px',
     lineHeight: 1.5,
   },
+  passwordChecklist: {
+    margin: '10px 0 0',
+    padding: 0,
+    listStyle: 'none',
+    display: 'grid',
+    gap: '6px',
+  },
+  passwordChecklistItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '11px',
+    lineHeight: 1.5,
+    color: 'rgba(255,255,255,0.72)',
+  },
+  passwordChecklistIcon: {
+    width: '16px',
+    height: '16px',
+    flexShrink: 0,
+  },
   panel: {
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.12)',
@@ -431,6 +451,14 @@ const SignupPage = () => {
     setStepIndex((prev) => Math.max(prev - 1, 0));
   };
 
+  const passwordChecklist = [
+    { label: 'At least 8 characters', met: passwordHasMinLength },
+    { label: 'One uppercase letter', met: passwordHasUppercase },
+    { label: 'One lowercase letter', met: passwordHasLowercase },
+    { label: 'One number', met: passwordHasNumber },
+    { label: 'One symbol', met: passwordHasSymbol },
+  ];
+
   const currentField = (() => {
     switch (current.field) {
       case 'firstName':
@@ -452,6 +480,21 @@ const SignupPage = () => {
               autoComplete={current.field}
             />
             {current.field === 'password' ? <p style={styles.inlineNote}>{passwordNotice}</p> : null}
+            {current.field === 'password' ? (
+              <ul style={styles.passwordChecklist}>
+                {passwordChecklist.map((item) => (
+                  <li key={item.label} style={styles.passwordChecklistItem}>
+                    <CheckCircle2
+                      style={{
+                        ...styles.passwordChecklistIcon,
+                        color: item.met ? '#4ade80' : 'rgba(255,255,255,0.32)',
+                      }}
+                    />
+                    <span style={{ color: item.met ? '#4ade80' : 'rgba(255,255,255,0.72)' }}>{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             {current.field === 'password' && passwordErrorMessage ? <p style={styles.inlineError}>{passwordErrorMessage}</p> : null}
           </div>
         );
