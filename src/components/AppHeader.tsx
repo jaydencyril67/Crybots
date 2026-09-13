@@ -34,16 +34,23 @@ const styles = {
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 24px rgba(0,0,0,0.28)',
     flexShrink: 0,
   },
-  brandBadgeText: {
-    margin: 0,
-    fontSize: '16px',
-    lineHeight: 1,
-    fontWeight: 900,
-    letterSpacing: '-0.08em',
-    background: 'linear-gradient(135deg, #F8FAFC 0%, #C7D2FE 22%, #A78BFA 52%, #67E8F9 82%, #E2E8F0 100%)',
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: 'transparent',
+  brandBadgeInner: {
+    width: '26px',
+    height: '26px',
+    borderRadius: '9px',
+    position: 'relative' as const,
+    background: 'linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(167,139,250,0.82) 55%, rgba(103,232,249,0.9) 100%)',
+    boxShadow: '0 0 0 1px rgba(255,255,255,0.22), 0 8px 18px rgba(139,92,246,0.18)',
+    overflow: 'hidden',
+    flexShrink: 0,
+  },
+  brandBadgeInnerCut: {
+    position: 'absolute' as const,
+    inset: '6px 5px 6px 5px',
+    borderRadius: '6px',
+    background: 'linear-gradient(180deg, rgba(6,11,22,0.96) 0%, rgba(17,24,39,0.96) 100%)',
+    clipPath: 'polygon(0 0, 58% 0, 58% 38%, 100% 38%, 100% 62%, 58% 62%, 58% 100%, 0 100%, 0 62%, 42% 62%, 42% 38%, 0 38%)',
+    opacity: 0.98,
   },
   brandCopy: {
     minWidth: 0,
@@ -95,7 +102,9 @@ const AppHeader = () => {
     <header style={styles.header}>
       <div style={styles.brand}>
         <div style={styles.brandBadge} aria-hidden="true">
-          <p style={styles.brandBadgeText}>KE</p>
+          <div style={styles.brandBadgeInner}>
+            <div style={styles.brandBadgeInnerCut} />
+          </div>
         </div>
         <div style={styles.brandCopy}>
           <p style={styles.brandTitle}>KE</p>
