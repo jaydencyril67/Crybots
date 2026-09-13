@@ -23,6 +23,13 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
   },
+  headerIcon: {
+    width: '24px',
+    height: '24px',
+    display: 'block',
+    objectFit: 'contain' as const,
+    flexShrink: 0,
+  },
   brandCopy: {
     minWidth: 0,
     display: 'flex',
@@ -69,6 +76,8 @@ const AppHeader = () => {
           <p style={styles.brandTitle}>KingsHall Exchange</p>
         </div>
       </div>
+
+      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
 
       <button type="button" aria-label="Log out" title="Log out" onClick={handleLogout} style={styles.logoutButton}>
         <LogOut size={16} />
