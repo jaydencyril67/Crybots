@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import NotificationBanner from './NotificationBanner';
 
 const steps = [
@@ -496,18 +496,17 @@ const ForgotPasswordPage = () => {
                 Confirm your identity, receive a 3-digit code, and set a new password.
               </h1>
               {completed ? (
-                <div style={styles.successBox}>
-                  <CheckCircle2 style={styles.icon} />
-                  <div>
-                    <strong>Password reset complete.</strong>
-                    <p style={{ margin: '6px 0 0', color: 'rgba(255,255,255,0.78)', fontSize: '13px', lineHeight: 1.6 }}>
-                      Your new password has been saved. You can now sign in with it.
-                    </p>
-                    <p style={{ margin: '6px 0 0', color: 'rgba(255,255,255,0.62)', fontSize: '12px', lineHeight: 1.5 }}>
-                      Redirecting to sign in in {redirectCountdown} second{redirectCountdown === 1 ? '' : 's'}...
-                    </p>
-                  </div>
-                </div>
+                <NotificationBanner
+                  tone="success"
+                  title="Password reset complete"
+                  message={(
+                    <>
+                      <span>Your new password has been saved. You can now sign in with it.</span>
+                      <br />
+                      <span>Redirecting to sign in in {redirectCountdown} second{redirectCountdown === 1 ? '' : 's'}...</span>
+                    </>
+                  )}
+                />
               ) : null}
             </section>
 
