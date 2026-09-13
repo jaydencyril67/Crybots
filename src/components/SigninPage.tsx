@@ -394,7 +394,8 @@ const SigninPage = () => {
 
       window.location.pathname = '/dashboard';
     } catch (error) {
-      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Unable to sign you in right now. Please try again.';
+      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
