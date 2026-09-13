@@ -286,6 +286,7 @@ const SigninPage = () => {
   const [isCodeLocked, setIsCodeLocked] = useState(false);
   const [isResendingCode, setIsResendingCode] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
+  const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in');
 
   const progress = step === 'email' ? 25 : step === 'method' ? 50 : step === 'password' || step === 'code' ? 75 : 100;
 
@@ -563,7 +564,16 @@ const SigninPage = () => {
                     </div>
                   ) : null}
 
-                  {submitError ? <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p> : null}
+                  {submitError ? (
+                    <div>
+                      <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p>
+                      {showResendConfirmationLink ? (
+                        <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
+                          {isResendingCode ? 'Resending confirmation code…' : 'Resend confirmation code'}
+                        </button>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
 
                 <div style={styles.navRow}>
