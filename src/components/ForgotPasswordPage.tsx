@@ -293,17 +293,6 @@ const styles = {
     color: '#67e8f9',
     flexShrink: 0,
   },
-  successBox: {
-    marginTop: '18px',
-    padding: '14px 16px',
-    borderRadius: '18px',
-    border: '1px solid rgba(74,222,128,0.3)',
-    background: 'rgba(74,222,128,0.08)',
-    color: '#d1fae5',
-    display: 'flex',
-    gap: '10px',
-    alignItems: 'flex-start',
-  },
 } as const;
 
 const normalizeEmail = (value: string) => value.trim().toLowerCase();
