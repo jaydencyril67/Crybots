@@ -437,22 +437,19 @@ const SigninPage = () => {
     setIsResendingCode(true);
 
     try {
-      const response = await api.post('/api/auth/signin/start', {
+      const response = await api.post('/api/auth/resend-confirmation', {
         email: form.email,
-        method: 'code',
       });
 
-      setCodeSent(true);
-      setStep('code');
+      setResendStatus(response.data?.message || 'Confirmation email resent successfully.');
+      setCodeSent(false);
+      setStep('email');
       setIsCodeLocked(false);
-      setAttemptsLeft(5 - (response.data?.attemptsUsed || 0));
+      setAttemptsLeft(5);
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
-      const message = response?.data?.message || 'Unable to resend code right now. Please try again.';
+      const message = response?.data?.message || 'Unable to resend confirmation email right now. Please try again.';
       setSubmitError(message);
-      if (response?.status === 423) {
-        setIsCodeLocked(true);
-      }
     } finally {
       setIsResendingCode(false);
     }
@@ -524,7 +521,7 @@ const SigninPage = () => {
                       <p style={styles.stepDesc}>{codeSent ? 'We sent the code to your email. Check your inbox and spam folder if needed.' : 'Request a code to continue.'}</p>
                       {codeSent ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
-                          {isResendingCode ? 'Resending code…' : 'Resend code'}
+                          {isResendingCode ? 'Resending confirmation email…' : 'Resend confirmation email'}
                         </button>
                       ) : null}
                     </>
@@ -575,7 +572,7 @@ const SigninPage = () => {
                       {resendStatus ? <p style={{ color: '#4ade80', fontSize: '13px', margin: 0 }}>{resendStatus}</p> : null}
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
-                          {isResendingCode ? 'Resending confirmation code…' : 'Resend confirmation code'}
+                          {isResendingCode ? 'Resending confirmation email…' : 'Resend confirmation email'}
                         </button>
                       ) : null}
                     </div>
