@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 import AppHeader from './AppHeader';
 import InstallAppButton from './InstallAppButton';
+import { isTokenValid } from '../utils/auth';
 
 const stats = [
   { value: '$2.4B+', label: '24h trading volume' },
@@ -418,7 +419,13 @@ const styles = {
   },
 };
 
-const LandingPage = () => (
+const LandingPage = () => {
+  const handleDashboardClick = () => {
+    const token = window.localStorage.getItem('token') || '';
+    window.location.pathname = token && isTokenValid(token) ? '/dashboard' : '/signin';
+  };
+
+  return (
   <>
     <Helmet>
       <title>KingsHall Exchange | Modern Crypto Trading & Investing</title>
@@ -457,11 +464,9 @@ const LandingPage = () => (
                     Get started
                   </div>
                 </a>
-                <a href="/signin" style={styles.buttonLink}>
-                  <div style={styles.buttonSecondary}>
-                    Dashboard
-                  </div>
-                </a>
+                <button type="button" onClick={handleDashboardClick} style={{ ...styles.buttonSecondary, cursor: 'pointer' }}>
+                  Dashboard
+                </button>
               </div>
 
               <div style={styles.statsGrid}>
@@ -550,6 +555,7 @@ const LandingPage = () => (
       </section>
     </main>
   </>
-);
+  );
+};
 
 export default LandingPage;
