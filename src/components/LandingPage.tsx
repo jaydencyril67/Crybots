@@ -4,6 +4,15 @@ import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, User
 import AppHeader from './AppHeader';
 import InstallAppButton from './InstallAppButton';
 
+const isTokenValid = (token: string) => {
+  try {
+    const payload = JSON.parse(window.atob(token.split('.')[1]));
+    return typeof payload.exp === 'number' ? payload.exp * 1000 > Date.now() : false;
+  } catch {
+    return false;
+  }
+};
+
 const stats = [
   { value: '$2.4B+', label: '24h trading volume' },
   { value: '140+', label: 'global markets' },
@@ -418,7 +427,13 @@ const styles = {
   },
 };
 
-const LandingPage = () => (
+const LandingPage = () => {
+  const handleDashboardClick = () => {
+    const token = window.localStorage.getItem('token') || '';
+    window.location.pathname = token && isTokenValid(token) ? '/dashboard' : '/signin';
+  };
+
+  return (
   <>
     <Helmet>
       <title>KingsHall Exchange | Modern Crypto Trading & Investing</title>
@@ -457,11 +472,9 @@ const LandingPage = () => (
                     Get started
                   </div>
                 </a>
-                <a href="/signin" style={styles.buttonLink}>
-                  <div style={styles.buttonSecondary}>
-                    Dashboard
-                  </div>
-                </a>
+                <button type="button" onClick={handleDashboardClick} style={{ ...styles.buttonSecondary, cursor: 'pointer' }}>
+                  Dashboard
+                </button>
               </div>
 
               <div style={styles.statsGrid}>
@@ -550,6 +563,7 @@ const LandingPage = () => (
       </section>
     </main>
   </>
-);
+  );
+};
 
 export default LandingPage;
