@@ -107,7 +107,6 @@ const AppSplashOverlay = () => {
           </div>
         </div>
         <div>
-          <p style={styles.title}>KE</p>
           <p style={styles.subtitle}>KingsHall Exchange</p>
         </div>
         <div style={styles.shimmer} />
