@@ -34,12 +34,16 @@ const isAccountConfirmedRoute = pathname === '/account-confirmed' || hash === '#
 const isSigninRoute = pathname === '/signin' || hash === '#/signin';
 const isForgotPasswordRoute = pathname === '/forgot-password' || hash === '#/forgot-password';
 const isDashboardRoute = pathname === '/dashboard' || hash === '#/dashboard';
+const navigationEntry = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+const showSplashOnThisLoad = navigationEntry?.entryType === 'navigation' && navigationEntry?.type === 'reload';
+
+const appContent = isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isForgotPasswordRoute ? <ForgotPasswordPage /> : isDashboardRoute ? <ProtectedRoute><DashboardPage /></ProtectedRoute> : <LandingPage />;
 
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      <AppSplashOverlay />
-      {isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isForgotPasswordRoute ? <ForgotPasswordPage /> : isDashboardRoute ? <ProtectedRoute><DashboardPage /></ProtectedRoute> : <LandingPage />}
+      <AppSplashOverlay active={showSplashOnThisLoad} />
+      {!showSplashOnThisLoad && appContent}
     </HelmetProvider>
   </React.StrictMode>
 );
