@@ -27,7 +27,7 @@ const styles = {
     minWidth: 0,
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '2px',
+    gap: '0',
   },
   brandTitle: {
     margin: 0,
@@ -36,13 +36,6 @@ const styles = {
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
     color: '#ffffff',
-  },
-  brandSub: {
-    margin: 0,
-    fontSize: '11px',
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase' as const,
-    color: 'rgba(255,255,255,0.62)',
   },
   logoutButton: {
     display: 'inline-flex',
@@ -74,7 +67,6 @@ const AppHeader = () => {
       <div style={styles.brand}>
         <div style={styles.brandCopy}>
           <p style={styles.brandTitle}>KingsHall Exchange</p>
-          <p style={styles.brandSub}>Modern crypto trading & investing</p>
         </div>
       </div>
 
