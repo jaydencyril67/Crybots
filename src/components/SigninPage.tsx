@@ -286,6 +286,7 @@ const SigninPage = () => {
   const [isCodeLocked, setIsCodeLocked] = useState(false);
   const [isResendingCode, setIsResendingCode] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
+  const [resendStatus, setResendStatus] = useState('');
   const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in');
 
   const progress = step === 'email' ? 25 : step === 'method' ? 50 : step === 'password' || step === 'code' ? 75 : 100;
@@ -304,6 +305,7 @@ const SigninPage = () => {
   const updateField = (field: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setSubmitError('');
+    setResendStatus('');
   };
 
   const emailInputStyle =
@@ -359,9 +361,11 @@ const SigninPage = () => {
       setStep('code');
       setIsCodeLocked(false);
       setAttemptsLeft(5 - (response.data?.attemptsUsed || 0));
+      setResendStatus(response.data?.message || 'Confirmation code resent successfully.');
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
       const message = response?.data?.message || 'Unable to start sign in right now. Please try again.';
+      setResendStatus('');
       setSubmitError(message);
       if (response?.status === 423) {
         setIsCodeLocked(true);
@@ -429,6 +433,7 @@ const SigninPage = () => {
     if (!form.email.trim() || isResendingCode) return;
 
     setSubmitError('');
+    setResendStatus('');
     setIsResendingCode(true);
 
     try {
@@ -564,9 +569,10 @@ const SigninPage = () => {
                     </div>
                   ) : null}
 
-                  {submitError ? (
+                  {submitError || resendStatus ? (
                     <div>
-                      <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p>
+                      {submitError ? <p style={{ color: '#f87171', fontSize: '13px', margin: 0 }}>{submitError}</p> : null}
+                      {resendStatus ? <p style={{ color: '#4ade80', fontSize: '13px', margin: 0 }}>{resendStatus}</p> : null}
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
                           {isResendingCode ? 'Resending confirmation code…' : 'Resend confirmation code'}
