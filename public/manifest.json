@@ -1,0 +1,26 @@
+{
+  "name": "KingsHall Exchange",
+  "short_name": "KingsHall",
+  "description": "KingsHall Exchange is a modern crypto exchange and investment app built for secure trading, fast transfers, and premium portfolio growth.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone"],
+  "theme_color": "#050816",
+  "background_color": "#050816",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/tradespot.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/tradespot.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

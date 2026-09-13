@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
+import InstallAppButton from './InstallAppButton';
 
 const stats = [
   { value: '$2.4B+', label: '24h trading volume' },

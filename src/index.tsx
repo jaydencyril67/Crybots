@@ -11,6 +11,14 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      // Ignore service worker registration failures.
+    });
+  });
+}
+
 const container = document.getElementById('root');
 if (!container) throw new Error('Root container missing in index.html');
 const root = ReactDOM.createRoot(container);
