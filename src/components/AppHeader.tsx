@@ -18,6 +18,36 @@ const styles = {
   brand: {
     minWidth: 0,
     display: 'flex',
+    flexDirection: 'row' as const,
+    alignItems: 'center',
+    gap: '12px',
+  },
+  brandBadge: {
+    width: '42px',
+    height: '42px',
+    borderRadius: '14px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(180deg, rgba(6,11,22,0.95) 0%, rgba(17,24,39,0.98) 100%)',
+    border: '1px solid rgba(255,255,255,0.14)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 24px rgba(0,0,0,0.28)',
+    flexShrink: 0,
+  },
+  brandBadgeText: {
+    margin: 0,
+    fontSize: '16px',
+    lineHeight: 1,
+    fontWeight: 900,
+    letterSpacing: '-0.08em',
+    background: 'linear-gradient(135deg, #F8FAFC 0%, #C7D2FE 22%, #A78BFA 52%, #67E8F9 82%, #E2E8F0 100%)',
+    WebkitBackgroundClip: 'text',
+    backgroundClip: 'text',
+    color: 'transparent',
+  },
+  brandCopy: {
+    minWidth: 0,
+    display: 'flex',
     flexDirection: 'column' as const,
     gap: '2px',
   },
@@ -27,11 +57,7 @@ const styles = {
     fontWeight: 900,
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
-    background: 'linear-gradient(135deg, #F8FAFC 0%, #C7D2FE 18%, #A78BFA 48%, #67E8F9 78%, #E2E8F0 100%)',
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: 'transparent',
-    textShadow: '0 0 14px rgba(139,92,246,0.16)',
+    color: '#ffffff',
   },
   brandSub: {
     margin: 0,
@@ -68,8 +94,13 @@ const AppHeader = () => {
   return (
     <header style={styles.header}>
       <div style={styles.brand}>
-        <p style={styles.brandTitle}>KE</p>
-        <p style={styles.brandSub}>KingsHall Exchange</p>
+        <div style={styles.brandBadge} aria-hidden="true">
+          <p style={styles.brandBadgeText}>KE</p>
+        </div>
+        <div style={styles.brandCopy}>
+          <p style={styles.brandTitle}>KE</p>
+          <p style={styles.brandSub}>KingsHall Exchange</p>
+        </div>
       </div>
 
       <button type="button" aria-label="Log out" title="Log out" onClick={handleLogout} style={styles.logoutButton}>
