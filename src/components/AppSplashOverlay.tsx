@@ -47,11 +47,15 @@ const styles = {
   },
 };
 
-const AppSplashOverlay = ({ active = false }: { active?: boolean }) => {
+const AppSplashOverlay = () => {
   const [ready, setReady] = useState(false);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
-    if (!active) {
+    const shouldShowSplash = Boolean((window as Window & { __kingshallRefreshSplash?: boolean }).__kingshallRefreshSplash);
+    setActive(shouldShowSplash);
+
+    if (!shouldShowSplash) {
       setReady(true);
       return;
     }
@@ -60,7 +64,7 @@ const AppSplashOverlay = ({ active = false }: { active?: boolean }) => {
     const timer = window.setTimeout(() => setReady(true), revealDelay);
 
     return () => window.clearTimeout(timer);
-  }, [active]);
+  }, []);
 
   if (!active) {
     return null;
