@@ -412,7 +412,7 @@ const getFirstName = (fullName?: string) => {
   if (fullName?.trim()) return fullName.trim().split(/\s+/)[0];
   const stored = window.localStorage.getItem('kingshall_first_name') || window.localStorage.getItem('firstName');
   if (stored?.trim()) return stored.trim().split(/\s+/)[0];
-  return 'Trader';
+  return '';
 };
 
 const getSeededAdviceOrder = (hourKey: number) => {
@@ -547,7 +547,7 @@ const DashboardPage = () => {
               <p style={styles.greeting}>{greeting}</p>
               <h1 style={styles.title}>
                 Welcome back,
-                <span style={styles.titleAccent}> {isAuthNameLoaded ? firstName : 'Trader'}</span>
+                <span style={styles.titleAccent}> {isAuthNameLoaded && firstName ? firstName : 'Trader'}</span>
               </h1>
               <p style={styles.lead}>
                 This is your market home base — live prices, market context, and a fresh hourly insight to help you stay sharp without showing personal account details.
