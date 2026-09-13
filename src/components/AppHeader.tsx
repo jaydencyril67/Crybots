@@ -3,9 +3,9 @@ import { LogOut } from 'lucide-react';
 
 const styles = {
   header: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr auto',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: '10px',
     padding: '10px 16px',
     marginBottom: '10px',
@@ -16,18 +16,24 @@ const styles = {
     position: 'relative' as const,
     zIndex: 2,
   },
+  headerIcon: {
+    width: '22px',
+    height: '22px',
+    display: 'block',
+    objectFit: 'contain' as const,
+    flexShrink: 0,
+  },
   brand: {
     minWidth: 0,
     display: 'flex',
-    flexDirection: 'row' as const,
-    alignItems: 'center',
-    gap: '12px',
+    justifyContent: 'center',
   },
   brandCopy: {
     minWidth: 0,
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '0',
+    textAlign: 'center' as const,
   },
   brandTitle: {
     margin: 0,
@@ -36,6 +42,7 @@ const styles = {
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
     color: '#ffffff',
+    whiteSpace: 'nowrap',
   },
   logoutButton: {
     display: 'inline-flex',
@@ -64,6 +71,8 @@ const AppHeader = () => {
 
   return (
     <header style={styles.header}>
+      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
+
       <div style={styles.brand}>
         <div style={styles.brandCopy}>
           <p style={styles.brandTitle}>KingsHall Exchange</p>
