@@ -344,19 +344,20 @@ const SigninPage = () => {
 
   const handleStartSignin = async (selectedMethod: SignInMethod) => {
     setSubmitError('');
-    setIsSubmitting(true);
     setMethod(selectedMethod);
+
+    if (selectedMethod === 'password') {
+      setStep('password');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const response = await api.post('/api/auth/signin/start', {
         email: form.email,
         method: selectedMethod,
       });
-
-      if (selectedMethod === 'password') {
-        setStep('password');
-        return;
-      }
 
       setCodeSent(true);
       setStep('code');
