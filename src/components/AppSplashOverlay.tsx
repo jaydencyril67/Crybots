@@ -80,22 +80,13 @@ const styles = {
 };
 
 const AppSplashOverlay = () => {
-  const [ready, setReady] = useState(document.readyState === 'complete');
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const revealDelay = 2200;
+    const revealDelay = 2000;
+    const timer = window.setTimeout(() => setReady(true), revealDelay);
 
-    if (document.readyState === 'complete') {
-      const timer = window.setTimeout(() => setReady(true), revealDelay);
-      return () => window.clearTimeout(timer);
-    }
-
-    const handleLoad = () => {
-      window.setTimeout(() => setReady(true), revealDelay);
-    };
-
-    window.addEventListener('load', handleLoad);
-    return () => window.removeEventListener('load', handleLoad);
+    return () => window.clearTimeout(timer);
   }, []);
 
   return (
@@ -107,7 +98,6 @@ const AppSplashOverlay = () => {
           </div>
         </div>
         <div>
-          <p style={styles.title}>KE</p>
           <p style={styles.subtitle}>KingsHall Exchange</p>
         </div>
         <div style={styles.shimmer} />
