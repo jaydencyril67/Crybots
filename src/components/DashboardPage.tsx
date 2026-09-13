@@ -676,29 +676,6 @@ const DashboardPage = () => {
               </div>
             </section>
 
-            <section style={styles.panel}>
-              <p style={styles.panelTitle}>What’s next</p>
-              <p style={styles.panelSub}>Useful shortcuts for the next step in the app, without exposing user-specific data.</p>
-
-              <div style={styles.featureList}>
-                <div style={styles.featureItem}>
-                  <ShieldCheck style={styles.icon} />
-                  <p style={styles.featureText}>Complete identity and security setup once you wire the full auth flow.</p>
-                </div>
-                <div style={styles.featureItem}>
-                  <Globe2 style={styles.icon} />
-                  <p style={styles.featureText}>Add Google sign-in as an alternate entry path for faster onboarding.</p>
-                </div>
-                <div style={styles.featureItem}>
-                  <Wallet style={styles.icon} />
-                  <p style={styles.featureText}>Keep this page as a neutral home screen that can lead into trading, deposits, and portfolio features later.</p>
-                </div>
-              </div>
-
-              <p style={styles.footerNote}>
-                This dashboard is intentionally clean: it gives users a market overview, a personal-feeling greeting, and a rotating insight — without showing balances, profile data, or account history.
-              </p>
-            </section>
           </div>
         </div>
       </main>
