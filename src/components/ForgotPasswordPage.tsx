@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import NotificationBanner from './NotificationBanner';
 
 const steps = [
@@ -183,6 +183,26 @@ const styles = {
     color: 'rgba(255,255,255,0.62)',
     fontSize: '11px',
     lineHeight: 1.5,
+  },
+  passwordChecklist: {
+    margin: '10px 0 0',
+    padding: 0,
+    listStyle: 'none',
+    display: 'grid',
+    gap: '6px',
+  },
+  passwordChecklistItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '11px',
+    lineHeight: 1.5,
+    color: 'rgba(255,255,255,0.72)',
+  },
+  passwordChecklistIcon: {
+    width: '16px',
+    height: '16px',
+    flexShrink: 0,
   },
   panel: {
     borderRadius: '32px',
@@ -456,7 +476,22 @@ const ForgotPasswordPage = () => {
     return () => window.clearTimeout(timer);
   }, [completed, redirectCountdown]);
 
-  const activeError = currentStep.field === 'password' ? errors.password || (confirmPassword && confirmPassword !== form.password ? 'Passwords do not match.' : '') : errors[currentStep.field];
+  const passwordHasLetter = /[A-Za-z]/.test(form.password);
+  const passwordHasNumber = /\d/.test(form.password);
+  const passwordHasMinLength = form.password.length >= 8;
+  const passwordHasUppercase = /[A-Z]/.test(form.password);
+  const passwordHasLowercase = /[a-z]/.test(form.password);
+  const passwordHasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(form.password);
+  const passwordMeetsRequirement = passwordHasLetter && passwordHasNumber && passwordHasMinLength && passwordHasUppercase && passwordHasLowercase && passwordHasSymbol;
+  const passwordChecklist = [
+    { label: 'At least 8 characters', met: passwordHasMinLength },
+    { label: 'One uppercase letter', met: passwordHasUppercase },
+    { label: 'One lowercase letter', met: passwordHasLowercase },
+    { label: 'One number', met: passwordHasNumber },
+    { label: 'One symbol', met: passwordHasSymbol },
+  ];
+  const passwordErrorMessage = currentStep.field === 'password' && form.password && !passwordMeetsRequirement ? 'Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.' : '';
+  const activeError = currentStep.field === 'password' ? passwordErrorMessage || errors.password || (confirmPassword && confirmPassword !== form.password ? 'Passwords do not match.' : '') : errors[currentStep.field];
 
   return (
     <>
@@ -556,6 +591,21 @@ const ForgotPasswordPage = () => {
 
                 {currentStep.field === 'password' ? (
                   <p style={styles.inlineNote}>Live validation checks password length, uppercase, lowercase, number, symbol, and confirmation match.</p>
+                ) : null}
+                {currentStep.field === 'password' ? (
+                  <ul style={styles.passwordChecklist}>
+                    {passwordChecklist.map((item) => (
+                      <li key={item.label} style={styles.passwordChecklistItem}>
+                        <CheckCircle2
+                          style={{
+                            ...styles.passwordChecklistIcon,
+                            color: item.met ? '#4ade80' : 'rgba(255,255,255,0.32)',
+                          }}
+                        />
+                        <span style={{ color: item.met ? '#4ade80' : 'rgba(255,255,255,0.72)' }}>{item.label}</span>
+                      </li>
+                    ))}
+                  </ul>
                 ) : null}
 
                 {activeError ? <NotificationBanner tone="error" title="Check your details" message={activeError} /> : null}
