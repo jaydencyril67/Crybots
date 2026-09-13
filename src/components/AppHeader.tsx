@@ -8,6 +8,7 @@ const styles = {
     justifyContent: 'space-between',
     gap: '16px',
     padding: '16px 18px',
+    marginBottom: '14px',
     borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.16)',
     background: 'linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(8,14,26,0.92) 100%)',
