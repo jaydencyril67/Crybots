@@ -287,7 +287,7 @@ const SigninPage = () => {
   const [isResendingCode, setIsResendingCode] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
   const [resendStatus, setResendStatus] = useState('');
-  const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in');
+  const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in') || resendStatus.toLowerCase().includes('confirmation email has been sent');
 
   const progress = step === 'email' ? 25 : step === 'method' ? 50 : step === 'password' || step === 'code' ? 75 : 100;
 
@@ -446,6 +446,10 @@ const SigninPage = () => {
       setStep('code');
       setIsCodeLocked(false);
       setAttemptsLeft(5 - (response.data?.attemptsUsed || 0));
+      if (response.data?.confirmationEmailSent) {
+        setSubmitError('');
+        setResendStatus('A new confirmation email has been sent.');
+      }
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
       const message = response?.data?.message || 'Unable to resend code right now. Please try again.';

@@ -383,7 +383,7 @@ const ForgotPasswordPage = () => {
 
     try {
       if (field === 'email') {
-        const response = await api.post('/auth/forgot-password/start', {
+        const response = await api.post('/api/auth/forgot-password/start', {
           email: normalizeEmail(form.email),
           fullName: normalizeFullName(form.fullName),
         });
@@ -400,7 +400,7 @@ const ForgotPasswordPage = () => {
       }
 
       if (field === 'code') {
-        const response = await api.post('/auth/forgot-password/verify-code', {
+        const response = await api.post('/api/auth/forgot-password/verify-code', {
           email: normalizeEmail(form.email),
           code: form.code.trim(),
         });
@@ -415,7 +415,7 @@ const ForgotPasswordPage = () => {
         return;
       }
 
-      const response = await api.post('/auth/forgot-password/reset', {
+      const response = await api.post('/api/auth/forgot-password/reset', {
         email: normalizeEmail(form.email),
         code: form.code.trim(),
         password: form.password,
