@@ -15,6 +15,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import AppHeader from './AppHeader';
+import NowBar from './NowBar';
 
 type MarketCoin = {
   symbol: string;
@@ -79,6 +80,7 @@ const styles = {
     background: '#050816',
     color: '#ffffff',
     overflow: 'hidden',
+    paddingBottom: '112px',
   },
   shell: {
     position: 'relative' as const,
@@ -683,6 +685,7 @@ const DashboardPage = () => {
 
           </div>
         </div>
+        <NowBar />
       </main>
     </>
   );
