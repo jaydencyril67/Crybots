@@ -174,7 +174,7 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
 
-  const uidReadyToSave = Boolean(activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false && uid !== initialUid);
+  const uidReadyToSave = Boolean(activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false);
   const showUidSaveButton = uidReadyToSave || uidCardSaving;
 
   useEffect(() => {
@@ -185,7 +185,7 @@ const SettingsPage = () => {
         const loadedUid = (user?.uid ?? '').replace(/\D/g, '').slice(0, 5);
         setUid(loadedUid);
         setInitialUid(loadedUid);
-      setActiveCard(null);
+        setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));

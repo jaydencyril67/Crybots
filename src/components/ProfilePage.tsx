@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
@@ -267,6 +268,10 @@ type ProfileDetails = {
   usdtBalance?: number;
 };
 
+type MeResponse = {
+  user?: ProfileDetails;
+};
+
 const ProfilePage = () => {
   const profile = useMemo(() => {
     try {
@@ -277,52 +282,77 @@ const ProfilePage = () => {
     }
   }, []);
 
-  const [liveBalance, setLiveBalance] = useState<number | null>(() => getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+  const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(profile);
   const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [balance, setBalance] = useState<number | null>(() => getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
 
   useEffect(() => {
     let isMounted = true;
+    let intervalId = 0;
     const unsubscribe = subscribeBalance((balance) => {
       if (isMounted) {
-        setLiveBalance(balance);
+        setBalance(balance);
       }
     });
 
     const loadProfile = async () => {
       try {
-        const liveBalance = await syncBalanceFromBackend();
+        const [liveBalance, meResponse] = await Promise.all([
+          syncBalanceFromBackend(),
+          api.get<MeResponse>('/api/auth/me'),
+        ]);
         if (!isMounted) {
           return;
         }
 
-        setLiveBalance(typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        const nextProfile = meResponse.data.user ?? profile ?? null;
+        const nextBalance = typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null);
+        setBalance(nextBalance);
+        setLiveProfile(nextProfile);
+        if (nextProfile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
+          window.localStorage.setItem('user', JSON.stringify(nextProfile));
+        }
         setBalanceError(null);
       } catch {
         if (!isMounted) {
           return;
         }
 
-        setLiveBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setLiveProfile(profile);
+        if (profile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
+          window.localStorage.setItem('user', JSON.stringify(profile));
+        }
         setBalanceError(null);
       }
     };
 
     void loadProfile();
-    const intervalId = window.setInterval(() => {
+    intervalId = window.setInterval(() => {
       void loadProfile();
-    }, 20000);
+    }, 12000);
+
+    const handleFocus = () => {
+      void loadProfile();
+    };
+
+    window.addEventListener('focus', handleFocus);
 
     return () => {
       isMounted = false;
       window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
       unsubscribe();
     };
-  }, [profile?.usdtBalance]);
+  }, [profile]);
 
-  const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
-  const email = profile?.email || 'Not available';
-  const uid = profile?.uid || 'Pending confirmation';
-  const usdtBalance = typeof liveBalance === 'number' ? liveBalance : typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : 0;
+  const profileDetails = liveProfile ?? profile;
+  const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
+  const email = profileDetails?.email || 'Not available';
+  const uid = profileDetails?.uid || 'Pending confirmation';
+  const usdtBalance = typeof balance === 'number' ? balance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : 0;
 
   const handleLogout = () => {
     window.localStorage.removeItem('token');
