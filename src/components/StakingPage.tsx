@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight } from 'lucide-react';
 import api from '../api/axios';
@@ -94,7 +94,9 @@ const styles = {
   field: { display: 'grid', gap: '8px', width: '100%' },
   label: { color: '#cbd5e1', fontSize: '0.92rem', fontWeight: 600 },
   input: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '13px 14px', fontSize: '1rem', width: '100%', boxSizing: 'border-box' as const },
-  select: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '13px 14px', fontSize: '1rem', width: '100%', boxSizing: 'border-box' as const },
+  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '13px 14px', fontSize: '1rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
+  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '12px 14px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
   button: { border: 'none', borderRadius: '999px', padding: '13px 16px', fontWeight: 700, color: '#04111f', background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px' },
   stakesList: { display: 'grid', gap: '10px' },
   stakeCard: { padding: '14px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '6px' },
@@ -139,9 +141,19 @@ const StakingPage = () => {
   const [error, setError] = useState('');
   const [packagesError, setPackagesError] = useState('');
 
+  const [isPackageMenuOpen, setIsPackageMenuOpen] = useState(false);
+  const packageMenuRef = useRef<HTMLDivElement | null>(null);
   const selectedPackage = useMemo(() => stakingPackages.find((stakingPackage) => stakingPackage.id === selectedPackageId) || stakingPackages[0], [selectedPackageId]);
 
   useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (packageMenuRef.current && !packageMenuRef.current.contains(event.target as Node)) {
+        setIsPackageMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
     let cancelled = false;
 
     const load = async () => {
@@ -168,7 +180,10 @@ const StakingPage = () => {
     };
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
   }, []);
 
   const selectedAmount = Number(amount);
@@ -227,16 +242,30 @@ const StakingPage = () => {
             <div style={styles.panel}>
               <h2 style={styles.packageTitle}>Create stake</h2>
               <form style={styles.form} onSubmit={handleCreateStake}>
-                <label style={styles.field}>
+                <div ref={packageMenuRef} style={styles.field}>
                   <span style={styles.label}>Package</span>
-                  <select value={selectedPackageId} onChange={(event) => setSelectedPackageId(event.target.value as StakingPackage['id'])} style={styles.select}>
-                    {stakingPackages.map((stakingPackage) => (
-                      <option key={stakingPackage.id} value={stakingPackage.id}>
-                        {stakingPackage.id}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                  <button type="button" style={styles.selectTrigger} onClick={() => setIsPackageMenuOpen((current) => !current)}>
+                    <span>{selectedPackage.id}</span>
+                    <span>▾</span>
+                  </button>
+                  {isPackageMenuOpen ? (
+                    <div style={styles.selectMenu}>
+                      {stakingPackages.map((stakingPackage) => (
+                        <button
+                          key={stakingPackage.id}
+                          type="button"
+                          style={styles.selectOption}
+                          onClick={() => {
+                            setSelectedPackageId(stakingPackage.id);
+                            setIsPackageMenuOpen(false);
+                          }}
+                        >
+                          {stakingPackage.id}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
                 <label style={styles.field}>
                   <span style={styles.label}>Amount (USDT)</span>
                   <input value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} inputMode="decimal" placeholder={`Min ${selectedPackage.minAmount} / Max ${selectedPackage.maxAmount}`} />
