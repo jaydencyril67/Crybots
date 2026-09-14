@@ -250,7 +250,7 @@ const SettingsPage = () => {
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
-  const twoFactorConfigured = Boolean(twoFactorSecret || twoFactorQrUrl || twoFactorEnabled);
+  const twoFactorConfigured = Boolean(twoFactorSecret);
   const twoFactorSetupAvailable = !twoFactorSecret;
   const securityCanSave = Boolean(twoFactorToken.trim());
   const shouldShowSecurityActions = twoFactorConfigured;
@@ -296,8 +296,8 @@ const SettingsPage = () => {
       const { data } = await api.post('/api/two-factor/setup');
       setTwoFactorSecret(data?.secret ?? '');
       setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
-      setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then save your account settings to enable 2FA.');
-      setTwoFactorEnabled(true);
+      setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then enter the 6-digit code to enable 2FA.');
+      setTwoFactorEnabled(false);
       setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
     } catch (error: any) {
@@ -619,14 +619,8 @@ const SettingsPage = () => {
                     </>
                   )}
                 </div>
-                {showUidSaveButton ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
-                      {uidCardSaving ? 'Saving...' : 'Save UID'}
-                    </button>
-                  </div>
-                ) : null}
               </section>
+
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><WalletCards size={18} /> Withdrawal wallet</h2>
