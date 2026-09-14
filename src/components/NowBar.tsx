@@ -123,6 +123,14 @@ const createDefaultActions = (): NowBarAction[] => [
     },
     active: getActivePath() === '/profile',
   },
+  {
+    label: 'Settings',
+    icon: <Settings size={18} />,
+    onClick: () => {
+      navigate('/settings');
+    },
+    active: getActivePath() === '/settings',
+  },
 ];
 
 const NowBar = ({ actions }: NowBarProps) => {
