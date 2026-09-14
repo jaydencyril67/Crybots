@@ -49,23 +49,6 @@ const styles = {
     WebkitBackdropFilter: 'blur(18px)',
     overflow: 'hidden',
   },
-  hero: {
-    padding: 'clamp(18px, 4vw, 30px)',
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
-    background: 'linear-gradient(135deg, rgba(34,211,238,0.08), rgba(167,139,250,0.08))',
-  },
-  title: {
-    margin: 0,
-    fontSize: 'clamp(1.7rem, 4vw, 2.4rem)',
-    fontWeight: 900,
-    letterSpacing: '-0.04em',
-  },
-  subtitle: {
-    margin: '10px 0 0',
-    maxWidth: '68ch',
-    color: '#c6d5f0',
-    lineHeight: 1.6,
-  },
   body: {
     padding: 'clamp(18px, 4vw, 30px)',
     display: 'grid',
@@ -73,11 +56,8 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: '1fr',
     gap: '18px',
-    '@media (max-width: 920px)': {
-      gridTemplateColumns: '1fr',
-    },
   } as const,
   card: {
     borderRadius: '22px',
@@ -367,12 +347,6 @@ const SettingsPage = () => {
       <div style={styles.shell}>
         <AppHeader />
         <div style={styles.panel}>
-          <div style={styles.hero}>
-            <h1 style={styles.title}>Account settings</h1>
-            <p style={styles.subtitle}>
-              Update your login details, choose a custom UID, bind a TRC-20 wallet for future withdrawals, enable extra security, and deactivate your account when needed.
-            </p>
-          </div>
           <div style={styles.body}>
             {status.kind !== 'idle' ? (
               <div style={{ ...styles.status, ...(status.kind === 'success' ? styles.success : styles.error) }}>
