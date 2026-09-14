@@ -225,6 +225,7 @@ const ProfilePage = () => {
 
   const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profile?.email || 'Not available';
+  const uid = profile?.uid || 'Pending confirmation';
   const initials = fullName.split(/\s+/).map((part) => part[0]).slice(0, 2).join('').toUpperCase() || 'T';
 
   return (
@@ -272,6 +273,10 @@ const ProfilePage = () => {
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><UserRound size={16} /> Username</span>
                     <span style={styles.metaValue}>{profile?.name || profile?.firstName || 'Trader profile'}</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><ShieldCheck size={16} /> UID</span>
+                    <span style={styles.metaValue}>{uid}</span>
                   </div>
                 </div>
 

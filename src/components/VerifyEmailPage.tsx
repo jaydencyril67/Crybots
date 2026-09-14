@@ -83,6 +83,7 @@ const VerifyEmailPage = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verifying your email address...');
   const [secondsLeft, setSecondsLeft] = useState(5);
+  const [uid, setUid] = useState('');
 
   const token = useMemo(() => new URLSearchParams(window.location.search).get('token') ?? '', []);
 
@@ -97,6 +98,7 @@ const VerifyEmailPage = () => {
       try {
         const response = await api.get('/api/auth/verify-email', { params: { token } });
         setStatus('success');
+        setUid(response.data?.uid || '');
         setMessage(response.data?.message || 'Your account has been confirmed successfully.');
       } catch (error) {
         setStatus('error');
@@ -142,6 +144,7 @@ const VerifyEmailPage = () => {
           <div style={{ ...styles.iconWrap, background: iconBackground, color: iconColor }}>{icon}</div>
           <h1 style={styles.title}>{status === 'success' ? 'Account confirmed' : status === 'error' ? 'Verification failed' : 'Verifying account'}</h1>
           <p style={styles.text}>{message}</p>
+          {status === 'success' && uid ? <p style={styles.meta}>Your UID: {uid}</p> : null}
           {status !== 'loading' ? (
             <>
               <p style={styles.meta}>Redirecting to sign in in {secondsLeft} seconds...</p>
