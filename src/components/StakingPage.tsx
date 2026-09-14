@@ -39,7 +39,7 @@ const styles = {
     background: '#050816',
     color: '#ffffff',
     overflowX: 'hidden' as const,
-    overflowY: 'auto' as const,
+    overflowY: 'visible' as const,
     paddingBottom: '132px',
   },
   shell: {
