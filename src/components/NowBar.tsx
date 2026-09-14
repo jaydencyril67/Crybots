@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight, CircleUserRound, Coins, Home, Search, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, Home, Search, UserRound } from 'lucide-react';
 
 const styles = {
   dock: {
@@ -42,24 +42,26 @@ const styles = {
   button: {
     width: '100%',
     minHeight: '44px',
-    padding: '10px 12px',
+    padding: '10px',
     border: 'none',
     borderRadius: '18px',
     background: 'rgba(255,255,255,0.04)',
     color: '#e5eefc',
-    fontSize: '0.84rem',
-    fontWeight: 600,
-    letterSpacing: '0.01em',
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonEmpty: {
     opacity: 0.7,
     border: '1px dashed rgba(255,255,255,0.12)',
+  },
+  iconOnly: {
+    width: '20px',
+    height: '20px',
+    display: 'grid',
+    placeItems: 'center',
   },
   iconWrap: {
     width: '18px',
@@ -144,9 +146,7 @@ const NowBar = ({ actions = defaultActions }: NowBarProps) => {
                 ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
               }}
             >
-              <span style={styles.iconWrap}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
-              <span>{action.label}</span>
-              {action.active ? <ChevronRight size={14} /> : null}
+              <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
             </button>
           </div>
         ))}

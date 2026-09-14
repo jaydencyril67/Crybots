@@ -126,11 +126,11 @@ const styles = {
   metaRow: {
     width: '100%',
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-    gap: '10px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '14px',
     '@media (max-width: 600px)': {
       gridTemplateColumns: 'minmax(0, 1fr)',
-      gap: '8px',
+      gap: '10px',
     },
   } as const,
   metaCard: {
@@ -139,15 +139,16 @@ const styles = {
     alignItems: 'flex-start' as const,
     justifyContent: 'flex-start' as const,
     gap: '8px',
-    padding: '14px 16px',
-    borderRadius: '18px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    padding: '16px 18px',
+    borderRadius: '20px',
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.09)',
     minWidth: 0,
+    width: '100%',
     '@media (max-width: 600px)': {
       alignItems: 'center',
       textAlign: 'center',
-      padding: '12px 14px',
+      padding: '14px 16px',
     },
   },
   metaLabel: {
@@ -169,6 +170,7 @@ const styles = {
     overflowWrap: 'anywhere' as const,
   },
   content: {
+    width: '100%',
     padding: 'clamp(18px, 4vw, 28px)',
   },
   sectionTitle: {
@@ -300,10 +302,6 @@ const ProfilePage = () => {
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><ShieldCheck size={16} /> Account status</span>
                     <span style={styles.metaValue}>Protected</span>
-                  </div>
-                  <div style={styles.metaCard}>
-                    <span style={styles.metaLabel}><UserRound size={16} /> Username</span>
-                    <span style={styles.metaValue}>{profile?.name || profile?.firstName || 'Trader profile'}</span>
                   </div>
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><ShieldCheck size={16} /> UID</span>
