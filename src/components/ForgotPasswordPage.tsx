@@ -466,7 +466,7 @@ const ForgotPasswordPage = () => {
     if (!completed) return;
 
     if (redirectCountdown <= 0) {
-      window.location.href = '/signin';
+      navigate('/signin');
       return;
     }
 
