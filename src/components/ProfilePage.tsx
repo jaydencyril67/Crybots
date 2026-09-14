@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CircleUserRound, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
-import api from '../api/axios';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
@@ -289,26 +288,24 @@ const ProfilePage = () => {
 
     const loadProfile = async () => {
       try {
-        const liveBalanceResponse = await syncBalanceFromBackend();
+        const liveBalance = await syncBalanceFromBackend();
         if (!isMounted) {
           return;
         }
 
-        if (typeof liveBalanceResponse === 'number') {
-          setLiveBalance(liveBalanceResponse);
-          setBalanceError(null);
-        }
+        setLiveBalance(typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setBalanceError(null);
       } catch {
         if (!isMounted) {
           return;
         }
 
-        setLiveBalance(typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : getCachedBalance());
-        setBalanceError('We could not refresh your live balance right now.');
+        setLiveBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setBalanceError(null);
       }
     };
 
-    loadProfile();
+    void loadProfile();
     const intervalId = window.setInterval(() => {
       void loadProfile();
     }, 20000);
