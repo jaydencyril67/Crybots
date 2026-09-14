@@ -117,6 +117,7 @@ const styles = {
   buttonRow: {
     display: 'flex',
     flexWrap: 'wrap' as const,
+    justifyContent: 'center',
     gap: '10px',
     marginTop: '4px',
   },
@@ -296,7 +297,7 @@ const SettingsPage = () => {
 
     setPasswordCardSaving(true);
     try {
-      await api.patch('/api/settings/account', {
+      await api.patch('/api/settings/password', {
         currentPassword,
         newPassword,
       });
@@ -327,7 +328,7 @@ const SettingsPage = () => {
 
     setUidCardSaving(true);
     try {
-      await api.patch('/api/settings/account', {
+      await api.patch('/api/settings/uid', {
         uid: nextUid,
       });
       showStatus('success', 'UID updated successfully.');
@@ -352,7 +353,7 @@ const SettingsPage = () => {
 
     setWalletCardSaving(true);
     try {
-      await api.patch('/api/settings/account', {
+      await api.patch('/api/settings/wallet', {
         walletAddress: trimmedWallet,
       });
       setWalletValidation({ valid: true, message: 'TRC-20 wallet format looks valid.' });
@@ -536,17 +537,17 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
+                {((activeCard === 'uid' && uid.trim().length === 5 && uidAvailable === true && uid !== initialUid) || uidCardSaving) ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
+                      {uidCardSaving ? 'Saving...' : 'Save UID'}
+                    </button>
+                  </div>
+                ) : null}
                 {((activeCard === 'security' && securityCanSave) || securityCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
                       {securityCardSaving ? 'Saving...' : 'Save security'}
-                    </button>
-                  </div>
-                ) : null}
-                {((uid.trim().length === 5 && uidAvailable === true && uid !== initialUid) || uidCardSaving) ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
-                      {uidCardSaving ? 'Saving...' : 'Save UID'}
                     </button>
                   </div>
                 ) : null}
