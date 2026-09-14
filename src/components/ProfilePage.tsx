@@ -311,11 +311,6 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                <div style={{ ...styles.helper, justifyContent: 'flex-start' }}>
-                  <p style={styles.helperText}>
-                    Profile picture upload will be added next.
-                  </p>
-                </div>
               </div>
             </section>
           </div>
