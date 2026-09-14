@@ -250,19 +250,6 @@ const StakingPage = () => {
                 <button type="submit" style={styles.button} disabled={isSubmitting}>{isSubmitting ? 'Creating...' : 'Stake now'} <ArrowRight size={16} /></button>
               </form>
             </div>
-            <div style={styles.panel}>
-              <h2 style={styles.packageTitle}>My stakes</h2>
-              {isLoading ? <LoadingDots /> : null}
-              {!isLoading && stakes.length === 0 ? <p style={styles.helper}>No stakes yet.</p> : null}
-              <div style={styles.stakesList}>
-                {stakes.map((stake) => (
-                  <article key={stake.id} style={styles.stakeCard}>
-                    <div style={styles.stakeRow}><strong>{stake.packageId}</strong><span style={styles.badge}>{stake.status}</span></div>
-                    <p style={styles.helper}>{stake.principal} USDT • {stake.dailyProfitPercent}% daily • {stake.lockDurationDays} days</p>
-                  </article>
-                ))}
-              </div>
-            </div>
           </section>
         </div>
         <NowBar />
