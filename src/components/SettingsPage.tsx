@@ -175,9 +175,7 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
 
   const uidReadyToSave = Boolean(activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false && uid !== initialUid);
-  const securityReadyToSave = Boolean(activeCard === 'security' && securityCanSave);
   const showUidSaveButton = uidReadyToSave || uidCardSaving;
-  const showSecuritySaveButton = securityReadyToSave || securityCardSaving;
 
   useEffect(() => {
     const loadAccount = async () => {
@@ -554,7 +552,7 @@ const SettingsPage = () => {
                     </button>
                   </div>
                 ) : null}
-                {showSecuritySaveButton ? (
+                {((activeCard === 'security' && securityCanSave) || securityCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
                       {securityCardSaving ? 'Saving...' : 'Save security'}
