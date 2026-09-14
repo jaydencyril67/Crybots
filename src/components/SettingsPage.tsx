@@ -213,7 +213,6 @@ const SettingsPage = () => {
       try {
         const { data } = await api.get<{ available?: boolean }>('/api/settings/uid-check', {
           params: { uid: trimmedUid },
-          signal: controller.signal,
         });
         setUidAvailable(Boolean(data.available));
       } catch {
