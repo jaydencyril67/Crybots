@@ -23,7 +23,13 @@ type StatusState = {
   message: string;
 };
 
+type WalletValidationState = {
+  valid: boolean;
+  message: string;
+};
+
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
+const trc20WalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
 
 const styles = {
   page: {
@@ -152,6 +158,7 @@ const SettingsPage = () => {
   const [securityCardSaving, setSecurityCardSaving] = useState(false);
   const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'security' | 'uid' | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
+  const [walletValidation, setWalletValidation] = useState<WalletValidationState>({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
   const [twoFactorSetupLoading, setTwoFactorSetupLoading] = useState(false);
@@ -172,6 +179,7 @@ const SettingsPage = () => {
         setUid((user?.uid ?? '').replace(/\D/g, '').slice(0, 5));
       setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
+        setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
         setTwoFactorBackupCodes(Array.isArray(user?.twoFactorBackupCodes) ? (user?.twoFactorBackupCodes ?? []) : []);
@@ -315,14 +323,24 @@ const SettingsPage = () => {
   };
 
   const handleSaveWallet = async () => {
+    const trimmedWallet = walletAddress.trim();
+
+    if (!trc20WalletPattern.test(trimmedWallet)) {
+      setWalletValidation({ valid: false, message: 'Wallet address must be a valid TRC-20 address starting with T.' });
+      showStatus('error', 'Enter a valid TRC-20 wallet address before saving.');
+      return;
+    }
+
     setWalletCardSaving(true);
     try {
       await api.patch('/api/settings/account', {
-        walletAddress: walletAddress.trim(),
+        walletAddress: trimmedWallet,
       });
+      setWalletValidation({ valid: true, message: 'TRC-20 wallet format looks valid.' });
       showStatus('success', 'Wallet address saved successfully.');
       setActiveCard(null);
     } catch (error: any) {
+      setWalletValidation({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
       showStatus('error', error?.response?.data?.message || 'Unable to save wallet address.');
     } finally {
       setWalletCardSaving(false);
@@ -525,18 +543,29 @@ const SettingsPage = () => {
                       style={styles.input}
                       value={walletAddress}
                       onChange={(event) => {
-                        setWalletAddress(event.target.value);
+                        const nextValue = event.target.value.trim();
+                        setWalletAddress(nextValue);
+                        setWalletValidation({
+                          valid: trc20WalletPattern.test(nextValue),
+                          message: trc20WalletPattern.test(nextValue)
+                            ? 'TRC-20 wallet format looks valid.'
+                            : 'Wallet address must be 34 characters, start with T, and use valid TRC-20 characters only.',
+                        });
                         setActiveCard('wallet');
                       }}
                       onFocus={() => setActiveCard('wallet')}
+                      inputMode="text"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      spellCheck={false}
                       placeholder="TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     />
-                    <span style={styles.helper}>Use the wallet address that will receive future TRC-20 withdrawals.</span>
+                    <span style={styles.helper}>{walletValidation.message}</span>
                   </label>
                 </div>
                 {activeCard === 'wallet' || walletCardSaving ? (
                   <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving || !walletValidation.valid}>
                       {walletCardSaving ? 'Saving...' : 'Save wallet'}
                     </button>
                   </div>
