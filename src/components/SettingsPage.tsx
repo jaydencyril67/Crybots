@@ -254,6 +254,7 @@ const SettingsPage = () => {
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
   const twoFactorConfigured = Boolean(twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0 || twoFactorEnabled);
+  const twoFactorSetupAvailable = !twoFactorSecret;
   const securityCanSave = Boolean(twoFactorToken.trim());
 
   const handleDeleteTwoFactor = async () => {
@@ -562,7 +563,7 @@ const SettingsPage = () => {
                 <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security controls</h2>
                 <p style={styles.cardText}>Turn on extra account security now. You can set up an authenticator app and keep email recovery available as fallback.</p>
                 <div style={styles.formGrid}>
-                  {!twoFactorConfigured ? (
+                  {!twoFactorSetupAvailable ? (
                     <>
                       <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
                         {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up 2FA'}
