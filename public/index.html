@@ -59,7 +59,7 @@
   <body style="margin: 0; background: #050816; overflow-x: hidden;">
     <script>
       if (window.__kingshallRefreshSplash) {
-        document.body.style.visibility = 'hidden';
+        document.documentElement.style.visibility = 'hidden';
       }
     </script>
 
@@ -68,9 +68,8 @@
     <script>
       if (window.__kingshallRefreshSplash) {
         requestAnimationFrame(() => {
-          document.body.style.visibility = 'visible';
+          document.documentElement.style.visibility = 'visible';
         });
       }
-    </script>
-  </body>
+    </script>  </body>
 </html>
