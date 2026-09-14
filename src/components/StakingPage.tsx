@@ -74,6 +74,12 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(200px, 1fr))',
     gap: '16px',
+    padding: '0 2px 6px',
+  },
+  packageGridScroll: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, minmax(200px, 1fr))',
+    gap: '16px',
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
     padding: '0 2px 6px',
@@ -124,6 +130,11 @@ const styles = {
     shell: { padding: '16px 8px 120px', gap: '12px' },
     hero: { padding: '18px' },
     packageGrid: {
+      gridTemplateColumns: '1fr',
+      gap: '20px',
+      padding: '0 4px 8px',
+    },
+    packageGridScroll: {
       gridTemplateColumns: 'repeat(3, minmax(240px, 82vw))',
       gap: '20px',
       overflowX: 'auto' as const,
@@ -227,7 +238,7 @@ const StakingPage = () => {
             <h1 style={styles.heroTitle}>Staking</h1>
           </section>
           {packagesError ? <p style={styles.error}>{packagesError}</p> : null}
-          <section style={styles.packageGrid}>
+          <section style={styles.packageGridScroll}>
             {stakingPackages.map((stakingPackage) => (
               <article key={stakingPackage.id} style={styles.packageCard}>
                 <span style={styles.packageBadge}>{stakingPackage.id}</span>
