@@ -268,7 +268,6 @@ const SettingsPage = () => {
       showStatus('success', deleteResponse.data?.message || '2FA deleted successfully.');
       setTwoFactorEnabled(false);
       setTwoFactorSecret('');
-      setTwoFactorBackupCodes([]);
       setTwoFactorQrUrl('');
       setTwoFactorToken('');
       setActiveCard(null);
