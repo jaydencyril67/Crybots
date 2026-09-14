@@ -40,7 +40,7 @@ const styles = {
     color: '#ffffff',
     overflowX: 'hidden' as const,
     overflowY: 'visible' as const,
-    paddingBottom: '132px',
+    paddingBottom: '24px',
   },
   shell: {
     position: 'relative' as const,
@@ -71,8 +71,8 @@ const styles = {
   metricValue: { margin: 0, fontSize: '1rem', fontWeight: 700 },
   packageGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
-    gap: '12px',
+    gridTemplateColumns: 'repeat(3, minmax(200px, 1fr))',
+    gap: '16px',
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
     paddingBottom: '6px',
@@ -116,7 +116,8 @@ const styles = {
     shell: { padding: '16px 12px 28px', gap: '12px' },
     hero: { padding: '18px' },
     packageGrid: {
-      gridTemplateColumns: 'repeat(3, minmax(220px, 78vw))',
+      gridTemplateColumns: 'repeat(3, minmax(190px, 72vw))',
+      gap: '14px',
       overflowX: 'auto' as const,
       overflowY: 'hidden' as const,
       scrollSnapType: 'x mandatory' as const,
@@ -252,7 +253,6 @@ const StakingPage = () => {
             </div>
           </section>
         </div>
-        <NowBar />
       </main>
     </>
   );

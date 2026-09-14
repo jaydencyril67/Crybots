@@ -109,7 +109,7 @@ const RouteTransition = () => {
     return <LandingPage />;
   }, [displayedRouteKey]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile';
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking';
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
