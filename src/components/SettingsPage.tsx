@@ -176,6 +176,10 @@ const SettingsPage = () => {
   const [uidChecking, setUidChecking] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [twoFactorSecret, setTwoFactorSecret] = useState('');
+  const [twoFactorBackupCodes, setTwoFactorBackupCodes] = useState<string[]>([]);
+  const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
+  const [twoFactorSetupLoading, setTwoFactorSetupLoading] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -191,6 +195,8 @@ const SettingsPage = () => {
         setUid(user?.uid ?? '');
         setWalletAddress(user?.walletAddress ?? '');
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
+        setTwoFactorSecret(user?.twoFactorSecret ?? '');
+        setTwoFactorBackupCodes(Array.isArray(user?.twoFactorBackupCodes) ? user.twoFactorBackupCodes : []);
       } catch {
         navigate('/signin');
       }
@@ -239,6 +245,24 @@ const SettingsPage = () => {
     setStatus({ kind, message });
   };
 
+  const handleSetupTwoFactor = async () => {
+    setTwoFactorSetupMessage('');
+    setTwoFactorSetupLoading(true);
+
+    try {
+      const { data } = await api.post('/api/two-factor/setup');
+      setTwoFactorSecret(data?.secret ?? '');
+      setTwoFactorBackupCodes(Array.isArray(data?.backupCodes) ? data.backupCodes : []);
+      setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then save your account settings to enable 2FA.');
+      setTwoFactorEnabled(true);
+      showStatus('success', '2FA setup created. Complete setup before leaving this page.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to create 2FA setup right now.');
+    } finally {
+      setTwoFactorSetupLoading(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!currentPassword) {
       showStatus('error', 'Enter your current password to save settings.');
@@ -276,6 +300,14 @@ const SettingsPage = () => {
         currentPassword,
         newPassword: newPassword.trim() ? newPassword : undefined,
       });
+      if (twoFactorEnabled && twoFactorSecret) {
+        const enableResponse = await api.post('/api/two-factor/enable', { token: '', backupCode: twoFactorBackupCodes[0] });
+        if (enableResponse.data?.message) {
+          showStatus('success', enableResponse.data.message);
+        }
+      } else if (!twoFactorEnabled) {
+        await api.post('/api/two-factor/disable');
+      }
       showStatus('success', 'Settings updated successfully.');
       setCurrentPassword('');
       setNewPassword('');
@@ -369,13 +401,35 @@ const SettingsPage = () => {
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security controls</h2>
-                <p style={styles.cardText}>Turn on extra account security now. We will connect the full 2FA flow later, but your preference is stored here.</p>
+                <p style={styles.cardText}>Turn on extra account security now. You can set up an authenticator app and keep email recovery available as fallback.</p>
                 <div style={styles.formGrid}>
                   <label style={{ ...styles.field, alignItems: 'start' }}>
                     <span style={styles.label}>2FA protection</span>
                     <input type="checkbox" checked={twoFactorEnabled} onChange={(event) => setTwoFactorEnabled(event.target.checked)} />
                     <span style={styles.helper}>Enable to require an additional verification step on future sign-ins.</span>
                   </label>
+                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => void handleSetupTwoFactor()} disabled={twoFactorSetupLoading}>
+                    {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up authenticator app'}
+                  </button>
+                  {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
+                  {twoFactorSecret ? (
+                    <div style={{ ...styles.field, gap: '10px' }}>
+                      <span style={styles.label}>Authenticator secret</span>
+                      <code style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', wordBreak: 'break-all' }}>{twoFactorSecret}</code>
+                      <span style={styles.helper}>Add this secret to your authenticator app if you cannot scan the QR code.</span>
+                    </div>
+                  ) : null}
+                  {twoFactorBackupCodes.length > 0 ? (
+                    <div style={{ ...styles.field, gap: '10px' }}>
+                      <span style={styles.label}>Backup codes</span>
+                      <div style={{ display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
+                        {twoFactorBackupCodes.map((code) => (
+                          <code key={code} style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', textAlign: 'center' }}>{code}</code>
+                        ))}
+                      </div>
+                      <span style={styles.helper}>Store these codes safely. They are fallback access if you lose your authenticator app.</span>
+                    </div>
+                  ) : null}
                 </div>
               </section>
 
