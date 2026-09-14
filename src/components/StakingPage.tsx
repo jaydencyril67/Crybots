@@ -102,6 +102,7 @@ const styles = {
   stakesTableWrap: { overflowX: 'auto' as const, overflowY: 'auto' as const, borderRadius: '22px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
   stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
   stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
+  stakesPageButtonActive: { background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', color: '#04111f' },
   stakesTable: { width: '100%', minWidth: '760px', borderCollapse: 'collapse' as const },
   stakesHead: { background: 'rgba(255,255,255,0.05)' },
   stakeTh: { position: 'sticky' as const, top: 0, zIndex: 1, padding: '14px 16px', textAlign: 'left' as const, fontSize: '0.84rem', letterSpacing: '0.02em', textTransform: 'uppercase' as const, color: '#cbd5e1', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,14,24,0.96)' },
@@ -159,7 +160,7 @@ const StakingPage = () => {
   const [packagesError, setPackagesError] = useState('');
 
   const [isPackageMenuOpen, setIsPackageMenuOpen] = useState(false);
-  const [isStakeHistoryExpanded, setIsStakeHistoryExpanded] = useState(false);
+  const [stakeHistoryPage, setStakeHistoryPage] = useState(1);
   const packageMenuRef = useRef<HTMLDivElement | null>(null);
   const selectedPackage = useMemo(() => stakingPackages.find((stakingPackage) => stakingPackage.id === selectedPackageId) || stakingPackages[0], [selectedPackageId]);
 
@@ -207,6 +208,11 @@ const StakingPage = () => {
   const selectedAmount = Number(amount);
   const isAmountValid = Number.isFinite(selectedAmount) && selectedAmount >= selectedPackage.minAmount && selectedAmount <= selectedPackage.maxAmount;
   const projectedProfit = isAmountValid ? Number((selectedAmount * (selectedPackage.dailyProfitPercent / 100) * selectedPackage.lockDurationDays).toFixed(2)) : 0;
+  const stakeHistoryPageSize = 4;
+  const stakeHistoryTotalPages = Math.max(1, Math.ceil(stakes.length / stakeHistoryPageSize));
+  const stakeHistoryCurrentPage = Math.min(stakeHistoryPage, stakeHistoryTotalPages);
+  const stakeHistoryStartIndex = (stakeHistoryCurrentPage - 1) * stakeHistoryPageSize;
+  const stakeHistoryRows = stakes.slice(stakeHistoryStartIndex, stakeHistoryStartIndex + stakeHistoryPageSize);
 
   const handleCreateStake = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -322,7 +328,6 @@ const StakingPage = () => {
                 <div
                   style={{
                     ...styles.stakesTableWrap,
-                    maxHeight: isStakeHistoryExpanded ? 'none' : '300px',
                   }}
                 >
                   <table style={styles.stakesTable}>
@@ -338,7 +343,7 @@ const StakingPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {stakes.map((stake, index) => (
+                      {stakeHistoryRows.map((stake, index) => (
                         <tr key={stake.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
                           <td style={styles.stakeTd}>
                             <span style={styles.stakeRow}>
@@ -373,9 +378,31 @@ const StakingPage = () => {
                   <button
                     type="button"
                     style={styles.stakesTableToggle}
-                    onClick={() => setIsStakeHistoryExpanded((current) => !current)}
+                    onClick={() => setStakeHistoryPage((current) => Math.max(1, current - 1))}
+                    disabled={stakeHistoryCurrentPage === 1}
                   >
-                    {isStakeHistoryExpanded ? 'Show less' : 'Show more'}
+                    Prev
+                  </button>
+                  {Array.from({ length: stakeHistoryTotalPages }, (_, index) => index + 1).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      style={{
+                        ...styles.stakesTableToggle,
+                        ...(page === stakeHistoryCurrentPage ? styles.stakesPageButtonActive : {}),
+                      }}
+                      onClick={() => setStakeHistoryPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    style={styles.stakesTableToggle}
+                    onClick={() => setStakeHistoryPage((current) => Math.min(stakeHistoryTotalPages, current + 1))}
+                    disabled={stakeHistoryCurrentPage === stakeHistoryTotalPages}
+                  >
+                    Next
                   </button>
                 </div>
               </>
