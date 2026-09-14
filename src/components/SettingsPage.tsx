@@ -56,11 +56,8 @@ const styles = {
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: '1fr',
     gap: '18px',
-    '@media (max-width: 920px)': {
-      gridTemplateColumns: '1fr',
-    },
   } as const,
   card: {
     borderRadius: '22px',
