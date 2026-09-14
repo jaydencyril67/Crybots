@@ -14,7 +14,6 @@ type MeResponse = {
     walletAddress?: string;
     twoFactorEnabled?: boolean;
     twoFactorSecret?: string;
-    twoFactorBackupCodes?: string[];
   };
 };
 
@@ -167,7 +166,6 @@ const SettingsPage = () => {
   const [twoFactorSetupLoading, setTwoFactorSetupLoading] = useState(false);
   const [twoFactorQrUrl, setTwoFactorQrUrl] = useState('');
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
-  const [twoFactorBackupCodes, setTwoFactorBackupCodes] = useState<string[]>([]);
   const [twoFactorToken, setTwoFactorToken] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -191,7 +189,6 @@ const SettingsPage = () => {
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
-        setTwoFactorBackupCodes(Array.isArray(user?.twoFactorBackupCodes) ? (user?.twoFactorBackupCodes ?? []) : []);
         setTwoFactorToken('');
       } catch {
         navigate('/signin');
@@ -253,8 +250,11 @@ const SettingsPage = () => {
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
-  const twoFactorConfigured = Boolean(twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0 || twoFactorEnabled);
+  const twoFactorConfigured = Boolean(twoFactorSecret || twoFactorQrUrl || twoFactorEnabled);
+  const twoFactorSetupAvailable = !twoFactorSecret;
   const securityCanSave = Boolean(twoFactorToken.trim());
+  const shouldShowSecurityActions = twoFactorConfigured;
+  const shouldShowSecuritySetup = !twoFactorConfigured;
 
   const handleDeleteTwoFactor = async () => {
     const trimmedToken = twoFactorToken.trim();
@@ -270,7 +270,6 @@ const SettingsPage = () => {
       showStatus('success', deleteResponse.data?.message || '2FA deleted successfully.');
       setTwoFactorEnabled(false);
       setTwoFactorSecret('');
-      setTwoFactorBackupCodes([]);
       setTwoFactorQrUrl('');
       setTwoFactorToken('');
       setActiveCard(null);
@@ -297,7 +296,6 @@ const SettingsPage = () => {
       const { data } = await api.post('/api/two-factor/setup');
       setTwoFactorSecret(data?.secret ?? '');
       setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
-      setTwoFactorBackupCodes(Array.isArray(data?.backupCodes) ? data.backupCodes : []);
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then save your account settings to enable 2FA.');
       setTwoFactorEnabled(true);
       setActiveCard('security');
@@ -416,7 +414,6 @@ const SettingsPage = () => {
       if (!twoFactorConfigured) {
         const enableResponse = await api.post('/api/two-factor/enable', {
           token: trimmedToken,
-          backupCode: twoFactorBackupCodes[0],
         });
         if (enableResponse.data?.message) {
           showStatus('success', enableResponse.data.message);
@@ -431,7 +428,6 @@ const SettingsPage = () => {
       } else {
         const enableResponse = await api.post('/api/two-factor/enable', {
           token: trimmedToken,
-          backupCode: twoFactorBackupCodes[0],
         });
         if (enableResponse.data?.message) {
           showStatus('success', enableResponse.data.message);
@@ -565,7 +561,7 @@ const SettingsPage = () => {
                   {!twoFactorConfigured ? (
                     <>
                       <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
-                        {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up 2FA'}
+                        {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Setup 2FA'}
                       </button>
                       {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
                       {twoFactorQrUrl ? (
@@ -580,17 +576,6 @@ const SettingsPage = () => {
                           <span style={styles.label}>Authenticator secret</span>
                           <code style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', wordBreak: 'break-all' }}>{twoFactorSecret}</code>
                           <span style={styles.helper}>Add this secret manually if you cannot scan the QR code.</span>
-                        </div>
-                      ) : null}
-                      {twoFactorBackupCodes.length > 0 ? (
-                        <div style={{ ...styles.field, gap: '10px' }}>
-                          <span style={styles.label}>Backup codes</span>
-                          <div style={{ display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
-                            {twoFactorBackupCodes.map((code) => (
-                              <code key={code} style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', textAlign: 'center' }}>{code}</code>
-                            ))}
-                          </div>
-                          <span style={styles.helper}>Store these codes safely. They are fallback access if you lose your authenticator app.</span>
                         </div>
                       ) : null}
                     </>
@@ -633,31 +618,6 @@ const SettingsPage = () => {
                       </div>
                     </>
                   )}
-                  {twoFactorQrUrl ? (
-                    <div style={{ ...styles.field, gap: '10px', alignItems: 'center' }}>
-                      <span style={styles.label}>QR code</span>
-                      <img src={twoFactorQrUrl} alt="2FA QR code" style={{ width: '220px', height: '220px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: '#ffffff' }} />
-                      <span style={styles.helper}>Scan this QR code with Google Authenticator, Authy, or another TOTP app.</span>
-                    </div>
-                  ) : null}
-                  {twoFactorSecret ? (
-                    <div style={{ ...styles.field, gap: '10px' }}>
-                      <span style={styles.label}>Authenticator secret</span>
-                      <code style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', wordBreak: 'break-all' }}>{twoFactorSecret}</code>
-                      <span style={styles.helper}>Add this secret manually if you cannot scan the QR code.</span>
-                    </div>
-                  ) : null}
-                  {twoFactorBackupCodes.length > 0 ? (
-                    <div style={{ ...styles.field, gap: '10px' }}>
-                      <span style={styles.label}>Backup codes</span>
-                      <div style={{ display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
-                        {twoFactorBackupCodes.map((code) => (
-                          <code key={code} style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', textAlign: 'center' }}>{code}</code>
-                        ))}
-                      </div>
-                      <span style={styles.helper}>Store these codes safely. They are fallback access if you lose your authenticator app.</span>
-                    </div>
-                  ) : null}
                 </div>
                 {showUidSaveButton ? (
                   <div style={styles.buttonRow}>
