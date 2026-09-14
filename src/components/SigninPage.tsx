@@ -309,8 +309,10 @@ const styles = {
 const SigninPage = () => {
   const [form, setForm] = useState<FormState>(initialState);
   const [method, setMethod] = useState<SignInMethod | null>(null);
-  const [step, setStep] = useState<'email' | 'method' | 'password' | 'code'>('email');
+  const [step, setStep] = useState<'email' | 'method' | 'password' | 'code' | 'twofactor' | 'recovery'>('email');
   const [submitError, setSubmitError] = useState('');
+  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
+  const [twoFactorMessage, setTwoFactorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
   const [isCodeLocked, setIsCodeLocked] = useState(false);
@@ -319,7 +321,7 @@ const SigninPage = () => {
   const [resendStatus, setResendStatus] = useState('');
   const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in') || resendStatus.toLowerCase().includes('confirmation email has been sent');
 
-  const progress = step === 'email' ? 25 : step === 'method' ? 50 : step === 'password' || step === 'code' ? 75 : 100;
+  const progress = step === 'email' ? 20 : step === 'method' ? 40 : step === 'password' || step === 'code' ? 60 : 80;
 
   const handleReturn = () => {
     if (window.history.length > 1) {
@@ -373,6 +375,8 @@ const SigninPage = () => {
 
   const handleStartSignin = async (selectedMethod: SignInMethod) => {
     setSubmitError('');
+    setTwoFactorRequired(false);
+    setTwoFactorMessage('');
     setMethod(selectedMethod);
 
     if (selectedMethod === 'password') {
@@ -417,6 +421,13 @@ const SigninPage = () => {
         password: form.password,
       });
 
+      if (response.status === 206 || response.data?.requiresTwoFactor) {
+        setTwoFactorRequired(true);
+        setTwoFactorMessage(response.data?.message || 'Two-factor authentication is required.');
+        setStep(response.data?.twoFactorMethod === 'recovery' ? 'recovery' : 'twofactor');
+        return;
+      }
+
       if (response.data?.token) {
         localStorage.setItem('token', response.data.token);
       }
@@ -433,6 +444,72 @@ const SigninPage = () => {
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
       const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleTwoFactorSignin = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post('/api/auth/signin', {
+        email: form.email,
+        password: form.password,
+        twoFactorToken: form.twoFactorCode,
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
+          localStorage.setItem('firstName', response.data.user.firstName.trim());
+          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
+        }
+      }
+
+      navigate('/dashboard');
+    } catch (error) {
+      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const message = response?.data?.message || 'Unable to verify your two-factor code right now. Please try again.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRecoverySignin = async () => {
+    setSubmitError('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await api.post('/api/auth/signin', {
+        email: form.email,
+        password: form.password,
+        recoveryCode: form.recoveryCode,
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+
+      if (response.data?.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
+          localStorage.setItem('firstName', response.data.user.firstName.trim());
+          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
+        }
+      }
+
+      navigate('/dashboard');
+    } catch (error) {
+      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const message = response?.data?.message || 'Unable to verify your recovery code right now. Please try again.';
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
@@ -510,6 +587,25 @@ const SigninPage = () => {
     }
   };
 
+  const handleRequestRecovery = async () => {
+    if (!form.email.trim()) return;
+
+    setSubmitError('');
+    setTwoFactorMessage('');
+    setIsSubmitting(true);
+
+    try {
+      await api.post('/api/two-factor/email-recovery', { email: form.email });
+      setTwoFactorMessage('A recovery code was sent to your email address.');
+      setStep('recovery');
+    } catch (error) {
+      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      setSubmitError(response?.data?.message || 'Unable to send a recovery code right now. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -539,7 +635,7 @@ const SigninPage = () => {
                   <div style={styles.progressBar}>
                     <div style={{ ...styles.progressFill, width: `${progress}%` }} />
                   </div>
-                  <div>{step === 'email' ? 'Step 1 of 3' : step === 'method' ? 'Step 2 of 3' : 'Step 3 of 3'}</div>
+                  <div>{step === 'email' ? 'Step 1 of 3' : step === 'method' ? 'Step 2 of 3' : step === 'password' || step === 'code' ? 'Step 3 of 3' : 'Step 4 of 4'}</div>
                 </div>
 
                 <div style={styles.headerCopy}>
@@ -561,16 +657,17 @@ const SigninPage = () => {
                       <h2 style={styles.stepTitle}>Enter your password</h2>
                       <p style={styles.stepDesc}>This is your standard sign-in route.</p>
                     </>
+                  ) : step === 'twofactor' ? (
+                    <>
+                      <p style={styles.stepLabel}>2FA</p>
+                      <h2 style={styles.stepTitle}>Enter your authenticator code</h2>
+                      <p style={styles.stepDesc}>{twoFactorMessage || 'Use the code from your authenticator app. If you cannot access it, switch to email recovery.'}</p>
+                    </>
                   ) : (
                     <>
-                      <p style={styles.stepLabel}>Email code</p>
-                      <h2 style={styles.stepTitle}>Enter the 3-digit code</h2>
-                      <p style={styles.stepDesc}>{codeSent ? 'We sent the code to your email. Check your inbox and spam folder if needed.' : 'Request a code to continue.'}</p>
-                      {codeSent ? (
-                        <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
-                          {isResendingCode ? 'Resending code…' : 'Resend code'}
-                        </button>
-                      ) : null}
+                      <p style={styles.stepLabel}>Recovery</p>
+                      <h2 style={styles.stepTitle}>Verify with your email recovery code</h2>
+                      <p style={styles.stepDesc}>{twoFactorMessage || 'We sent a fallback recovery code to your email address.'}</p>
                     </>
                   )}
                 </div>
@@ -601,6 +698,20 @@ const SigninPage = () => {
                     <div style={styles.field}>
                       <label style={styles.label} htmlFor="signin-password">Password</label>
                       <input id="signin-password" style={styles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
+                    </div>
+                  ) : null}
+                  {step === 'twofactor' ? (
+                    <div style={styles.field}>
+                      <label style={styles.label} htmlFor="signin-twofactor">Authenticator code</label>
+                      <input id="signin-twofactor" style={styles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" autoComplete="one-time-code" />
+                      <div style={styles.footerNote}>Use the code from your authenticator app. If you cannot access it, request email recovery.</div>
+                    </div>
+                  ) : null}
+                  {step === 'recovery' ? (
+                    <div style={styles.field}>
+                      <label style={styles.label} htmlFor="signin-recovery">Recovery code</label>
+                      <input id="signin-recovery" style={styles.input} inputMode="numeric" maxLength={6} value={form.recoveryCode} onChange={(event) => updateField('recoveryCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" autoComplete="one-time-code" />
+                      <div style={styles.footerNote}>We sent this fallback recovery code to your email address.</div>
                     </div>
                   ) : null}
 
@@ -634,7 +745,14 @@ const SigninPage = () => {
                     <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Sign in</button>
                   ) : step === 'code' ? (
                     <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
-                  ) : null}
+                  ) : step === 'twofactor' ? (
+                    <>
+                      <button type="button" onClick={handleTwoFactorSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled || !form.twoFactorCode.trim()}>Verify 2FA</button>
+                      <button type="button" onClick={handleRequestRecovery} style={{ ...styles.button, ...styles.buttonGhost }} disabled={signInDisabled}>Use email recovery</button>
+                    </>
+                  ) : (
+                    <button type="button" onClick={handleRecoverySignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled || !form.recoveryCode.trim()}>Use recovery code</button>
+                  )}
                 </div>
                 <div style={styles.switchRow}>
                   <span style={styles.switchText}>New to KingsHall?</span>
