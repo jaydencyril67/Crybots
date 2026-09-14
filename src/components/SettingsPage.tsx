@@ -235,6 +235,9 @@ const SettingsPage = () => {
   const passwordValid = useMemo(() => passwordMeetsRule(newPassword), [newPassword]);
   const passwordMismatch = newPassword.length > 0 && confirmPassword.length > 0 && newPassword !== confirmPassword;
   const passwordCanSave = currentPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0 && passwordValid && !passwordMismatch;
+  const passwordFieldStyle = newPassword.length > 0 && !passwordValid
+    ? { ...styles.input, borderColor: 'rgba(239, 68, 68, 0.9)', boxShadow: '0 0 0 1px rgba(239, 68, 68, 0.35)' }
+    : styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
   const securityCanSave = twoFactorSetupLoading || Boolean(twoFactorEnabled !== false || twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0);
@@ -443,7 +446,7 @@ const SettingsPage = () => {
                   <label style={styles.field}>
                     <span style={styles.label}>Current password</span>
                     <input
-                      style={styles.input}
+                      style={passwordFieldStyle}
                       type="password"
                       value={currentPassword}
                       onChange={(event) => {
