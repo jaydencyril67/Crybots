@@ -40,7 +40,7 @@ const styles = {
   },
   hero: {
     display: 'grid',
-    gridTemplateColumns: 'minmax(0, 360px) minmax(0, 1fr)',
+    gridTemplateColumns: 'minmax(0, 1fr)',
     gap: '24px',
     marginTop: '24px',
     alignItems: 'start',
@@ -56,11 +56,10 @@ const styles = {
   },
   avatarPanel: {
     padding: '28px',
-    display: 'flex',
-    flexDirection: 'column' as const,
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 260px) minmax(0, 1fr)',
+    gap: '28px',
     alignItems: 'center',
-    textAlign: 'center' as const,
-    gap: '16px',
   },
   avatarShell: {
     position: 'relative' as const,
@@ -139,8 +138,7 @@ const styles = {
     fontSize: '0.92rem',
   },
   content: {
-    padding: '28px',
-    minHeight: '100%',
+    padding: 0,
   },
   sectionTitle: {
     margin: 0,
@@ -253,58 +251,38 @@ const ProfilePage = () => {
               </div>
 
               <div>
-                <h1 style={styles.name}>{fullName}</h1>
-                <p style={styles.role}>KingsHall Exchange member</p>
-              </div>
-
-              <div style={styles.metaRow}>
-                <div style={styles.metaCard}>
-                  <span style={styles.metaLabel}><UserRound size={16} /> Display name</span>
-                  <span style={styles.metaValue}>{fullName}</span>
-                </div>
-                <div style={styles.metaCard}>
-                  <span style={styles.metaLabel}><Mail size={16} /> Email</span>
-                  <span style={styles.metaValue}>{email}</span>
-                </div>
-                <div style={styles.metaCard}>
-                  <span style={styles.metaLabel}><ShieldCheck size={16} /> Account status</span>
-                  <span style={styles.metaValue}>Protected</span>
-                </div>
-              </div>
-            </section>
-
-            <section style={{ ...styles.panel, ...styles.content }}>
-              <p style={styles.sectionTitle}>Profile details</p>
-              <p style={styles.sectionSub}>
-                This page uses the same dark glass styling as the rest of the app and gives you a clean place to manage your account identity before profile photo uploads are connected.
-              </p>
-
-              <div style={styles.infoGrid}>
-                <div style={styles.infoCard}>
-                  <p style={styles.infoLabel}>Username</p>
-                  <p style={styles.infoValue}>{profile?.name || profile?.firstName || 'Trader profile'}</p>
-                </div>
-                <div style={styles.infoCard}>
-                  <p style={styles.infoLabel}>Full name</p>
-                  <p style={styles.infoValue}>{fullName}</p>
-                </div>
-                <div style={styles.infoCard}>
-                  <p style={styles.infoLabel}>Email address</p>
-                  <p style={styles.infoValue}>{email}</p>
-                </div>
-                <div style={styles.infoCard}>
-                  <p style={styles.infoLabel}>Profile image</p>
-                  <p style={styles.infoValue}>Ready for upload</p>
-                </div>
-              </div>
-
-              <div style={styles.helper}>
-                <p style={styles.helperText}>
-                  We’ll add the profile picture upload action next so this layout can become fully interactive.
+                <p style={styles.sectionTitle}>Profile details</p>
+                <p style={styles.sectionSub}>
+                  This page uses the same dark glass styling as the rest of the app and gives you a clean place to manage your account identity before profile photo uploads are connected.
                 </p>
-                <button type="button" style={styles.helperAction}>
-                  Continue <ChevronRight size={16} />
-                </button>
+
+                <div style={styles.metaRow}>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><UserRound size={16} /> Display name</span>
+                    <span style={styles.metaValue}>{fullName}</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><Mail size={16} /> Email</span>
+                    <span style={styles.metaValue}>{email}</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><ShieldCheck size={16} /> Account status</span>
+                    <span style={styles.metaValue}>Protected</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><UserRound size={16} /> Username</span>
+                    <span style={styles.metaValue}>{profile?.name || profile?.firstName || 'Trader profile'}</span>
+                  </div>
+                </div>
+
+                <div style={styles.helper}>
+                  <p style={styles.helperText}>
+                    We’ll add the profile picture upload action next so this layout can become fully interactive.
+                  </p>
+                  <button type="button" style={styles.helperAction}>
+                    Continue <ChevronRight size={16} />
+                  </button>
+                </div>
               </div>
             </section>
           </div>
