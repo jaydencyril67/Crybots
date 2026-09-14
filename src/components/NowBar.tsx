@@ -1,5 +1,6 @@
 import React from 'react';
 import { CircleUserRound, Coins, Home, Search, UserRound } from 'lucide-react';
+import { navigate } from '../utils/navigate';
 
 const styles = {
   dock: {
@@ -102,7 +103,7 @@ const defaultActions: NowBarAction[] = [
     label: 'Dashboard',
     icon: <Home size={18} />,
     onClick: () => {
-      window.location.pathname = '/dashboard';
+      navigate('/dashboard');
     },
     active: getActivePath() === '/dashboard',
   },
@@ -110,21 +111,21 @@ const defaultActions: NowBarAction[] = [
     label: 'Markets',
     icon: <Coins size={18} />,
     onClick: () => {
-      window.location.pathname = '/dashboard';
+      navigate('/dashboard');
     },
   },
   {
     label: 'Search',
     icon: <Search size={18} />,
     onClick: () => {
-      window.location.pathname = '/dashboard';
+      navigate('/dashboard');
     },
   },
   {
     label: 'Profile',
     icon: <UserRound size={18} />,
     onClick: () => {
-      window.location.pathname = '/profile';
+      navigate('/profile');
     },
     active: getActivePath() === '/profile',
   },

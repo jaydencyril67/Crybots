@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import LoadingDots from './LoadingDots';
 import { Helmet } from 'react-helmet-async';
 import {
   Activity,
@@ -546,6 +547,12 @@ const DashboardPage = () => {
         <div style={styles.shell}>
           <div style={styles.glow} />
           <div style={styles.topLine} />
+
+          {!(isAuthNameLoaded && isCoinsLoaded) ? (
+            <div style={{ padding: '18px 0 10px', display: 'flex', justifyContent: 'center' }}>
+              <LoadingDots />
+            </div>
+          ) : null}
 
           <AppHeader />
 

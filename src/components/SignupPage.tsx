@@ -359,7 +359,7 @@ const SignupPage = () => {
       return;
     }
 
-    window.location.pathname = '/';
+    navigate('/');
   };
 
   const canContinue = useMemo(() => {
@@ -463,7 +463,7 @@ const SignupPage = () => {
 
       setSubmitError('');
       setStepIndex(steps.length - 1);
-      window.location.pathname = '/signup-confirmation-sent';
+      navigate('/signup-confirmation-sent');
     } catch (error) {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
@@ -699,7 +699,7 @@ const SignupPage = () => {
                 {submitError ? <NotificationBanner tone="warning" title="One more step" message={submitError} /> : null}
                 <div style={styles.switchRow}>
                   <span style={styles.switchText}>Have an account?</span>
-                  <button type="button" onClick={() => { window.location.pathname = '/signin'; }} style={styles.switchLink}>
+                  <button type="button" onClick={() => { navigate('/signin'); }} style={styles.switchLink}>
                     Sign in here
                   </button>
                 </div>

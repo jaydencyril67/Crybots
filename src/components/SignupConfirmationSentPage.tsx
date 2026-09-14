@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { navigate } from '../utils/navigate';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -61,7 +62,7 @@ const SignupConfirmationSentPage = () => {
       setSecondsLeft((current) => {
         if (current <= 1) {
           window.clearInterval(timer);
-          window.location.pathname = '/signin';
+          navigate('/signin');
           return 0;
         }
 

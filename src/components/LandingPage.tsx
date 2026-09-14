@@ -422,7 +422,7 @@ const styles = {
 const LandingPage = () => {
   const handleDashboardClick = () => {
     const token = window.localStorage.getItem('token') || '';
-    window.location.pathname = token && isTokenValid(token) ? '/dashboard' : '/signin';
+    navigate(token && isTokenValid(token) ? '/dashboard' : '/signin');
   };
 
   return (

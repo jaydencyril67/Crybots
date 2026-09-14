@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2 } from 'lucide-react';
+import { navigate } from '../utils/navigate';
 
 const styles = {
   page: {
@@ -61,7 +62,7 @@ const AccountConfirmedPage = () => {
       setSecondsLeft((current) => {
         if (current <= 1) {
           window.clearInterval(timer);
-          window.location.pathname = '/signin';
+          navigate('/signin');
           return 0;
         }
 

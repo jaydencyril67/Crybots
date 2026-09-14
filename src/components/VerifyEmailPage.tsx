@@ -118,7 +118,7 @@ const VerifyEmailPage = () => {
       setSecondsLeft((current) => {
         if (current <= 1) {
           window.clearInterval(timer);
-          window.location.pathname = '/signin';
+          navigate('/signin');
           return 0;
         }
 
