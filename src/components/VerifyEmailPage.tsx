@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import api from '../api/axios';
+import { navigate } from '../utils/navigate';
 import InlineLoadingDots from './InlineLoadingDots';
 
 const styles = {
