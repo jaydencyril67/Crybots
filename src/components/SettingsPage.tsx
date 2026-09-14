@@ -174,7 +174,7 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
 
-  const uidReadyToSave = activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false && uid !== initialUid;
+  const uidReadyToSave = Boolean(activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false && uid !== initialUid);
 
   useEffect(() => {
     const loadAccount = async () => {
