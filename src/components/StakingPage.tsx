@@ -317,65 +317,67 @@ const StakingPage = () => {
                 <LoadingDots />
               </div>
             ) : stakes.length ? (
-              <div
-                style={{
-                  ...styles.stakesTableWrap,
-                  ...(isStakeHistoryExpanded ? styles.stakesTableExpanded : {}),
-                }}
-              >
-                <table style={styles.stakesTable}>
-                  <thead style={styles.stakesHead}>
-                    <tr>
-                      <th style={styles.stakeTh}>Package</th>
-                      <th style={styles.stakeTh}>Amount</th>
-                      <th style={styles.stakeTh}>Target profit</th>
-                      <th style={styles.stakeTh}>Earned</th>
-                      <th style={styles.stakeTh}>Started</th>
-                      <th style={styles.stakeTh}>Matures</th>
-                      <th style={styles.stakeTh}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stakes.map((stake, index) => (
-                      <tr key={stake.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
-                        <td style={styles.stakeTd}>
-                          <span style={styles.stakeRow}>
-                            <span style={styles.badge}>{stake.packageId}</span>
-                          </span>
-                        </td>
-                        <td style={styles.stakeTd}>{stake.principal.toLocaleString()} USDT</td>
-                        <td style={styles.stakeTd}>{stake.totalProfitTarget.toLocaleString()} USDT</td>
-                        <td style={styles.stakeTd}>{stake.earnedProfit.toLocaleString()} USDT</td>
-                        <td style={styles.stakeTd}>{stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</td>
-                        <td style={styles.stakeTd}>{new Date(stake.maturityDate).toLocaleDateString()}</td>
-                        <td style={styles.stakeTd}>
-                          <span
-                            style={{
-                              ...styles.badge,
-                              ...(stake.status === 'active'
-                                ? styles.statusActive
-                                : stake.status === 'completed'
-                                  ? styles.statusCompleted
-                                  : styles.statusCancelled),
-                            }}
-                          >
-                            {stake.status.toUpperCase()}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div style={styles.stakesTableFooter}>
-                <button
-                  type="button"
-                  style={styles.stakesTableToggle}
-                  onClick={() => setIsStakeHistoryExpanded((current) => !current)}
+              <>
+                <div
+                  style={{
+                    ...styles.stakesTableWrap,
+                    ...(isStakeHistoryExpanded ? styles.stakesTableExpanded : {}),
+                  }}
                 >
-                  {isStakeHistoryExpanded ? 'Show less' : 'Show more'}
-                </button>
-              </div>
+                  <table style={styles.stakesTable}>
+                    <thead style={styles.stakesHead}>
+                      <tr>
+                        <th style={styles.stakeTh}>Package</th>
+                        <th style={styles.stakeTh}>Amount</th>
+                        <th style={styles.stakeTh}>Target profit</th>
+                        <th style={styles.stakeTh}>Earned</th>
+                        <th style={styles.stakeTh}>Started</th>
+                        <th style={styles.stakeTh}>Matures</th>
+                        <th style={styles.stakeTh}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stakes.map((stake, index) => (
+                        <tr key={stake.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
+                          <td style={styles.stakeTd}>
+                            <span style={styles.stakeRow}>
+                              <span style={styles.badge}>{stake.packageId}</span>
+                            </span>
+                          </td>
+                          <td style={styles.stakeTd}>{stake.principal.toLocaleString()} USDT</td>
+                          <td style={styles.stakeTd}>{stake.totalProfitTarget.toLocaleString()} USDT</td>
+                          <td style={styles.stakeTd}>{stake.earnedProfit.toLocaleString()} USDT</td>
+                          <td style={styles.stakeTd}>{stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</td>
+                          <td style={styles.stakeTd}>{new Date(stake.maturityDate).toLocaleDateString()}</td>
+                          <td style={styles.stakeTd}>
+                            <span
+                              style={{
+                                ...styles.badge,
+                                ...(stake.status === 'active'
+                                  ? styles.statusActive
+                                  : stake.status === 'completed'
+                                    ? styles.statusCompleted
+                                    : styles.statusCancelled),
+                              }}
+                            >
+                              {stake.status.toUpperCase()}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div style={styles.stakesTableFooter}>
+                  <button
+                    type="button"
+                    style={styles.stakesTableToggle}
+                    onClick={() => setIsStakeHistoryExpanded((current) => !current)}
+                  >
+                    {isStakeHistoryExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                </div>
+              </>
             ) : (
               <div style={styles.panel}>
                 <p style={styles.helper}>No stakes created yet.</p>
