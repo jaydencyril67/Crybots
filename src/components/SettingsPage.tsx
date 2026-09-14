@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { LockKeyhole, ShieldCheck, Trash2, WalletCards } from 'lucide-react';
+import { CheckCircle2, LockKeyhole, ShieldCheck, Trash2, WalletCards } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
