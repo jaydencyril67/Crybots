@@ -12,6 +12,8 @@ type MeResponse = {
     email?: string;
     walletAddress?: string;
     twoFactorEnabled?: boolean;
+    twoFactorSecret?: string;
+    twoFactorBackupCodes?: string[];
   };
 };
 
