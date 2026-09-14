@@ -105,6 +105,8 @@ const styles = {
   stakeCard: { padding: '14px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '6px' },
   stakeRow: { display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const, alignItems: 'center' },
   badge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '6px 10px', borderRadius: '999px', background: 'rgba(34,197,94,0.14)', color: '#bbf7d0', fontWeight: 700, fontSize: '0.82rem' },
+  stakesSection: { display: 'grid', gap: '14px' },
+  stakesHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   helper: { color: '#94a3b8', margin: 0, fontSize: '0.9rem', lineHeight: 1.55 },
   error: { color: '#fca5a5', margin: 0 },
   success: { color: '#86efac', margin: 0 },
@@ -251,6 +253,35 @@ const StakingPage = () => {
                 <button type="submit" style={styles.button} disabled={isSubmitting}>{isSubmitting ? 'Creating...' : 'Stake now'} <ArrowRight size={16} /></button>
               </form>
             </div>
+          </section>
+
+          <section style={styles.stakesSection}>
+            <div style={styles.stakesHeader}>
+              <h2 style={styles.packageTitle}>Created stake packages</h2>
+              <p style={styles.helper}>{stakes.length} active package{stakes.length === 1 ? '' : 's'}</p>
+            </div>
+            {isLoading ? (
+              <div style={styles.panel}>
+                <LoadingDots />
+              </div>
+            ) : stakes.length ? (
+              stakes.map((stake) => (
+                <article key={stake.id} style={styles.panel}>
+                  <div style={styles.stakeRow}>
+                    <span style={styles.badge}>{stake.packageId}</span>
+                    <span style={styles.helper}>{stake.status.toUpperCase()}</span>
+                  </div>
+                  <p style={styles.packageText}>Amount: {stake.principal.toLocaleString()} USDT</p>
+                  <p style={styles.packageText}>Target profit: {stake.totalProfitTarget.toLocaleString()} USDT</p>
+                  <p style={styles.packageText}>Earned: {stake.earnedProfit.toLocaleString()} USDT</p>
+                  <p style={styles.packageText}>Matures: {new Date(stake.maturityDate).toLocaleDateString()}</p>
+                </article>
+              ))
+            ) : (
+              <div style={styles.panel}>
+                <p style={styles.helper}>No stakes created yet.</p>
+              </div>
+            )}
           </section>
         </div>
       </main>
