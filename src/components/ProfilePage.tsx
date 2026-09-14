@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CircleUserRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 
@@ -265,6 +265,7 @@ const ProfilePage = () => {
         name?: string;
         email?: string;
         uid?: string;
+        usdtBalance?: number;
       } : null;
     } catch {
       return null;
@@ -274,6 +275,7 @@ const ProfilePage = () => {
   const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profile?.email || 'Not available';
   const uid = profile?.uid || 'Pending confirmation';
+  const usdtBalance = typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : 0;
 
 
   return (
@@ -315,6 +317,10 @@ const ProfilePage = () => {
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><ShieldCheck size={16} /> UID</span>
                     <span style={styles.metaValue}>{uid}</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><Coins size={16} /> USDT Balance</span>
+                    <span style={styles.metaValue}>{usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
                 </div>
               </section>
