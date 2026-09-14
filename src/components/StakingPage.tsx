@@ -139,7 +139,6 @@ const styles = {
     stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '18px 16px', width: '100%', minWidth: 0 },
     stakesTableWrap: { margin: '0 -16px', maxHeight: '300px' },
-    stakesTableExpanded: { maxHeight: 'none' },
     stakesTable: { minWidth: '680px' },
     stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
     stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
@@ -321,7 +320,7 @@ const StakingPage = () => {
                 <div
                   style={{
                     ...styles.stakesTableWrap,
-                    ...(isStakeHistoryExpanded ? styles.stakesTableExpanded : {}),
+                    maxHeight: isStakeHistoryExpanded ? 'none' : '300px',
                   }}
                 >
                   <table style={styles.stakesTable}>
