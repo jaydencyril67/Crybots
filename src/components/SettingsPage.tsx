@@ -23,7 +23,13 @@ type StatusState = {
   message: string;
 };
 
+type WalletValidationState = {
+  valid: boolean;
+  message: string;
+};
+
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
+const trc20WalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
 
 const styles = {
   page: {
@@ -151,7 +157,9 @@ const SettingsPage = () => {
   const [walletCardSaving, setWalletCardSaving] = useState(false);
   const [securityCardSaving, setSecurityCardSaving] = useState(false);
   const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'security' | 'uid' | null>(null);
+  const [initialUid, setInitialUid] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
+  const [walletValidation, setWalletValidation] = useState<WalletValidationState>({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
   const [twoFactorSetupLoading, setTwoFactorSetupLoading] = useState(false);
@@ -169,9 +177,12 @@ const SettingsPage = () => {
       try {
         const { data } = await api.get<MeResponse>('/api/auth/me');
         const user = data.user;
-        setUid((user?.uid ?? '').replace(/\D/g, '').slice(0, 5));
+        const loadedUid = (user?.uid ?? '').replace(/\D/g, '').slice(0, 5);
+        setUid(loadedUid);
+        setInitialUid(loadedUid);
       setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
+        setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
         setTwoFactorBackupCodes(Array.isArray(user?.twoFactorBackupCodes) ? (user?.twoFactorBackupCodes ?? []) : []);
@@ -188,6 +199,11 @@ const SettingsPage = () => {
 
     if (trimmedUid.length !== 5) {
       setUidAvailable(null);
+      return;
+    }
+
+    if (trimmedUid === initialUid) {
+      setUidAvailable(true);
       return;
     }
 
@@ -218,6 +234,10 @@ const SettingsPage = () => {
 
   const passwordValid = useMemo(() => passwordMeetsRule(newPassword), [newPassword]);
   const passwordMismatch = newPassword.length > 0 && confirmPassword.length > 0 && newPassword !== confirmPassword;
+  const passwordCanSave = currentPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0 && passwordValid && !passwordMismatch;
+  const walletAddressChanged = walletAddress.trim() !== '';
+  const walletCanSave = walletAddressChanged && walletValidation.valid;
+  const securityCanSave = twoFactorSetupLoading || Boolean(twoFactorEnabled !== false || twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0);
 
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
@@ -306,6 +326,7 @@ const SettingsPage = () => {
       });
       showStatus('success', 'UID updated successfully.');
       setUidAvailable(null);
+      setInitialUid(nextUid);
       setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update your UID.');
@@ -315,14 +336,24 @@ const SettingsPage = () => {
   };
 
   const handleSaveWallet = async () => {
+    const trimmedWallet = walletAddress.trim();
+
+    if (!trc20WalletPattern.test(trimmedWallet)) {
+      setWalletValidation({ valid: false, message: 'Wallet address must be a valid TRC-20 address starting with T.' });
+      showStatus('error', 'Enter a valid TRC-20 wallet address before saving.');
+      return;
+    }
+
     setWalletCardSaving(true);
     try {
       await api.patch('/api/settings/account', {
-        walletAddress: walletAddress.trim(),
+        walletAddress: trimmedWallet,
       });
+      setWalletValidation({ valid: true, message: 'TRC-20 wallet format looks valid.' });
       showStatus('success', 'Wallet address saved successfully.');
       setActiveCard(null);
     } catch (error: any) {
+      setWalletValidation({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
       showStatus('error', error?.response?.data?.message || 'Unable to save wallet address.');
     } finally {
       setWalletCardSaving(false);
@@ -451,9 +482,9 @@ const SettingsPage = () => {
                     {passwordMismatch ? <span style={{ ...styles.helper, color: '#fca5a5' }}>Passwords do not match.</span> : null}
                   </label>
                 </div>
-                {activeCard === 'password' || passwordCardSaving ? (
+                {((activeCard === 'password' && passwordCanSave) || passwordCardSaving) ? (
                   <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving || !passwordCanSave}>
                       {passwordCardSaving ? 'Saving...' : 'Save password'}
                     </button>
                   </div>
@@ -499,14 +530,14 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
-                {activeCard === 'security' || securityCardSaving ? (
+                {((activeCard === 'security' && securityCanSave) || securityCardSaving) ? (
                   <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
                       {securityCardSaving ? 'Saving...' : 'Save security'}
                     </button>
                   </div>
                 ) : null}
-                {activeCard === 'uid' || uidCardSaving ? (
+                {((uid.trim().length === 5 && uidAvailable === true && uid !== initialUid) || uidCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
                       {uidCardSaving ? 'Saving...' : 'Save UID'}
@@ -525,18 +556,29 @@ const SettingsPage = () => {
                       style={styles.input}
                       value={walletAddress}
                       onChange={(event) => {
-                        setWalletAddress(event.target.value);
+                        const nextValue = event.target.value.trim();
+                        setWalletAddress(nextValue);
+                        setWalletValidation({
+                          valid: trc20WalletPattern.test(nextValue),
+                          message: trc20WalletPattern.test(nextValue)
+                            ? 'TRC-20 wallet format looks valid.'
+                            : 'Wallet address must be 34 characters, start with T, and use valid TRC-20 characters only.',
+                        });
                         setActiveCard('wallet');
                       }}
                       onFocus={() => setActiveCard('wallet')}
+                      inputMode="text"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      spellCheck={false}
                       placeholder="TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     />
-                    <span style={styles.helper}>Use the wallet address that will receive future TRC-20 withdrawals.</span>
+                    <span style={styles.helper}>{walletValidation.message}</span>
                   </label>
                 </div>
-                {activeCard === 'wallet' || walletCardSaving ? (
+                {((activeCard === 'wallet' && walletCanSave) || walletCardSaving) ? (
                   <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving || !walletCanSave}>
                       {walletCardSaving ? 'Saving...' : 'Save wallet'}
                     </button>
                   </div>
