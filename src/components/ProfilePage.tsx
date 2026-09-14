@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Camera, ChevronRight, CircleUserRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { Camera, CircleUserRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 
@@ -9,14 +9,17 @@ const styles = {
     minHeight: '100vh',
     background: '#050816',
     color: '#ffffff',
-    overflow: 'hidden',
-    paddingBottom: '112px',
-  },
+    overflowX: 'hidden' as const,
+    overflowY: 'auto' as const,
+    paddingBottom: '132px',
+  } as const,
   shell: {
     position: 'relative' as const,
+    width: '100%',
     maxWidth: '1320px',
     margin: '0 auto',
-    padding: 'clamp(20px, 3vw, 32px) clamp(16px, 2.5vw, 24px) 40px',
+    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    boxSizing: 'border-box' as const,
   },
   glow: {
     position: 'absolute' as const,
@@ -55,16 +58,20 @@ const styles = {
     WebkitBackdropFilter: 'blur(18px)',
   },
   avatarPanel: {
-    padding: '28px',
+    padding: 'clamp(18px, 4vw, 28px)',
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 260px) minmax(0, 1fr)',
-    gap: '28px',
+    gap: 'clamp(18px, 3vw, 28px)',
     alignItems: 'center',
-  },
+    '@media (max-width: 900px)': {
+      gridTemplateColumns: 'minmax(0, 1fr)',
+    },
+  } as const,
   avatarShell: {
     position: 'relative' as const,
     width: '140px',
     height: '140px',
+    margin: '0 auto',
     borderRadius: '50%',
     padding: '4px',
     background: 'linear-gradient(135deg, rgba(125,211,252,0.8), rgba(167,139,250,0.7), rgba(34,211,238,0.7))',
@@ -113,17 +120,20 @@ const styles = {
   metaRow: {
     width: '100%',
     display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
     gap: '10px',
-  },
+  } as const,
   metaCard: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
+    display: 'flex' as const,
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
+    justifyContent: 'flex-start' as const,
+    gap: '8px',
     padding: '14px 16px',
     borderRadius: '18px',
     background: 'rgba(255,255,255,0.04)',
     border: '1px solid rgba(255,255,255,0.08)',
+    minWidth: 0,
   },
   metaLabel: {
     display: 'flex',
@@ -136,6 +146,8 @@ const styles = {
     color: '#ffffff',
     fontWeight: 700,
     fontSize: '0.92rem',
+    wordBreak: 'break-word' as const,
+    overflowWrap: 'anywhere' as const,
   },
   content: {
     padding: 0,
@@ -157,7 +169,10 @@ const styles = {
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     gap: '14px',
     marginTop: '24px',
-  },
+    '@media (max-width: 900px)': {
+      gridTemplateColumns: 'minmax(0, 1fr)',
+    },
+  } as const,
   infoCard: {
     padding: '18px',
     borderRadius: '20px',
@@ -179,15 +194,16 @@ const styles = {
     lineHeight: 1.5,
   },
   helper: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
     gap: '14px',
     marginTop: '24px',
     padding: '18px 20px',
     borderRadius: '22px',
     background: 'linear-gradient(135deg, rgba(34,211,238,0.08), rgba(167,139,250,0.08))',
     border: '1px solid rgba(255,255,255,0.08)',
+    flexWrap: 'wrap' as const,
   },
   helperText: {
     margin: 0,
@@ -277,13 +293,10 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                <div style={styles.helper}>
+                <div style={{ ...styles.helper, justifyContent: 'flex-start' }}>
                   <p style={styles.helperText}>
                     Profile picture upload will be added next.
                   </p>
-                  <button type="button" style={styles.helperAction}>
-                    Upload later <ChevronRight size={16} />
-                  </button>
                 </div>
               </div>
             </section>
