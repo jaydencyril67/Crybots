@@ -253,10 +253,6 @@ const ProfilePage = () => {
 
               <div>
                 <p style={styles.sectionTitle}>Profile details</p>
-                <p style={styles.sectionSub}>
-                  This page uses the same dark glass styling as the rest of the app and gives you a clean place to manage your account identity before profile photo uploads are connected.
-                </p>
-
                 <div style={styles.metaRow}>
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><UserRound size={16} /> Display name</span>
@@ -282,10 +278,10 @@ const ProfilePage = () => {
 
                 <div style={styles.helper}>
                   <p style={styles.helperText}>
-                    We’ll add the profile picture upload action next so this layout can become fully interactive.
+                    Profile picture upload will be added next.
                   </p>
                   <button type="button" style={styles.helperAction}>
-                    Continue <ChevronRight size={16} />
+                    Upload later <ChevronRight size={16} />
                   </button>
                 </div>
               </div>
