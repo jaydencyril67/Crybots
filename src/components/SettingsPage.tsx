@@ -175,8 +175,8 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
 
-  const uidReadyToSave = Boolean(activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false);
-  const showUidSaveButton = uidReadyToSave || uidCardSaving;
+  const uidReadyToSave = Boolean(uidEditorActive && uid.trim().length === 5 && uidAvailable !== false);
+  const showUidSaveButton = activeCard === 'uid' && (uidReadyToSave || uidCardSaving);
 
   useEffect(() => {
     const loadAccount = async () => {
@@ -253,7 +253,7 @@ const SettingsPage = () => {
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
-  const securityCanSave = twoFactorSetupLoading || Boolean(twoFactorToken.trim() || twoFactorEnabled || twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0);
+  const securityCanSave = twoFactorSetupLoading || Boolean(twoFactorToken.trim() || twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0 || twoFactorEnabled);
 
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
@@ -545,6 +545,13 @@ const SettingsPage = () => {
                     />
                     <span style={styles.helper}>Use the current code from your authenticator app.</span>
                   </label>
+                  {activeCard === 'security' && (securityCanSave || securityCardSaving) ? (
+                    <div style={styles.buttonRow}>
+                      <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
+                        {securityCardSaving ? 'Saving...' : (twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA')}
+                      </button>
+                    </div>
+                  ) : null}
                   <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
                     {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up authenticator app'}
                   </button>
@@ -582,10 +589,10 @@ const SettingsPage = () => {
                     </button>
                   </div>
                 ) : null}
-                {((activeCard === 'security' && securityCanSave) || securityCardSaving) ? (
+                {activeCard === 'security' && (securityCanSave || securityCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
-                      {securityCardSaving ? 'Saving...' : 'Save security'}
+                      {securityCardSaving ? 'Saving...' : (twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA')}
                     </button>
                   </div>
                 ) : null}
