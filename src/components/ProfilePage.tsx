@@ -300,7 +300,6 @@ const ProfilePage = () => {
               </section>
 
               <section style={{ ...styles.panel, ...styles.content }}>
-                <p style={styles.sectionTitle}>Profile details</p>
                 <div style={styles.metaRow}>
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><UserRound size={16} /> Display name</span>
