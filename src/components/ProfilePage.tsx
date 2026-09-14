@@ -128,9 +128,13 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '14px',
-    '@media (max-width: 600px)': {
+    '@media (max-width: 900px)': {
       gridTemplateColumns: 'minmax(0, 1fr)',
       gap: '10px',
+    },
+    '@media (max-width: 600px)': {
+      gridTemplateColumns: 'minmax(0, 1fr)',
+      gap: '8px',
     },
   } as const,
   metaCard: {
@@ -145,10 +149,15 @@ const styles = {
     border: '1px solid rgba(255,255,255,0.09)',
     minWidth: 0,
     width: '100%',
+    maxWidth: '100%',
+    boxSizing: 'border-box' as const,
+    '@media (max-width: 900px)': {
+      padding: '14px 16px',
+    },
     '@media (max-width: 600px)': {
       alignItems: 'center',
       textAlign: 'center',
-      padding: '14px 16px',
+      padding: '12px 14px',
     },
   },
   metaLabel: {
@@ -172,6 +181,7 @@ const styles = {
   content: {
     width: '100%',
     padding: 'clamp(18px, 4vw, 28px)',
+    boxSizing: 'border-box' as const,
   },
   sectionTitle: {
     margin: 0,
