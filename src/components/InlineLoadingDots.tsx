@@ -18,7 +18,7 @@ const styles = {
 
 const InlineLoadingDots = () => {
   return (
-    <span style={styles.wrap} aria-label="Loading">
+    <span style={styles.wrap} aria-hidden="true">
       <span style={{ ...styles.dot, animationDelay: '0ms' }} />
       <span style={{ ...styles.dot, animationDelay: '150ms' }} />
       <span style={{ ...styles.dot, animationDelay: '300ms' }} />
