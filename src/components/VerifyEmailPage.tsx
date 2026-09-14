@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import api from '../api/axios';
+import InlineLoadingDots from './InlineLoadingDots';
 
 const styles = {
   page: {
@@ -129,7 +130,7 @@ const VerifyEmailPage = () => {
     return () => window.clearInterval(timer);
   }, [status]);
 
-  const icon = status === 'success' ? <CheckCircle2 size={30} /> : status === 'error' ? <XCircle size={30} /> : <Loader2 size={30} className="animate-spin" />;
+  const icon = status === 'success' ? <CheckCircle2 size={30} /> : status === 'error' ? <XCircle size={30} /> : <CheckCircle2 size={30} />;
   const iconBackground = status === 'success' ? 'rgba(34,197,94,0.14)' : status === 'error' ? 'rgba(248,113,113,0.14)' : 'rgba(103,232,249,0.14)';
   const iconColor = status === 'success' ? '#4ade80' : status === 'error' ? '#f87171' : '#67e8f9';
 
@@ -144,6 +145,11 @@ const VerifyEmailPage = () => {
           <div style={{ ...styles.iconWrap, background: iconBackground, color: iconColor }}>{icon}</div>
           <h1 style={styles.title}>{status === 'success' ? 'Account confirmed' : status === 'error' ? 'Verification failed' : 'Verifying account'}</h1>
           <p style={styles.text}>{message}</p>
+          {status === 'loading' ? (
+            <div style={{ marginTop: '18px', color: 'rgba(255,255,255,0.7)' }}>
+              <InlineLoadingDots />
+            </div>
+          ) : null}
           {status === 'success' && uid ? <p style={styles.meta}>Your UID: {uid}</p> : null}
           {status !== 'loading' ? (
             <>

@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'luc
 import AppHeader from './AppHeader';
 import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
+import { navigate } from '../utils/navigate';
 
 const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
