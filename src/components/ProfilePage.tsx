@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Camera, CircleUserRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { CircleUserRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 
@@ -111,20 +111,7 @@ const styles = {
     height: '56px',
     opacity: 0.95,
   },
-  uploadPill: {
-    position: 'absolute' as const,
-    right: '6px',
-    bottom: '6px',
-    width: '38px',
-    height: '38px',
-    borderRadius: '50%',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(6,10,18,0.9)',
-    color: '#e5eefc',
-    display: 'grid',
-    placeItems: 'center',
-    boxShadow: '0 10px 22px rgba(0,0,0,0.35)',
-  },
+
   name: {
     margin: 0,
     fontSize: '1.6rem',
@@ -296,10 +283,7 @@ const ProfilePage = () => {
                     <CircleUserRound style={styles.avatarIcon} />
                     <span style={{ position: 'absolute', bottom: '18px', right: '18px', fontSize: '1rem', fontWeight: 800, color: '#ffffff' }}>{initials}</span>
                   </div>
-                  <button type="button" aria-label="Upload profile picture" style={styles.uploadPill}>
-                    <Camera size={18} />
-                  </button>
-                </div>
+                 </div>
               </section>
 
               <section style={{ ...styles.panel, ...styles.content }}>
