@@ -453,9 +453,6 @@ const SettingsPage = () => {
               <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSave()} disabled={saving || uidChecking}>
                 {saving ? 'Saving...' : 'Save settings'}
               </button>
-              <button style={styles.button} type="button" onClick={() => navigate('/dashboard')}>
-                Back to dashboard
-              </button>
             </div>
           </div>
         </div>
