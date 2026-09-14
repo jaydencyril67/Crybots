@@ -117,6 +117,7 @@ const styles = {
   buttonRow: {
     display: 'flex',
     flexWrap: 'wrap' as const,
+    justifyContent: 'center',
     gap: '10px',
     marginTop: '4px',
   },
