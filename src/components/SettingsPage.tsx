@@ -150,6 +150,7 @@ const SettingsPage = () => {
   const [passwordCardSaving, setPasswordCardSaving] = useState(false);
   const [walletCardSaving, setWalletCardSaving] = useState(false);
   const [securityCardSaving, setSecurityCardSaving] = useState(false);
+  const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'security' | 'uid' | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
@@ -169,6 +170,7 @@ const SettingsPage = () => {
         const { data } = await api.get<MeResponse>('/api/auth/me');
         const user = data.user;
         setUid((user?.uid ?? '').replace(/\D/g, '').slice(0, 5));
+      setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
@@ -221,6 +223,10 @@ const SettingsPage = () => {
     setStatus({ kind, message });
   };
 
+  const clearActiveIfMatches = (card: typeof activeCard) => {
+    setActiveCard((current) => (current === card ? null : current));
+  };
+
   const handleSetupTwoFactor = async () => {
     setTwoFactorSetupMessage('');
     setTwoFactorSetupLoading(true);
@@ -232,6 +238,7 @@ const SettingsPage = () => {
       setTwoFactorBackupCodes(Array.isArray(data?.backupCodes) ? data.backupCodes : []);
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then save your account settings to enable 2FA.');
       setTwoFactorEnabled(true);
+      setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to create 2FA setup right now.');
@@ -271,6 +278,7 @@ const SettingsPage = () => {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update your password.');
     } finally {
@@ -298,6 +306,7 @@ const SettingsPage = () => {
       });
       showStatus('success', 'UID updated successfully.');
       setUidAvailable(null);
+      setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update your UID.');
     } finally {
@@ -312,6 +321,7 @@ const SettingsPage = () => {
         walletAddress: walletAddress.trim(),
       });
       showStatus('success', 'Wallet address saved successfully.');
+      setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to save wallet address.');
     } finally {
@@ -333,6 +343,7 @@ const SettingsPage = () => {
         await api.post('/api/two-factor/disable');
         showStatus('success', '2FA disabled successfully.');
       }
+      setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update security settings.');
     } finally {
@@ -400,24 +411,53 @@ const SettingsPage = () => {
                 <div style={styles.formGrid}>
                   <label style={styles.field}>
                     <span style={styles.label}>Current password</span>
-                    <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} />
+                    <input
+                      style={styles.input}
+                      type="password"
+                      value={currentPassword}
+                      onChange={(event) => {
+                        setCurrentPassword(event.target.value);
+                        setActiveCard('password');
+                      }}
+                      onFocus={() => setActiveCard('password')}
+                    />
                   </label>
+                  <label style={styles.field}>
+                    <span style={styles.label}>New password</span>
+                    <input
+                      style={styles.input}
+                      type="password"
+                      value={newPassword}
+                      onChange={(event) => {
+                        setNewPassword(event.target.value);
+                        setActiveCard('password');
+                      }}
+                      onFocus={() => setActiveCard('password')}
+                    />
+                    <span style={styles.helper}>{passwordRuleMessage}</span>
+                  </label>
+                  <label style={styles.field}>
+                    <span style={styles.label}>Confirm new password</span>
+                    <input
+                      style={styles.input}
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(event) => {
+                        setConfirmPassword(event.target.value);
+                        setActiveCard('password');
+                      }}
+                      onFocus={() => setActiveCard('password')}
+                    />
+                    {passwordMismatch ? <span style={{ ...styles.helper, color: '#fca5a5' }}>Passwords do not match.</span> : null}
+                  </label>
+                </div>
+                {activeCard === 'password' || passwordCardSaving ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving}>
                       {passwordCardSaving ? 'Saving...' : 'Save password'}
                     </button>
                   </div>
-                  <label style={styles.field}>
-                    <span style={styles.label}>New password</span>
-                    <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
-                    <span style={styles.helper}>{passwordRuleMessage}</span>
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Confirm new password</span>
-                    <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
-                    {passwordMismatch ? <span style={{ ...styles.helper, color: '#fca5a5' }}>Passwords do not match.</span> : null}
-                  </label>
-                </div>
+                ) : null}
               </section>
 
               <section style={styles.card}>
@@ -426,10 +466,10 @@ const SettingsPage = () => {
                 <div style={styles.formGrid}>
                   <label style={{ ...styles.field, alignItems: 'start' }}>
                     <span style={styles.label}>2FA protection</span>
-                    <input type="checkbox" checked={twoFactorEnabled} onChange={(event) => setTwoFactorEnabled(event.target.checked)} />
+                    <input type="checkbox" checked={twoFactorEnabled} onChange={(event) => { setTwoFactorEnabled(event.target.checked); setActiveCard('security'); }} onFocus={() => setActiveCard('security')} />
                     <span style={styles.helper}>Enable to require an additional verification step on future sign-ins.</span>
                   </label>
-                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => void handleSetupTwoFactor()} disabled={twoFactorSetupLoading}>
+                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
                     {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up authenticator app'}
                   </button>
                   {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
@@ -459,11 +499,20 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
-                <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveSecurity()} disabled={securityCardSaving}>
-                    {securityCardSaving ? 'Saving...' : 'Save security'}
-                  </button>
-                </div>
+                {activeCard === 'security' || securityCardSaving ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving}>
+                      {securityCardSaving ? 'Saving...' : 'Save security'}
+                    </button>
+                  </div>
+                ) : null}
+                {activeCard === 'uid' || uidCardSaving ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
+                      {uidCardSaving ? 'Saving...' : 'Save UID'}
+                    </button>
+                  </div>
+                ) : null}
               </section>
 
               <section style={styles.card}>
@@ -475,12 +524,23 @@ const SettingsPage = () => {
                     <input
                       style={styles.input}
                       value={walletAddress}
-                      onChange={(event) => setWalletAddress(event.target.value)}
+                      onChange={(event) => {
+                        setWalletAddress(event.target.value);
+                        setActiveCard('wallet');
+                      }}
+                      onFocus={() => setActiveCard('wallet')}
                       placeholder="TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     />
                     <span style={styles.helper}>Use the wallet address that will receive future TRC-20 withdrawals.</span>
                   </label>
                 </div>
+                {activeCard === 'wallet' || walletCardSaving ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving}>
+                      {walletCardSaving ? 'Saving...' : 'Save wallet'}
+                    </button>
+                  </div>
+                ) : null}
               </section>
 
               <section style={styles.card}>
@@ -495,7 +555,9 @@ const SettingsPage = () => {
                       onChange={(event) => {
                         setUid(event.target.value.replace(/\D/g, '').slice(0, 5));
                         setUidAvailable(null);
+                        setActiveCard('uid');
                       }}
+                      onFocus={() => setActiveCard('uid')}
                       inputMode="numeric"
                       maxLength={5}
                       placeholder="Enter 5 digits"
