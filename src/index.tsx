@@ -26,7 +26,8 @@ const root = ReactDOM.createRoot(container);
 
 const pathname = window.location.pathname;
 const hash = window.location.hash;
-const isPageRefresh = window.performance.getEntriesByType('navigation')[0]?.type === 'reload';
+const navigationEntry = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+const isPageRefresh = navigationEntry?.type === 'reload';
 
 (window as Window & { __kingshallRefreshSplash?: boolean }).__kingshallRefreshSplash = isPageRefresh;
 
