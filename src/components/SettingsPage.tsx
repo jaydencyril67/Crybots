@@ -152,6 +152,7 @@ const passwordMeetsRule = (value: string) => {
 const SettingsPage = () => {
   const [uid, setUid] = useState('');
   const [uidAvailable, setUidAvailable] = useState<boolean | null>(null);
+  const [uidEditorActive, setUidEditorActive] = useState(false);
   const [uidChecking, setUidChecking] = useState(false);
   const [uidCardSaving, setUidCardSaving] = useState(false);
   const [passwordCardSaving, setPasswordCardSaving] = useState(false);
@@ -202,6 +203,8 @@ const SettingsPage = () => {
       setUidAvailable(null);
       return;
     }
+
+    setUidEditorActive(true);
 
     if (trimmedUid === initialUid) {
       setUidAvailable(true);
@@ -335,6 +338,7 @@ const SettingsPage = () => {
       showStatus('success', 'UID updated successfully.');
       setUidAvailable(null);
       setInitialUid(nextUid);
+      setUidEditorActive(false);
       setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update your UID.');
@@ -538,7 +542,7 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
-                {activeCard === 'uid' && uid.trim().length === 5 && uidAvailable === true && uid !== initialUid ? (
+                {activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable === true && uid !== initialUid ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
                       {uidCardSaving ? 'Saving...' : 'Save UID'}
@@ -605,9 +609,10 @@ const SettingsPage = () => {
                       onChange={(event) => {
                         setUid(event.target.value.replace(/\D/g, '').slice(0, 5));
                         setUidAvailable(null);
+                        setUidEditorActive(true);
                         setActiveCard('uid');
                       }}
-                      onFocus={() => setActiveCard('uid')}
+                      onFocus={() => { setUidEditorActive(true); setActiveCard('uid'); }}
                       inputMode="numeric"
                       maxLength={5}
                       placeholder="Enter 5 digits"
