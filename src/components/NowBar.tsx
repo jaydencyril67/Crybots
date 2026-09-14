@@ -93,6 +93,8 @@ type NowBarProps = {
   actions?: NowBarAction[];
 };
 
+const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
+
 const defaultActions: NowBarAction[] = [
   {
     label: 'Dashboard',
@@ -100,7 +102,7 @@ const defaultActions: NowBarAction[] = [
     onClick: () => {
       window.location.pathname = '/dashboard';
     },
-    active: window.location.pathname === '/dashboard' || window.location.hash === '#/dashboard',
+    active: getActivePath() === '/dashboard',
   },
   {
     label: 'Markets',
@@ -122,7 +124,7 @@ const defaultActions: NowBarAction[] = [
     onClick: () => {
       window.location.pathname = '/profile';
     },
-    active: window.location.pathname === '/profile' || window.location.hash === '#/profile',
+    active: getActivePath() === '/profile',
   },
 ];
 
