@@ -548,13 +548,13 @@ const DashboardPage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
 
+          <AppHeader />
+
           {!(isAuthNameLoaded && isCoinsLoaded) ? (
             <div style={{ padding: '18px 0 10px', display: 'flex', justifyContent: 'center' }}>
               <LoadingDots />
             </div>
           ) : null}
-
-          <AppHeader />
 
           <div style={styles.heroGrid}>
             <section style={styles.heroCard}>
