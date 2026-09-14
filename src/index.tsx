@@ -11,6 +11,7 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProfilePage from './components/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
+import NowBar from './components/NowBar';
 import AppSplashOverlay from './components/AppSplashOverlay';
 
 if ('serviceWorker' in navigator) {
@@ -92,6 +93,8 @@ const RouteTransition = () => {
     return pathname === '/' || hash === '#/' || displayedRouteKey === 'landing' ? <LandingPage /> : <LandingPage />;
   }, [displayedRouteKey]);
 
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile';
+
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
       <div
@@ -106,6 +109,7 @@ const RouteTransition = () => {
       >
         {appContent}
       </div>
+      {showNowBar ? <NowBar /> : null}
     </div>
   );
 };
