@@ -169,6 +169,7 @@ const styles = {
     overflowWrap: 'anywhere' as const,
   },
   content: {
+    width: '100%',
     padding: 'clamp(18px, 4vw, 28px)',
   },
   sectionTitle: {
@@ -261,6 +262,8 @@ const ProfilePage = () => {
 
   const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profile?.email || 'Not available';
+  const gender = profile?.gender || 'Not available';
+  const dob = profile?.dob || 'Not available';
   const uid = profile?.uid || 'Pending confirmation';
   const initials = fullName.split(/\s+/).map((part) => part[0]).slice(0, 2).join('').toUpperCase() || 'T';
 
@@ -302,12 +305,16 @@ const ProfilePage = () => {
                     <span style={styles.metaValue}>Protected</span>
                   </div>
                   <div style={styles.metaCard}>
-                    <span style={styles.metaLabel}><UserRound size={16} /> Username</span>
-                    <span style={styles.metaValue}>{profile?.name || profile?.firstName || 'Trader profile'}</span>
-                  </div>
-                  <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><ShieldCheck size={16} /> UID</span>
                     <span style={styles.metaValue}>{uid}</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><UserRound size={16} /> Gender</span>
+                    <span style={styles.metaValue}>{gender}</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><UserRound size={16} /> Date of birth</span>
+                    <span style={styles.metaValue}>{dob}</span>
                   </div>
                 </div>
               </section>
