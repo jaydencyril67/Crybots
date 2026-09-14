@@ -46,7 +46,7 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
     gap: '24px',
-    marginTop: '24px',
+    marginTop: '18px',
     alignItems: 'start',
     justifyItems: 'center',
   },
@@ -115,7 +115,7 @@ const styles = {
 
   name: {
     margin: 0,
-    fontSize: '1.6rem',
+    fontSize: '1.45rem',
     fontWeight: 800,
     letterSpacing: '-0.03em',
   },
@@ -128,10 +128,10 @@ const styles = {
     width: '100%',
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '14px',
+    gap: '12px',
     '@media (max-width: 900px)': {
       gridTemplateColumns: 'minmax(0, 1fr)',
-      gap: '10px',
+      gap: '6px',
     },
     '@media (max-width: 600px)': {
       gridTemplateColumns: 'minmax(0, 1fr)',
@@ -144,7 +144,7 @@ const styles = {
     alignItems: 'flex-start' as const,
     justifyContent: 'flex-start' as const,
     gap: '8px',
-    padding: '16px 18px',
+    padding: '14px 16px',
     borderRadius: '20px',
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.09)',
@@ -153,7 +153,7 @@ const styles = {
     maxWidth: '100%',
     boxSizing: 'border-box' as const,
     '@media (max-width: 900px)': {
-      padding: '14px 16px',
+      padding: '10px 12px',
     },
     '@media (max-width: 600px)': {
       alignItems: 'center',
@@ -186,7 +186,7 @@ const styles = {
   },
   sectionTitle: {
     margin: 0,
-    fontSize: '1.6rem',
+    fontSize: '1.45rem',
     fontWeight: 800,
     letterSpacing: '-0.03em',
   },
@@ -206,7 +206,7 @@ const styles = {
     },
   } as const,
   infoCard: {
-    padding: '18px',
+    padding: '16px',
     borderRadius: '20px',
     background: 'rgba(255,255,255,0.04)',
     border: '1px solid rgba(255,255,255,0.08)',

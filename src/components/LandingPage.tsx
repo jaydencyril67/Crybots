@@ -151,7 +151,7 @@ const styles = {
     maxWidth: '100%',
   },
   heading: {
-    fontSize: 'clamp(2.6rem, 6vw, 5rem)',
+    fontSize: 'clamp(2.3rem, 5vw, 4.4rem)',
     lineHeight: 1.02,
     margin: 0,
     fontWeight: 700,
@@ -196,13 +196,13 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
     gap: '16px',
-    marginTop: '48px',
+    marginTop: '36px',
   },
   statCard: {
     borderRadius: '28px',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.05)',
-    padding: '20px',
+    padding: '16px',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
     minWidth: 0,
@@ -264,7 +264,7 @@ const styles = {
   },
   bigText: {
     margin: '6px 0 0',
-    fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
+    fontSize: 'clamp(1.6rem, 2.6vw, 2.2rem)',
     fontWeight: 700,
     wordBreak: 'break-word' as const,
   },
@@ -354,7 +354,7 @@ const styles = {
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.05)',
-    padding: '28px',
+    padding: '24px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
     position: 'relative' as const,
@@ -450,10 +450,10 @@ const LandingPage = () => {
                 <Sparkles style={styles.icon} />
                 Premium trading experience for modern investors
               </div>
-              <h1 style={styles.heading}>
+              <h2 style={styles.heading}>
                 Trade smarter.
                 <span style={styles.gradientText}>Invest with confidence.</span>
-              </h1>
+              </h2>
               <p style={styles.lead}>
                 KingsHall Exchange brings together crypto trading, portfolio growth, staking, and instant transfers in a clean,
                 modern experience built for serious users.

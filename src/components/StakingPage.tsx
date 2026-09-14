@@ -43,78 +43,80 @@ const styles = {
     color: '#ffffff',
     overflowX: 'hidden' as const,
     overflowY: 'visible' as const,
-    paddingBottom: '132px',
+    paddingBottom: '120px',
   },
   shell: {
     position: 'relative' as const,
     width: '100%',
     maxWidth: '1320px',
     margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(14px, 2.4vw, 28px) clamp(12px, 2.2vw, 20px) 32px',
     boxSizing: 'border-box' as const,
     display: 'grid',
     gap: '18px',
   },
 
-  heroText: { margin: 0, color: '#b7c5da', maxWidth: '58ch', lineHeight: 1.65 },
-  metricsRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' },
-  metricCard: { padding: '14px', borderRadius: '18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '6px' },
+  heroText: { margin: 0, color: '#b7c5da', maxWidth: '58ch', lineHeight: 1.55, fontSize: '0.95rem' },
+  metricsRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '8px' },
+  metricCard: { padding: '12px', borderRadius: '18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '5px' },
   metricLabel: { margin: 0, color: '#94a3b8', fontSize: '0.85rem' },
   metricValue: { margin: 0, fontSize: '1rem', fontWeight: 700 },
   packageGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(200px, 1fr))',
-    gap: '16px',
+    gap: '12px',
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
-    padding: '0 2px 6px',
+    padding: '0 2px 4px',
     scrollPaddingLeft: '2px',
     scrollPaddingRight: '2px',
     scrollSnapType: 'x proximity' as const,
     WebkitOverflowScrolling: 'touch' as const,
   },
   packageCard: {
-    padding: '18px',
-    borderRadius: '22px',
+    padding: '14px',
+    borderRadius: '20px',
     background: 'rgba(255,255,255,0.04)',
     border: '1px solid rgba(255,255,255,0.08)',
     display: 'grid',
-    gap: '12px',
+    gap: '10px',
     minWidth: 0,
     scrollSnapAlign: 'start',
     justifyItems: 'center',
     textAlign: 'center' as const,
   },
-  packageBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '7px 10px', borderRadius: '999px', background: 'rgba(59,130,246,0.14)', color: '#bfdbfe', fontWeight: 700, justifySelf: 'center' },
-  packageTitle: { margin: 0, fontSize: '1.2rem' },
-  packageText: { margin: 0, color: '#cbd5e1', lineHeight: 1.55, textAlign: 'center' as const },
+  packageBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '6px 10px', borderRadius: '999px', background: 'rgba(59,130,246,0.14)', color: '#bfdbfe', fontWeight: 700, justifySelf: 'center' },
+  packageTitle: { margin: 0, fontSize: '1.08rem' },
+  packageText: { margin: 0, color: '#cbd5e1', lineHeight: 1.45, textAlign: 'center' as const, fontSize: '0.92rem' },
   packageList: { margin: 0, paddingLeft: '18px', color: '#cbd5e1', display: 'grid', gap: '6px' },
-  stakeSection: { display: 'grid', gap: '14px', gridTemplateColumns: '1fr' },
-  panel: { padding: 'clamp(20px, 4vw, 30px)', borderRadius: '32px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)' },
-  form: { display: 'grid', gap: '12px', width: '100%' },
-  field: { display: 'grid', gap: '8px', width: '100%' },
-  label: { color: '#cbd5e1', fontSize: '0.92rem', fontWeight: 600 },
-  input: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '13px 14px', fontSize: '1rem', width: '100%', boxSizing: 'border-box' as const },
-  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '13px 14px', fontSize: '1rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', cursor: 'pointer' },
-  selectMenu: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
-  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '12px 14px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
-  button: { border: 'none', borderRadius: '999px', padding: '13px 16px', fontWeight: 700, color: '#04111f', background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px' },
-  stakesTableWrap: { overflowX: 'auto' as const, overflowY: 'auto' as const, borderRadius: '22px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
-  stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
-  stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
+  stakeSection: { display: 'grid', gap: '12px', gridTemplateColumns: '1fr' },
+  panel: { padding: 'clamp(16px, 3.2vw, 24px)', borderRadius: '28px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)' },
+  form: { display: 'grid', gap: '10px', width: '100%' },
+  field: { display: 'grid', gap: '6px', width: '100%' },
+  label: { color: '#cbd5e1', fontSize: '0.88rem', fontWeight: 600 },
+  input: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const },
+  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
+  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
+  button: { border: 'none', borderRadius: '999px', padding: '11px 14px', fontWeight: 700, color: '#04111f', background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
+  stakesTableWrap: { overflowX: 'auto' as const, overflowY: 'hidden' as const, borderRadius: '20px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
+  stakesTableFooter: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const, marginTop: '10px' },
+  stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '8px 12px', fontWeight: 600, cursor: 'pointer' },
+  stakesPageButtonActive: { background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', color: '#04111f' },
+  stakesPageEllipsis: { color: '#94a3b8', fontWeight: 700, padding: '0 4px' },
   stakesTable: { width: '100%', minWidth: '760px', borderCollapse: 'collapse' as const },
   stakesHead: { background: 'rgba(255,255,255,0.05)' },
-  stakeTh: { position: 'sticky' as const, top: 0, zIndex: 1, padding: '14px 16px', textAlign: 'left' as const, fontSize: '0.84rem', letterSpacing: '0.02em', textTransform: 'uppercase' as const, color: '#cbd5e1', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,14,24,0.96)' },
-  stakeTd: { padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0', verticalAlign: 'middle' as const },
+  stakeTh: { position: 'sticky' as const, top: 0, zIndex: 1, padding: '12px 14px', textAlign: 'left' as const, fontSize: '0.8rem', letterSpacing: '0.02em', textTransform: 'uppercase' as const, color: '#cbd5e1', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,14,24,0.96)' },
+  stakeTd: { padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0', verticalAlign: 'middle' as const },
   stakeRow: { display: 'inline-flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const },
-  badge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '6px 10px', borderRadius: '999px', background: 'rgba(34,197,94,0.14)', color: '#bbf7d0', fontWeight: 700, fontSize: '0.82rem' },
+  badge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '5px 9px', borderRadius: '999px', background: 'rgba(34,197,94,0.14)', color: '#bbf7d0', fontWeight: 700, fontSize: '0.78rem' },
   statusActive: { background: 'rgba(34,197,94,0.14)', color: '#bbf7d0' },
   statusCompleted: { background: 'rgba(59,130,246,0.14)', color: '#dbeafe' },
   statusCancelled: { background: 'rgba(239,68,68,0.14)', color: '#fecaca' },
-  stakesSection: { display: 'grid', gap: '14px' },
+  stakesSection: { display: 'grid', gap: '12px' },
   stakesHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
-  helper: { color: '#94a3b8', margin: 0, fontSize: '0.9rem', lineHeight: 1.55 },
-  previewCard: { display: 'grid', gap: '6px', padding: '14px', borderRadius: '18px', background: 'rgba(96,165,250,0.08)', border: '1px solid rgba(96,165,250,0.18)' },
+  helper: { color: '#94a3b8', margin: 0, fontSize: '0.85rem', lineHeight: 1.45 },
+  previewCard: { display: 'grid', gap: '5px', padding: '12px', borderRadius: '18px', background: 'rgba(96,165,250,0.08)', border: '1px solid rgba(96,165,250,0.18)' },
   previewLabel: { margin: 0, color: '#bfdbfe', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase' as const },
   previewValue: { margin: 0, color: '#ffffff', fontSize: '1.15rem', fontWeight: 800 },
   previewSubtext: { margin: 0, color: '#cbd5e1', fontSize: '0.92rem', lineHeight: 1.5 },
@@ -127,24 +129,24 @@ const styles = {
   '@media (max-width: 640px)': {
     page: { paddingBottom: '180px' },
     shell: { maxWidth: '100%', padding: '16px 0 120px', gap: '12px' },
-    hero: { padding: '18px' },
+    hero: { padding: '16px' },
     packageGrid: {
       gridTemplateColumns: 'repeat(3, minmax(240px, 82vw))',
-      gap: '20px',
+      gap: '14px',
       overflowX: 'auto' as const,
       overflowY: 'hidden' as const,
-      padding: '0 4px 8px',
+      padding: '0 4px 4px',
       scrollPaddingLeft: '4px',
       scrollPaddingRight: '4px',
       scrollSnapType: 'x mandatory' as const,
     },
     stakeSection: { width: '100%' },
-    panel: { borderRadius: '0', padding: '18px 16px', width: '100%', minWidth: 0 },
-    stakesTableWrap: { margin: '0 -16px', maxHeight: '300px' },
+    panel: { borderRadius: '0', padding: '16px 14px', width: '100%', minWidth: 0 },
+    stakesTableWrap: { margin: '0 -14px' },
     stakesTable: { minWidth: '680px' },
-    stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
-    stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
-    button: { width: '100%' },
+    stakesTableFooter: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const, marginTop: '10px' },
+    stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '8px 12px', fontWeight: 600, cursor: 'pointer' },
+    button: { width: '100%' }
   },
 };
 
@@ -159,7 +161,7 @@ const StakingPage = () => {
   const [packagesError, setPackagesError] = useState('');
 
   const [isPackageMenuOpen, setIsPackageMenuOpen] = useState(false);
-  const [isStakeHistoryExpanded, setIsStakeHistoryExpanded] = useState(false);
+  const [stakeHistoryPage, setStakeHistoryPage] = useState(1);
   const packageMenuRef = useRef<HTMLDivElement | null>(null);
   const selectedPackage = useMemo(() => stakingPackages.find((stakingPackage) => stakingPackage.id === selectedPackageId) || stakingPackages[0], [selectedPackageId]);
 
@@ -207,6 +209,40 @@ const StakingPage = () => {
   const selectedAmount = Number(amount);
   const isAmountValid = Number.isFinite(selectedAmount) && selectedAmount >= selectedPackage.minAmount && selectedAmount <= selectedPackage.maxAmount;
   const projectedProfit = isAmountValid ? Number((selectedAmount * (selectedPackage.dailyProfitPercent / 100) * selectedPackage.lockDurationDays).toFixed(2)) : 0;
+  const stakeHistoryPageSize = 4;
+  const stakeHistoryTotalPages = Math.max(1, Math.ceil(stakes.length / stakeHistoryPageSize));
+  const stakeHistoryCurrentPage = Math.min(stakeHistoryPage, stakeHistoryTotalPages);
+  const stakeHistoryStartIndex = (stakeHistoryCurrentPage - 1) * stakeHistoryPageSize;
+  const stakeHistoryRows = stakes.slice(stakeHistoryStartIndex, stakeHistoryStartIndex + stakeHistoryPageSize);
+  const stakeHistoryPageItems = useMemo(() => {
+    if (stakeHistoryTotalPages <= 7) {
+      return Array.from({ length: stakeHistoryTotalPages }, (_, index) => index + 1);
+    }
+
+    const visiblePages = new Set<number>([1, stakeHistoryTotalPages, stakeHistoryCurrentPage]);
+    if (stakeHistoryCurrentPage > 1) visiblePages.add(stakeHistoryCurrentPage - 1);
+    if (stakeHistoryCurrentPage < stakeHistoryTotalPages) visiblePages.add(stakeHistoryCurrentPage + 1);
+    if (stakeHistoryCurrentPage <= 3) {
+      visiblePages.add(2);
+      visiblePages.add(3);
+    }
+    if (stakeHistoryCurrentPage >= stakeHistoryTotalPages - 2) {
+      visiblePages.add(stakeHistoryTotalPages - 1);
+      visiblePages.add(stakeHistoryTotalPages - 2);
+    }
+
+    return Array.from(visiblePages)
+      .filter((page) => page >= 1 && page <= stakeHistoryTotalPages)
+      .sort((left, right) => left - right)
+      .flatMap((page, index, pages) => {
+        const nextPage = pages[index + 1];
+        if (nextPage && nextPage - page > 1) {
+          return [page, 'ellipsis' as const, nextPage];
+        }
+        return [page];
+      })
+      .filter((item, index, items) => item !== 'ellipsis' || items[index - 1] !== 'ellipsis');
+  }, [stakeHistoryCurrentPage, stakeHistoryTotalPages]);
 
   const handleCreateStake = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -322,7 +358,6 @@ const StakingPage = () => {
                 <div
                   style={{
                     ...styles.stakesTableWrap,
-                    maxHeight: isStakeHistoryExpanded ? 'none' : '300px',
                   }}
                 >
                   <table style={styles.stakesTable}>
@@ -338,7 +373,7 @@ const StakingPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {stakes.map((stake, index) => (
+                      {stakeHistoryRows.map((stake, index) => (
                         <tr key={stake.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
                           <td style={styles.stakeTd}>
                             <span style={styles.stakeRow}>
@@ -373,9 +408,38 @@ const StakingPage = () => {
                   <button
                     type="button"
                     style={styles.stakesTableToggle}
-                    onClick={() => setIsStakeHistoryExpanded((current) => !current)}
+                    onClick={() => setStakeHistoryPage((current) => Math.max(1, current - 1))}
+                    disabled={stakeHistoryCurrentPage === 1}
                   >
-                    {isStakeHistoryExpanded ? 'Show less' : 'Show more'}
+                    Prev
+                  </button>
+                  {stakeHistoryPageItems.map((item, index) =>
+                    item === 'ellipsis' ? (
+                      <span key={`ellipsis-${index}`} style={styles.stakesPageEllipsis}>
+                        …
+                      </span>
+                    ) : (
+                      <button
+                        key={item}
+                        type="button"
+                        style={{
+                          ...styles.stakesTableToggle,
+                          minWidth: '42px',
+                          ...(item === stakeHistoryCurrentPage ? styles.stakesPageButtonActive : {}),
+                        }}
+                        onClick={() => setStakeHistoryPage(item)}
+                      >
+                        {item}
+                      </button>
+                    )
+                  )}
+                  <button
+                    type="button"
+                    style={styles.stakesTableToggle}
+                    onClick={() => setStakeHistoryPage((current) => Math.min(stakeHistoryTotalPages, current + 1))}
+                    disabled={stakeHistoryCurrentPage === stakeHistoryTotalPages}
+                  >
+                    Next
                   </button>
                 </div>
               </>

@@ -57,11 +57,11 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: '16px',
+    gap: '12px',
     flexWrap: 'wrap' as const,
     position: 'relative' as const,
     zIndex: 1,
-    marginBottom: '24px',
+    marginBottom: '18px',
   },
   brandBlock: {
     minWidth: 0,
@@ -111,7 +111,7 @@ const styles = {
   },
   title: {
     margin: '12px 0 0',
-    fontSize: 'clamp(1.6rem, 2.8vw, 2.4rem)',
+    fontSize: 'clamp(1.45rem, 2.4vw, 2rem)',
     lineHeight: 1.08,
     letterSpacing: '-0.03em',
   },
@@ -132,7 +132,7 @@ const styles = {
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.06)',
-    padding: 'clamp(22px, 4vw, 30px)',
+    padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
   },
@@ -144,7 +144,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: '16px',
+    gap: '12px',
     flexWrap: 'wrap' as const,
     marginBottom: '18px',
   },
@@ -170,7 +170,7 @@ const styles = {
   },
   stepTitle: {
     margin: '12px 0 0',
-    fontSize: 'clamp(1.7rem, 3vw, 2.4rem)',
+    fontSize: 'clamp(1.5rem, 2.6vw, 2.05rem)',
     lineHeight: 1.1,
   },
   stepDesc: {
@@ -180,7 +180,7 @@ const styles = {
     fontSize: '15px',
   },
   form: {
-    marginTop: '24px',
+    marginTop: '18px',
     display: 'grid',
     gap: '16px',
   },
@@ -200,7 +200,7 @@ const styles = {
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(6,10,20,0.9)',
     color: '#ffffff',
-    padding: '15px 16px',
+    padding: '13px 14px',
     fontSize: '16px',
     outline: 'none',
   },
@@ -254,10 +254,10 @@ const styles = {
   button: {
     border: 'none',
     borderRadius: '999px',
-    padding: '13px 18px',
+    padding: '11px 16px',
     fontWeight: 700,
     cursor: 'pointer',
-    minWidth: '120px',
+    minWidth: '108px',
   },
   buttonGhost: {
     background: 'rgba(255,255,255,0.06)',
@@ -521,10 +521,10 @@ const SigninPage = () => {
 
             <div style={styles.grid}>
               <article style={styles.heroCard}>
-                <h1 style={styles.title}>
+                <h2 style={styles.title}>
                   Welcome back.
                   <span style={styles.titleAccent}>Sign in fast.</span>
-                </h1>
+                </h2>
                 <p style={styles.lead}>Enter your email once, then choose password or email code to continue. Email-code sign in is protected with a 5-attempt lockout.</p>
               </article>
 
@@ -540,7 +540,7 @@ const SigninPage = () => {
                   {step === 'email' ? (
                     <>
                       <p style={styles.stepLabel}>Email</p>
-                      <h2 style={styles.stepTitle}>Start with your account email</h2>
+                      <h3 style={styles.stepTitle}>Start with your account email</h3>
                       <p style={styles.stepDesc}>We’ll use this to show your sign-in choices and keep the flow secure.</p>
                     </>
                   ) : step === 'method' ? (
