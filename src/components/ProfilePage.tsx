@@ -49,6 +49,13 @@ const styles = {
     alignItems: 'start',
     justifyItems: 'center',
   },
+  profileStack: {
+    width: '100%',
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr)',
+    gap: '24px',
+    justifyItems: 'center',
+  } as const,
   panel: {
     position: 'relative' as const,
     borderRadius: '28px',
@@ -175,7 +182,7 @@ const styles = {
     overflowWrap: 'anywhere' as const,
   },
   content: {
-    padding: 0,
+    padding: 'clamp(18px, 4vw, 28px)',
   },
   sectionTitle: {
     margin: 0,
@@ -282,18 +289,20 @@ const ProfilePage = () => {
           <AppHeader />
 
           <div style={styles.hero}>
-            <section style={{ ...styles.panel, ...styles.avatarPanel }}>
-              <div style={styles.avatarShell}>
-                <div style={styles.avatar}>
-                  <CircleUserRound style={styles.avatarIcon} />
-                  <span style={{ position: 'absolute', bottom: '18px', right: '18px', fontSize: '1rem', fontWeight: 800, color: '#ffffff' }}>{initials}</span>
+            <div style={styles.profileStack}>
+              <section style={{ ...styles.panel, ...styles.avatarPanel }}>
+                <div style={styles.avatarShell}>
+                  <div style={styles.avatar}>
+                    <CircleUserRound style={styles.avatarIcon} />
+                    <span style={{ position: 'absolute', bottom: '18px', right: '18px', fontSize: '1rem', fontWeight: 800, color: '#ffffff' }}>{initials}</span>
+                  </div>
+                  <button type="button" aria-label="Upload profile picture" style={styles.uploadPill}>
+                    <Camera size={18} />
+                  </button>
                 </div>
-                <button type="button" aria-label="Upload profile picture" style={styles.uploadPill}>
-                  <Camera size={18} />
-                </button>
-              </div>
+              </section>
 
-              <div>
+              <section style={{ ...styles.panel, ...styles.content }}>
                 <p style={styles.sectionTitle}>Profile details</p>
                 <div style={styles.metaRow}>
                   <div style={styles.metaCard}>
@@ -317,9 +326,8 @@ const ProfilePage = () => {
                     <span style={styles.metaValue}>{uid}</span>
                   </div>
                 </div>
-
-              </div>
-            </section>
+              </section>
+            </div>
           </div>
 
           <NowBar />
