@@ -125,7 +125,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Settings',
-    icon: <Settings size={18} />,
+    icon: <Settings2 size={18} />,
     onClick: () => {
       navigate('/settings');
     },
