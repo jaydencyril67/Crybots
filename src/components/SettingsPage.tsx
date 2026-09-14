@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { AlertCircle, CheckCircle2, LockKeyhole, ShieldCheck, Trash2, WalletCards } from 'lucide-react';
+import { LockKeyhole, ShieldCheck, Trash2, WalletCards } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
+import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
@@ -130,17 +131,6 @@ const styles = {
     background: 'linear-gradient(135deg, #ef4444, #b91c1c)',
     border: 'none',
   },
-  status: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    borderRadius: '16px',
-    padding: '12px 14px',
-    fontSize: '0.92rem',
-  },
-  success: { background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.24)' },
-  error: { background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.24)' },
-  neutral: { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' },
 };
 
 const passwordMeetsRule = (value: string) => {
@@ -349,10 +339,11 @@ const SettingsPage = () => {
         <div style={styles.panel}>
           <div style={styles.body}>
             {status.kind !== 'idle' ? (
-              <div style={{ ...styles.status, ...(status.kind === 'success' ? styles.success : styles.error) }}>
-                {status.kind === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                <span>{status.message}</span>
-              </div>
+              <NotificationBanner
+                tone={status.kind === 'success' ? 'success' : 'error'}
+                title={status.kind === 'success' ? 'Settings updated' : 'Check your details'}
+                message={status.message}
+              />
             ) : null}
 
             <div style={styles.grid}>
