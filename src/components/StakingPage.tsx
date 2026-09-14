@@ -99,10 +99,16 @@ const styles = {
   selectMenu: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
   selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '12px 14px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
   button: { border: 'none', borderRadius: '999px', padding: '13px 16px', fontWeight: 700, color: '#04111f', background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px' },
-  stakesList: { display: 'grid', gap: '10px' },
-  stakeCard: { padding: '14px', borderRadius: '16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '6px' },
-  stakeRow: { display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const, alignItems: 'center' },
+  stakesTableWrap: { overflowX: 'auto' as const, borderRadius: '22px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
+  stakesTable: { width: '100%', minWidth: '760px', borderCollapse: 'collapse' as const },
+  stakesHead: { background: 'rgba(255,255,255,0.05)' },
+  stakeTh: { position: 'sticky' as const, top: 0, zIndex: 1, padding: '14px 16px', textAlign: 'left' as const, fontSize: '0.84rem', letterSpacing: '0.02em', textTransform: 'uppercase' as const, color: '#cbd5e1', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,14,24,0.96)' },
+  stakeTd: { padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#e2e8f0', verticalAlign: 'middle' as const },
+  stakeRow: { display: 'inline-flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const },
   badge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '6px 10px', borderRadius: '999px', background: 'rgba(34,197,94,0.14)', color: '#bbf7d0', fontWeight: 700, fontSize: '0.82rem' },
+  statusActive: { background: 'rgba(34,197,94,0.14)', color: '#bbf7d0' },
+  statusCompleted: { background: 'rgba(59,130,246,0.14)', color: '#dbeafe' },
+  statusCancelled: { background: 'rgba(239,68,68,0.14)', color: '#fecaca' },
   stakesSection: { display: 'grid', gap: '14px' },
   stakesHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   helper: { color: '#94a3b8', margin: 0, fontSize: '0.9rem', lineHeight: 1.55 },
@@ -132,6 +138,8 @@ const styles = {
     },
     stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '18px 16px', width: '100%', minWidth: 0 },
+    stakesTableWrap: { margin: '0 -16px' },
+    stakesTable: { minWidth: '680px' },
     button: { width: '100%' },
   },
 };
@@ -305,19 +313,51 @@ const StakingPage = () => {
                 <LoadingDots />
               </div>
             ) : stakes.length ? (
-              stakes.map((stake) => (
-                <article key={stake.id} style={styles.panel}>
-                  <div style={styles.stakeRow}>
-                    <span style={styles.badge}>{stake.packageId}</span>
-                    <span style={styles.helper}>{stake.status.toUpperCase()}</span>
-                  </div>
-                  <p style={styles.packageText}>Amount: {stake.principal.toLocaleString()} USDT</p>
-                  <p style={styles.packageText}>Target profit: {stake.totalProfitTarget.toLocaleString()} USDT</p>
-                  <p style={styles.packageText}>Earned: {stake.earnedProfit.toLocaleString()} USDT</p>
-                  <p style={styles.packageText}>Started: {stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</p>
-                  <p style={styles.packageText}>Matures: {new Date(stake.maturityDate).toLocaleDateString()}</p>
-                </article>
-              ))
+              <div style={styles.stakesTableWrap}>
+                <table style={styles.stakesTable}>
+                  <thead style={styles.stakesHead}>
+                    <tr>
+                      <th style={styles.stakeTh}>Package</th>
+                      <th style={styles.stakeTh}>Amount</th>
+                      <th style={styles.stakeTh}>Target profit</th>
+                      <th style={styles.stakeTh}>Earned</th>
+                      <th style={styles.stakeTh}>Started</th>
+                      <th style={styles.stakeTh}>Matures</th>
+                      <th style={styles.stakeTh}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stakes.map((stake, index) => (
+                      <tr key={stake.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
+                        <td style={styles.stakeTd}>
+                          <span style={styles.stakeRow}>
+                            <span style={styles.badge}>{stake.packageId}</span>
+                          </span>
+                        </td>
+                        <td style={styles.stakeTd}>{stake.principal.toLocaleString()} USDT</td>
+                        <td style={styles.stakeTd}>{stake.totalProfitTarget.toLocaleString()} USDT</td>
+                        <td style={styles.stakeTd}>{stake.earnedProfit.toLocaleString()} USDT</td>
+                        <td style={styles.stakeTd}>{stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</td>
+                        <td style={styles.stakeTd}>{new Date(stake.maturityDate).toLocaleDateString()}</td>
+                        <td style={styles.stakeTd}>
+                          <span
+                            style={{
+                              ...styles.badge,
+                              ...(stake.status === 'active'
+                                ? styles.statusActive
+                                : stake.status === 'completed'
+                                  ? styles.statusCompleted
+                                  : styles.statusCancelled),
+                            }}
+                          >
+                            {stake.status.toUpperCase()}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div style={styles.panel}>
                 <p style={styles.helper}>No stakes created yet.</p>
