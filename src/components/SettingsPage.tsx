@@ -49,12 +49,6 @@ const styles = {
     WebkitBackdropFilter: 'blur(18px)',
     overflow: 'hidden',
   },
-  title: {
-    margin: 0,
-    fontSize: 'clamp(1.7rem, 4vw, 2.4rem)',
-    fontWeight: 900,
-    letterSpacing: '-0.04em',
-  },
   body: {
     padding: 'clamp(18px, 4vw, 30px)',
     display: 'grid',
@@ -357,7 +351,6 @@ const SettingsPage = () => {
         <AppHeader />
         <div style={styles.panel}>
           <div style={styles.body}>
-            <h1 style={styles.title}>Account settings</h1>
             {status.kind !== 'idle' ? (
               <div style={{ ...styles.status, ...(status.kind === 'success' ? styles.success : styles.error) }}>
                 {status.kind === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
