@@ -65,6 +65,8 @@ const styles = {
     alignItems: 'center',
     '@media (max-width: 900px)': {
       gridTemplateColumns: 'minmax(0, 1fr)',
+      justifyItems: 'center',
+      textAlign: 'center',
     },
   } as const,
   avatarShell: {
@@ -76,6 +78,11 @@ const styles = {
     padding: '4px',
     background: 'linear-gradient(135deg, rgba(125,211,252,0.8), rgba(167,139,250,0.7), rgba(34,211,238,0.7))',
     boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 18px 40px rgba(0,0,0,0.35)',
+    '@media (max-width: 600px)': {
+      width: '120px',
+      height: '120px',
+      margin: '0 auto',
+    },
   },
   avatar: {
     width: '100%',
@@ -122,6 +129,10 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
     gap: '10px',
+    '@media (max-width: 600px)': {
+      gridTemplateColumns: 'minmax(0, 1fr)',
+      gap: '8px',
+    },
   } as const,
   metaCard: {
     display: 'flex' as const,
@@ -134,6 +145,10 @@ const styles = {
     background: 'rgba(255,255,255,0.04)',
     border: '1px solid rgba(255,255,255,0.08)',
     minWidth: 0,
+    '@media (max-width: 600px)': {
+      alignItems: 'center',
+      textAlign: 'center',
+    },
   },
   metaLabel: {
     display: 'flex',
@@ -141,6 +156,9 @@ const styles = {
     gap: '10px',
     color: '#bfd0ee',
     fontSize: '0.92rem',
+    '@media (max-width: 600px)': {
+      justifyContent: 'center',
+    },
   },
   metaValue: {
     color: '#ffffff',
