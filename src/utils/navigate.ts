@@ -3,6 +3,7 @@ export const navigate = (path: string) => {
     return;
   }
 
+  window.dispatchEvent(new CustomEvent('ke:navigation-start', { detail: { path } }));
   window.history.pushState({}, '', path);
   window.dispatchEvent(new PopStateEvent('popstate'));
 };

@@ -44,20 +44,41 @@ const getRouteKey = () => {
   return 'landing';
 };
 
+const routeToKey = (path: string) => {
+  if (path === '/signup' || path === '#/signup') return 'signup';
+  if (path === '/signup-confirmation-sent' || path === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
+  if (path === '/verify-email' || path === '#/verify-email') return 'verify-email';
+  if (path === '/account-confirmed' || path === '#/account-confirmed') return 'account-confirmed';
+  if (path === '/signin' || path === '#/signin') return 'signin';
+  if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
+  if (path === '/dashboard' || path === '#/dashboard') return 'dashboard';
+  if (path === '/profile' || path === '#/profile') return 'profile';
+  return 'landing';
+};
+
 const RouteTransition = () => {
   const [routeKey, setRouteKey] = useState(getRouteKey);
   const [displayedRouteKey, setDisplayedRouteKey] = useState(routeKey);
-  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     const syncRoute = () => {
       const nextRouteKey = getRouteKey();
       setRouteKey(nextRouteKey);
+      setDisplayedRouteKey(nextRouteKey);
     };
 
+    const handleNavigationStart = (event: Event) => {
+      const customEvent = event as CustomEvent<{ path?: string }>;
+      const nextRouteKey = routeToKey(customEvent.detail?.path ?? window.location.pathname);
+      setRouteKey(nextRouteKey);
+      setDisplayedRouteKey(nextRouteKey);
+    };
+
+    window.addEventListener('ke:navigation-start', handleNavigationStart as EventListener);
     window.addEventListener('popstate', syncRoute);
     window.addEventListener('hashchange', syncRoute);
     return () => {
+      window.removeEventListener('ke:navigation-start', handleNavigationStart as EventListener);
       window.removeEventListener('popstate', syncRoute);
       window.removeEventListener('hashchange', syncRoute);
     };
@@ -69,13 +90,9 @@ const RouteTransition = () => {
     }
 
     setDisplayedRouteKey(routeKey);
-    setIsExiting(false);
   }, [displayedRouteKey, routeKey]);
 
   const appContent = useMemo(() => {
-    const pathname = getPathname();
-    const hash = getHash();
-
     if (displayedRouteKey === 'signup') return <SignupPage />;
     if (displayedRouteKey === 'signup-confirmation-sent') return <SignupConfirmationSentPage />;
     if (displayedRouteKey === 'verify-email') return <VerifyEmailPage />;
@@ -85,7 +102,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'dashboard') return <ProtectedRoute><DashboardPage /></ProtectedRoute>;
     if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
 
-    return pathname === '/' || hash === '#/' || displayedRouteKey === 'landing' ? <LandingPage /> : <LandingPage />;
+    return <LandingPage />;
   }, [displayedRouteKey]);
 
   const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile';
