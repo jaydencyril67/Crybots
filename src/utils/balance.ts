@@ -4,6 +4,7 @@ type BalanceListener = (balance: number | null) => void;
 
 const STORAGE_KEYS = ['kingshall_user', 'user'];
 const BALANCE_EVENT = 'kingshall:balance-updated';
+const BALANCE_REFRESH_ENDPOINT = '/api/auth/me';
 
 let cachedBalance: number | null = null;
 const listeners = new Set<BalanceListener>();
@@ -74,7 +75,7 @@ export const setCachedBalance = (balance: number | null) => {
 };
 
 export const syncBalanceFromBackend = async () => {
-  const response = await api.get('/api/auth/me');
+  const response = await api.get(BALANCE_REFRESH_ENDPOINT);
   const nextProfile = response.data?.user ?? response.data;
 
   if (typeof nextProfile?.usdtBalance === 'number') {
@@ -93,3 +94,8 @@ export const subscribeBalance = (listener: BalanceListener) => {
 };
 
 export const balanceEventName = BALANCE_EVENT;
+
+export const refreshBalanceFromBackend = async () => {
+  const balance = await syncBalanceFromBackend();
+  return balance;
+};
