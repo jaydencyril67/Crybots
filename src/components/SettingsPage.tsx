@@ -152,7 +152,7 @@ const passwordMeetsRule = (value: string) => {
 const SettingsPage = () => {
   const [uid, setUid] = useState('');
   const [uidAvailable, setUidAvailable] = useState<boolean | null>(null);
-  const [uidEditorActive, setUidEditorActive] = useState(false);
+  const [uidEditorActive, setUidEditorActive] = useState(false as boolean);
   const [uidChecking, setUidChecking] = useState(false);
   const [uidCardSaving, setUidCardSaving] = useState(false);
   const [passwordCardSaving, setPasswordCardSaving] = useState(false);
@@ -542,7 +542,7 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
-                {activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable === true && uid !== initialUid ? (
+                {activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable && uid !== initialUid ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
                       {uidCardSaving ? 'Saving...' : 'Save UID'}
