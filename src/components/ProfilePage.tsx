@@ -217,6 +217,7 @@ const ProfilePage = () => {
         fullName?: string;
         name?: string;
         email?: string;
+        uid?: string;
       } : null;
     } catch {
       return null;
