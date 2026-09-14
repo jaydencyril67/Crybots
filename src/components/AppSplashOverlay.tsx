@@ -56,14 +56,15 @@ const AppSplashOverlay = () => {
     setActive(shouldShowSplash);
 
     if (!shouldShowSplash) {
-      document.documentElement.style.visibility = 'visible';
-      setReady(true);
+      document.documentElement.style.visibility = '';
       return;
     }
 
-    document.documentElement.style.visibility = 'visible';
     const revealDelay = 3000;
-    const timer = window.setTimeout(() => setReady(true), revealDelay);
+    const timer = window.setTimeout(() => {
+      document.documentElement.style.visibility = '';
+      setReady(true);
+    }, revealDelay);
 
     return () => window.clearTimeout(timer);
   }, []);

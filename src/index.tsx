@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
+import AppSplashOverlay from './components/AppSplashOverlay';
 import LandingPage from './components/LandingPage';
 import SignupPage from './components/SignupPage';
 import SignupConfirmationSentPage from './components/SignupConfirmationSentPage';
@@ -10,7 +11,6 @@ import SigninPage from './components/SigninPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import AppSplashOverlay from './components/AppSplashOverlay';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -26,6 +26,9 @@ const root = ReactDOM.createRoot(container);
 
 const pathname = window.location.pathname;
 const hash = window.location.hash;
+const isPageRefresh = window.performance.getEntriesByType('navigation')[0]?.type === 'reload';
+
+(window as Window & { __kingshallRefreshSplash?: boolean }).__kingshallRefreshSplash = isPageRefresh;
 
 const isSignupRoute = pathname === '/signup' || hash === '#/signup';
 const isSignupConfirmationSentRoute = pathname === '/signup-confirmation-sent' || hash === '#/signup-confirmation-sent';
@@ -40,7 +43,7 @@ root.render(
   <React.StrictMode>
     <HelmetProvider>
       <AppSplashOverlay />
-      {appContent}
     </HelmetProvider>
+    {appContent}
   </React.StrictMode>
 );
