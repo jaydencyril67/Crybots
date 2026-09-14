@@ -47,6 +47,7 @@ const styles = {
     gap: '24px',
     marginTop: '24px',
     alignItems: 'start',
+    justifyItems: 'center',
   },
   panel: {
     position: 'relative' as const,
@@ -65,6 +66,10 @@ const styles = {
     alignItems: 'center',
     '@media (max-width: 900px)': {
       gridTemplateColumns: 'minmax(0, 1fr)',
+      justifyItems: 'center',
+      textAlign: 'center',
+    },
+    '@media (max-width: 600px)': {
       justifyItems: 'center',
       textAlign: 'center',
     },
