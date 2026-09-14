@@ -43,6 +43,7 @@ const styles = {
     gridTemplateColumns: 'minmax(0, 360px) minmax(0, 1fr)',
     gap: '24px',
     marginTop: '24px',
+    alignItems: 'start',
   },
   panel: {
     position: 'relative' as const,
@@ -139,6 +140,7 @@ const styles = {
   },
   content: {
     padding: '28px',
+    minHeight: '100%',
   },
   sectionTitle: {
     margin: 0,
