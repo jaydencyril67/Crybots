@@ -158,7 +158,6 @@ const SettingsPage = () => {
   const [securityCardSaving, setSecurityCardSaving] = useState(false);
   const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'security' | 'uid' | null>(null);
   const [initialUid, setInitialUid] = useState('');
-  const [initialPassword, setInitialPassword] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [walletValidation, setWalletValidation] = useState<WalletValidationState>({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -183,7 +182,6 @@ const SettingsPage = () => {
         setInitialUid(loadedUid);
       setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
-        setInitialPassword('');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
@@ -237,6 +235,9 @@ const SettingsPage = () => {
   const passwordValid = useMemo(() => passwordMeetsRule(newPassword), [newPassword]);
   const passwordMismatch = newPassword.length > 0 && confirmPassword.length > 0 && newPassword !== confirmPassword;
   const passwordCanSave = currentPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0 && passwordValid && !passwordMismatch;
+  const walletAddressChanged = walletAddress.trim() !== '';
+  const walletCanSave = walletAddressChanged && walletValidation.valid;
+  const securityCanSave = twoFactorSetupLoading || Boolean(twoFactorEnabled !== false || twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0);
 
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
@@ -529,9 +530,9 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
-                {activeCard === 'security' || securityCardSaving ? (
+                {((activeCard === 'security' && securityCanSave) || securityCardSaving) ? (
                   <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
                       {securityCardSaving ? 'Saving...' : 'Save security'}
                     </button>
                   </div>
@@ -575,9 +576,9 @@ const SettingsPage = () => {
                     <span style={styles.helper}>{walletValidation.message}</span>
                   </label>
                 </div>
-                {activeCard === 'wallet' || walletCardSaving ? (
+                {((activeCard === 'wallet' && walletCanSave) || walletCardSaving) ? (
                   <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving || !walletValidation.valid}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving || !walletCanSave}>
                       {walletCardSaving ? 'Saving...' : 'Save wallet'}
                     </button>
                   </div>
