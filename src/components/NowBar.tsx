@@ -108,18 +108,12 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/dashboard',
   },
   {
-    label: 'Markets',
+    label: 'Staking',
     icon: <Coins size={18} />,
     onClick: () => {
-      navigate('/dashboard');
+      navigate('/staking');
     },
-  },
-  {
-    label: 'Search',
-    icon: <Search size={18} />,
-    onClick: () => {
-      navigate('/dashboard');
-    },
+    active: getActivePath() === '/staking',
   },
   {
     label: 'Profile',
