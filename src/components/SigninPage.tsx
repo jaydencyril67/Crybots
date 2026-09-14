@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, KeyRound } from 'lucide-react';
+import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
@@ -12,18 +12,24 @@ const signInMethods = [
   { value: 'code', title: 'Email sign-in code', description: 'Receive a 3-digit code by email.' },
 ] as const;
 
+type TwoFactorState = 'idle' | 'required' | 'email-recovery';
+
 type SignInMethod = (typeof signInMethods)[number]['value'];
 
 type FormState = {
   email: string;
   password: string;
   code: string;
+  twoFactorCode: string;
+  recoveryCode: string;
 };
 
 const initialState: FormState = {
   email: '',
   password: '',
   code: '',
+  twoFactorCode: '',
+  recoveryCode: '',
 };
 
 const styles = {
