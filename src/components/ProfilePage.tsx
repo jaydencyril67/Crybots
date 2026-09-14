@@ -288,9 +288,10 @@ const ProfilePage = () => {
 
   useEffect(() => {
     let isMounted = true;
+    let intervalId = 0;
     const unsubscribe = subscribeBalance((balance) => {
       if (isMounted) {
-        setLiveBalance(balance);
+        setBalance(balance);
       }
     });
 
@@ -305,7 +306,8 @@ const ProfilePage = () => {
         }
 
         const nextProfile = meResponse.data.user ?? profile ?? null;
-        setBalance(typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        const nextBalance = typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null);
+        setBalance(nextBalance);
         setLiveProfile(nextProfile);
         if (nextProfile) {
           window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
@@ -328,13 +330,20 @@ const ProfilePage = () => {
     };
 
     void loadProfile();
-    const intervalId = window.setInterval(() => {
+    intervalId = window.setInterval(() => {
       void loadProfile();
-    }, 20000);
+    }, 12000);
+
+    const handleFocus = () => {
+      void loadProfile();
+    };
+
+    window.addEventListener('focus', handleFocus);
 
     return () => {
       isMounted = false;
       window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
       unsubscribe();
     };
   }, [profile]);
