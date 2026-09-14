@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
+import InlineLoadingDots from './InlineLoadingDots';
 import { navigate } from '../utils/navigate';
 
 const signInMethods = [

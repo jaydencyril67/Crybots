@@ -3,6 +3,7 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
 import AppHeader from './AppHeader';
+import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 
 const steps = [
@@ -696,6 +697,11 @@ const SignupPage = () => {
                   )}
                 </div>
 
+                {isSubmitting ? (
+                  <div style={{ marginTop: '18px', color: 'rgba(255,255,255,0.7)' }}>
+                    <InlineLoadingDots />
+                  </div>
+                ) : null}
                 {submitError ? <NotificationBanner tone="warning" title="One more step" message={submitError} /> : null}
                 <div style={styles.switchRow}>
                   <span style={styles.switchText}>Have an account?</span>

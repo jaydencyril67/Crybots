@@ -3,6 +3,7 @@ import { navigate } from '../utils/navigate';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 
 const steps = [
