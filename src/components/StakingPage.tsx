@@ -40,7 +40,7 @@ const styles = {
     color: '#ffffff',
     overflowX: 'hidden' as const,
     overflowY: 'visible' as const,
-    paddingBottom: '132px',
+    paddingBottom: '24px',
   },
   shell: {
     position: 'relative' as const,
@@ -252,7 +252,6 @@ const StakingPage = () => {
             </div>
           </section>
         </div>
-        <NowBar />
       </main>
     </>
   );
