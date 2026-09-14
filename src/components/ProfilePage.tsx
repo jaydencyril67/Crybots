@@ -274,7 +274,7 @@ const ProfilePage = () => {
   const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profile?.email || 'Not available';
   const uid = profile?.uid || 'Pending confirmation';
-  const initials = fullName.split(/\s+/).map((part) => part[0]).slice(0, 2).join('').toUpperCase() || 'T';
+
 
   return (
     <>
@@ -293,7 +293,6 @@ const ProfilePage = () => {
                 <div style={styles.avatarShell}>
                   <div style={styles.avatar}>
                     <CircleUserRound style={styles.avatarIcon} />
-                    <span style={{ position: 'absolute', bottom: '18px', right: '18px', fontSize: '1rem', fontWeight: 800, color: '#ffffff' }}>{initials}</span>
                   </div>
                  </div>
               </section>
