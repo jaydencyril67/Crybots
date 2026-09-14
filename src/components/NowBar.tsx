@@ -98,7 +98,7 @@ type NowBarProps = {
 
 const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
 
-const defaultActions: NowBarAction[] = [
+const createDefaultActions = (): NowBarAction[] => [
   {
     label: 'Dashboard',
     icon: <Home size={18} />,
@@ -131,12 +131,13 @@ const defaultActions: NowBarAction[] = [
   },
 ];
 
-const NowBar = ({ actions = defaultActions }: NowBarProps) => {
+const NowBar = ({ actions }: NowBarProps) => {
+  const resolvedActions = actions || createDefaultActions();
   return (
     <div style={styles.dock} aria-label="Quick navigation bar">
       <div style={styles.bar}>
         <div style={styles.rail} />
-        {actions.map((action, index) => (
+        {resolvedActions.map((action, index) => (
           <div key={`now-bar-slot-${index}`} style={styles.slot}>
             <button
               type="button"
