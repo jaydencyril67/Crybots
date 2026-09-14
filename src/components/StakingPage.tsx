@@ -99,7 +99,7 @@ const styles = {
   selectMenu: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
   selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '12px 14px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
   button: { border: 'none', borderRadius: '999px', padding: '13px 16px', fontWeight: 700, color: '#04111f', background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px' },
-  stakesTableWrap: { overflowX: 'auto' as const, borderRadius: '22px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
+  stakesTableWrap: { overflowX: 'auto' as const, overflowY: 'auto' as const, borderRadius: '22px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
   stakesTable: { width: '100%', minWidth: '760px', borderCollapse: 'collapse' as const },
   stakesHead: { background: 'rgba(255,255,255,0.05)' },
   stakeTh: { position: 'sticky' as const, top: 0, zIndex: 1, padding: '14px 16px', textAlign: 'left' as const, fontSize: '0.84rem', letterSpacing: '0.02em', textTransform: 'uppercase' as const, color: '#cbd5e1', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,14,24,0.96)' },
@@ -138,8 +138,11 @@ const styles = {
     },
     stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '18px 16px', width: '100%', minWidth: 0 },
-    stakesTableWrap: { margin: '0 -16px' },
+    stakesTableWrap: { margin: '0 -16px', maxHeight: '300px' },
+    stakesTableExpanded: { maxHeight: 'none' },
     stakesTable: { minWidth: '680px' },
+    stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
+    stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
     button: { width: '100%' },
   },
 };
@@ -155,6 +158,7 @@ const StakingPage = () => {
   const [packagesError, setPackagesError] = useState('');
 
   const [isPackageMenuOpen, setIsPackageMenuOpen] = useState(false);
+  const [isStakeHistoryExpanded, setIsStakeHistoryExpanded] = useState(false);
   const packageMenuRef = useRef<HTMLDivElement | null>(null);
   const selectedPackage = useMemo(() => stakingPackages.find((stakingPackage) => stakingPackage.id === selectedPackageId) || stakingPackages[0], [selectedPackageId]);
 
@@ -313,7 +317,12 @@ const StakingPage = () => {
                 <LoadingDots />
               </div>
             ) : stakes.length ? (
-              <div style={styles.stakesTableWrap}>
+              <div
+                style={{
+                  ...styles.stakesTableWrap,
+                  ...(isStakeHistoryExpanded ? styles.stakesTableExpanded : {}),
+                }}
+              >
                 <table style={styles.stakesTable}>
                   <thead style={styles.stakesHead}>
                     <tr>
@@ -357,6 +366,15 @@ const StakingPage = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+              <div style={styles.stakesTableFooter}>
+                <button
+                  type="button"
+                  style={styles.stakesTableToggle}
+                  onClick={() => setIsStakeHistoryExpanded((current) => !current)}
+                >
+                  {isStakeHistoryExpanded ? 'Show less' : 'Show more'}
+                </button>
               </div>
             ) : (
               <div style={styles.panel}>
