@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { navigate } from '../utils/navigate';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 
 const steps = [
@@ -458,14 +460,14 @@ const ForgotPasswordPage = () => {
       setStep((prev) => prev - 1);
       return;
     }
-    window.location.href = '/signin';
+    navigate('/signin');
   };
 
   useEffect(() => {
     if (!completed) return;
 
     if (redirectCountdown <= 0) {
-      window.location.href = '/signin';
+      navigate('/signin');
       return;
     }
 

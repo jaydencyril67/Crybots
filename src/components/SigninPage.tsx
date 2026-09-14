@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
+import InlineLoadingDots from './InlineLoadingDots';
+import { navigate } from '../utils/navigate';
 
 const signInMethods = [
   { value: 'password', title: 'Password', description: 'Use your account password to sign in.' },
@@ -319,7 +321,7 @@ const SigninPage = () => {
       return;
     }
 
-    window.location.pathname = '/dashboard';
+    navigate('/dashboard');
   };
 
   const canContinue = useMemo(() => form.email.trim().length > 0, [form.email]);
@@ -359,7 +361,7 @@ const SigninPage = () => {
     if (window.history.length > 1) {
       window.history.back();
     } else {
-      window.location.pathname = '/dashboard';
+      navigate('/dashboard');
     }
   };
 
@@ -421,7 +423,7 @@ const SigninPage = () => {
         }
       }
 
-      window.location.pathname = '/dashboard';
+      navigate('/dashboard');
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
       const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
@@ -453,7 +455,7 @@ const SigninPage = () => {
         }
       }
 
-      window.location.pathname = '/dashboard';
+      navigate('/dashboard');
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
       const message = response?.data?.message || 'Unable to verify code right now. Please try again.';
@@ -630,7 +632,7 @@ const SigninPage = () => {
                 </div>
                 <div style={styles.switchRow}>
                   <span style={styles.switchText}>New to KingsHall?</span>
-                  <button type="button" onClick={() => { window.location.pathname = '/signup'; }} style={styles.switchLink}>
+                  <button type="button" onClick={() => { navigate('/signup'); }} style={styles.switchLink}>
                     Signup here
                   </button>
                 </div>

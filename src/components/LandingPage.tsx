@@ -4,6 +4,7 @@ import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, User
 import AppHeader from './AppHeader';
 import InstallAppButton from './InstallAppButton';
 import { isTokenValid } from '../utils/auth';
+import { navigate } from '../utils/navigate';
 
 const stats = [
   { value: '$2.4B+', label: '24h trading volume' },
@@ -422,7 +423,7 @@ const styles = {
 const LandingPage = () => {
   const handleDashboardClick = () => {
     const token = window.localStorage.getItem('token') || '';
-    window.location.pathname = token && isTokenValid(token) ? '/dashboard' : '/signin';
+    navigate(token && isTokenValid(token) ? '/dashboard' : '/signin');
   };
 
   return (

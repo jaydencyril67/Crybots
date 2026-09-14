@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
+import { navigate } from '../utils/navigate';
 
 const styles = {
   header: {
@@ -66,7 +67,7 @@ const AppHeader = () => {
     window.localStorage.removeItem('kingshall_user');
     window.localStorage.removeItem('firstName');
     window.localStorage.removeItem('kingshall_first_name');
-    window.location.pathname = '/';
+    navigate('/');
   };
 
   return (

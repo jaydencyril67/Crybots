@@ -3,7 +3,9 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
 import AppHeader from './AppHeader';
+import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
+import { navigate } from '../utils/navigate';
 
 const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
@@ -359,7 +361,7 @@ const SignupPage = () => {
       return;
     }
 
-    window.location.pathname = '/';
+    navigate('/');
   };
 
   const canContinue = useMemo(() => {
@@ -463,7 +465,7 @@ const SignupPage = () => {
 
       setSubmitError('');
       setStepIndex(steps.length - 1);
-      window.location.pathname = '/signup-confirmation-sent';
+      navigate('/signup-confirmation-sent');
     } catch (error) {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
@@ -696,10 +698,15 @@ const SignupPage = () => {
                   )}
                 </div>
 
+                {isSubmitting ? (
+                  <div style={{ marginTop: '18px', color: 'rgba(255,255,255,0.7)' }}>
+                    <InlineLoadingDots />
+                  </div>
+                ) : null}
                 {submitError ? <NotificationBanner tone="warning" title="One more step" message={submitError} /> : null}
                 <div style={styles.switchRow}>
                   <span style={styles.switchText}>Have an account?</span>
-                  <button type="button" onClick={() => { window.location.pathname = '/signin'; }} style={styles.switchLink}>
+                  <button type="button" onClick={() => { navigate('/signin'); }} style={styles.switchLink}>
                     Sign in here
                   </button>
                 </div>
