@@ -1,4 +1,5 @@
 import React from 'react';
+import { ChevronRight, CircleUserRound, Coins, Home, Search, UserRound } from 'lucide-react';
 
 const styles = {
   dock: {
@@ -60,6 +61,17 @@ const styles = {
     opacity: 0.7,
     border: '1px dashed rgba(255,255,255,0.12)',
   },
+  iconWrap: {
+    width: '18px',
+    height: '18px',
+    display: 'grid',
+    placeItems: 'center',
+    flexShrink: 0,
+  },
+  icon: {
+    width: '18px',
+    height: '18px',
+  },
   orb: {
     width: '10px',
     height: '10px',
@@ -71,40 +83,71 @@ const styles = {
 };
 
 type NowBarAction = {
-  label?: string;
-  onClick?: () => void;
+  label: string;
+  onClick: () => void;
+  icon?: React.ReactNode;
+  active?: boolean;
 };
 
 type NowBarProps = {
   actions?: NowBarAction[];
 };
 
-const NowBar = ({ actions = [] }: NowBarProps) => {
+const defaultActions: NowBarAction[] = [
+  {
+    label: 'Dashboard',
+    icon: <Home size={18} />,
+    onClick: () => {
+      window.location.pathname = '/dashboard';
+    },
+    active: window.location.pathname === '/dashboard' || window.location.hash === '#/dashboard',
+  },
+  {
+    label: 'Markets',
+    icon: <Coins size={18} />,
+    onClick: () => {
+      window.location.pathname = '/dashboard';
+    },
+  },
+  {
+    label: 'Search',
+    icon: <Search size={18} />,
+    onClick: () => {
+      window.location.pathname = '/dashboard';
+    },
+  },
+  {
+    label: 'Profile',
+    icon: <UserRound size={18} />,
+    onClick: () => {
+      window.location.pathname = '/profile';
+    },
+    active: window.location.pathname === '/profile' || window.location.hash === '#/profile',
+  },
+];
+
+const NowBar = ({ actions = defaultActions }: NowBarProps) => {
   return (
     <div style={styles.dock} aria-label="Quick navigation bar">
       <div style={styles.bar}>
         <div style={styles.rail} />
-        {Array.from({ length: 4 }).map((_, index) => {
-          const action = actions[index];
-          const isFilled = Boolean(action?.label && action?.onClick);
-
-          return (
-            <div key={`now-bar-slot-${index}`} style={styles.slot}>
-              <button
-                type="button"
-                aria-label={action?.label || `Now bar action ${index + 1}`}
-                onClick={action?.onClick}
-                style={{
-                  ...styles.button,
-                  ...(isFilled ? null : styles.buttonEmpty),
-                }}
-              >
-                <span style={styles.orb} />
-                <span>{action?.label || 'Now'}</span>
-              </button>
-            </div>
-          );
-        })}
+        {actions.map((action, index) => (
+          <div key={`now-bar-slot-${index}`} style={styles.slot}>
+            <button
+              type="button"
+              aria-label={action.label}
+              onClick={action.onClick}
+              style={{
+                ...styles.button,
+                ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
+              }}
+            >
+              <span style={styles.iconWrap}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+              <span>{action.label}</span>
+              {action.active ? <ChevronRight size={14} /> : null}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
