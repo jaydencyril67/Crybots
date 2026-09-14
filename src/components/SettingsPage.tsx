@@ -157,6 +157,7 @@ const SettingsPage = () => {
   const [walletCardSaving, setWalletCardSaving] = useState(false);
   const [securityCardSaving, setSecurityCardSaving] = useState(false);
   const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'security' | 'uid' | null>(null);
+  const [initialUid, setInitialUid] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [walletValidation, setWalletValidation] = useState<WalletValidationState>({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -176,7 +177,9 @@ const SettingsPage = () => {
       try {
         const { data } = await api.get<MeResponse>('/api/auth/me');
         const user = data.user;
-        setUid((user?.uid ?? '').replace(/\D/g, '').slice(0, 5));
+        const loadedUid = (user?.uid ?? '').replace(/\D/g, '').slice(0, 5);
+        setUid(loadedUid);
+        setInitialUid(loadedUid);
       setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
@@ -196,6 +199,11 @@ const SettingsPage = () => {
 
     if (trimmedUid.length !== 5) {
       setUidAvailable(null);
+      return;
+    }
+
+    if (trimmedUid === initialUid) {
+      setUidAvailable(true);
       return;
     }
 
@@ -314,6 +322,7 @@ const SettingsPage = () => {
       });
       showStatus('success', 'UID updated successfully.');
       setUidAvailable(null);
+      setInitialUid(nextUid);
       setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update your UID.');
@@ -524,7 +533,7 @@ const SettingsPage = () => {
                     </button>
                   </div>
                 ) : null}
-                {activeCard === 'uid' || uidCardSaving ? (
+                {((uid.trim().length === 5 && uidAvailable === true && uid !== initialUid) || uidCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
                       {uidCardSaving ? 'Saving...' : 'Save UID'}
