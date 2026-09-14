@@ -103,6 +103,7 @@ const styles = {
   stakesTableFooter: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const, marginTop: '10px' },
   stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '8px 12px', fontWeight: 600, cursor: 'pointer' },
   stakesPageButtonActive: { background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', color: '#04111f' },
+  stakesPageEllipsis: { color: '#94a3b8', fontWeight: 700, padding: '0 4px' },
   stakesTable: { width: '100%', minWidth: '760px', borderCollapse: 'collapse' as const },
   stakesHead: { background: 'rgba(255,255,255,0.05)' },
   stakeTh: { position: 'sticky' as const, top: 0, zIndex: 1, padding: '12px 14px', textAlign: 'left' as const, fontSize: '0.8rem', letterSpacing: '0.02em', textTransform: 'uppercase' as const, color: '#cbd5e1', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,14,24,0.96)' },
@@ -143,8 +144,8 @@ const styles = {
     panel: { borderRadius: '0', padding: '16px 14px', width: '100%', minWidth: 0 },
     stakesTableWrap: { margin: '0 -14px' },
     stakesTable: { minWidth: '680px' },
-    stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
-    stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
+    stakesTableFooter: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const, marginTop: '10px' },
+    stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '8px 12px', fontWeight: 600, cursor: 'pointer' },
     button: { width: '100%' }
   },
 };
