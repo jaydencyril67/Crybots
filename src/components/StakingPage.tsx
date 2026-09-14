@@ -80,7 +80,7 @@ const styles = {
   button: { border: 'none', borderRadius: '16px', padding: '14px 18px', fontWeight: 700, color: '#04111f', background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px' },
   stakesList: { display: 'grid', gap: '12px' },
   stakeCard: { padding: '16px', borderRadius: '18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '8px' },
-  stakeRow: { display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' },
+  stakeRow: { display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   badge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '6px 10px', borderRadius: '999px', background: 'rgba(34,197,94,0.14)', color: '#bbf7d0', fontWeight: 700, fontSize: '0.85rem' },
   helper: { color: '#94a3b8', margin: 0, fontSize: '0.92rem', lineHeight: 1.6 },
   error: { color: '#fca5a5', margin: 0 },
