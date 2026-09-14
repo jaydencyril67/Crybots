@@ -108,7 +108,7 @@ const styles = {
   helper: { color: '#94a3b8', margin: 0, fontSize: '0.9rem', lineHeight: 1.55 },
   error: { color: '#fca5a5', margin: 0 },
   success: { color: '#86efac', margin: 0 },
-  '@media (max-width: 900px)': {
+  '@media (max-width: 1100px)': {
     stakeSection: { gridTemplateColumns: '1fr' },
   },
   '@media (max-width: 640px)': {
@@ -117,7 +117,7 @@ const styles = {
     hero: { padding: '18px' },
     packageGrid: {
       gridTemplateColumns: 'repeat(3, minmax(190px, 72vw))',
-      gap: '14px',
+      gap: '18px',
       overflowX: 'auto' as const,
       overflowY: 'hidden' as const,
       scrollSnapType: 'x mandatory' as const,
