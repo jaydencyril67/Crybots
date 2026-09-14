@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
+import { navigate } from '../utils/navigate';
 
 const signInMethods = [
   { value: 'password', title: 'Password', description: 'Use your account password to sign in.' },
