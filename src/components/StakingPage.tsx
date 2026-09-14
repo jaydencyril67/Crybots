@@ -41,7 +41,7 @@ const styles = {
     color: '#ffffff',
     overflowX: 'hidden' as const,
     overflowY: 'visible' as const,
-    paddingBottom: '24px',
+    paddingBottom: '132px',
   },
   shell: {
     position: 'relative' as const,
@@ -118,8 +118,8 @@ const styles = {
     panel: { width: '100%' },
   },
   '@media (max-width: 640px)': {
-    page: { paddingBottom: '108px' },
-    shell: { padding: '16px 12px 28px', gap: '12px' },
+    page: { paddingBottom: '180px' },
+    shell: { padding: '16px 12px 120px', gap: '12px' },
     hero: { padding: '18px' },
     packageGrid: {
       gridTemplateColumns: 'repeat(3, minmax(240px, 82vw))',
