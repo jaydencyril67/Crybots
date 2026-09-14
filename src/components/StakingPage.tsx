@@ -99,7 +99,9 @@ const styles = {
   selectMenu: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
   selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '12px 14px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
   button: { border: 'none', borderRadius: '999px', padding: '13px 16px', fontWeight: 700, color: '#04111f', background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px' },
-  stakesTableWrap: { overflowX: 'auto' as const, borderRadius: '22px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
+  stakesTableWrap: { overflowX: 'auto' as const, overflowY: 'auto' as const, borderRadius: '22px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' },
+  stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
+  stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
   stakesTable: { width: '100%', minWidth: '760px', borderCollapse: 'collapse' as const },
   stakesHead: { background: 'rgba(255,255,255,0.05)' },
   stakeTh: { position: 'sticky' as const, top: 0, zIndex: 1, padding: '14px 16px', textAlign: 'left' as const, fontSize: '0.84rem', letterSpacing: '0.02em', textTransform: 'uppercase' as const, color: '#cbd5e1', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,14,24,0.96)' },
@@ -138,8 +140,10 @@ const styles = {
     },
     stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '18px 16px', width: '100%', minWidth: 0 },
-    stakesTableWrap: { margin: '0 -16px' },
+    stakesTableWrap: { margin: '0 -16px', maxHeight: '300px' },
     stakesTable: { minWidth: '680px' },
+    stakesTableFooter: { display: 'flex', justifyContent: 'center', marginTop: '10px' },
+    stakesTableToggle: { border: '1px solid rgba(148, 163, 184, 0.2)', background: 'rgba(255,255,255,0.04)', color: '#e2e8f0', borderRadius: '999px', padding: '10px 14px', fontWeight: 600, cursor: 'pointer' },
     button: { width: '100%' },
   },
 };
@@ -155,6 +159,7 @@ const StakingPage = () => {
   const [packagesError, setPackagesError] = useState('');
 
   const [isPackageMenuOpen, setIsPackageMenuOpen] = useState(false);
+  const [isStakeHistoryExpanded, setIsStakeHistoryExpanded] = useState(false);
   const packageMenuRef = useRef<HTMLDivElement | null>(null);
   const selectedPackage = useMemo(() => stakingPackages.find((stakingPackage) => stakingPackage.id === selectedPackageId) || stakingPackages[0], [selectedPackageId]);
 
@@ -313,51 +318,67 @@ const StakingPage = () => {
                 <LoadingDots />
               </div>
             ) : stakes.length ? (
-              <div style={styles.stakesTableWrap}>
-                <table style={styles.stakesTable}>
-                  <thead style={styles.stakesHead}>
-                    <tr>
-                      <th style={styles.stakeTh}>Package</th>
-                      <th style={styles.stakeTh}>Amount</th>
-                      <th style={styles.stakeTh}>Target profit</th>
-                      <th style={styles.stakeTh}>Earned</th>
-                      <th style={styles.stakeTh}>Started</th>
-                      <th style={styles.stakeTh}>Matures</th>
-                      <th style={styles.stakeTh}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stakes.map((stake, index) => (
-                      <tr key={stake.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
-                        <td style={styles.stakeTd}>
-                          <span style={styles.stakeRow}>
-                            <span style={styles.badge}>{stake.packageId}</span>
-                          </span>
-                        </td>
-                        <td style={styles.stakeTd}>{stake.principal.toLocaleString()} USDT</td>
-                        <td style={styles.stakeTd}>{stake.totalProfitTarget.toLocaleString()} USDT</td>
-                        <td style={styles.stakeTd}>{stake.earnedProfit.toLocaleString()} USDT</td>
-                        <td style={styles.stakeTd}>{stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</td>
-                        <td style={styles.stakeTd}>{new Date(stake.maturityDate).toLocaleDateString()}</td>
-                        <td style={styles.stakeTd}>
-                          <span
-                            style={{
-                              ...styles.badge,
-                              ...(stake.status === 'active'
-                                ? styles.statusActive
-                                : stake.status === 'completed'
-                                  ? styles.statusCompleted
-                                  : styles.statusCancelled),
-                            }}
-                          >
-                            {stake.status.toUpperCase()}
-                          </span>
-                        </td>
+              <>
+                <div
+                  style={{
+                    ...styles.stakesTableWrap,
+                    maxHeight: isStakeHistoryExpanded ? 'none' : '300px',
+                  }}
+                >
+                  <table style={styles.stakesTable}>
+                    <thead style={styles.stakesHead}>
+                      <tr>
+                        <th style={styles.stakeTh}>Package</th>
+                        <th style={styles.stakeTh}>Amount</th>
+                        <th style={styles.stakeTh}>Target profit</th>
+                        <th style={styles.stakeTh}>Earned</th>
+                        <th style={styles.stakeTh}>Started</th>
+                        <th style={styles.stakeTh}>Matures</th>
+                        <th style={styles.stakeTh}>Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {stakes.map((stake, index) => (
+                        <tr key={stake.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
+                          <td style={styles.stakeTd}>
+                            <span style={styles.stakeRow}>
+                              <span style={styles.badge}>{stake.packageId}</span>
+                            </span>
+                          </td>
+                          <td style={styles.stakeTd}>{stake.principal.toLocaleString()} USDT</td>
+                          <td style={styles.stakeTd}>{stake.totalProfitTarget.toLocaleString()} USDT</td>
+                          <td style={styles.stakeTd}>{stake.earnedProfit.toLocaleString()} USDT</td>
+                          <td style={styles.stakeTd}>{stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</td>
+                          <td style={styles.stakeTd}>{new Date(stake.maturityDate).toLocaleDateString()}</td>
+                          <td style={styles.stakeTd}>
+                            <span
+                              style={{
+                                ...styles.badge,
+                                ...(stake.status === 'active'
+                                  ? styles.statusActive
+                                  : stake.status === 'completed'
+                                    ? styles.statusCompleted
+                                    : styles.statusCancelled),
+                              }}
+                            >
+                              {stake.status.toUpperCase()}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div style={styles.stakesTableFooter}>
+                  <button
+                    type="button"
+                    style={styles.stakesTableToggle}
+                    onClick={() => setIsStakeHistoryExpanded((current) => !current)}
+                  >
+                    {isStakeHistoryExpanded ? 'Show less' : 'Show more'}
+                  </button>
+                </div>
+              </>
             ) : (
               <div style={styles.panel}>
                 <p style={styles.helper}>No stakes created yet.</p>
