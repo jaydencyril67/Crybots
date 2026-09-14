@@ -9,6 +9,7 @@ import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
+import ProfilePage from './components/ProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppSplashOverlay from './components/AppSplashOverlay';
 
@@ -34,7 +35,8 @@ const isAccountConfirmedRoute = pathname === '/account-confirmed' || hash === '#
 const isSigninRoute = pathname === '/signin' || hash === '#/signin';
 const isForgotPasswordRoute = pathname === '/forgot-password' || hash === '#/forgot-password';
 const isDashboardRoute = pathname === '/dashboard' || hash === '#/dashboard';
-const appContent = isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isForgotPasswordRoute ? <ForgotPasswordPage /> : isDashboardRoute ? <ProtectedRoute><DashboardPage /></ProtectedRoute> : <LandingPage />;
+const isProfileRoute = pathname === '/profile' || hash === '#/profile';
+const appContent = isSignupRoute ? <SignupPage /> : isSignupConfirmationSentRoute ? <SignupConfirmationSentPage /> : isVerifyEmailRoute ? <VerifyEmailPage /> : isAccountConfirmedRoute ? <AccountConfirmedPage /> : isSigninRoute ? <SigninPage /> : isForgotPasswordRoute ? <ForgotPasswordPage /> : isDashboardRoute ? <ProtectedRoute><DashboardPage /></ProtectedRoute> : isProfileRoute ? <ProtectedRoute><ProfilePage /></ProtectedRoute> : <LandingPage />;
 
 root.render(
   <React.StrictMode>
