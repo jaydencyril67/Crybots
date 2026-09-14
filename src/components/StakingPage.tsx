@@ -105,6 +105,10 @@ const styles = {
   stakesSection: { display: 'grid', gap: '14px' },
   stakesHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   helper: { color: '#94a3b8', margin: 0, fontSize: '0.9rem', lineHeight: 1.55 },
+  previewCard: { display: 'grid', gap: '6px', padding: '14px', borderRadius: '18px', background: 'rgba(96,165,250,0.08)', border: '1px solid rgba(96,165,250,0.18)' },
+  previewLabel: { margin: 0, color: '#bfdbfe', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase' as const },
+  previewValue: { margin: 0, color: '#ffffff', fontSize: '1.15rem', fontWeight: 800 },
+  previewSubtext: { margin: 0, color: '#cbd5e1', fontSize: '0.92rem', lineHeight: 1.5 },
   error: { color: '#fca5a5', margin: 0 },
   success: { color: '#86efac', margin: 0 },
   '@media (max-width: 1100px)': {
@@ -271,6 +275,15 @@ const StakingPage = () => {
                   <input value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} inputMode="decimal" placeholder={`Min ${selectedPackage.minAmount} / Max ${selectedPackage.maxAmount}`} />
                 </label>
                 <p style={styles.helper}>{selectedPackage.lockDurationDays} day lock • {selectedPackage.dailyProfitPercent}% daily</p>
+                <div style={styles.previewCard} aria-live="polite">
+                  <p style={styles.previewLabel}>Estimated total at maturity</p>
+                  <p style={styles.previewValue}>{isAmountValid ? `${(selectedAmount + projectedProfit).toLocaleString()} USDT` : '—'}</p>
+                  <p style={styles.previewSubtext}>
+                    {isAmountValid
+                      ? `You’d earn ${projectedProfit.toLocaleString()} USDT in profit over ${selectedPackage.lockDurationDays} days.`
+                      : `Enter an amount between ${selectedPackage.minAmount} and ${selectedPackage.maxAmount} USDT to preview your earnings.`}
+                  </p>
+                </div>
                 {error ? <NotificationBanner tone="error" title="Check your details" message={error} /> : null}
                 {message ? <NotificationBanner tone="success" title="Stake created" message={message} /> : null}
                 <button type="submit" style={styles.button} disabled={isSubmitting}>{isSubmitting ? 'Creating...' : 'Stake now'} <ArrowRight size={16} /></button>
