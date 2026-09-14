@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CircleUserRound, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import api from '../api/axios';
+import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 
@@ -254,28 +256,74 @@ const styles = {
   },
 };
 
+type ProfileDetails = {
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+  name?: string;
+  email?: string;
+  uid?: string;
+  usdtBalance?: number;
+};
+
 const ProfilePage = () => {
   const profile = useMemo(() => {
     try {
       const raw = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
-      return raw ? JSON.parse(raw) as {
-        firstName?: string;
-        lastName?: string;
-        fullName?: string;
-        name?: string;
-        email?: string;
-        uid?: string;
-        usdtBalance?: number;
-      } : null;
+      return raw ? JSON.parse(raw) as ProfileDetails : null;
     } catch {
       return null;
     }
   }, []);
 
+  const [liveBalance, setLiveBalance] = useState<number | null>(() => getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+  const [balanceError, setBalanceError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const unsubscribe = subscribeBalance((balance) => {
+      if (isMounted) {
+        setLiveBalance(balance);
+      }
+    });
+
+    const loadProfile = async () => {
+      try {
+        const liveBalanceResponse = await syncBalanceFromBackend();
+        if (!isMounted) {
+          return;
+        }
+
+        if (typeof liveBalanceResponse === 'number') {
+          setLiveBalance(liveBalanceResponse);
+          setBalanceError(null);
+        }
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setLiveBalance(typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : getCachedBalance());
+        setBalanceError('We could not refresh your live balance right now.');
+      }
+    };
+
+    loadProfile();
+    const intervalId = window.setInterval(() => {
+      void loadProfile();
+    }, 20000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+      unsubscribe();
+    };
+  }, [profile?.usdtBalance]);
+
   const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profile?.email || 'Not available';
   const uid = profile?.uid || 'Pending confirmation';
-  const usdtBalance = typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : 0;
+  const usdtBalance = typeof liveBalance === 'number' ? liveBalance : typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : 0;
 
 
   return (
@@ -300,6 +348,7 @@ const ProfilePage = () => {
               </section>
 
               <section style={{ ...styles.panel, ...styles.content }}>
+                {balanceError ? <div style={{ marginBottom: '12px', color: '#fca5a5', fontSize: '13px', lineHeight: 1.5 }}>{balanceError}</div> : null}
                 <div style={styles.metaRow}>
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><UserRound size={16} /> Display name</span>
