@@ -153,6 +153,7 @@ const styles = {
     '@media (max-width: 600px)': {
       alignItems: 'center',
       textAlign: 'center',
+      padding: '12px 14px',
     },
   },
   metaLabel: {
@@ -163,6 +164,7 @@ const styles = {
     fontSize: '0.92rem',
     '@media (max-width: 600px)': {
       justifyContent: 'center',
+      gap: '8px',
     },
   },
   metaValue: {
