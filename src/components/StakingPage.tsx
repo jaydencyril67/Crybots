@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, Lock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import LoadingDots from './LoadingDots';
+import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 
 type StakingPackage = {
@@ -53,18 +54,7 @@ const styles = {
     display: 'grid',
     gap: '18px',
   },
-  hero: {
-    display: 'grid',
-    gap: '10px',
-    padding: 'clamp(20px, 4vw, 30px)',
-    borderRadius: '32px',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.12)',
-    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-  },
-  heroTitle: { margin: 0, fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', lineHeight: 1.05 },
+
   heroText: { margin: 0, color: '#b7c5da', maxWidth: '58ch', lineHeight: 1.65 },
   metricsRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' },
   metricCard: { padding: '14px', borderRadius: '18px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', gap: '6px' },
@@ -222,10 +212,7 @@ const StakingPage = () => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />
-          <section style={styles.hero}>
-            <span style={styles.packageBadge}><Lock size={16} /> Locked investment</span>
-          </section>
-          {packagesError ? <p style={styles.error}>{packagesError}</p> : null}
+          {packagesError ? <NotificationBanner tone="error" title="Package load issue" message={packagesError} /> : null}
           <section style={styles.packageGrid}>
             {stakingPackages.map((stakingPackage) => (
               <article key={stakingPackage.id} style={styles.packageCard}>
@@ -255,8 +242,8 @@ const StakingPage = () => {
                   <input value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} inputMode="decimal" placeholder={`Min ${selectedPackage.minAmount} / Max ${selectedPackage.maxAmount}`} />
                 </label>
                 <p style={styles.helper}>{selectedPackage.lockDurationDays} day lock • {selectedPackage.dailyProfitPercent}% daily</p>
-                {error ? <p style={styles.error}>{error}</p> : null}
-                {message ? <p style={styles.success}>{message}</p> : null}
+                {error ? <NotificationBanner tone="error" title="Check your details" message={error} /> : null}
+                {message ? <NotificationBanner tone="success" title="Stake created" message={message} /> : null}
                 <button type="submit" style={styles.button} disabled={isSubmitting}>{isSubmitting ? 'Creating...' : 'Stake now'} <ArrowRight size={16} /></button>
               </form>
             </div>
