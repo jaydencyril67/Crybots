@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CircleUserRound, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 
