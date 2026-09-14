@@ -117,7 +117,7 @@ const styles = {
     hero: { padding: '18px' },
     packageGrid: {
       gridTemplateColumns: 'repeat(3, minmax(190px, 72vw))',
-      gap: '14px',
+      gap: '18px',
       overflowX: 'auto' as const,
       overflowY: 'hidden' as const,
       scrollSnapType: 'x mandatory' as const,
