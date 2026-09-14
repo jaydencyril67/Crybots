@@ -1,0 +1,113 @@
+import React from 'react';
+
+const styles = {
+  dock: {
+    position: 'fixed' as const,
+    left: '50%',
+    bottom: '18px',
+    transform: 'translateX(-50%)',
+    zIndex: 40,
+    width: 'min(560px, calc(100vw - 32px))',
+    pointerEvents: 'none' as const,
+  },
+  bar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    padding: '12px 14px',
+    borderRadius: '28px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'linear-gradient(180deg, rgba(20,24,40,0.88), rgba(10,14,24,0.82))',
+    boxShadow: '0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    pointerEvents: 'auto' as const,
+  },
+  rail: {
+    position: 'absolute' as const,
+    inset: '50% 10px auto',
+    height: '1px',
+    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent)',
+    transform: 'translateY(-50%)',
+    pointerEvents: 'none' as const,
+  },
+  slot: {
+    flex: '1 1 0',
+    minWidth: 0,
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  button: {
+    width: '100%',
+    minHeight: '44px',
+    padding: '10px 12px',
+    border: 'none',
+    borderRadius: '18px',
+    background: 'rgba(255,255,255,0.04)',
+    color: '#e5eefc',
+    fontSize: '0.84rem',
+    fontWeight: 600,
+    letterSpacing: '0.01em',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px',
+    transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
+  },
+  buttonEmpty: {
+    opacity: 0.7,
+    border: '1px dashed rgba(255,255,255,0.12)',
+  },
+  orb: {
+    width: '10px',
+    height: '10px',
+    borderRadius: '999px',
+    background: 'linear-gradient(135deg, #7dd3fc, #a78bfa)',
+    boxShadow: '0 0 18px rgba(125, 211, 252, 0.55)',
+    flexShrink: 0,
+  },
+};
+
+type NowBarAction = {
+  label?: string;
+  onClick?: () => void;
+};
+
+type NowBarProps = {
+  actions?: NowBarAction[];
+};
+
+const NowBar = ({ actions = [] }: NowBarProps) => {
+  return (
+    <div style={styles.dock} aria-label="Quick navigation bar">
+      <div style={styles.bar}>
+        <div style={styles.rail} />
+        {Array.from({ length: 4 }).map((_, index) => {
+          const action = actions[index];
+          const isFilled = Boolean(action?.label && action?.onClick);
+
+          return (
+            <div key={`now-bar-slot-${index}`} style={styles.slot}>
+              <button
+                type="button"
+                aria-label={action?.label || `Now bar action ${index + 1}`}
+                onClick={action?.onClick}
+                style={{
+                  ...styles.button,
+                  ...(isFilled ? null : styles.buttonEmpty),
+                }}
+              >
+                <span style={styles.orb} />
+                <span>{action?.label || 'Now'}</span>
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export default NowBar;

@@ -15,6 +15,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import AppHeader from './AppHeader';
+import NowBar from './NowBar';
 
 type MarketCoin = {
   symbol: string;
@@ -39,13 +40,13 @@ const marketCoins: MarketCoin[] = [
   { symbol: 'SOL', name: 'Solana', price: 0, change24h: 0, color: '#22d3ee', id: 'solana' },
   { symbol: 'XRP', name: 'XRP', price: 0, change24h: 0, color: '#60a5fa', id: 'ripple' },
   { symbol: 'ADA', name: 'Cardano', price: 0, change24h: 0, color: '#38bdf8', id: 'cardano' },
-  { symbol: 'DOGE', name: 'Dogecoin', price: 0, change24h: 0, color: '#fde68a', id: 'dogecoin' },
-  { symbol: 'MATIC', name: 'Polygon', price: 0, change24h: 0, color: '#c084fc', id: 'polygon-pos' },
 ];
+
+const marketCoinIds = marketCoins.map((coin) => coin.id).join(',');
 
 const dashboardMetrics = [
   { label: 'Market sentiment', value: 'Bullish momentum', icon: <ChartNoAxesColumnIncreasing size={18} /> },
-  { label: 'Live watchlist', value: '8 tracked assets', icon: <Coins size={18} /> },
+  { label: 'Live watchlist', value: '6 tracked assets', icon: <Coins size={18} /> },
   { label: 'Signal cadence', value: 'Updated every minute', icon: <Activity size={18} /> },
   { label: 'Risk posture', value: 'Balanced and alert', icon: <ShieldCheck size={18} /> },
 ];
@@ -79,6 +80,7 @@ const styles = {
     background: '#050816',
     color: '#ffffff',
     overflow: 'hidden',
+    paddingBottom: '112px',
   },
   shell: {
     position: 'relative' as const,
@@ -489,7 +491,7 @@ const DashboardPage = () => {
 
     const loadLiveCoins = async () => {
       try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,solana,ripple,cardano,dogecoin,polygon-pos&vs_currencies=usd&include_24hr_change=true');
+        const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${marketCoinIds}&vs_currencies=usd&include_24hr_change=true`);
         if (!response.ok) throw new Error('Failed to load live prices');
 
         const data = await response.json() as Record<string, { usd?: number; usd_24h_change?: number }>;
@@ -683,6 +685,7 @@ const DashboardPage = () => {
 
           </div>
         </div>
+        <NowBar />
       </main>
     </>
   );
