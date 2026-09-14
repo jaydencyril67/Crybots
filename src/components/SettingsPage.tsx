@@ -253,6 +253,8 @@ const SettingsPage = () => {
   const twoFactorConfigured = Boolean(twoFactorSecret || twoFactorQrUrl || twoFactorEnabled);
   const twoFactorSetupAvailable = !twoFactorSecret;
   const securityCanSave = Boolean(twoFactorToken.trim());
+  const shouldShowSecurityActions = twoFactorConfigured;
+  const shouldShowSecuritySetup = !twoFactorConfigured;
 
   const handleDeleteTwoFactor = async () => {
     const trimmedToken = twoFactorToken.trim();
@@ -294,7 +296,6 @@ const SettingsPage = () => {
       const { data } = await api.post('/api/two-factor/setup');
       setTwoFactorSecret(data?.secret ?? '');
       setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
-      setTwoFactorBackupCodes(Array.isArray(data?.backupCodes) ? data.backupCodes : []);
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then save your account settings to enable 2FA.');
       setTwoFactorEnabled(true);
       setActiveCard('security');
@@ -557,10 +558,10 @@ const SettingsPage = () => {
                 <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security controls</h2>
                 <p style={styles.cardText}>Turn on extra account security now. You can set up an authenticator app and keep email recovery available as fallback.</p>
                 <div style={styles.formGrid}>
-                  {!twoFactorSetupAvailable ? (
+                  {!twoFactorConfigured ? (
                     <>
                       <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
-                        {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up 2FA'}
+                        {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Setup 2FA'}
                       </button>
                       {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
                       {twoFactorQrUrl ? (
@@ -617,20 +618,6 @@ const SettingsPage = () => {
                       </div>
                     </>
                   )}
-                  {twoFactorQrUrl ? (
-                    <div style={{ ...styles.field, gap: '10px', alignItems: 'center' }}>
-                      <span style={styles.label}>QR code</span>
-                      <img src={twoFactorQrUrl} alt="2FA QR code" style={{ width: '220px', height: '220px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: '#ffffff' }} />
-                      <span style={styles.helper}>Scan this QR code with Google Authenticator, Authy, or another TOTP app.</span>
-                    </div>
-                  ) : null}
-                  {twoFactorSecret ? (
-                    <div style={{ ...styles.field, gap: '10px' }}>
-                      <span style={styles.label}>Authenticator secret</span>
-                      <code style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', wordBreak: 'break-all' }}>{twoFactorSecret}</code>
-                      <span style={styles.helper}>Add this secret manually if you cannot scan the QR code.</span>
-                    </div>
-                  ) : null}
                 </div>
                 {showUidSaveButton ? (
                   <div style={styles.buttonRow}>
