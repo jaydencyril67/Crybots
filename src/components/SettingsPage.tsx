@@ -538,7 +538,7 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
-                {((activeCard === 'uid' && uid.trim().length === 5 && uidAvailable === true && uid !== initialUid) || uidCardSaving) ? (
+                {activeCard === 'uid' && uid.trim().length === 5 && uidAvailable === true && uid !== initialUid ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
                       {uidCardSaving ? 'Saving...' : 'Save UID'}
