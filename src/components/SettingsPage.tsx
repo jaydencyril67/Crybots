@@ -158,6 +158,7 @@ const SettingsPage = () => {
   const [securityCardSaving, setSecurityCardSaving] = useState(false);
   const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'security' | 'uid' | null>(null);
   const [initialUid, setInitialUid] = useState('');
+  const [initialPassword, setInitialPassword] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [walletValidation, setWalletValidation] = useState<WalletValidationState>({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -182,6 +183,7 @@ const SettingsPage = () => {
         setInitialUid(loadedUid);
       setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
+        setInitialPassword('');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
@@ -234,6 +236,7 @@ const SettingsPage = () => {
 
   const passwordValid = useMemo(() => passwordMeetsRule(newPassword), [newPassword]);
   const passwordMismatch = newPassword.length > 0 && confirmPassword.length > 0 && newPassword !== confirmPassword;
+  const passwordCanSave = currentPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0 && passwordValid && !passwordMismatch;
 
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
@@ -478,9 +481,9 @@ const SettingsPage = () => {
                     {passwordMismatch ? <span style={{ ...styles.helper, color: '#fca5a5' }}>Passwords do not match.</span> : null}
                   </label>
                 </div>
-                {activeCard === 'password' || passwordCardSaving ? (
+                {((activeCard === 'password' && passwordCanSave) || passwordCardSaving) ? (
                   <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving || !passwordCanSave}>
                       {passwordCardSaving ? 'Saving...' : 'Save password'}
                     </button>
                   </div>
