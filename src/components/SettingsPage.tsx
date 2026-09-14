@@ -168,7 +168,7 @@ const SettingsPage = () => {
       try {
         const { data } = await api.get<MeResponse>('/api/auth/me');
         const user = data.user;
-        setUid(user?.uid ?? '');
+        setUid((user?.uid ?? '').replace(/\D/g, '').slice(0, 5));
         setWalletAddress(user?.walletAddress ?? '');
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
@@ -184,7 +184,7 @@ const SettingsPage = () => {
   useEffect(() => {
     const trimmedUid = uid.trim();
 
-    if (trimmedUid.length < 3) {
+    if (trimmedUid.length !== 5) {
       setUidAvailable(null);
       return;
     }
@@ -279,8 +279,10 @@ const SettingsPage = () => {
   };
 
   const handleSaveUid = async () => {
-    if (uid.trim().length < 3) {
-      showStatus('error', 'UID must be at least 3 characters long.');
+    const nextUid = uid.replace(/\D/g, '').slice(0, 5);
+
+    if (nextUid.length !== 5) {
+      showStatus('error', 'UID must be exactly 5 digits.');
       return;
     }
 
@@ -292,7 +294,7 @@ const SettingsPage = () => {
     setUidCardSaving(true);
     try {
       await api.patch('/api/settings/account', {
-        uid: uid.trim(),
+        uid: nextUid,
       });
       showStatus('success', 'UID updated successfully.');
       setUidAvailable(null);
@@ -359,8 +361,8 @@ const SettingsPage = () => {
   };
 
   const uidStatus = useMemo(() => {
-    if (uid.trim().length < 3) {
-      return 'UID must be at least 3 characters.';
+    if (uid.replace(/\D/g, '').slice(0, 5).length !== 5) {
+      return 'UID must be exactly 5 digits.';
     }
     if (uidChecking) {
       return 'Checking UID availability...';
@@ -371,7 +373,7 @@ const SettingsPage = () => {
     if (uidAvailable === false) {
       return 'UID is already in use.';
     }
-    return 'Enter a new UID to check availability.';
+    return 'Enter exactly 5 digits to check availability.';
   }, [uid, uidAvailable, uidChecking]);
 
   return (
@@ -483,11 +485,21 @@ const SettingsPage = () => {
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><CheckCircle2 size={18} /> UID settings</h2>
-                <p style={styles.cardText}>Choose a unique account UID. Validation runs live as you type so you can see availability right away.</p>
+                <p style={styles.cardText}>Choose a unique 5-digit account UID. Digits only; validation runs live as you type so you can see availability right away.</p>
                 <div style={styles.formGrid}>
                   <label style={styles.field}>
                     <span style={styles.label}>UID</span>
-                    <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value)} />
+                    <input
+                      style={styles.input}
+                      value={uid}
+                      onChange={(event) => {
+                        setUid(event.target.value.replace(/\D/g, '').slice(0, 5));
+                        setUidAvailable(null);
+                      }}
+                      inputMode="numeric"
+                      maxLength={5}
+                      placeholder="Enter 5 digits"
+                    />
                     <span style={styles.helper}>{uidStatus}</span>
                   </label>
                 </div>
