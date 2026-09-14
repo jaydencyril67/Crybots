@@ -39,8 +39,6 @@ const marketCoins: MarketCoin[] = [
   { symbol: 'SOL', name: 'Solana', price: 0, change24h: 0, color: '#22d3ee', id: 'solana' },
   { symbol: 'XRP', name: 'XRP', price: 0, change24h: 0, color: '#60a5fa', id: 'ripple' },
   { symbol: 'ADA', name: 'Cardano', price: 0, change24h: 0, color: '#38bdf8', id: 'cardano' },
-  { symbol: 'DOGE', name: 'Dogecoin', price: 0, change24h: 0, color: '#fde68a', id: 'dogecoin' },
-  { symbol: 'MATIC', name: 'Polygon', price: 0, change24h: 0, color: '#c084fc', id: 'polygon-pos' },
 ];
 
 const dashboardMetrics = [
