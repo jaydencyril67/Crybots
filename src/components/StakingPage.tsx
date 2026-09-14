@@ -261,6 +261,7 @@ const StakingPage = () => {
       const { data } = await api.post<{ message?: string; balance?: number; stake?: Stake }>('/api/staking', { packageId: selectedPackage.id, amount: selectedAmount });
       if (typeof data.balance === 'number') {
         setCachedBalance(data.balance);
+        window.dispatchEvent(new CustomEvent('kingshall:balance-updated', { detail: data.balance }));
       }
       if (data.stake) {
         const nextStake = data.stake;

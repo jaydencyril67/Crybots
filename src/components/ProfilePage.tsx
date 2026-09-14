@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CircleUserRound, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
+import { navigate } from '../utils/navigate';
 import NowBar from './NowBar';
 
 const styles = {
@@ -115,14 +116,14 @@ const styles = {
 
   name: {
     margin: 0,
-    fontSize: '1.45rem',
+    fontSize: '1.3rem',
     fontWeight: 800,
     letterSpacing: '-0.03em',
   },
   role: {
     margin: 0,
     color: '#93a4c3',
-    fontSize: '0.95rem',
+    fontSize: '0.9rem',
   },
   metaRow: {
     width: '100%',
@@ -143,8 +144,8 @@ const styles = {
     flexDirection: 'column' as const,
     alignItems: 'flex-start' as const,
     justifyContent: 'flex-start' as const,
-    gap: '8px',
-    padding: '14px 16px',
+    gap: '7px',
+    padding: '12px 14px',
     borderRadius: '20px',
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.09)',
@@ -242,6 +243,7 @@ const styles = {
     color: '#dbe7fb',
     lineHeight: 1.5,
   },
+  logoutButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.08)', color: '#ffffff', cursor: 'pointer', flexShrink: 0 },
   helperAction: {
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.06)',
@@ -322,6 +324,14 @@ const ProfilePage = () => {
   const uid = profile?.uid || 'Pending confirmation';
   const usdtBalance = typeof liveBalance === 'number' ? liveBalance : typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : 0;
 
+  const handleLogout = () => {
+    window.localStorage.removeItem('token');
+    window.localStorage.removeItem('user');
+    window.localStorage.removeItem('kingshall_user');
+    window.localStorage.removeItem('firstName');
+    window.localStorage.removeItem('kingshall_first_name');
+    navigate('/');
+  };
 
   return (
     <>
@@ -346,6 +356,11 @@ const ProfilePage = () => {
 
               <section style={{ ...styles.panel, ...styles.content }}>
                 {balanceError ? <div style={{ marginBottom: '12px', color: '#fca5a5', fontSize: '13px', lineHeight: 1.5 }}>{balanceError}</div> : null}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+                  <button type="button" onClick={handleLogout} style={styles.logoutButton} aria-label="Logout">
+                    <LogOut size={16} />
+                  </button>
+                </div>
                 <div style={styles.metaRow}>
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><UserRound size={16} /> Display name</span>
