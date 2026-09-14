@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircleUserRound, Coins, Home, Search, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, Home, UserRound } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const styles = {
