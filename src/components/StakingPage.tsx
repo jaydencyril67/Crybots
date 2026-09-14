@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight } from 'lucide-react';
 import api from '../api/axios';
+import { setCachedBalance } from '../utils/balance';
 import AppHeader from './AppHeader';
 import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
@@ -208,7 +209,10 @@ const StakingPage = () => {
     setMessage('');
 
     try {
-      const { data } = await api.post<{ message?: string; stake?: Stake }>('/api/staking', { packageId: selectedPackage.id, amount: selectedAmount });
+      const { data } = await api.post<{ message?: string; balance?: number; stake?: Stake }>('/api/staking', { packageId: selectedPackage.id, amount: selectedAmount });
+      if (typeof data.balance === 'number') {
+        setCachedBalance(data.balance);
+      }
       if (data.stake) {
         const nextStake = data.stake;
         setStakes((current) => [nextStake, ...current]);
