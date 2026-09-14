@@ -213,6 +213,35 @@ const StakingPage = () => {
   const stakeHistoryCurrentPage = Math.min(stakeHistoryPage, stakeHistoryTotalPages);
   const stakeHistoryStartIndex = (stakeHistoryCurrentPage - 1) * stakeHistoryPageSize;
   const stakeHistoryRows = stakes.slice(stakeHistoryStartIndex, stakeHistoryStartIndex + stakeHistoryPageSize);
+  const stakeHistoryPageItems = useMemo(() => {
+    if (stakeHistoryTotalPages <= 7) {
+      return Array.from({ length: stakeHistoryTotalPages }, (_, index) => index + 1);
+    }
+
+    const visiblePages = new Set<number>([1, stakeHistoryTotalPages, stakeHistoryCurrentPage]);
+    if (stakeHistoryCurrentPage > 1) visiblePages.add(stakeHistoryCurrentPage - 1);
+    if (stakeHistoryCurrentPage < stakeHistoryTotalPages) visiblePages.add(stakeHistoryCurrentPage + 1);
+    if (stakeHistoryCurrentPage <= 3) {
+      visiblePages.add(2);
+      visiblePages.add(3);
+    }
+    if (stakeHistoryCurrentPage >= stakeHistoryTotalPages - 2) {
+      visiblePages.add(stakeHistoryTotalPages - 1);
+      visiblePages.add(stakeHistoryTotalPages - 2);
+    }
+
+    return Array.from(visiblePages)
+      .filter((page) => page >= 1 && page <= stakeHistoryTotalPages)
+      .sort((left, right) => left - right)
+      .flatMap((page, index, pages) => {
+        const nextPage = pages[index + 1];
+        if (nextPage && nextPage - page > 1) {
+          return [page, 'ellipsis' as const, nextPage];
+        }
+        return [page];
+      })
+      .filter((item, index, items) => item !== 'ellipsis' || items[index - 1] !== 'ellipsis');
+  }, [stakeHistoryCurrentPage, stakeHistoryTotalPages]);
 
   const handleCreateStake = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -383,19 +412,26 @@ const StakingPage = () => {
                   >
                     Prev
                   </button>
-                  {Array.from({ length: stakeHistoryTotalPages }, (_, index) => index + 1).map((page) => (
-                    <button
-                      key={page}
-                      type="button"
-                      style={{
-                        ...styles.stakesTableToggle,
-                        ...(page === stakeHistoryCurrentPage ? styles.stakesPageButtonActive : {}),
-                      }}
-                      onClick={() => setStakeHistoryPage(page)}
-                    >
-                      {page}
-                    </button>
-                  ))}
+                  {stakeHistoryPageItems.map((item, index) =>
+                    item === 'ellipsis' ? (
+                      <span key={`ellipsis-${index}`} style={styles.stakesPageEllipsis}>
+                        …
+                      </span>
+                    ) : (
+                      <button
+                        key={item}
+                        type="button"
+                        style={{
+                          ...styles.stakesTableToggle,
+                          minWidth: '42px',
+                          ...(item === stakeHistoryCurrentPage ? styles.stakesPageButtonActive : {}),
+                        }}
+                        onClick={() => setStakeHistoryPage(item)}
+                      >
+                        {item}
+                      </button>
+                    )
+                  )}
                   <button
                     type="button"
                     style={styles.stakesTableToggle}
