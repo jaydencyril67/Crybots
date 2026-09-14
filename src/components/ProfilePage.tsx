@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
@@ -281,9 +282,9 @@ const ProfilePage = () => {
     }
   }, []);
 
-  const [liveBalance, setLiveBalance] = useState<number | null>(() => getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+  const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(profile);
   const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [liveUid, setLiveUid] = useState<string>(() => profile?.uid || 'Pending confirmation');
+  const [balance, setBalance] = useState<number | null>(() => getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
 
   useEffect(() => {
     let isMounted = true;
@@ -303,16 +304,16 @@ const ProfilePage = () => {
           return;
         }
 
-        setLiveBalance(typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
-        setLiveUid((meResponse.data.user?.uid ?? '').trim() || profile?.uid || 'Pending confirmation');
+        setBalance(typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setLiveProfile(meResponse.data.user ?? profile ?? null);
         setBalanceError(null);
       } catch {
         if (!isMounted) {
           return;
         }
 
-        setLiveBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
-        setLiveUid(profile?.uid || 'Pending confirmation');
+        setBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setLiveProfile(profile);
         setBalanceError(null);
       }
     };
@@ -327,12 +328,13 @@ const ProfilePage = () => {
       window.clearInterval(intervalId);
       unsubscribe();
     };
-  }, [profile?.uid, profile?.usdtBalance]);
+  }, [profile]);
 
-  const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
-  const email = profile?.email || 'Not available';
-  const uid = liveUid;
-  const usdtBalance = typeof liveBalance === 'number' ? liveBalance : typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : 0;
+  const profileDetails = liveProfile ?? profile;
+  const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
+  const email = profileDetails?.email || 'Not available';
+  const uid = profileDetails?.uid || 'Pending confirmation';
+  const usdtBalance = typeof balance === 'number' ? balance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : 0;
 
   const handleLogout = () => {
     window.localStorage.removeItem('token');
