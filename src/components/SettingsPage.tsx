@@ -176,10 +176,11 @@ const SettingsPage = () => {
   const [uidChecking, setUidChecking] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [twoFactorSecret, setTwoFactorSecret] = useState('');
-  const [twoFactorBackupCodes, setTwoFactorBackupCodes] = useState<string[]>([]);
   const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
   const [twoFactorSetupLoading, setTwoFactorSetupLoading] = useState(false);
+  const [twoFactorQrUrl, setTwoFactorQrUrl] = useState('');
+  const [twoFactorSecret, setTwoFactorSecret] = useState('');
+  const [twoFactorBackupCodes, setTwoFactorBackupCodes] = useState<string[]>([]);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -252,6 +253,7 @@ const SettingsPage = () => {
     try {
       const { data } = await api.post('/api/two-factor/setup');
       setTwoFactorSecret(data?.secret ?? '');
+      setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
       setTwoFactorBackupCodes(Array.isArray(data?.backupCodes) ? data.backupCodes : []);
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then save your account settings to enable 2FA.');
       setTwoFactorEnabled(true);
@@ -412,11 +414,18 @@ const SettingsPage = () => {
                     {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up authenticator app'}
                   </button>
                   {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
+                  {twoFactorQrUrl ? (
+                    <div style={{ ...styles.field, gap: '10px', alignItems: 'center' }}>
+                      <span style={styles.label}>QR code</span>
+                      <img src={twoFactorQrUrl} alt="2FA QR code" style={{ width: '220px', height: '220px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: '#ffffff' }} />
+                      <span style={styles.helper}>Scan this QR code with Google Authenticator, Authy, or another TOTP app.</span>
+                    </div>
+                  ) : null}
                   {twoFactorSecret ? (
                     <div style={{ ...styles.field, gap: '10px' }}>
                       <span style={styles.label}>Authenticator secret</span>
                       <code style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', wordBreak: 'break-all' }}>{twoFactorSecret}</code>
-                      <span style={styles.helper}>Add this secret to your authenticator app if you cannot scan the QR code.</span>
+                      <span style={styles.helper}>Add this secret manually if you cannot scan the QR code.</span>
                     </div>
                   ) : null}
                   {twoFactorBackupCodes.length > 0 ? (
