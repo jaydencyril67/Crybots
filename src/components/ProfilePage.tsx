@@ -9,10 +9,10 @@ const styles = {
     minHeight: '100vh',
     background: '#050816',
     color: '#ffffff',
-    overflowX: 'hidden',
-    overflowY: 'auto',
+    overflowX: 'hidden' as const,
+    overflowY: 'auto' as const,
     paddingBottom: '132px',
-  },
+  } as const,
   shell: {
     position: 'relative' as const,
     width: '100%',
