@@ -56,10 +56,12 @@ const AppSplashOverlay = () => {
     setActive(shouldShowSplash);
 
     if (!shouldShowSplash) {
+      document.body.style.visibility = 'visible';
       setReady(true);
       return;
     }
 
+    document.body.style.visibility = 'visible';
     const revealDelay = 3000;
     const timer = window.setTimeout(() => setReady(true), revealDelay);
 
