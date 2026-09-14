@@ -98,7 +98,7 @@ const styles = {
   packageTitle: { margin: 0, fontSize: '1.2rem' },
   packageText: { margin: 0, color: '#cbd5e1', lineHeight: 1.55, textAlign: 'center' as const },
   packageList: { margin: 0, paddingLeft: '18px', color: '#cbd5e1', display: 'grid', gap: '6px' },
-  stakeSection: { display: 'grid', gap: '14px', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' },
+  stakeSection: { display: 'grid', gap: '14px', gridTemplateColumns: '1fr' },
   panel: { padding: 'clamp(20px, 4vw, 30px)', borderRadius: '32px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)' },
   form: { display: 'grid', gap: '12px', width: '100%' },
   field: { display: 'grid', gap: '8px', width: '100%' },
@@ -116,7 +116,7 @@ const styles = {
   error: { color: '#fca5a5', margin: 0 },
   success: { color: '#86efac', margin: 0 },
   '@media (max-width: 1100px)': {
-    stakeSection: { gridTemplateColumns: '1fr', width: '100%' },
+    stakeSection: { width: '100%' },
     panel: { width: '100%' },
   },
   '@media (max-width: 640px)': {
@@ -133,7 +133,7 @@ const styles = {
       scrollPaddingRight: '4px',
       scrollSnapType: 'x mandatory' as const,
     },
-    stakeSection: { gridTemplateColumns: '1fr', width: '100%' },
+    stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '18px 16px', width: '100%', minWidth: 0 },
     button: { width: '100%' },
   },
