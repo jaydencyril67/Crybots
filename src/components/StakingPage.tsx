@@ -224,7 +224,6 @@ const StakingPage = () => {
           <AppHeader />
           <section style={styles.hero}>
             <span style={styles.packageBadge}><Lock size={16} /> Locked investment</span>
-            <h1 style={styles.heroTitle}>Staking</h1>
           </section>
           {packagesError ? <p style={styles.error}>{packagesError}</p> : null}
           <section style={styles.packageGrid}>
