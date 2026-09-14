@@ -199,7 +199,7 @@ const SettingsPage = () => {
         setWalletAddress(user?.walletAddress ?? '');
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
-        setTwoFactorBackupCodes(Array.isArray(user?.twoFactorBackupCodes) ? user.twoFactorBackupCodes : []);
+        setTwoFactorBackupCodes(Array.isArray(user?.twoFactorBackupCodes) ? (user?.twoFactorBackupCodes ?? []) : []);
       } catch {
         navigate('/signin');
       }
