@@ -176,7 +176,7 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
 
   const uidReadyToSave = Boolean(uidEditorActive && uid.trim().length === 5 && uidAvailable !== false);
-  const showUidSaveButton = activeCard === 'uid' && (uidReadyToSave || uidCardSaving);
+  const showUidSaveButton = uidReadyToSave || uidCardSaving;
 
   useEffect(() => {
     const loadAccount = async () => {
@@ -253,7 +253,33 @@ const SettingsPage = () => {
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
-  const securityCanSave = twoFactorSetupLoading || Boolean(twoFactorToken.trim() || twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0 || twoFactorEnabled);
+  const twoFactorConfigured = Boolean(twoFactorSecret || twoFactorQrUrl || twoFactorBackupCodes.length > 0 || twoFactorEnabled);
+  const securityCanSave = Boolean(twoFactorToken.trim());
+
+  const handleDeleteTwoFactor = async () => {
+    const trimmedToken = twoFactorToken.trim();
+
+    if (!trimmedToken) {
+      showStatus('error', 'Enter the 2FA code from your authenticator app.');
+      return;
+    }
+
+    setSecurityCardSaving(true);
+    try {
+      const deleteResponse = await api.post('/api/two-factor/delete', { token: trimmedToken });
+      showStatus('success', deleteResponse.data?.message || '2FA deleted successfully.');
+      setTwoFactorEnabled(false);
+      setTwoFactorSecret('');
+      setTwoFactorBackupCodes([]);
+      setTwoFactorQrUrl('');
+      setTwoFactorToken('');
+      setActiveCard(null);
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to delete 2FA.');
+    } finally {
+      setSecurityCardSaving(false);
+    }
+  };
 
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
@@ -387,9 +413,21 @@ const SettingsPage = () => {
 
     setSecurityCardSaving(true);
     try {
-      if (twoFactorEnabled) {
+      if (!twoFactorConfigured) {
+        const enableResponse = await api.post('/api/two-factor/enable', {
+          token: trimmedToken,
+          backupCode: twoFactorBackupCodes[0],
+        });
+        if (enableResponse.data?.message) {
+          showStatus('success', enableResponse.data.message);
+        } else {
+          showStatus('success', '2FA enabled successfully.');
+        }
+        setTwoFactorEnabled(true);
+      } else if (twoFactorEnabled) {
         const disableResponse = await api.post('/api/two-factor/disable', { token: trimmedToken });
         showStatus('success', disableResponse.data?.message || '2FA disabled successfully.');
+        setTwoFactorEnabled(false);
       } else {
         const enableResponse = await api.post('/api/two-factor/enable', {
           token: trimmedToken,
@@ -400,6 +438,7 @@ const SettingsPage = () => {
         } else {
           showStatus('success', '2FA enabled successfully.');
         }
+        setTwoFactorEnabled(true);
       }
       setTwoFactorToken('');
       setActiveCard(null);
@@ -523,39 +562,77 @@ const SettingsPage = () => {
                 <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security controls</h2>
                 <p style={styles.cardText}>Turn on extra account security now. You can set up an authenticator app and keep email recovery available as fallback.</p>
                 <div style={styles.formGrid}>
-                  <label style={{ ...styles.field, alignItems: 'start' }}>
-                    <span style={styles.label}>2FA protection</span>
-                    <input type="checkbox" checked={twoFactorEnabled} onChange={(event) => { setTwoFactorEnabled(event.target.checked); setActiveCard('security'); }} onFocus={() => setActiveCard('security')} />
-                    <span style={styles.helper}>{twoFactorEnabled ? '2FA is enabled. Enter a current authenticator code below to disable it.' : 'Enable to require an additional verification step on future sign-ins.'}</span>
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>2FA code</span>
-                    <input
-                      style={styles.input}
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      value={twoFactorToken}
-                      onChange={(event) => {
-                        setTwoFactorToken(event.target.value.replace(/\D/g, '').slice(0, 8));
-                        setActiveCard('security');
-                      }}
-                      onFocus={() => setActiveCard('security')}
-                      placeholder={twoFactorEnabled ? 'Enter current 2FA code to disable' : 'Enter your 6-digit code'}
-                    />
-                    <span style={styles.helper}>Use the current code from your authenticator app.</span>
-                  </label>
-                  {activeCard === 'security' && (securityCanSave || securityCardSaving) ? (
-                    <div style={styles.buttonRow}>
-                      <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
-                        {securityCardSaving ? 'Saving...' : (twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA')}
+                  {!twoFactorConfigured ? (
+                    <>
+                      <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
+                        {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up 2FA'}
                       </button>
-                    </div>
-                  ) : null}
-                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
-                    {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up authenticator app'}
-                  </button>
-                  {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
+                      {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
+                      {twoFactorQrUrl ? (
+                        <div style={{ ...styles.field, gap: '10px', alignItems: 'center' }}>
+                          <span style={styles.label}>QR code</span>
+                          <img src={twoFactorQrUrl} alt="2FA QR code" style={{ width: '220px', height: '220px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.1)', background: '#ffffff' }} />
+                          <span style={styles.helper}>Scan this QR code with Google Authenticator, Authy, or another TOTP app.</span>
+                        </div>
+                      ) : null}
+                      {twoFactorSecret ? (
+                        <div style={{ ...styles.field, gap: '10px' }}>
+                          <span style={styles.label}>Authenticator secret</span>
+                          <code style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', wordBreak: 'break-all' }}>{twoFactorSecret}</code>
+                          <span style={styles.helper}>Add this secret manually if you cannot scan the QR code.</span>
+                        </div>
+                      ) : null}
+                      {twoFactorBackupCodes.length > 0 ? (
+                        <div style={{ ...styles.field, gap: '10px' }}>
+                          <span style={styles.label}>Backup codes</span>
+                          <div style={{ display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
+                            {twoFactorBackupCodes.map((code) => (
+                              <code key={code} style={{ ...styles.input, display: 'block', paddingTop: '12px', minHeight: 'auto', textAlign: 'center' }}>{code}</code>
+                            ))}
+                          </div>
+                          <span style={styles.helper}>Store these codes safely. They are fallback access if you lose your authenticator app.</span>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <label style={styles.field}>
+                        <span style={styles.label}>2FA status</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ ...styles.helper, color: twoFactorEnabled ? '#86efac' : '#fbbf24' }}>
+                            {twoFactorEnabled ? '2FA is active' : '2FA is set up but currently disabled'}
+                          </span>
+                          <CheckCircle2 size={16} color={twoFactorEnabled ? '#86efac' : '#fbbf24'} />
+                        </div>
+                        <span style={styles.helper}>Enter your current authenticator code to toggle 2FA or delete it entirely.</span>
+                      </label>
+                      <label style={styles.field}>
+                        <span style={styles.label}>2FA code</span>
+                        <input
+                          style={styles.input}
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          value={twoFactorToken}
+                          onChange={(event) => {
+                            setTwoFactorToken(event.target.value.replace(/\D/g, '').slice(0, 8));
+                            setActiveCard('security');
+                          }}
+                          onFocus={() => setActiveCard('security')}
+                          placeholder="Enter current 2FA code"
+                        />
+                        <span style={styles.helper}>Use the current code from your authenticator app.</span>
+                      </label>
+                      <div style={styles.buttonRow}>
+                        <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
+                          {securityCardSaving ? 'Saving...' : (twoFactorEnabled ? 'Turn 2FA off' : 'Turn 2FA on')}
+                        </button>
+                        <button style={{ ...styles.button, ...styles.dangerButton }} type="button" onClick={() => { setActiveCard('security'); void handleDeleteTwoFactor(); }} disabled={securityCardSaving || !twoFactorToken.trim()}>
+                          Delete 2FA
+                        </button>
+                      </div>
+                    </>
+                  )}
                   {twoFactorQrUrl ? (
                     <div style={{ ...styles.field, gap: '10px', alignItems: 'center' }}>
                       <span style={styles.label}>QR code</span>
@@ -586,13 +663,6 @@ const SettingsPage = () => {
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
                       {uidCardSaving ? 'Saving...' : 'Save UID'}
-                    </button>
-                  </div>
-                ) : null}
-                {activeCard === 'security' && (securityCanSave || securityCardSaving) ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
-                      {securityCardSaving ? 'Saving...' : (twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA')}
                     </button>
                   </div>
                 ) : null}
