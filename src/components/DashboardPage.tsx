@@ -107,11 +107,11 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: '16px',
+    gap: '12px',
     flexWrap: 'wrap' as const,
     position: 'relative' as const,
     zIndex: 1,
-    marginBottom: '24px',
+    marginBottom: '18px',
   },
   brandBlock: {
     minWidth: 0,
@@ -154,7 +154,7 @@ const styles = {
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.05)',
-    padding: 'clamp(22px, 4vw, 30px)',
+    padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
   },
@@ -168,7 +168,7 @@ const styles = {
   },
   title: {
     margin: '12px 0 0',
-    fontSize: 'clamp(1.9rem, 3.4vw, 3.2rem)',
+    fontSize: 'clamp(1.65rem, 2.9vw, 2.6rem)',
     lineHeight: 1.06,
     letterSpacing: '-0.04em',
   },
@@ -189,8 +189,8 @@ const styles = {
   metricRow: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: '14px',
-    marginTop: '24px',
+    gap: '12px',
+    marginTop: '18px',
   },
   metricCard: {
     borderRadius: '22px',
@@ -208,7 +208,7 @@ const styles = {
   },
   metricValue: {
     margin: '8px 0 0',
-    fontSize: 'clamp(1.2rem, 2vw, 1.7rem)',
+    fontSize: 'clamp(1.08rem, 1.8vw, 1.45rem)',
     fontWeight: 800,
   },
   panel: {
@@ -221,7 +221,7 @@ const styles = {
   },
   panelTitle: {
     margin: 0,
-    fontSize: '20px',
+    fontSize: '18px',
     letterSpacing: '-0.02em',
   },
   panelSub: {
@@ -259,7 +259,7 @@ const styles = {
     gridTemplateColumns: 'auto 1fr auto',
     alignItems: 'center',
     gap: '14px',
-    padding: '14px 16px',
+    padding: '12px 14px',
     borderRadius: '20px',
     border: '1px solid rgba(255,255,255,0.1)',
     background: 'rgba(9,14,28,0.72)',
@@ -304,7 +304,7 @@ const styles = {
     borderRadius: '22px',
     border: '1px solid rgba(255,255,255,0.1)',
     background: 'rgba(8,12,24,0.74)',
-    padding: '18px',
+    padding: '16px',
     display: 'grid',
     gap: '12px',
   },
@@ -559,10 +559,10 @@ const DashboardPage = () => {
           <div style={styles.heroGrid}>
             <section style={styles.heroCard}>
               <p style={styles.greeting}>{greeting}</p>
-              <h1 style={styles.title}>
+              <h2 style={styles.title}>
                 Welcome back,
                 <span style={styles.titleAccent}> {isAuthNameLoaded && firstName ? firstName : 'Trader'}</span>
-              </h1>
+              </h2>
               <p style={styles.lead}>
                 This is your market home base — live prices, market context, and a fresh hourly insight to help you stay sharp without showing personal account details.
               </p>

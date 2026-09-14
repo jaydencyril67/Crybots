@@ -83,7 +83,7 @@ const AccountConfirmedPage = () => {
           <div style={styles.iconWrap}>
             <CheckCircle2 size={30} />
           </div>
-          <h1 style={styles.title}>Account confirmed</h1>
+          <h2 style={styles.title}>Account confirmed</h2>
           <p style={styles.text}>Your email has been verified successfully. You can now sign in to your account.</p>
           <p style={styles.countdown}>Redirecting to sign in in {secondsLeft} seconds...</p>
         </section>

@@ -144,7 +144,7 @@ const VerifyEmailPage = () => {
         <div style={styles.backdrop} />
         <section style={styles.card}>
           <div style={{ ...styles.iconWrap, background: iconBackground, color: iconColor }}>{icon}</div>
-          <h1 style={styles.title}>{status === 'success' ? 'Account confirmed' : status === 'error' ? 'Verification failed' : 'Verifying account'}</h1>
+          <h2 style={styles.title}>{status === 'success' ? 'Account confirmed' : status === 'error' ? 'Verification failed' : 'Verifying account'}</h2>
           <p style={styles.text}>{message}</p>
           {status === 'loading' ? (
             <div style={{ marginTop: '18px', color: 'rgba(255,255,255,0.7)' }}>

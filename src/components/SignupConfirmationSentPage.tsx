@@ -83,7 +83,7 @@ const SignupConfirmationSentPage = () => {
           <div style={styles.iconWrap}>
             <CheckCircle2 size={30} />
           </div>
-          <h1 style={styles.title}>Account created</h1>
+          <h2 style={styles.title}>Account created</h2>
           <p style={styles.text}>
             We sent a confirmation link to your email. Open it within 15 minutes to verify your account before signing in.
           </p>
