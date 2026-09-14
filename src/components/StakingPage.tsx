@@ -114,12 +114,12 @@ const styles = {
   error: { color: '#fca5a5', margin: 0 },
   success: { color: '#86efac', margin: 0 },
   '@media (max-width: 1100px)': {
-    stakeSection: { gridTemplateColumns: '1fr' },
+    stakeSection: { gridTemplateColumns: '1fr', width: '100%' },
     panel: { width: '100%' },
   },
   '@media (max-width: 640px)': {
     page: { paddingBottom: '180px' },
-    shell: { padding: '16px 12px 120px', gap: '12px' },
+    shell: { padding: '16px 8px 120px', gap: '12px' },
     hero: { padding: '18px' },
     packageGrid: {
       gridTemplateColumns: 'repeat(3, minmax(240px, 82vw))',
@@ -132,7 +132,7 @@ const styles = {
       scrollSnapType: 'x mandatory' as const,
     },
     stakeSection: { gridTemplateColumns: '1fr' },
-    panel: { borderRadius: '28px', padding: '18px', width: '100%' },
+    panel: { borderRadius: '28px', padding: '18px', width: '100%', minWidth: 0 },
     button: { width: '100%' },
   },
 };
