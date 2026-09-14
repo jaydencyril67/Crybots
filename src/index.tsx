@@ -11,6 +11,7 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProfilePage from './components/ProfilePage';
 import StakingPage from './components/StakingPage';
+import SettingsPage from './components/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppSplashOverlay from './components/AppSplashOverlay';
@@ -43,6 +44,7 @@ const getRouteKey = () => {
   if (pathname === '/dashboard' || hash === '#/dashboard') return 'dashboard';
   if (pathname === '/profile' || hash === '#/profile') return 'profile';
   if (pathname === '/staking' || hash === '#/staking') return 'staking';
+  if (pathname === '/settings' || hash === '#/settings') return 'settings';
   return 'landing';
 };
 
@@ -56,6 +58,7 @@ const routeToKey = (path: string) => {
   if (path === '/dashboard' || path === '#/dashboard') return 'dashboard';
   if (path === '/profile' || path === '#/profile') return 'profile';
   if (path === '/staking' || path === '#/staking') return 'staking';
+  if (path === '/settings' || path === '#/settings') return 'settings';
   return 'landing';
 };
 
@@ -105,11 +108,12 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'dashboard') return <ProtectedRoute><DashboardPage /></ProtectedRoute>;
     if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
     if (displayedRouteKey === 'staking') return <ProtectedRoute><StakingPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'settings') return <ProtectedRoute><SettingsPage /></ProtectedRoute>;
 
     return <LandingPage />;
   }, [displayedRouteKey]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking';
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings';
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
