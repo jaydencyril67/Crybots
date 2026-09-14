@@ -243,6 +243,7 @@ const styles = {
     color: '#dbe7fb',
     lineHeight: 1.5,
   },
+  logoutButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.08)', color: '#ffffff', cursor: 'pointer', flexShrink: 0 },
   helperAction: {
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.06)',
