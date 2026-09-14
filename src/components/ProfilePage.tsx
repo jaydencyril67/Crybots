@@ -267,6 +267,10 @@ type ProfileDetails = {
   usdtBalance?: number;
 };
 
+type MeResponse = {
+  user?: ProfileDetails;
+};
+
 const ProfilePage = () => {
   const profile = useMemo(() => {
     try {
@@ -279,6 +283,7 @@ const ProfilePage = () => {
 
   const [liveBalance, setLiveBalance] = useState<number | null>(() => getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
   const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [liveUid, setLiveUid] = useState<string>(() => profile?.uid || 'Pending confirmation');
 
   useEffect(() => {
     let isMounted = true;
@@ -290,12 +295,16 @@ const ProfilePage = () => {
 
     const loadProfile = async () => {
       try {
-        const liveBalance = await syncBalanceFromBackend();
+        const [liveBalance, meResponse] = await Promise.all([
+          syncBalanceFromBackend(),
+          api.get<MeResponse>('/api/auth/me'),
+        ]);
         if (!isMounted) {
           return;
         }
 
         setLiveBalance(typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setLiveUid((meResponse.data.user?.uid ?? '').trim() || profile?.uid || 'Pending confirmation');
         setBalanceError(null);
       } catch {
         if (!isMounted) {
@@ -303,6 +312,7 @@ const ProfilePage = () => {
         }
 
         setLiveBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setLiveUid(profile?.uid || 'Pending confirmation');
         setBalanceError(null);
       }
     };
@@ -317,11 +327,11 @@ const ProfilePage = () => {
       window.clearInterval(intervalId);
       unsubscribe();
     };
-  }, [profile?.usdtBalance]);
+  }, [profile?.uid, profile?.usdtBalance]);
 
   const fullName = profile?.fullName || profile?.name || [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profile?.email || 'Not available';
-  const uid = profile?.uid || 'Pending confirmation';
+  const uid = liveUid;
   const usdtBalance = typeof liveBalance === 'number' ? liveBalance : typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : 0;
 
   const handleLogout = () => {
