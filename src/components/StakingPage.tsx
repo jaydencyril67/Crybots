@@ -24,6 +24,7 @@ type Stake = {
   earnedProfit: number;
   status: 'active' | 'completed' | 'cancelled';
   maturityDate: string;
+  startedAt?: string;
   completedAt?: string;
 };
 
@@ -274,6 +275,7 @@ const StakingPage = () => {
                   <p style={styles.packageText}>Amount: {stake.principal.toLocaleString()} USDT</p>
                   <p style={styles.packageText}>Target profit: {stake.totalProfitTarget.toLocaleString()} USDT</p>
                   <p style={styles.packageText}>Earned: {stake.earnedProfit.toLocaleString()} USDT</p>
+                  <p style={styles.packageText}>Started: {stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</p>
                   <p style={styles.packageText}>Matures: {new Date(stake.maturityDate).toLocaleDateString()}</p>
                 </article>
               ))
