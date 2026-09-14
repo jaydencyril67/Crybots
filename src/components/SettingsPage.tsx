@@ -153,7 +153,6 @@ const SettingsPage = () => {
   const [uid, setUid] = useState('');
   const [uidAvailable, setUidAvailable] = useState<boolean | null>(null);
   const [uidEditorActive, setUidEditorActive] = useState(false as boolean);
-  const uidReadyToSave = activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false && uid !== initialUid;
   const [uidChecking, setUidChecking] = useState(false);
   const [uidCardSaving, setUidCardSaving] = useState(false);
   const [passwordCardSaving, setPasswordCardSaving] = useState(false);
@@ -174,6 +173,8 @@ const SettingsPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
+
+  const uidReadyToSave = activeCard === 'uid' && uidEditorActive && uid.trim().length === 5 && uidAvailable !== false && uid !== initialUid;
 
   useEffect(() => {
     const loadAccount = async () => {
