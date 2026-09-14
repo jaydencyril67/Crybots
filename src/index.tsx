@@ -68,13 +68,8 @@ const RouteTransition = () => {
       return;
     }
 
-    setIsExiting(true);
-    const timer = window.setTimeout(() => {
-      setDisplayedRouteKey(routeKey);
-      setIsExiting(false);
-    }, 180);
-
-    return () => window.clearTimeout(timer);
+    setDisplayedRouteKey(routeKey);
+    setIsExiting(false);
   }, [displayedRouteKey, routeKey]);
 
   const appContent = useMemo(() => {
@@ -99,11 +94,8 @@ const RouteTransition = () => {
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
       <div
         style={{
-          transform: isExiting ? 'translateX(-10%) scale(0.985)' : 'translateX(0) scale(1)',
-          opacity: isExiting ? 0 : 1,
-          filter: isExiting ? 'blur(1px)' : 'blur(0)',
-          transition: 'transform 180ms ease, opacity 180ms ease, filter 180ms ease',
-          willChange: 'transform, opacity, filter',
+          transform: 'translateX(0)',
+          transition: 'transform 120ms ease',
           minHeight: '100vh',
         }}
       >
