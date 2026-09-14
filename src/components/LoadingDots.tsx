@@ -15,16 +15,20 @@ const styles = {
     height: '8px',
     borderRadius: '999px',
     background: '#7dd3fc',
-    animation: 'loading-dots 1s infinite ease-in-out',
+    opacity: 0.35,
+    animation: 'loading-dots 1.2s infinite steps(1, end)',
+  },
+  activeDot: {
+    opacity: 1,
   },
 } as const;
 
 const LoadingDots = () => {
   return (
     <div style={styles.wrap} aria-hidden="true">
-      <span style={{ ...styles.dot, animationDelay: '0ms' }} />
-      <span style={{ ...styles.dot, animationDelay: '150ms' }} />
-      <span style={{ ...styles.dot, animationDelay: '300ms' }} />
+      <span style={{ ...styles.dot, ...styles.activeDot }} />
+      <span style={styles.dot} />
+      <span style={styles.dot} />
     </div>
   );
 };
