@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { AlertCircle, CheckCircle2, LockKeyhole, ShieldCheck, Trash2, WalletCards } from 'lucide-react';
+import { CheckCircle2, LockKeyhole, ShieldCheck, Trash2, WalletCards } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
+import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
@@ -130,17 +131,6 @@ const styles = {
     background: 'linear-gradient(135deg, #ef4444, #b91c1c)',
     border: 'none',
   },
-  status: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    borderRadius: '16px',
-    padding: '12px 14px',
-    fontSize: '0.92rem',
-  },
-  success: { background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.24)' },
-  error: { background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.24)' },
-  neutral: { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' },
 };
 
 const passwordMeetsRule = (value: string) => {
@@ -156,6 +146,11 @@ const SettingsPage = () => {
   const [uid, setUid] = useState('');
   const [uidAvailable, setUidAvailable] = useState<boolean | null>(null);
   const [uidChecking, setUidChecking] = useState(false);
+  const [uidCardSaving, setUidCardSaving] = useState(false);
+  const [passwordCardSaving, setPasswordCardSaving] = useState(false);
+  const [walletCardSaving, setWalletCardSaving] = useState(false);
+  const [securityCardSaving, setSecurityCardSaving] = useState(false);
+  const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'security' | 'uid' | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
@@ -167,7 +162,6 @@ const SettingsPage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
-  const [saving, setSaving] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
 
   useEffect(() => {
@@ -175,7 +169,8 @@ const SettingsPage = () => {
       try {
         const { data } = await api.get<MeResponse>('/api/auth/me');
         const user = data.user;
-        setUid(user?.uid ?? '');
+        setUid((user?.uid ?? '').replace(/\D/g, '').slice(0, 5));
+      setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
@@ -191,7 +186,7 @@ const SettingsPage = () => {
   useEffect(() => {
     const trimmedUid = uid.trim();
 
-    if (trimmedUid.length < 3) {
+    if (trimmedUid.length !== 5) {
       setUidAvailable(null);
       return;
     }
@@ -228,6 +223,10 @@ const SettingsPage = () => {
     setStatus({ kind, message });
   };
 
+  const clearActiveIfMatches = (card: typeof activeCard) => {
+    setActiveCard((current) => (current === card ? null : current));
+  };
+
   const handleSetupTwoFactor = async () => {
     setTwoFactorSetupMessage('');
     setTwoFactorSetupLoading(true);
@@ -239,6 +238,7 @@ const SettingsPage = () => {
       setTwoFactorBackupCodes(Array.isArray(data?.backupCodes) ? data.backupCodes : []);
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then save your account settings to enable 2FA.');
       setTwoFactorEnabled(true);
+      setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to create 2FA setup right now.');
@@ -247,26 +247,50 @@ const SettingsPage = () => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSavePassword = async () => {
     if (!currentPassword) {
-      showStatus('error', 'Enter your current password to save settings.');
+      showStatus('error', 'Enter your current password to update your password.');
       return;
     }
 
-    if (newPassword && !passwordValid) {
+    if (!newPassword || !confirmPassword) {
+      showStatus('error', 'Enter and confirm your new password.');
+      return;
+    }
+
+    if (!passwordValid) {
       showStatus('error', passwordRuleMessage);
       return;
     }
 
-    if (newPassword || confirmPassword) {
-      if (!newPassword || !confirmPassword || newPassword !== confirmPassword) {
-        showStatus('error', 'New password and confirmation must match.');
-        return;
-      }
+    if (newPassword !== confirmPassword) {
+      showStatus('error', 'New password and confirmation must match.');
+      return;
     }
 
-    if (uid.trim().length < 3) {
-      showStatus('error', 'UID must be at least 3 characters long.');
+    setPasswordCardSaving(true);
+    try {
+      await api.patch('/api/settings/account', {
+        currentPassword,
+        newPassword,
+      });
+      showStatus('success', 'Password updated successfully.');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setActiveCard(null);
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to update your password.');
+    } finally {
+      setPasswordCardSaving(false);
+    }
+  };
+
+  const handleSaveUid = async () => {
+    const nextUid = uid.replace(/\D/g, '').slice(0, 5);
+
+    if (nextUid.length !== 5) {
+      showStatus('error', 'UID must be exactly 5 digits.');
       return;
     }
 
@@ -275,31 +299,55 @@ const SettingsPage = () => {
       return;
     }
 
-    setSaving(true);
+    setUidCardSaving(true);
     try {
       await api.patch('/api/settings/account', {
-        uid: uid.trim(),
-        walletAddress: walletAddress.trim(),
-        twoFactorEnabled,
-        currentPassword,
-        newPassword: newPassword.trim() ? newPassword : undefined,
+        uid: nextUid,
       });
+      showStatus('success', 'UID updated successfully.');
+      setUidAvailable(null);
+      setActiveCard(null);
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to update your UID.');
+    } finally {
+      setUidCardSaving(false);
+    }
+  };
+
+  const handleSaveWallet = async () => {
+    setWalletCardSaving(true);
+    try {
+      await api.patch('/api/settings/account', {
+        walletAddress: walletAddress.trim(),
+      });
+      showStatus('success', 'Wallet address saved successfully.');
+      setActiveCard(null);
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to save wallet address.');
+    } finally {
+      setWalletCardSaving(false);
+    }
+  };
+
+  const handleSaveSecurity = async () => {
+    setSecurityCardSaving(true);
+    try {
       if (twoFactorEnabled && twoFactorSecret) {
         const enableResponse = await api.post('/api/two-factor/enable', { token: '', backupCode: twoFactorBackupCodes[0] });
         if (enableResponse.data?.message) {
           showStatus('success', enableResponse.data.message);
+        } else {
+          showStatus('success', '2FA enabled successfully.');
         }
-      } else if (!twoFactorEnabled) {
+      } else {
         await api.post('/api/two-factor/disable');
+        showStatus('success', '2FA disabled successfully.');
       }
-      showStatus('success', 'Settings updated successfully.');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      setActiveCard(null);
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to save settings.');
+      showStatus('error', error?.response?.data?.message || 'Unable to update security settings.');
     } finally {
-      setSaving(false);
+      setSecurityCardSaving(false);
     }
   };
 
@@ -324,8 +372,8 @@ const SettingsPage = () => {
   };
 
   const uidStatus = useMemo(() => {
-    if (uid.trim().length < 3) {
-      return 'UID must be at least 3 characters.';
+    if (uid.replace(/\D/g, '').slice(0, 5).length !== 5) {
+      return 'UID must be exactly 5 digits.';
     }
     if (uidChecking) {
       return 'Checking UID availability...';
@@ -336,7 +384,7 @@ const SettingsPage = () => {
     if (uidAvailable === false) {
       return 'UID is already in use.';
     }
-    return 'Enter a new UID to check availability.';
+    return 'Enter exactly 5 digits to check availability.';
   }, [uid, uidAvailable, uidChecking]);
 
   return (
@@ -349,10 +397,11 @@ const SettingsPage = () => {
         <div style={styles.panel}>
           <div style={styles.body}>
             {status.kind !== 'idle' ? (
-              <div style={{ ...styles.status, ...(status.kind === 'success' ? styles.success : styles.error) }}>
-                {status.kind === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-                <span>{status.message}</span>
-              </div>
+              <NotificationBanner
+                tone={status.kind === 'success' ? 'success' : 'error'}
+                title={status.kind === 'success' ? 'Settings updated' : 'Check your details'}
+                message={status.message}
+              />
             ) : null}
 
             <div style={styles.grid}>
@@ -362,19 +411,53 @@ const SettingsPage = () => {
                 <div style={styles.formGrid}>
                   <label style={styles.field}>
                     <span style={styles.label}>Current password</span>
-                    <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} />
+                    <input
+                      style={styles.input}
+                      type="password"
+                      value={currentPassword}
+                      onChange={(event) => {
+                        setCurrentPassword(event.target.value);
+                        setActiveCard('password');
+                      }}
+                      onFocus={() => setActiveCard('password')}
+                    />
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>New password</span>
-                    <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} />
+                    <input
+                      style={styles.input}
+                      type="password"
+                      value={newPassword}
+                      onChange={(event) => {
+                        setNewPassword(event.target.value);
+                        setActiveCard('password');
+                      }}
+                      onFocus={() => setActiveCard('password')}
+                    />
                     <span style={styles.helper}>{passwordRuleMessage}</span>
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>Confirm new password</span>
-                    <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
+                    <input
+                      style={styles.input}
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(event) => {
+                        setConfirmPassword(event.target.value);
+                        setActiveCard('password');
+                      }}
+                      onFocus={() => setActiveCard('password')}
+                    />
                     {passwordMismatch ? <span style={{ ...styles.helper, color: '#fca5a5' }}>Passwords do not match.</span> : null}
                   </label>
                 </div>
+                {activeCard === 'password' || passwordCardSaving ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving}>
+                      {passwordCardSaving ? 'Saving...' : 'Save password'}
+                    </button>
+                  </div>
+                ) : null}
               </section>
 
               <section style={styles.card}>
@@ -383,10 +466,10 @@ const SettingsPage = () => {
                 <div style={styles.formGrid}>
                   <label style={{ ...styles.field, alignItems: 'start' }}>
                     <span style={styles.label}>2FA protection</span>
-                    <input type="checkbox" checked={twoFactorEnabled} onChange={(event) => setTwoFactorEnabled(event.target.checked)} />
+                    <input type="checkbox" checked={twoFactorEnabled} onChange={(event) => { setTwoFactorEnabled(event.target.checked); setActiveCard('security'); }} onFocus={() => setActiveCard('security')} />
                     <span style={styles.helper}>Enable to require an additional verification step on future sign-ins.</span>
                   </label>
-                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => void handleSetupTwoFactor()} disabled={twoFactorSetupLoading}>
+                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
                     {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Set up authenticator app'}
                   </button>
                   {twoFactorSetupMessage ? <span style={styles.helper}>{twoFactorSetupMessage}</span> : null}
@@ -416,6 +499,20 @@ const SettingsPage = () => {
                     </div>
                   ) : null}
                 </div>
+                {activeCard === 'security' || securityCardSaving ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving}>
+                      {securityCardSaving ? 'Saving...' : 'Save security'}
+                    </button>
+                  </div>
+                ) : null}
+                {activeCard === 'uid' || uidCardSaving ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || uidChecking || uid.replace(/\D/g, '').slice(0, 5).length !== 5 || uidAvailable === false}>
+                      {uidCardSaving ? 'Saving...' : 'Save UID'}
+                    </button>
+                  </div>
+                ) : null}
               </section>
 
               <section style={styles.card}>
@@ -427,21 +524,44 @@ const SettingsPage = () => {
                     <input
                       style={styles.input}
                       value={walletAddress}
-                      onChange={(event) => setWalletAddress(event.target.value)}
+                      onChange={(event) => {
+                        setWalletAddress(event.target.value);
+                        setActiveCard('wallet');
+                      }}
+                      onFocus={() => setActiveCard('wallet')}
                       placeholder="TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     />
                     <span style={styles.helper}>Use the wallet address that will receive future TRC-20 withdrawals.</span>
                   </label>
                 </div>
+                {activeCard === 'wallet' || walletCardSaving ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving}>
+                      {walletCardSaving ? 'Saving...' : 'Save wallet'}
+                    </button>
+                  </div>
+                ) : null}
               </section>
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><CheckCircle2 size={18} /> UID settings</h2>
-                <p style={styles.cardText}>Choose a unique account UID. Validation runs live as you type so you can see availability right away.</p>
+                <p style={styles.cardText}>Choose a unique 5-digit account UID. Digits only; validation runs live as you type so you can see availability right away.</p>
                 <div style={styles.formGrid}>
                   <label style={styles.field}>
                     <span style={styles.label}>UID</span>
-                    <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value)} />
+                    <input
+                      style={styles.input}
+                      value={uid}
+                      onChange={(event) => {
+                        setUid(event.target.value.replace(/\D/g, '').slice(0, 5));
+                        setUidAvailable(null);
+                        setActiveCard('uid');
+                      }}
+                      onFocus={() => setActiveCard('uid')}
+                      inputMode="numeric"
+                      maxLength={5}
+                      placeholder="Enter 5 digits"
+                    />
                     <span style={styles.helper}>{uidStatus}</span>
                   </label>
                 </div>
@@ -458,14 +578,6 @@ const SettingsPage = () => {
               </div>
             </section>
 
-            <div style={styles.buttonRow}>
-              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSave()} disabled={saving || uidChecking}>
-                {saving ? 'Saving...' : 'Save settings'}
-              </button>
-              <button style={styles.button} type="button" onClick={() => navigate('/dashboard')}>
-                Back to dashboard
-              </button>
-            </div>
           </div>
         </div>
         <NowBar />
