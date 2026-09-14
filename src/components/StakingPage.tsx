@@ -148,7 +148,7 @@ const StakingPage = () => {
 
     try {
       const { data } = await api.post<{ message?: string; stake?: Stake }>('/api/staking', { packageId: selectedPackage.id, amount: selectedAmount });
-      if (data.stake) setStakes((current) => [data.stake, ...current]);
+      if (data.stake) setStakes((current) => [data.stake, ...current.filter((stake) => stake !== undefined)]);
       setMessage(data.message || 'Your stake has been created successfully.');
       setError('');
       setAmount('');
