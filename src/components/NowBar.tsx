@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircleUserRound, Coins, Home, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, Home, Settings2, UserRound } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const styles = {
@@ -125,7 +125,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Settings',
-    icon: <CircleUserRound size={18} />,
+    icon: <Settings2 size={18} />,
     onClick: () => {
       navigate('/settings');
     },
