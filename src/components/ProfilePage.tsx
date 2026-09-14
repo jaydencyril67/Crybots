@@ -304,8 +304,13 @@ const ProfilePage = () => {
           return;
         }
 
+        const nextProfile = meResponse.data.user ?? profile ?? null;
         setBalance(typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
-        setLiveProfile(meResponse.data.user ?? profile ?? null);
+        setLiveProfile(nextProfile);
+        if (nextProfile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
+          window.localStorage.setItem('user', JSON.stringify(nextProfile));
+        }
         setBalanceError(null);
       } catch {
         if (!isMounted) {
@@ -314,6 +319,10 @@ const ProfilePage = () => {
 
         setBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
         setLiveProfile(profile);
+        if (profile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
+          window.localStorage.setItem('user', JSON.stringify(profile));
+        }
         setBalanceError(null);
       }
     };
