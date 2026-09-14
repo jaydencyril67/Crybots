@@ -121,6 +121,7 @@ const styles = {
       overflowY: 'hidden' as const,
       scrollSnapType: 'x mandatory' as const,
     },
+    stakeSection: { gridTemplateColumns: '1fr' },
     panel: { borderRadius: '28px', padding: '18px' },
     button: { width: '100%' },
   },
