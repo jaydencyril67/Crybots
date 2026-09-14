@@ -10,6 +10,7 @@ import SigninPage from './components/SigninPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProfilePage from './components/ProfilePage';
+import StakingPage from './components/StakingPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppSplashOverlay from './components/AppSplashOverlay';
@@ -41,6 +42,7 @@ const getRouteKey = () => {
   if (pathname === '/forgot-password' || hash === '#/forgot-password') return 'forgot-password';
   if (pathname === '/dashboard' || hash === '#/dashboard') return 'dashboard';
   if (pathname === '/profile' || hash === '#/profile') return 'profile';
+  if (pathname === '/staking' || hash === '#/staking') return 'staking';
   return 'landing';
 };
 
@@ -53,6 +55,7 @@ const routeToKey = (path: string) => {
   if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
   if (path === '/dashboard' || path === '#/dashboard') return 'dashboard';
   if (path === '/profile' || path === '#/profile') return 'profile';
+  if (path === '/staking' || path === '#/staking') return 'staking';
   return 'landing';
 };
 
@@ -101,6 +104,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'forgot-password') return <ForgotPasswordPage />;
     if (displayedRouteKey === 'dashboard') return <ProtectedRoute><DashboardPage /></ProtectedRoute>;
     if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
+    if (displayedRouteKey === 'staking') return <ProtectedRoute><StakingPage /></ProtectedRoute>;
 
     return <LandingPage />;
   }, [displayedRouteKey]);
