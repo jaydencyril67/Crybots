@@ -16,7 +16,7 @@ type FiatFormState = {
 const styles = {
   page: {
     minHeight: '100vh',
-    padding: '24px 16px 104px',
+    padding: 'clamp(16px, 4vw, 24px) clamp(12px, 4vw, 16px) 104px',
     background: 'radial-gradient(circle at top, rgba(37,99,235,0.18), transparent 35%), linear-gradient(180deg, #07111f 0%, #050b14 100%)',
     color: '#eef4ff',
   },
@@ -31,7 +31,7 @@ const styles = {
     boxShadow: '0 24px 60px rgba(0,0,0,0.36)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
-    padding: '22px',
+    padding: 'clamp(16px, 4vw, 22px)',
   },
   headerRow: {
     display: 'flex',
@@ -43,25 +43,25 @@ const styles = {
   },
   title: {
     margin: '18px 0 0',
-    fontSize: '1.45rem',
+    fontSize: 'clamp(1.3rem, 4vw, 1.45rem)',
     fontWeight: 800,
     letterSpacing: '-0.03em',
     lineHeight: 1.2,
-  },
+  }
   subtitle: {
     margin: '8px 0 0',
     color: '#9aaac9',
     lineHeight: 1.6,
     fontSize: '0.92rem',
     maxWidth: '58ch',
-  },
+  }
   selector: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     gap: '14px',
     marginTop: '22px',
     marginBottom: '22px',
-  },
+  }
   option: {
     textAlign: 'left' as const,
     border: '1px solid rgba(255,255,255,0.12)',
@@ -70,7 +70,8 @@ const styles = {
     borderRadius: '22px',
     padding: '18px',
     cursor: 'pointer',
-  },
+    minHeight: '92px',
+  }
   optionActive: {
     borderColor: 'rgba(96,165,250,0.7)',
     background: 'rgba(59,130,246,0.14)',
@@ -87,12 +88,12 @@ const styles = {
     display: 'grid',
     gap: '14px',
     marginTop: '18px',
-    padding: '20px',
+    padding: 'clamp(16px, 4vw, 20px)',
     borderRadius: '24px',
     background: 'linear-gradient(180deg, rgba(96,165,250,0.10), rgba(255,255,255,0.03))',
     border: '1px solid rgba(96,165,250,0.18)',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
-  },
+  }
   field: {
     display: 'grid',
     gap: '8px',
@@ -100,7 +101,7 @@ const styles = {
     borderRadius: '18px',
     background: 'rgba(4,10,20,0.32)',
     border: '1px solid rgba(255,255,255,0.06)',
-  },
+  }
   label: {
     fontSize: '0.82rem',
     color: '#93a4c3',
@@ -132,7 +133,7 @@ const styles = {
     gap: '12px',
     flexWrap: 'wrap' as const,
     marginTop: '8px',
-  },
+  }
   primaryButton: {
     border: 'none',
     background: 'linear-gradient(135deg, #00c2ff, #5b8cff 55%, #a855f7)',
@@ -147,7 +148,8 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
     minHeight: '56px',
-  },
+    width: '100%',
+  }
   mutedCard: {
     marginTop: '16px',
     borderRadius: '22px',
