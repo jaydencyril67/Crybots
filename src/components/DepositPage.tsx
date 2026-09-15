@@ -93,7 +93,7 @@ const styles = {
     background: 'linear-gradient(180deg, rgba(96,165,250,0.10), rgba(255,255,255,0.03))',
     border: '1px solid rgba(96,165,250,0.18)',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
-  }
+  },
   field: {
     display: 'grid',
     gap: '8px',
@@ -101,7 +101,7 @@ const styles = {
     borderRadius: '18px',
     background: 'rgba(4,10,20,0.32)',
     border: '1px solid rgba(255,255,255,0.06)',
-  }
+  },
   label: {
     fontSize: '0.82rem',
     color: '#93a4c3',
@@ -119,7 +119,7 @@ const styles = {
     fontSize: '0.92rem',
     outline: 'none',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-  }
+  },
   helper: {
     color: '#9aaac9',
     fontSize: '0.82rem',
@@ -134,7 +134,7 @@ const styles = {
     gap: '12px',
     flexWrap: 'wrap' as const,
     marginTop: '8px',
-  }
+  },
   primaryButton: {
     border: 'none',
     background: 'linear-gradient(135deg, #00c2ff, #5b8cff 55%, #a855f7)',
