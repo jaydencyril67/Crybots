@@ -101,10 +101,12 @@ const styles = {
   inputCard: {
     display: 'grid',
     gap: '8px',
-    padding: '14px',
+    padding: '14px 14px 12px',
     borderRadius: '18px',
     background: 'rgba(4,10,20,0.32)',
     border: '1px solid rgba(255,255,255,0.06)',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   label: {
     fontSize: '0.82rem',
@@ -123,6 +125,8 @@ const styles = {
     fontSize: '0.92rem',
     outline: 'none',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+    boxSizing: 'border-box' as const,
+    display: 'block',
   },
   helper: {
     color: '#9aaac9',
@@ -154,6 +158,7 @@ const styles = {
     gap: '10px',
     minHeight: '56px',
     width: '100%',
+    boxSizing: 'border-box' as const,
   },
   mutedCard: {
     marginTop: '16px',
