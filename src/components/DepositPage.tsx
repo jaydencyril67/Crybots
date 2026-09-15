@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, BadgeDollarSign, Building2, CreditCard, ShieldCheck, Wallet } from 'lucide-react';
 import Header from './Header';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
+
+const authToken = window.localStorage.getItem('token') ?? '';
 
 const paystackPublicKey = process.env.REACT_APP_PAYSTACK_PUBLIC_KEY ?? '';
 
@@ -151,6 +153,26 @@ const DepositPage = () => {
   const [method, setMethod] = useState<DepositMethod>('fiat');
   const [fiatForm, setFiatForm] = useState<FiatFormState>({ amount: '', email: '' });
   const [isPaystackLoading, setIsPaystackLoading] = useState(false);
+  const [paystackScriptLoaded, setPaystackScriptLoaded] = useState(false);
+
+  useEffect(() => {
+    if (window.PaystackPop) {
+      setPaystackScriptLoaded(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.async = true;
+    script.onload = () => setPaystackScriptLoaded(true);
+    script.onerror = () => setPaystackScriptLoaded(false);
+    document.body.appendChild(script);
+
+    return () => {
+      script.onload = null;
+      script.onerror = null;
+    };
+  }, []);
 
   const amountNumber = Number(fiatForm.amount);
   const canStartFiatDeposit = Boolean(fiatForm.email && amountNumber >= 100 && paystackPublicKey);
@@ -187,10 +209,35 @@ const DepositPage = () => {
       metadata: {
         source: 'KingsHall deposit page',
         method: 'fiat',
+        depositType: 'fiat',
+        userId: JSON.parse(window.localStorage.getItem('kingshall_user') ?? window.localStorage.getItem('user') ?? '{}')?.id ?? '',
       },
-      callback: () => {
-        setIsPaystackLoading(false);
-        window.alert('Payment successful. Your deposit will be confirmed after verification.');
+      callback: async (response: { reference?: string }) => {
+        try {
+          const reference = response?.reference;
+          if (!reference) {
+            throw new Error('Missing payment reference.');
+          }
+
+          const verificationResponse = await fetch('/api/paystack/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({ reference }),
+          });
+
+          if (!verificationResponse.ok) {
+            throw new Error('Deposit verification failed.');
+          }
+
+          window.alert('Payment successful. Your fiat balance has been updated.');
+        } catch (error) {
+          window.alert(error instanceof Error ? error.message : 'Payment verification failed.');
+        } finally {
+          setIsPaystackLoading(false);
+        }
       },
       onClose: () => {
         setIsPaystackLoading(false);
@@ -257,13 +304,23 @@ const DepositPage = () => {
                 <span style={styles.helper}>Minimum fiat deposit is 100.</span>
               </label>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading}>
-                  {isPaystackLoading ? 'Opening Paystack...' : 'Deposit with Paystack'}
+                <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
+                  {isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}
                 </button>
               </div>
+              {!authToken ? (
+                <div style={styles.mutedCard}>
+                  Please sign in first so we can attach your account to the deposit.
+                </div>
+              ) : null}
               {!paystackPublicKey ? (
                 <div style={styles.mutedCard}>
                   Paystack is not configured yet. Add <code>REACT_APP_PAYSTACK_PUBLIC_KEY</code> to enable checkout.
+                </div>
+              ) : null}
+              {!paystackScriptLoaded ? (
+                <div style={styles.mutedCard}>
+                  Loading Paystack checkout...
                 </div>
               ) : null}
             </div>
