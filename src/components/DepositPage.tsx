@@ -112,14 +112,14 @@ const styles = {
     borderRadius: '18px',
     background: 'rgba(4,10,20,0.32)',
     border: '1px solid rgba(255,255,255,0.06)',
-  }
+  },
   label: {
     fontSize: '0.82rem',
     color: '#93a4c3',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
     fontWeight: 700,
-  }
+  },
   input: {
     width: '100%',
     borderRadius: '18px',
@@ -159,7 +159,7 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
     minHeight: '56px',
-  }
+  },
   mutedCard: {
     marginTop: '16px',
     borderRadius: '22px',
