@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircleUserRound, Coins, Home, Settings2, UserRound, Wallet } from 'lucide-react';
+import { CircleUserRound, Coins, Home, SendHorizontal, Settings2, UserRound, Wallet } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const styles = {
@@ -128,6 +128,14 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/staking');
     },
     active: getActivePath() === '/staking',
+  },
+  {
+    label: 'Withdraw',
+    icon: <SendHorizontal size={18} />,
+    onClick: () => {
+      navigate('/withdrawals');
+    },
+    active: getActivePath() === '/withdrawals',
   },
   {
     label: 'Profile',
