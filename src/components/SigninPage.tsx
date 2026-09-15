@@ -12,7 +12,6 @@ const signInMethods = [
   { value: 'code', title: 'Email sign-in code', description: 'Receive a 3-digit code by email.' },
 ] as const;
 
-type TwoFactorState = 'idle' | 'required' | 'email-recovery';
 
 type SignInMethod = (typeof signInMethods)[number]['value'];
 
@@ -20,15 +19,13 @@ type FormState = {
   email: string;
   password: string;
   code: string;
-    recoveryCode: string;
-};
+  };
 
 const initialState: FormState = {
   email: '',
   password: '',
   code: '',
-    recoveryCode: '',
-};
+  };
 
 const styles = {
   page: {
@@ -656,7 +653,7 @@ const SigninPage = () => {
               <article style={styles.heroCard}>
                 <p style={styles.stepLabel}>Need help?</p>
                 <h2 style={styles.stepTitle}>Forgot your password?</h2>
-                <p style={styles.stepDesc}>Use the recovery flow to verify your account and reset access securely.</p>
+                <p style={styles.stepDesc}>Use your email code to verify your account and reset access securely.</p>
                 <a
                   href="/forgot-password"
                   style={{
