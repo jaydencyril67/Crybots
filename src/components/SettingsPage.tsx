@@ -261,7 +261,7 @@ const SettingsPage = () => {
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
-  const twoFactorConfigured = Boolean(twoFactorSecret) && !twoFactorSetupPending;
+  const twoFactorConfigured = Boolean(twoFactorSecret) || twoFactorSetupCompleted;
   const securityCanSave = Boolean(twoFactorToken.trim());
   const shouldShowSecurityActions = twoFactorConfigured;
   const shouldShowSecuritySetup = !twoFactorSecret && !twoFactorSetupPending;
