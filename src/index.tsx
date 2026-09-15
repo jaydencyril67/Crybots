@@ -13,6 +13,7 @@ import ProfilePage from './components/ProfilePage';
 import StakingPage from './components/StakingPage';
 import SettingsPage from './components/SettingsPage';
 import DepositPage from './components/DepositPage';
+import WithdrawalsPage from './components/WithdrawalsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppSplashOverlay from './components/AppSplashOverlay';
@@ -46,6 +47,7 @@ const getRouteKey = () => {
   if (pathname === '/profile' || hash === '#/profile') return 'profile';
   if (pathname === '/staking' || hash === '#/staking') return 'staking';
   if (pathname === '/settings' || hash === '#/settings') return 'settings';
+  if (pathname === '/withdrawals' || hash === '#/withdrawals') return 'withdrawals';
   if (pathname === '/deposit' || hash === '#/deposit') return 'deposit';
   return 'landing';
 };
@@ -61,6 +63,7 @@ const routeToKey = (path: string) => {
   if (path === '/profile' || path === '#/profile') return 'profile';
   if (path === '/staking' || path === '#/staking') return 'staking';
   if (path === '/settings' || path === '#/settings') return 'settings';
+  if (path === '/withdrawals' || path === '#/withdrawals') return 'withdrawals';
   if (path === '/deposit' || path === '#/deposit') return 'deposit';
   return 'landing';
 };
@@ -112,12 +115,13 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
     if (displayedRouteKey === 'staking') return <ProtectedRoute><StakingPage /></ProtectedRoute>;
     if (displayedRouteKey === 'settings') return <ProtectedRoute><SettingsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'withdrawals') return <ProtectedRoute><WithdrawalsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'deposit') return <ProtectedRoute><DepositPage /></ProtectedRoute>;
 
     return <LandingPage />;
   }, [displayedRouteKey]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'deposit';
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'deposit';
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
