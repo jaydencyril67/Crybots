@@ -114,10 +114,10 @@ const styles = {
     border: '1px solid rgba(255,255,255,0.06)',
   }
   label: {
-    fontSize: '12px',
-    color: 'rgba(238,244,255,0.72)',
+    fontSize: '0.82rem',
+    color: '#93a4c3',
     textTransform: 'uppercase' as const,
-    letterSpacing: '0.12em',
+    letterSpacing: '0.08em',
     fontWeight: 700,
   }
   input: {
