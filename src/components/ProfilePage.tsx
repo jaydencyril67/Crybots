@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound, Wallet } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
 import { navigate } from '../utils/navigate';
@@ -416,6 +416,10 @@ const ProfilePage = () => {
                   <div style={styles.metaCard}>
                     <span style={styles.metaLabel}><Coins size={16} /> USDT Balance</span>
                     <span style={styles.metaValue}>{usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
+                  </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><Wallet size={16} /> Fiat Balance</span>
+                    <span style={styles.metaValue}>{fiatBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
                   </div>
                 </div>
               </section>

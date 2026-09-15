@@ -46,6 +46,7 @@ const getRouteKey = () => {
   if (pathname === '/profile' || hash === '#/profile') return 'profile';
   if (pathname === '/staking' || hash === '#/staking') return 'staking';
   if (pathname === '/settings' || hash === '#/settings') return 'settings';
+  if (pathname === '/deposit' || hash === '#/deposit') return 'deposit';
   return 'landing';
 };
 
@@ -60,6 +61,7 @@ const routeToKey = (path: string) => {
   if (path === '/profile' || path === '#/profile') return 'profile';
   if (path === '/staking' || path === '#/staking') return 'staking';
   if (path === '/settings' || path === '#/settings') return 'settings';
+  if (path === '/deposit' || path === '#/deposit') return 'deposit';
   return 'landing';
 };
 
