@@ -103,6 +103,14 @@ const getActivePath = () => window.location.pathname || window.location.hash.rep
 
 const createDefaultActions = (): NowBarAction[] => [
   {
+    label: 'Deposit',
+    icon: <Wallet size={18} />,
+    onClick: () => {
+      navigate('/deposit');
+    },
+    active: getActivePath() === '/deposit',
+  },
+  {
     label: 'Dashboard',
     icon: <Home size={18} />,
     onClick: () => {
