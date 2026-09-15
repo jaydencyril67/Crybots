@@ -12,7 +12,6 @@ type DepositMethod = 'fiat' | 'crypto';
 
 type FiatFormState = {
   amount: string;
-  email: string;
 };
 
 const styles = {
@@ -55,13 +54,18 @@ const styles = {
     cursor: 'pointer',
   },
   title: {
-    fontSize: 'clamp(28px, 5vw, 42px)',
-    margin: 0,
+    margin: '18px 0 0',
+    fontSize: '1.45rem',
+    fontWeight: 800,
+    letterSpacing: '-0.03em',
+    lineHeight: 1.2,
   },
   subtitle: {
-    margin: '10px 0 0',
-    color: 'rgba(238,244,255,0.74)',
+    margin: '8px 0 0',
+    color: '#9aaac9',
     lineHeight: 1.6,
+    fontSize: '0.92rem',
+    maxWidth: '58ch',
   },
   selector: {
     display: 'grid',
@@ -87,43 +91,59 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    fontSize: '18px',
+    fontSize: '1rem',
     fontWeight: 700,
     margin: 0,
   },
   optionText: {
-    margin: '10px 0 0',
-    color: 'rgba(238,244,255,0.72)',
-    lineHeight: 1.5,
+    margin: '8px 0 0',
+    color: '#9aaac9',
+    lineHeight: 1.6,
+    fontSize: '0.92rem',
   },
   form: {
     display: 'grid',
     gap: '14px',
     marginTop: '18px',
+    padding: '20px',
+    borderRadius: '24px',
+    background: 'linear-gradient(180deg, rgba(96,165,250,0.10), rgba(255,255,255,0.03))',
+    border: '1px solid rgba(96,165,250,0.18)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
   },
   field: {
     display: 'grid',
     gap: '8px',
+    padding: '14px',
+    borderRadius: '18px',
+    background: 'rgba(4,10,20,0.32)',
+    border: '1px solid rgba(255,255,255,0.06)',
   },
   label: {
-    fontSize: '13px',
-    color: 'rgba(238,244,255,0.72)',
+    fontSize: '0.82rem',
+    color: '#93a4c3',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
+    fontWeight: 700,
   },
   input: {
     width: '100%',
-    borderRadius: '16px',
+    borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.04)',
+    background: 'rgba(4,10,20,0.72)',
     color: '#eef4ff',
     padding: '14px 16px',
-    fontSize: '16px',
+    fontSize: '0.92rem',
     outline: 'none',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
   },
   helper: {
-    color: 'rgba(238,244,255,0.68)',
-    fontSize: '14px',
+    color: '#9aaac9',
+    fontSize: '0.82rem',
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: '12px',
+    alignItems: 'center',
   },
   buttonRow: {
     display: 'flex',
@@ -133,12 +153,18 @@ const styles = {
   },
   primaryButton: {
     border: 'none',
-    background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
-    color: '#08111f',
-    padding: '14px 18px',
-    borderRadius: '16px',
-    fontWeight: 700,
+    background: 'linear-gradient(135deg, #00c2ff, #5b8cff 55%, #a855f7)',
+    color: '#06101d',
+    padding: '16px 18px',
+    borderRadius: '18px',
+    fontWeight: 800,
     cursor: 'pointer',
+    boxShadow: '0 16px 30px rgba(91,140,255,0.28)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
+    minHeight: '56px',
   },
   mutedCard: {
     marginTop: '16px',
@@ -146,12 +172,13 @@ const styles = {
     padding: '18px',
     border: '1px dashed rgba(255,255,255,0.12)',
     color: 'rgba(238,244,255,0.72)',
-  },
+    background: 'rgba(255,255,255,0.03)',
+  }
 };
 
 const DepositPage = () => {
   const [method, setMethod] = useState<DepositMethod>('fiat');
-  const [fiatForm, setFiatForm] = useState<FiatFormState>({ amount: '', email: '' });
+  const [fiatForm, setFiatForm] = useState<FiatFormState>({ amount: '' });
   const [isPaystackLoading, setIsPaystackLoading] = useState(false);
   const [paystackScriptLoaded, setPaystackScriptLoaded] = useState(false);
 
@@ -175,7 +202,7 @@ const DepositPage = () => {
   }, []);
 
   const amountNumber = Number(fiatForm.amount);
-  const canStartFiatDeposit = Boolean(fiatForm.email && amountNumber >= 100 && paystackPublicKey);
+  const canStartFiatDeposit = Boolean(amountNumber >= 100 && paystackPublicKey);
 
   const cryptoContent = useMemo(() => (
     <div style={styles.mutedCard}>
@@ -203,7 +230,7 @@ const DepositPage = () => {
     setIsPaystackLoading(true);
     const handler = window.PaystackPop.setup({
       key: publicKey,
-      email: fiatForm.email,
+      email: authToken ? JSON.parse(window.localStorage.getItem('kingshall_user') ?? window.localStorage.getItem('user') ?? '{}')?.email ?? '' : '',
       amount: amountInKobo,
       currency: 'USD',
       metadata: {
@@ -283,16 +310,6 @@ const DepositPage = () => {
           {method === 'fiat' ? (
             <div style={styles.form}>
               <label style={styles.field}>
-                <span style={styles.label}>Email</span>
-                <input
-                  style={styles.input}
-                  type="email"
-                  value={fiatForm.email}
-                  onChange={(event) => setFiatForm((current) => ({ ...current, email: event.target.value }))}
-                  placeholder="Enter the email linked to your payment"
-                />
-              </label>
-              <label style={styles.field}>
                 <span style={styles.label}>Amount</span>
                 <input
                   style={styles.input}
@@ -302,11 +319,13 @@ const DepositPage = () => {
                   value={fiatForm.amount}
                   onChange={(event) => setFiatForm((current) => ({ ...current, amount: event.target.value }))}
                   placeholder="Enter deposit amount"
+                  inputMode="decimal"
                 />
                 <span style={styles.helper}>Minimum fiat deposit is 100.</span>
               </label>
               <div style={styles.buttonRow}>
                 <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
+                  <CreditCard size={18} />
                   {isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}
                 </button>
               </div>
