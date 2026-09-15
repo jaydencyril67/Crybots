@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircleUserRound, Coins, Home, Settings2, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, Home, Settings2, UserRound, Wallet } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const styles = {
@@ -15,7 +15,6 @@ const styles = {
   bar: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: '12px',
     padding: '12px 14px',
     borderRadius: '28px',
@@ -25,6 +24,10 @@ const styles = {
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
     pointerEvents: 'auto' as const,
+    overflowX: 'auto' as const,
+    overflowY: 'hidden' as const,
+    whiteSpace: 'nowrap' as const,
+    scrollbarWidth: 'none' as const,
   },
   rail: {
     position: 'absolute' as const,
@@ -35,8 +38,8 @@ const styles = {
     pointerEvents: 'none' as const,
   },
   slot: {
-    flex: '1 1 0',
-    minWidth: 0,
+    flex: '0 0 auto',
+    minWidth: '104px',
     display: 'flex',
     justifyContent: 'center',
   },

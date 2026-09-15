@@ -12,6 +12,7 @@ import DashboardPage from './components/DashboardPage';
 import ProfilePage from './components/ProfilePage';
 import StakingPage from './components/StakingPage';
 import SettingsPage from './components/SettingsPage';
+import DepositPage from './components/DepositPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppSplashOverlay from './components/AppSplashOverlay';
@@ -109,11 +110,12 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
     if (displayedRouteKey === 'staking') return <ProtectedRoute><StakingPage /></ProtectedRoute>;
     if (displayedRouteKey === 'settings') return <ProtectedRoute><SettingsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'deposit') return <ProtectedRoute><DepositPage /></ProtectedRoute>;
 
     return <LandingPage />;
   }, [displayedRouteKey]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings';
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'deposit';
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
