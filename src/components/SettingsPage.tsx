@@ -196,6 +196,10 @@ const SettingsPage = () => {
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
         setTwoFactorSetupPending(hasPendingTwoFactor);
         setTwoFactorSetupCompleted(Boolean(user?.twoFactorSecret));
+        if (!hasPendingTwoFactor) {
+          setTwoFactorQrUrl('');
+          setTwoFactorSetupMessage('');
+        }
         setTwoFactorToken('');
       } catch {
         navigate('/signin');
@@ -575,6 +579,42 @@ const SettingsPage = () => {
                       <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => { setActiveCard('security'); void handleSetupTwoFactor(); }} disabled={twoFactorSetupLoading}>
                         {twoFactorSetupLoading ? 'Preparing 2FA setup...' : 'Setup 2FA'}
                       </button>
+                    </>
+                  ) : shouldShowSecurityVerification ? (
+                    <>
+                      <label style={styles.field}>
+                        <span style={styles.label}>2FA setup status</span>
+                        <span style={styles.helper}>Scan the QR code in your authenticator app, then enter the 6-digit code to finish setup.</span>
+                      </label>
+                      <div style={{ display: 'grid', gap: '16px', justifyItems: 'center' }}>
+                        {twoFactorQrUrl ? <img src={twoFactorQrUrl} alt="2FA QR code" style={{ width: '220px', height: '220px', borderRadius: '16px', background: '#fff', padding: '10px' }} /> : null}
+                        {twoFactorSecret ? <code style={{ ...styles.helper, wordBreak: 'break-all', textAlign: 'center' }}>{twoFactorSecret}</code> : null}
+                      </div>
+                      <label style={styles.field}>
+                        <span style={styles.label}>2FA code</span>
+                        <input
+                          style={styles.input}
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          value={twoFactorToken}
+                          onChange={(event) => {
+                            setTwoFactorToken(event.target.value.replace(/\D/g, '').slice(0, 8));
+                            setActiveCard('security');
+                          }}
+                          onFocus={() => setActiveCard('security')}
+                          placeholder="Enter 6-digit code"
+                        />
+                        <span style={styles.helper}>{twoFactorSetupMessage}</span>
+                      </label>
+                      <div style={styles.buttonRow}>
+                        <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
+                          {securityCardSaving ? 'Saving...' : 'Enable 2FA'}
+                        </button>
+                        <button style={{ ...styles.button, ...styles.dangerButton }} type="button" onClick={() => { setActiveCard('security'); void handleDeleteTwoFactor(); }} disabled={securityCardSaving || !twoFactorToken.trim()}>
+                          Cancel setup
+                        </button>
+                      </div>
                     </>
                   ) : shouldShowSecurityActions ? (
                     <>
