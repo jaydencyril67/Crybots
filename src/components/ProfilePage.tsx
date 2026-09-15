@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound, Wallet } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
 import { navigate } from '../utils/navigate';
