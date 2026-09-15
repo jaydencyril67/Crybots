@@ -212,7 +212,7 @@ const DepositPage = () => {
         depositType: 'fiat',
         userId: JSON.parse(window.localStorage.getItem('kingshall_user') ?? window.localStorage.getItem('user') ?? '{}')?.id ?? '',
       },
-      callback: async (response: { reference?: string }) => {
+      callback: (response: { reference?: string }) => {
         try {
           const reference = response?.reference;
           if (!reference) {
@@ -345,7 +345,7 @@ declare global {
         amount: number;
         currency: string;
         metadata?: Record<string, string>;
-        callback: () => void;
+        callback: (response: { reference?: string }) => void;
         onClose: () => void;
       }) => { openIframe: () => void };
     };
