@@ -441,6 +441,7 @@ const SettingsPage = () => {
       if (!twoFactorConfigured) {
         const enableResponse = await api.post('/api/two-factor/enable', {
           token: trimmedToken,
+          secret: twoFactorSecret,
         });
         if (enableResponse.data?.message) {
           showStatus('success', enableResponse.data.message);
