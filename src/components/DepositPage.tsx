@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, BadgeDollarSign, Building2, CreditCard, ShieldCheck, Wallet } from 'lucide-react';
+import { BadgeDollarSign, Building2, CreditCard, ShieldCheck, Wallet } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
-import { navigate } from '../utils/navigate';
 
 const authToken = window.localStorage.getItem('token') ?? '';
 
@@ -17,7 +16,7 @@ type FiatFormState = {
 const styles = {
   page: {
     minHeight: '100vh',
-    padding: '24px 16px 104px',
+    padding: 'clamp(16px, 4vw, 24px) clamp(12px, 4vw, 16px) 104px',
     background: 'radial-gradient(circle at top, rgba(37,99,235,0.18), transparent 35%), linear-gradient(180deg, #07111f 0%, #050b14 100%)',
     color: '#eef4ff',
   },
@@ -32,7 +31,7 @@ const styles = {
     boxShadow: '0 24px 60px rgba(0,0,0,0.36)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
-    padding: '22px',
+    padding: 'clamp(16px, 4vw, 22px)',
   },
   headerRow: {
     display: 'flex',
@@ -42,20 +41,9 @@ const styles = {
     marginBottom: '18px',
     flexWrap: 'wrap' as const,
   },
-  backButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.04)',
-    color: '#eef4ff',
-    borderRadius: '999px',
-    padding: '10px 14px',
-    cursor: 'pointer',
-  },
   title: {
     margin: '18px 0 0',
-    fontSize: '1.45rem',
+    fontSize: 'clamp(1.3rem, 4vw, 1.45rem)',
     fontWeight: 800,
     letterSpacing: '-0.03em',
     lineHeight: 1.2,
@@ -82,6 +70,7 @@ const styles = {
     borderRadius: '22px',
     padding: '18px',
     cursor: 'pointer',
+    minHeight: '92px',
   },
   optionActive: {
     borderColor: 'rgba(96,165,250,0.7)',
@@ -95,17 +84,11 @@ const styles = {
     fontWeight: 700,
     margin: 0,
   },
-  optionText: {
-    margin: '8px 0 0',
-    color: '#9aaac9',
-    lineHeight: 1.6,
-    fontSize: '0.92rem',
-  },
   form: {
     display: 'grid',
     gap: '14px',
     marginTop: '18px',
-    padding: '20px',
+    padding: 'clamp(16px, 4vw, 20px)',
     borderRadius: '24px',
     background: 'linear-gradient(180deg, rgba(96,165,250,0.10), rgba(255,255,255,0.03))',
     border: '1px solid rgba(96,165,250,0.18)',
@@ -144,6 +127,7 @@ const styles = {
     justifyContent: 'space-between',
     gap: '12px',
     alignItems: 'center',
+    flexWrap: 'wrap' as const,
   },
   buttonRow: {
     display: 'flex',
@@ -165,6 +149,7 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
     minHeight: '56px',
+    width: '100%',
   },
   mutedCard: {
     marginTop: '16px',
@@ -173,7 +158,7 @@ const styles = {
     border: '1px dashed rgba(255,255,255,0.12)',
     color: 'rgba(238,244,255,0.72)',
     background: 'rgba(255,255,255,0.03)',
-  }
+  },
 };
 
 const DepositPage = () => {
@@ -282,10 +267,7 @@ const DepositPage = () => {
         <AppHeader />
         <div style={styles.card}>
           <div style={styles.headerRow}>
-            <button type="button" style={styles.backButton} onClick={() => navigate('dashboard')}>
-              <ArrowLeft size={18} /> Back
-            </button>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '0.92rem', color: '#9aaac9' }}>
               <ShieldCheck size={18} />
               <span>Secure deposits</span>
             </div>
@@ -293,17 +275,15 @@ const DepositPage = () => {
 
           <h1 style={styles.title}>Deposit funds</h1>
           <p style={styles.subtitle}>
-            Choose fiat or crypto. Fiat deposits are available now through Paystack; crypto deposits will be added next.
+            Deposit funds with Paystack or switch to crypto when you need it.
           </p>
 
           <div style={styles.selector}>
             <button type="button" style={{ ...styles.option, ...(method === 'fiat' ? styles.optionActive : {}) }} onClick={() => setMethod('fiat')}>
               <h2 style={styles.optionTitle}><BadgeDollarSign size={18} /> Fiat deposit</h2>
-              <p style={styles.optionText}>Fund your account with card or supported local payment methods through Paystack.</p>
             </button>
             <button type="button" style={{ ...styles.option, ...(method === 'crypto' ? styles.optionActive : {}) }} onClick={() => setMethod('crypto')}>
               <h2 style={styles.optionTitle}><Wallet size={18} /> Crypto deposit</h2>
-              <p style={styles.optionText}>We’ll add on-chain deposits with network and wallet address selection soon.</p>
             </button>
           </div>
 
@@ -326,7 +306,7 @@ const DepositPage = () => {
               <div style={styles.buttonRow}>
                 <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
                   <CreditCard size={18} />
-                  {isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}
+                  <span>{isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}</span>
                 </button>
               </div>
               {!authToken ? (
