@@ -173,8 +173,9 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
 
-  const uidReadyToSave = Boolean(uidEditorActive && uid.trim().length === 5 && uidAvailable !== false);
-  const showUidSaveButton = uidReadyToSave || uidCardSaving;
+  const uidDigits = uid.replace(/\D/g, '').slice(0, 5);
+  const uidReadyToSave = Boolean(uidEditorActive && uidDigits.length === 5 && uidAvailable !== false);
+  const showUidSaveButton = Boolean(activeCard === 'uid' && uidReadyToSave) || uidCardSaving;
 
   useEffect(() => {
     const loadAccount = async () => {
@@ -297,7 +298,6 @@ const SettingsPage = () => {
       setTwoFactorSecret(data?.secret ?? '');
       setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then enter the 6-digit code to enable 2FA.');
-      setTwoFactorEnabled(false);
       setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
     } catch (error: any) {
@@ -421,6 +421,7 @@ const SettingsPage = () => {
           showStatus('success', '2FA enabled successfully.');
         }
         setTwoFactorEnabled(true);
+        setTwoFactorSecret((currentSecret) => currentSecret || '');
       } else if (twoFactorEnabled) {
         const disableResponse = await api.post('/api/two-factor/disable', { token: trimmedToken });
         showStatus('success', disableResponse.data?.message || '2FA disabled successfully.');
