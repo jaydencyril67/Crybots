@@ -59,14 +59,14 @@ const styles = {
     fontWeight: 800,
     letterSpacing: '-0.03em',
     lineHeight: 1.2,
-  }
+  },
   subtitle: {
     margin: '8px 0 0',
     color: '#9aaac9',
     lineHeight: 1.6,
     fontSize: '0.92rem',
     maxWidth: '58ch',
-  }
+  },
   selector: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
@@ -94,13 +94,13 @@ const styles = {
     fontSize: '1rem',
     fontWeight: 700,
     margin: 0,
-  }
+  },
   optionText: {
     margin: '8px 0 0',
     color: '#9aaac9',
     lineHeight: 1.6,
     fontSize: '0.92rem',
-  }
+  },
   form: {
     display: 'grid',
     gap: '14px',
@@ -110,7 +110,7 @@ const styles = {
     background: 'linear-gradient(180deg, rgba(96,165,250,0.10), rgba(255,255,255,0.03))',
     border: '1px solid rgba(96,165,250,0.18)',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
-  }
+  },
   field: {
     display: 'grid',
     gap: '8px',
@@ -136,7 +136,7 @@ const styles = {
     fontSize: '0.92rem',
     outline: 'none',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-  }
+  },
   helper: {
     color: '#9aaac9',
     fontSize: '0.82rem',
@@ -144,7 +144,7 @@ const styles = {
     justifyContent: 'space-between',
     gap: '12px',
     alignItems: 'center',
-  }
+  },
   buttonRow: {
     display: 'flex',
     gap: '12px',
