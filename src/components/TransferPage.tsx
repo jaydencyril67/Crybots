@@ -139,33 +139,26 @@ const TransferPage = () => {
 
     if (!value) return;
 
-    const controller = new AbortController();
     const timeout = window.setTimeout(() => {
       void (async () => {
         try {
           setRecipientChecking(true);
           const { data } = await api.get<TransferRecipientCheckResponse>('/api/transfers/recipient-check', {
             params: { method: recipientMethod, value },
-            signal: controller.signal,
           });
           setRecipientValid(Boolean(data.exists));
           setRecipientDetails(data.user ?? null);
         } catch {
-          if (!controller.signal.aborted) {
-            setRecipientValid(false);
-            setRecipientDetails(null);
-          }
+          setRecipientValid(false);
+          setRecipientDetails(null);
         } finally {
-          if (!controller.signal.aborted) {
-            setRecipientChecking(false);
-          }
+          setRecipientChecking(false);
         }
       })();
     }, 350);
 
     return () => {
       window.clearTimeout(timeout);
-      controller.abort();
     };
   }, [recipientMethod, recipientValue]);
 
