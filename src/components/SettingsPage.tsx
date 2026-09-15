@@ -166,6 +166,7 @@ const SettingsPage = () => {
   const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
   const [twoFactorSetupLoading, setTwoFactorSetupLoading] = useState(false);
   const [twoFactorSetupPending, setTwoFactorSetupPending] = useState(false);
+  const [twoFactorSetupCompleted, setTwoFactorSetupCompleted] = useState(false);
   const [twoFactorQrUrl, setTwoFactorQrUrl] = useState('');
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
   const [twoFactorToken, setTwoFactorToken] = useState('');
@@ -190,9 +191,11 @@ const SettingsPage = () => {
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
+        const hasPendingTwoFactor = Boolean(user?.twoFactorPendingSecret) && !user?.twoFactorSecret;
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
-        setTwoFactorSetupPending(Boolean(user?.twoFactorPendingSecret) && !user?.twoFactorSecret);
+        setTwoFactorSetupPending(hasPendingTwoFactor);
+        setTwoFactorSetupCompleted(Boolean(user?.twoFactorSecret));
         setTwoFactorToken('');
       } catch {
         navigate('/signin');
@@ -276,6 +279,7 @@ const SettingsPage = () => {
       setTwoFactorQrUrl('');
       setTwoFactorToken('');
       setTwoFactorSetupPending(false);
+      setTwoFactorSetupCompleted(false);
       setActiveCard(null);
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to delete 2FA.');
@@ -302,6 +306,7 @@ const SettingsPage = () => {
       setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then enter the 6-digit code to enable 2FA.');
       setTwoFactorSetupPending(true);
+      setTwoFactorSetupCompleted(false);
       setTwoFactorEnabled(false);
       setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
@@ -427,6 +432,7 @@ const SettingsPage = () => {
         }
         setTwoFactorEnabled(true);
         setTwoFactorSetupPending(false);
+        setTwoFactorSetupCompleted(true);
       } else if (twoFactorEnabled) {
         const disableResponse = await api.post('/api/two-factor/disable', { token: trimmedToken });
         showStatus('success', disableResponse.data?.message || '2FA disabled successfully.');
