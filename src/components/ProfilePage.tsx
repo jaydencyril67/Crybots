@@ -284,7 +284,10 @@ const ProfilePage = () => {
 
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(profile);
   const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [balance, setBalance] = useState<number | null>(() => getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+  const [balance, setBalance] = useState<{ usdtBalance: number | null; fiatBalance: number | null } | null>(() => ({
+    usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null),
+    fiatBalance: typeof profile?.fiatBalance === 'number' ? profile.fiatBalance : null,
+  }));
 
   useEffect(() => {
     let isMounted = true;
@@ -306,7 +309,7 @@ const ProfilePage = () => {
         }
 
         const nextProfile = meResponse.data.user ?? profile ?? null;
-        const nextBalance = typeof liveBalance === 'number' ? liveBalance : getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null);
+        const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null), fiatBalance: typeof meResponse.data.user?.fiatBalance === 'number' ? meResponse.data.user.fiatBalance : null };
         setBalance(nextBalance);
         setLiveProfile(nextProfile);
         if (nextProfile) {
@@ -319,7 +322,7 @@ const ProfilePage = () => {
           return;
         }
 
-        setBalance(getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null));
+        setBalance({ usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null), fiatBalance: typeof profile?.fiatBalance === 'number' ? profile.fiatBalance : null });
         setLiveProfile(profile);
         if (profile) {
           window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
@@ -352,7 +355,8 @@ const ProfilePage = () => {
   const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profileDetails?.email || 'Not available';
   const uid = profileDetails?.uid || 'Pending confirmation';
-  const usdtBalance = typeof balance === 'number' ? balance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : 0;
+  const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : 0;
+  const fiatBalance = typeof balance?.fiatBalance === 'number' ? balance.fiatBalance : typeof profileDetails?.fiatBalance === 'number' ? profileDetails.fiatBalance : 0;
 
   const handleLogout = () => {
     window.localStorage.removeItem('token');
