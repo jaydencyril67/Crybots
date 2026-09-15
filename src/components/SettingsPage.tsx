@@ -169,6 +169,7 @@ const SettingsPage = () => {
   const [twoFactorSetupCompleted, setTwoFactorSetupCompleted] = useState(false);
   const [twoFactorQrUrl, setTwoFactorQrUrl] = useState('');
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
+  const [twoFactorSetupStorageKey] = useState('kingshall.twoFactorSetup');
   const [twoFactorToken, setTwoFactorToken] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -191,12 +192,19 @@ const SettingsPage = () => {
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
-        const hasPendingTwoFactor = Boolean(user?.twoFactorPendingSecret) && !user?.twoFactorSecret;
+        const storedSetup = window.localStorage.getItem(twoFactorSetupStorageKey);
+        const parsedSetup = storedSetup ? JSON.parse(storedSetup) as { qrUrl?: string; secret?: string; message?: string } : null;
+        const hasPendingTwoFactor = Boolean(parsedSetup?.secret) && !user?.twoFactorSecret;
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
         setTwoFactorSetupPending(hasPendingTwoFactor);
         setTwoFactorSetupCompleted(Boolean(user?.twoFactorSecret));
-        if (!hasPendingTwoFactor) {
+        if (hasPendingTwoFactor && parsedSetup) {
+          setTwoFactorQrUrl(parsedSetup.qrUrl ?? '');
+          setTwoFactorSecret(parsedSetup.secret ?? '');
+          setTwoFactorSetupMessage(parsedSetup.message ?? '');
+        } else {
+          window.localStorage.removeItem(twoFactorSetupStorageKey);
           setTwoFactorQrUrl('');
           setTwoFactorSetupMessage('');
         }
@@ -307,12 +315,16 @@ const SettingsPage = () => {
 
     try {
       const { data } = await api.post('/api/two-factor/setup');
-      setTwoFactorSecret(data?.secret ?? '');
-      setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
-      setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then enter the 6-digit code to enable 2FA.');
+      const nextSecret = data?.secret ?? '';
+      const nextQrUrl = data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '';
+      const nextMessage = 'Scan the QR code in your authenticator app, then enter the 6-digit code to enable 2FA.';
+      setTwoFactorSecret(nextSecret);
+      setTwoFactorQrUrl(nextQrUrl);
+      setTwoFactorSetupMessage(nextMessage);
       setTwoFactorSetupPending(true);
       setTwoFactorSetupCompleted(false);
       setTwoFactorEnabled(false);
+      window.localStorage.setItem(twoFactorSetupStorageKey, JSON.stringify({ qrUrl: nextQrUrl, secret: nextSecret, message: nextMessage }));
       setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
     } catch (error: any) {
@@ -438,6 +450,7 @@ const SettingsPage = () => {
         setTwoFactorEnabled(true);
         setTwoFactorSetupPending(false);
         setTwoFactorSetupCompleted(true);
+        window.localStorage.removeItem(twoFactorSetupStorageKey);
       } else if (twoFactorEnabled) {
         const disableResponse = await api.post('/api/two-factor/disable', { token: trimmedToken });
         showStatus('success', disableResponse.data?.message || '2FA disabled successfully.');
