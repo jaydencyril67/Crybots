@@ -12,7 +12,6 @@ type DepositMethod = 'fiat' | 'crypto';
 
 type FiatFormState = {
   amount: string;
-  email: string;
 };
 
 const styles = {
@@ -151,7 +150,7 @@ const styles = {
 
 const DepositPage = () => {
   const [method, setMethod] = useState<DepositMethod>('fiat');
-  const [fiatForm, setFiatForm] = useState<FiatFormState>({ amount: '', email: '' });
+  const [fiatForm, setFiatForm] = useState<FiatFormState>({ amount: '' });
   const [isPaystackLoading, setIsPaystackLoading] = useState(false);
   const [paystackScriptLoaded, setPaystackScriptLoaded] = useState(false);
 
@@ -175,7 +174,7 @@ const DepositPage = () => {
   }, []);
 
   const amountNumber = Number(fiatForm.amount);
-  const canStartFiatDeposit = Boolean(fiatForm.email && amountNumber >= 100 && paystackPublicKey);
+  const canStartFiatDeposit = Boolean(amountNumber >= 100 && paystackPublicKey);
 
   const cryptoContent = useMemo(() => (
     <div style={styles.mutedCard}>
@@ -203,7 +202,7 @@ const DepositPage = () => {
     setIsPaystackLoading(true);
     const handler = window.PaystackPop.setup({
       key: publicKey,
-      email: fiatForm.email,
+      email: authToken ? JSON.parse(window.localStorage.getItem('kingshall_user') ?? window.localStorage.getItem('user') ?? '{}')?.email ?? '' : '',
       amount: amountInKobo,
       currency: 'USD',
       metadata: {
@@ -282,16 +281,6 @@ const DepositPage = () => {
 
           {method === 'fiat' ? (
             <div style={styles.form}>
-              <label style={styles.field}>
-                <span style={styles.label}>Email</span>
-                <input
-                  style={styles.input}
-                  type="email"
-                  value={fiatForm.email}
-                  onChange={(event) => setFiatForm((current) => ({ ...current, email: event.target.value }))}
-                  placeholder="Enter the email linked to your payment"
-                />
-              </label>
               <label style={styles.field}>
                 <span style={styles.label}>Amount</span>
                 <input
