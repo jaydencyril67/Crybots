@@ -615,44 +615,6 @@ const SettingsPage = () => {
                       </div>
                     </>
                   ) : null}
-                    <>
-                      <label style={styles.field}>
-                        <span style={styles.label}>2FA status</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ ...styles.helper, color: twoFactorEnabled ? '#86efac' : '#fbbf24' }}>
-                            {twoFactorEnabled ? '2FA is active' : twoFactorSetupPending ? '2FA setup in progress' : '2FA is set up but currently disabled'}
-                          </span>
-                          <CheckCircle2 size={16} color={twoFactorEnabled ? '#86efac' : '#fbbf24'} />
-                        </div>
-                        <span style={styles.helper}>Enter your current authenticator code to toggle 2FA or delete it entirely.</span>
-                      </label>
-                      <label style={styles.field}>
-                        <span style={styles.label}>2FA code</span>
-                        <input
-                          style={styles.input}
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="one-time-code"
-                          value={twoFactorToken}
-                          onChange={(event) => {
-                            setTwoFactorToken(event.target.value.replace(/\D/g, '').slice(0, 8));
-                            setActiveCard('security');
-                          }}
-                          onFocus={() => setActiveCard('security')}
-                          placeholder="Enter current 2FA code"
-                        />
-                        <span style={styles.helper}>Use the current code from your authenticator app.</span>
-                      </label>
-                      <div style={styles.buttonRow}>
-                        <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => { setActiveCard('security'); void handleSaveSecurity(); }} disabled={securityCardSaving || !securityCanSave}>
-                          {securityCardSaving ? 'Saving...' : (twoFactorEnabled ? 'Turn 2FA off' : 'Turn 2FA on')}
-                        </button>
-                        <button style={{ ...styles.button, ...styles.dangerButton }} type="button" onClick={() => { setActiveCard('security'); void handleDeleteTwoFactor(); }} disabled={securityCardSaving || !twoFactorToken.trim()}>
-                          Delete 2FA
-                        </button>
-                      </div>
-                    </>
-                  )}
                 </div>
               </section>
 
