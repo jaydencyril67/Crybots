@@ -298,7 +298,6 @@ const SettingsPage = () => {
       setTwoFactorSecret(data?.secret ?? '');
       setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then enter the 6-digit code to enable 2FA.');
-      setTwoFactorEnabled(false);
       setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
     } catch (error: any) {
@@ -422,6 +421,7 @@ const SettingsPage = () => {
           showStatus('success', '2FA enabled successfully.');
         }
         setTwoFactorEnabled(true);
+        setTwoFactorSecret((currentSecret) => currentSecret || '');
       } else if (twoFactorEnabled) {
         const disableResponse = await api.post('/api/two-factor/disable', { token: trimmedToken });
         showStatus('success', disableResponse.data?.message || '2FA disabled successfully.');
