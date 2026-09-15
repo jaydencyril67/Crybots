@@ -417,6 +417,10 @@ const ProfilePage = () => {
                     <span style={styles.metaLabel}><Coins size={16} /> USDT Balance</span>
                     <span style={styles.metaValue}>{usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
+                  <div style={styles.metaCard}>
+                    <span style={styles.metaLabel}><Wallet size={16} /> Fiat Balance</span>
+                    <span style={styles.metaValue}>{fiatBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+                  </div>
                 </div>
               </section>
             </div>
