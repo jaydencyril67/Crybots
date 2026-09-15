@@ -265,6 +265,7 @@ const SettingsPage = () => {
   const securityCanSave = Boolean(twoFactorToken.trim());
   const shouldShowSecurityActions = twoFactorConfigured;
   const shouldShowSecuritySetup = !twoFactorSecret && !twoFactorSetupPending;
+  const shouldShowSecurityVerification = twoFactorSetupPending;
 
   const handleDeleteTwoFactor = async () => {
     const trimmedToken = twoFactorToken.trim();
