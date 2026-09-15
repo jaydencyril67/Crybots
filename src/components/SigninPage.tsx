@@ -316,7 +316,7 @@ const SigninPage = () => {
   const [resendStatus, setResendStatus] = useState('');
   const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in') || resendStatus.toLowerCase().includes('confirmation email has been sent');
 
-  const progress = step === 'email' ? 20 : step === 'method' ? 40 : step === 'password' || step === 'code' ? 60 : 80;
+  const progress = step === 'email' ? 20 : step === 'method' ? 40 : step === 'password' ? 60 : 80;
 
   const handleReturn = () => {
     if (window.history.length > 1) {
@@ -605,15 +605,6 @@ const SigninPage = () => {
                     </div>
                   ) : null}
 
-                  {step === 'code' ? (
-                    <div style={styles.field}>
-                      <label style={styles.label} htmlFor="signin-code">Sign-in code</label>
-                      <input id="signin-code" style={styles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
-                      <div style={styles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
-
-                    </div>
-                  ) : null}
-
                   {submitError || resendStatus ? (
                     <div>
                       {submitError ? <NotificationBanner tone="warning" title="Action required" message={submitError} /> : null}
@@ -633,8 +624,6 @@ const SigninPage = () => {
                     <button type="button" onClick={handleNext} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={!canContinue}>Continue</button>
                   ) : step === 'password' ? (
                     <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Sign in</button>
-                  ) : step === 'code' ? (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   ) : step === 'code' ? (
                     <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   ) : (
