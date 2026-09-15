@@ -367,7 +367,6 @@ const StakingPage = () => {
                         <th style={styles.stakeTh}>Package</th>
                         <th style={styles.stakeTh}>Amount</th>
                         <th style={styles.stakeTh}>Target profit</th>
-                        <th style={styles.stakeTh}>Earned</th>
                         <th style={styles.stakeTh}>Started</th>
                         <th style={styles.stakeTh}>Matures</th>
                         <th style={styles.stakeTh}>Status</th>
@@ -383,7 +382,6 @@ const StakingPage = () => {
                           </td>
                           <td style={styles.stakeTd}>{stake.principal.toLocaleString()} USDT</td>
                           <td style={styles.stakeTd}>{stake.totalProfitTarget.toLocaleString()} USDT</td>
-                          <td style={styles.stakeTd}>{stake.earnedProfit.toLocaleString()} USDT</td>
                           <td style={styles.stakeTd}>{stake.startedAt ? new Date(stake.startedAt).toLocaleDateString() : '—'}</td>
                           <td style={styles.stakeTd}>{new Date(stake.maturityDate).toLocaleDateString()}</td>
                           <td style={styles.stakeTd}>

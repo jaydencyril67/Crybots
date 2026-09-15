@@ -1,6 +1,6 @@
 import api from '../api/axios';
 
-type BalanceListener = (balance: number | null) => void;
+type BalanceListener = (balance: { usdtBalance: number | null; fiatBalance: number | null } | null) => void;
 
 const STORAGE_KEYS = ['kingshall_user', 'user'];
 const BALANCE_EVENT = 'kingshall:balance-updated';
@@ -17,7 +17,7 @@ const readStoredBalance = () => {
         continue;
       }
 
-      const parsed = JSON.parse(raw) as { usdtBalance?: number };
+      const parsed = JSON.parse(raw) as { usdtBalance?: number; fiatBalance?: number };
       if (typeof parsed.usdtBalance === 'number') {
         return parsed.usdtBalance;
       }
@@ -46,7 +46,7 @@ const writeStoredBalance = (balance: number) => {
   }
 };
 
-const notifyListeners = (balance: number | null) => {
+const notifyListeners = (balance: { usdtBalance: number | null; fiatBalance: number | null } | null) => {
   listeners.forEach((listener) => listener(balance));
 };
 
@@ -71,7 +71,7 @@ export const setCachedBalance = (balance: number | null) => {
     window.dispatchEvent(new CustomEvent(BALANCE_EVENT, { detail: balance }));
   }
 
-  notifyListeners(balance);
+  notifyListeners({ usdtBalance: balance, fiatBalance: null });
 };
 
 export const syncBalanceFromBackend = async () => {
@@ -80,10 +80,12 @@ export const syncBalanceFromBackend = async () => {
 
   if (typeof nextProfile?.usdtBalance === 'number') {
     setCachedBalance(nextProfile.usdtBalance);
-    return nextProfile.usdtBalance as number;
   }
 
-  return null;
+  return {
+    usdtBalance: typeof nextProfile?.usdtBalance === 'number' ? nextProfile.usdtBalance : null,
+    fiatBalance: typeof nextProfile?.fiatBalance === 'number' ? nextProfile.fiatBalance : null,
+  };
 };
 
 export const subscribeBalance = (listener: BalanceListener) => {

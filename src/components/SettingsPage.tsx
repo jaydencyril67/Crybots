@@ -165,7 +165,7 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
 
   const uidDigits = uid.replace(/\D/g, '').slice(0, 5);
-  const uidReadyToSave = Boolean(uidEditorActive && uidDigits.length === 5 && uidAvailable !== false);
+  const uidReadyToSave = Boolean(uidEditorActive && uidDigits.length === 5 && uidAvailable !== false && uidDigits !== initialUid);
   const showUidSaveButton = Boolean(activeCard === 'uid' && uidReadyToSave) || uidCardSaving;
 
   useEffect(() => {
@@ -513,6 +513,13 @@ const SettingsPage = () => {
                     <span style={styles.helper}>{uidStatus}</span>
                   </label>
                 </div>
+                {showUidSaveButton ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || !uidReadyToSave}>
+                      {uidCardSaving ? 'Saving...' : 'Save UID'}
+                    </button>
+                  </div>
+                ) : null}
               </section>
             </div>
 
