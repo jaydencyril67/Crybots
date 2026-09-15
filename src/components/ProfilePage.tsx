@@ -266,6 +266,7 @@ type ProfileDetails = {
   email?: string;
   uid?: string;
   usdtBalance?: number;
+  fiatBalance?: number;
 };
 
 type MeResponse = {
