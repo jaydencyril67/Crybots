@@ -213,31 +213,33 @@ const DepositPage = () => {
         userId: JSON.parse(window.localStorage.getItem('kingshall_user') ?? window.localStorage.getItem('user') ?? '{}')?.id ?? '',
       },
       callback: (response: { reference?: string }) => {
-        try {
-          const reference = response?.reference;
-          if (!reference) {
-            throw new Error('Missing payment reference.');
+        void (async () => {
+          try {
+            const reference = response?.reference;
+            if (!reference) {
+              throw new Error('Missing payment reference.');
+            }
+
+            const verificationResponse = await fetch('/api/paystack/verify', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authToken}`,
+              },
+              body: JSON.stringify({ reference }),
+            });
+
+            if (!verificationResponse.ok) {
+              throw new Error('Deposit verification failed.');
+            }
+
+            window.alert('Payment successful. Your fiat balance has been updated.');
+          } catch (error) {
+            window.alert(error instanceof Error ? error.message : 'Payment verification failed.');
+          } finally {
+            setIsPaystackLoading(false);
           }
-
-          const verificationResponse = await fetch('/api/paystack/verify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ reference }),
-          });
-
-          if (!verificationResponse.ok) {
-            throw new Error('Deposit verification failed.');
-          }
-
-          window.alert('Payment successful. Your fiat balance has been updated.');
-        } catch (error) {
-          window.alert(error instanceof Error ? error.message : 'Payment verification failed.');
-        } finally {
-          setIsPaystackLoading(false);
-        }
+        })();
       },
       onClose: () => {
         setIsPaystackLoading(false);
