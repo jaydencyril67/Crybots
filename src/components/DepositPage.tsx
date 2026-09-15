@@ -158,7 +158,7 @@ const styles = {
     border: '1px dashed rgba(255,255,255,0.12)',
     color: 'rgba(238,244,255,0.72)',
     background: 'rgba(255,255,255,0.03)',
-  }
+  },
 };
 
 const DepositPage = () => {
