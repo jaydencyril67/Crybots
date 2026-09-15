@@ -17,7 +17,7 @@ const readStoredBalance = () => {
         continue;
       }
 
-      const parsed = JSON.parse(raw) as { usdtBalance?: number };
+      const parsed = JSON.parse(raw) as { usdtBalance?: number; fiatBalance?: number };
       if (typeof parsed.usdtBalance === 'number') {
         return parsed.usdtBalance;
       }
@@ -71,7 +71,7 @@ export const setCachedBalance = (balance: number | null) => {
     window.dispatchEvent(new CustomEvent(BALANCE_EVENT, { detail: balance }));
   }
 
-  notifyListeners(balance);
+  notifyListeners({ usdtBalance: balance, fiatBalance: null });
 };
 
 export const syncBalanceFromBackend = async () => {
