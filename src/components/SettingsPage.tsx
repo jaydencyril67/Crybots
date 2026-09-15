@@ -164,6 +164,7 @@ const SettingsPage = () => {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorSetupMessage, setTwoFactorSetupMessage] = useState('');
   const [twoFactorSetupLoading, setTwoFactorSetupLoading] = useState(false);
+  const [twoFactorSetupPending, setTwoFactorSetupPending] = useState(false);
   const [twoFactorQrUrl, setTwoFactorQrUrl] = useState('');
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
   const [twoFactorToken, setTwoFactorToken] = useState('');
@@ -190,6 +191,7 @@ const SettingsPage = () => {
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
         setTwoFactorEnabled(Boolean(user?.twoFactorEnabled));
         setTwoFactorSecret(user?.twoFactorSecret ?? '');
+        setTwoFactorSetupPending(false);
         setTwoFactorToken('');
       } catch {
         navigate('/signin');
@@ -251,7 +253,7 @@ const SettingsPage = () => {
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
-  const twoFactorConfigured = Boolean(twoFactorSecret);
+  const twoFactorConfigured = Boolean(twoFactorSecret) && !twoFactorSetupPending;
   const twoFactorSetupAvailable = !twoFactorSecret;
   const securityCanSave = Boolean(twoFactorToken.trim());
   const shouldShowSecurityActions = twoFactorConfigured;
@@ -298,6 +300,7 @@ const SettingsPage = () => {
       setTwoFactorSecret(data?.secret ?? '');
       setTwoFactorQrUrl(data?.otpauthUrl ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(data.otpauthUrl)}` : '');
       setTwoFactorSetupMessage('Scan the QR code in your authenticator app, then enter the 6-digit code to enable 2FA.');
+      setTwoFactorSetupPending(true);
       setActiveCard('security');
       showStatus('success', '2FA setup created. Complete setup before leaving this page.');
     } catch (error: any) {
@@ -421,7 +424,7 @@ const SettingsPage = () => {
           showStatus('success', '2FA enabled successfully.');
         }
         setTwoFactorEnabled(true);
-        setTwoFactorSecret((currentSecret) => currentSecret || '');
+        setTwoFactorSetupPending(false);
       } else if (twoFactorEnabled) {
         const disableResponse = await api.post('/api/two-factor/disable', { token: trimmedToken });
         showStatus('success', disableResponse.data?.message || '2FA disabled successfully.');
@@ -586,7 +589,7 @@ const SettingsPage = () => {
                         <span style={styles.label}>2FA status</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <span style={{ ...styles.helper, color: twoFactorEnabled ? '#86efac' : '#fbbf24' }}>
-                            {twoFactorEnabled ? '2FA is active' : '2FA is set up but currently disabled'}
+                            {twoFactorEnabled ? '2FA is active' : twoFactorSetupPending ? '2FA setup in progress' : '2FA is set up but currently disabled'}
                           </span>
                           <CheckCircle2 size={16} color={twoFactorEnabled ? '#86efac' : '#fbbf24'} />
                         </div>
