@@ -47,21 +47,21 @@ const styles = {
     fontWeight: 800,
     letterSpacing: '-0.03em',
     lineHeight: 1.2,
-  }
+  },
   subtitle: {
     margin: '8px 0 0',
     color: '#9aaac9',
     lineHeight: 1.6,
     fontSize: '0.92rem',
     maxWidth: '58ch',
-  }
+  },
   selector: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     gap: '14px',
     marginTop: '22px',
     marginBottom: '22px',
-  }
+  },
   option: {
     textAlign: 'left' as const,
     border: '1px solid rgba(255,255,255,0.12)',
@@ -71,7 +71,7 @@ const styles = {
     padding: '18px',
     cursor: 'pointer',
     minHeight: '92px',
-  }
+  },
   optionActive: {
     borderColor: 'rgba(96,165,250,0.7)',
     background: 'rgba(59,130,246,0.14)',
@@ -119,7 +119,7 @@ const styles = {
     fontSize: '0.92rem',
     outline: 'none',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
-  },
+  }
   helper: {
     color: '#9aaac9',
     fontSize: '0.82rem',
@@ -127,7 +127,8 @@ const styles = {
     justifyContent: 'space-between',
     gap: '12px',
     alignItems: 'center',
-  },
+    flexWrap: 'wrap' as const,
+  }
   buttonRow: {
     display: 'flex',
     gap: '12px',
@@ -266,7 +267,7 @@ const DepositPage = () => {
         <AppHeader />
         <div style={styles.card}>
           <div style={styles.headerRow}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '0.92rem', color: '#9aaac9' }}>
               <ShieldCheck size={18} />
               <span>Secure deposits</span>
             </div>
@@ -280,11 +281,9 @@ const DepositPage = () => {
           <div style={styles.selector}>
             <button type="button" style={{ ...styles.option, ...(method === 'fiat' ? styles.optionActive : {}) }} onClick={() => setMethod('fiat')}>
               <h2 style={styles.optionTitle}><BadgeDollarSign size={18} /> Fiat deposit</h2>
-
             </button>
             <button type="button" style={{ ...styles.option, ...(method === 'crypto' ? styles.optionActive : {}) }} onClick={() => setMethod('crypto')}>
               <h2 style={styles.optionTitle}><Wallet size={18} /> Crypto deposit</h2>
-
             </button>
           </div>
 
@@ -307,7 +306,7 @@ const DepositPage = () => {
               <div style={styles.buttonRow}>
                 <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
                   <CreditCard size={18} />
-                  {isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}
+                  <span>{isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}</span>
                 </button>
               </div>
               {!authToken ? (
