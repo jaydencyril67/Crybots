@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from './balance';
 
+type BalanceState = { usdtBalance: number | null; fiatBalance: number | null } | null;
+
 const useBalance = () => {
-  const [balance, setBalance] = useState<number | null>(() => getCachedBalance());
+  const [balance, setBalance] = useState<BalanceState>(() => ({ usdtBalance: getCachedBalance(), fiatBalance: null }));
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +24,7 @@ const useBalance = () => {
           return;
         }
 
-        if (typeof liveBalance === 'number') {
+        if (liveBalance) {
           setBalance(liveBalance);
           setError(null);
         }
