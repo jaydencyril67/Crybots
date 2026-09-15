@@ -128,7 +128,7 @@ const styles = {
     gap: '12px',
     alignItems: 'center',
     flexWrap: 'wrap' as const,
-  }
+  },
   buttonRow: {
     display: 'flex',
     gap: '12px',
@@ -150,7 +150,7 @@ const styles = {
     gap: '10px',
     minHeight: '56px',
     width: '100%',
-  }
+  },
   mutedCard: {
     marginTop: '16px',
     borderRadius: '22px',
