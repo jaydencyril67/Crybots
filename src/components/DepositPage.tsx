@@ -68,9 +68,9 @@ const styles = {
     background: 'rgba(255,255,255,0.03)',
     color: '#eef4ff',
     borderRadius: '22px',
-    padding: '18px',
+    padding: '14px 18px',
     cursor: 'pointer',
-    minHeight: '92px',
+    minHeight: '72px',
   },
   optionActive: {
     borderColor: 'rgba(96,165,250,0.7)',
@@ -80,7 +80,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    fontSize: '1rem',
+    fontSize: '0.95rem',
     fontWeight: 700,
     margin: 0,
   },
@@ -97,10 +97,16 @@ const styles = {
   field: {
     display: 'grid',
     gap: '8px',
-    padding: '14px',
+  },
+  inputCard: {
+    display: 'grid',
+    gap: '8px',
+    padding: '14px 14px 12px',
     borderRadius: '18px',
     background: 'rgba(4,10,20,0.32)',
     border: '1px solid rgba(255,255,255,0.06)',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   label: {
     fontSize: '0.82rem',
@@ -119,6 +125,8 @@ const styles = {
     fontSize: '0.92rem',
     outline: 'none',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+    boxSizing: 'border-box' as const,
+    display: 'block',
   },
   helper: {
     color: '#9aaac9',
@@ -139,7 +147,7 @@ const styles = {
     border: 'none',
     background: 'linear-gradient(135deg, #00c2ff, #5b8cff 55%, #a855f7)',
     color: '#06101d',
-    padding: '16px 18px',
+    padding: '12px 18px',
     borderRadius: '18px',
     fontWeight: 800,
     cursor: 'pointer',
@@ -148,8 +156,9 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     gap: '10px',
-    minHeight: '56px',
+    minHeight: '46px',
     width: '100%',
+    boxSizing: 'border-box' as const,
   },
   mutedCard: {
     marginTop: '16px',
@@ -291,24 +300,24 @@ const DepositPage = () => {
             <div style={styles.form}>
               <label style={styles.field}>
                 <span style={styles.label}>Amount</span>
-                <input
-                  style={styles.input}
-                  type="number"
-                  min="100"
-                  step="1"
-                  value={fiatForm.amount}
-                  onChange={(event) => setFiatForm((current) => ({ ...current, amount: event.target.value }))}
-                  placeholder="Enter deposit amount"
-                  inputMode="decimal"
-                />
-                <span style={styles.helper}>Minimum fiat deposit is 100.</span>
+                <div style={styles.inputCard}>
+                  <input
+                    style={styles.input}
+                    type="number"
+                    min="100"
+                    step="1"
+                    value={fiatForm.amount}
+                    onChange={(event) => setFiatForm((current) => ({ ...current, amount: event.target.value }))}
+                    placeholder="Enter deposit amount"
+                    inputMode="decimal"
+                  />
+                  <span style={styles.helper}>Minimum fiat deposit is 100.</span>
+                </div>
               </label>
-              <div style={styles.buttonRow}>
-                <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
-                  <CreditCard size={18} />
-                  <span>{isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}</span>
-                </button>
-              </div>
+              <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
+                <CreditCard size={18} />
+                <span>{isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}</span>
+              </button>
               {!authToken ? (
                 <div style={styles.mutedCard}>
                   Please sign in first so we can attach your account to the deposit.
