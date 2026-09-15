@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Coins, Landmark, ShieldCheck, TimerReset } from 'lucide-react';
+import { CalendarClock, Coins, Landmark, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -84,6 +84,11 @@ const styles = {
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%' },
   primaryButton: { background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)', border: 'none' },
+  customPickerRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' },
+  customPickerButton: { borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', fontSize: '0.92rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const },
+  customPickerButtonActive: { border: '1px solid rgba(125,211,252,0.55)', background: 'rgba(125,211,252,0.12)' },
+  customPickerDisplay: { borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', padding: '13px 14px', color: '#eef4ff', fontSize: '0.92rem', lineHeight: 1.5 },
+  customPickerHint: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
 };
 
 const WithdrawalsPage = () => {

@@ -131,7 +131,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Withdraw',
-    icon: <ArrowDownToLine size={18} />,
+    icon: <Coins size={18} />,
     onClick: () => {
       navigate('/withdrawals');
     },
@@ -139,7 +139,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Transfer',
-    icon: <SendHorizontal size={18} />,
+    icon: <ArrowDownToLine size={18} />,
     onClick: () => {
       navigate('/transfer');
     },
