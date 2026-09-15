@@ -20,16 +20,14 @@ type FormState = {
   email: string;
   password: string;
   code: string;
-  twoFactorCode: string;
-  recoveryCode: string;
+    recoveryCode: string;
 };
 
 const initialState: FormState = {
   email: '',
   password: '',
   code: '',
-  twoFactorCode: '',
-  recoveryCode: '',
+    recoveryCode: '',
 };
 
 const styles = {
@@ -309,10 +307,10 @@ const styles = {
 const SigninPage = () => {
   const [form, setForm] = useState<FormState>(initialState);
   const [method, setMethod] = useState<SignInMethod | null>(null);
-  const [step, setStep] = useState<'email' | 'method' | 'password' | 'code' | 'twofactor' | 'recovery'>('email');
+  const [step, setStep] = useState<'email' | 'method' | 'password' | 'code'>('email');
   const [submitError, setSubmitError] = useState('');
-  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
-  const [twoFactorMessage, setTwoFactorMessage] = useState('');
+  
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
   const [isCodeLocked, setIsCodeLocked] = useState(false);
@@ -421,12 +419,7 @@ const SigninPage = () => {
         password: form.password,
       });
 
-      if (response.status === 206 || response.data?.requiresTwoFactor) {
-        setTwoFactorRequired(true);
-        setTwoFactorMessage(response.data?.message || 'Two-factor authentication is required.');
-        setStep(response.data?.twoFactorMethod === 'recovery' ? 'recovery' : 'twofactor');
-        return;
-      }
+      
 
       if (response.data?.token) {
         localStorage.setItem('token', response.data.token);
@@ -450,73 +443,7 @@ const SigninPage = () => {
     }
   };
 
-  const handleTwoFactorSignin = async () => {
-    setSubmitError('');
-    setIsSubmitting(true);
-
-    try {
-      const response = await api.post('/api/auth/signin', {
-        email: form.email,
-        password: form.password,
-        twoFactorToken: form.twoFactorCode,
-      });
-
-      if (response.data?.token) {
-        localStorage.setItem('token', response.data.token);
-      }
-
-      if (response.data?.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
-          localStorage.setItem('firstName', response.data.user.firstName.trim());
-          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
-        }
-      }
-
-      navigate('/dashboard');
-    } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
-      const message = response?.data?.message || 'Unable to verify your two-factor code right now. Please try again.';
-      setSubmitError(message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleRecoverySignin = async () => {
-    setSubmitError('');
-    setIsSubmitting(true);
-
-    try {
-      const response = await api.post('/api/auth/signin', {
-        email: form.email,
-        password: form.password,
-        recoveryCode: form.recoveryCode,
-      });
-
-      if (response.data?.token) {
-        localStorage.setItem('token', response.data.token);
-      }
-
-      if (response.data?.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
-          localStorage.setItem('firstName', response.data.user.firstName.trim());
-          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
-        }
-      }
-
-      navigate('/dashboard');
-    } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
-      const message = response?.data?.message || 'Unable to verify your recovery code right now. Please try again.';
-      setSubmitError(message);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCodeSignin = async () => {
+      const handleCodeSignin = async () => {
     setSubmitError('');
     setIsSubmitting(true);
 
@@ -587,26 +514,7 @@ const SigninPage = () => {
     }
   };
 
-  const handleRequestRecovery = async () => {
-    if (!form.email.trim()) return;
-
-    setSubmitError('');
-    setTwoFactorMessage('');
-    setIsSubmitting(true);
-
-    try {
-      await api.post('/api/two-factor/email-recovery', { email: form.email });
-      setTwoFactorMessage('A recovery code was sent to your email address.');
-      setStep('recovery');
-    } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
-      setSubmitError(response?.data?.message || 'Unable to send a recovery code right now. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
+    return (
     <>
       <Helmet>
         <title>KingsHall Exchange | Sign in</title>
@@ -657,17 +565,11 @@ const SigninPage = () => {
                       <h2 style={styles.stepTitle}>Enter your password</h2>
                       <p style={styles.stepDesc}>This is your standard sign-in route.</p>
                     </>
-                  ) : step === 'twofactor' ? (
-                    <>
-                      <p style={styles.stepLabel}>2FA</p>
-                      <h2 style={styles.stepTitle}>Enter your authenticator code</h2>
-                      <p style={styles.stepDesc}>{twoFactorMessage || 'Use the code from your authenticator app. If you cannot access it, switch to email recovery.'}</p>
-                    </>
                   ) : (
                     <>
-                      <p style={styles.stepLabel}>Recovery</p>
-                      <h2 style={styles.stepTitle}>Verify with your email recovery code</h2>
-                      <p style={styles.stepDesc}>{twoFactorMessage || 'We sent a fallback recovery code to your email address.'}</p>
+                      <p style={styles.stepLabel}>Code</p>
+                      <h2 style={styles.stepTitle}>Enter your email code</h2>
+                      <p style={styles.stepDesc}>We sent a sign-in code to your email address.</p>
                     </>
                   )}
                 </div>
@@ -700,18 +602,11 @@ const SigninPage = () => {
                       <input id="signin-password" style={styles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
                     </div>
                   ) : null}
-                  {step === 'twofactor' ? (
+                  {step === 'code' ? (
                     <div style={styles.field}>
-                      <label style={styles.label} htmlFor="signin-twofactor">Authenticator code</label>
-                      <input id="signin-twofactor" style={styles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" autoComplete="one-time-code" />
-                      <div style={styles.footerNote}>Use the code from your authenticator app. If you cannot access it, request email recovery.</div>
-                    </div>
-                  ) : null}
-                  {step === 'recovery' ? (
-                    <div style={styles.field}>
-                      <label style={styles.label} htmlFor="signin-recovery">Recovery code</label>
-                      <input id="signin-recovery" style={styles.input} inputMode="numeric" maxLength={6} value={form.recoveryCode} onChange={(event) => updateField('recoveryCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" autoComplete="one-time-code" />
-                      <div style={styles.footerNote}>We sent this fallback recovery code to your email address.</div>
+                      <label style={styles.label} htmlFor="signin-code">Sign-in code</label>
+                      <input id="signin-code" style={styles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
+                      <div style={styles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
                     </div>
                   ) : null}
 
@@ -745,13 +640,10 @@ const SigninPage = () => {
                     <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Sign in</button>
                   ) : step === 'code' ? (
                     <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
-                  ) : step === 'twofactor' ? (
-                    <>
-                      <button type="button" onClick={handleTwoFactorSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled || !form.twoFactorCode.trim()}>Verify 2FA</button>
-                      <button type="button" onClick={handleRequestRecovery} style={{ ...styles.button, ...styles.buttonGhost }} disabled={signInDisabled}>Use email recovery</button>
-                    </>
+                  ) : step === 'code' ? (
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   ) : (
-                    <button type="button" onClick={handleRecoverySignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled || !form.recoveryCode.trim()}>Use recovery code</button>
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   )}
                 </div>
                 <div style={styles.switchRow}>
