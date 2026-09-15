@@ -99,30 +99,45 @@ const styles = {
     display: 'grid',
     gap: '14px',
     marginTop: '18px',
-  },
+    padding: '20px',
+    borderRadius: '24px',
+    background: 'linear-gradient(180deg, rgba(96,165,250,0.10), rgba(255,255,255,0.03))',
+    border: '1px solid rgba(96,165,250,0.18)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+  }
   field: {
     display: 'grid',
     gap: '8px',
-  },
+    padding: '14px',
+    borderRadius: '18px',
+    background: 'rgba(4,10,20,0.32)',
+    border: '1px solid rgba(255,255,255,0.06)',
+  }
   label: {
-    fontSize: '13px',
+    fontSize: '12px',
     color: 'rgba(238,244,255,0.72)',
     textTransform: 'uppercase' as const,
-    letterSpacing: '0.08em',
-  },
+    letterSpacing: '0.12em',
+    fontWeight: 700,
+  }
   input: {
     width: '100%',
-    borderRadius: '16px',
+    borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.04)',
+    background: 'rgba(4,10,20,0.72)',
     color: '#eef4ff',
-    padding: '14px 16px',
-    fontSize: '16px',
+    padding: '16px 16px',
+    fontSize: '18px',
     outline: 'none',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
   },
   helper: {
     color: 'rgba(238,244,255,0.68)',
     fontSize: '14px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: '12px',
+    alignItems: 'center',
   },
   buttonRow: {
     display: 'flex',
@@ -132,20 +147,27 @@ const styles = {
   },
   primaryButton: {
     border: 'none',
-    background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
-    color: '#08111f',
-    padding: '14px 18px',
-    borderRadius: '16px',
-    fontWeight: 700,
+    background: 'linear-gradient(135deg, #00c2ff, #5b8cff 55%, #a855f7)',
+    color: '#06101d',
+    padding: '16px 18px',
+    borderRadius: '18px',
+    fontWeight: 800,
     cursor: 'pointer',
-  },
+    boxShadow: '0 16px 30px rgba(91,140,255,0.28)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
+    minHeight: '56px',
+  }
   mutedCard: {
     marginTop: '16px',
     borderRadius: '22px',
     padding: '18px',
     border: '1px dashed rgba(255,255,255,0.12)',
     color: 'rgba(238,244,255,0.72)',
-  },
+    background: 'rgba(255,255,255,0.03)',
+  }
 };
 
 const DepositPage = () => {
@@ -291,11 +313,13 @@ const DepositPage = () => {
                   value={fiatForm.amount}
                   onChange={(event) => setFiatForm((current) => ({ ...current, amount: event.target.value }))}
                   placeholder="Enter deposit amount"
+                  inputMode="decimal"
                 />
                 <span style={styles.helper}>Minimum fiat deposit is 100.</span>
               </label>
               <div style={styles.buttonRow}>
                 <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
+                  <CreditCard size={18} />
                   {isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}
                 </button>
               </div>
