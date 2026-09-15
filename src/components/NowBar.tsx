@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDownToLine, CircleUserRound, Coins, Home, SendHorizontal, Settings2, UserRound, Wallet } from 'lucide-react';
+import { ArrowDownToLine, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const styles = {
@@ -107,7 +107,7 @@ const getActivePath = () => window.location.pathname || window.location.hash.rep
 const createDefaultActions = (): NowBarAction[] => [
   {
     label: 'Deposit',
-    icon: <Wallet size={18} />,
+    icon: <WalletCards size={18} />,
     onClick: () => {
       navigate('/deposit');
     },
@@ -123,7 +123,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Staking',
-    icon: <Coins size={18} />,
+    icon: <Landmark size={18} />,
     onClick: () => {
       navigate('/staking');
     },
@@ -131,7 +131,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Withdraw',
-    icon: <Coins size={18} />,
+    icon: <ArrowDownToLine size={18} />,
     onClick: () => {
       navigate('/withdrawals');
     },
