@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, BadgeDollarSign, Building2, CreditCard, ShieldCheck, Wallet } from 'lucide-react';
-import Header from './Header';
+import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
@@ -250,7 +250,7 @@ const DepositPage = () => {
   return (
     <div style={styles.page}>
       <div style={styles.shell}>
-        <Header />
+        <AppHeader />
         <div style={styles.card}>
           <div style={styles.headerRow}>
             <button type="button" style={styles.backButton} onClick={() => navigate('dashboard')}>
