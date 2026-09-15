@@ -97,6 +97,10 @@ const styles = {
   field: {
     display: 'grid',
     gap: '8px',
+  },
+  inputCard: {
+    display: 'grid',
+    gap: '8px',
     padding: '14px',
     borderRadius: '18px',
     background: 'rgba(4,10,20,0.32)',
@@ -291,24 +295,24 @@ const DepositPage = () => {
             <div style={styles.form}>
               <label style={styles.field}>
                 <span style={styles.label}>Amount</span>
-                <input
-                  style={styles.input}
-                  type="number"
-                  min="100"
-                  step="1"
-                  value={fiatForm.amount}
-                  onChange={(event) => setFiatForm((current) => ({ ...current, amount: event.target.value }))}
-                  placeholder="Enter deposit amount"
-                  inputMode="decimal"
-                />
-                <span style={styles.helper}>Minimum fiat deposit is 100.</span>
+                <div style={styles.inputCard}>
+                  <input
+                    style={styles.input}
+                    type="number"
+                    min="100"
+                    step="1"
+                    value={fiatForm.amount}
+                    onChange={(event) => setFiatForm((current) => ({ ...current, amount: event.target.value }))}
+                    placeholder="Enter deposit amount"
+                    inputMode="decimal"
+                  />
+                  <span style={styles.helper}>Minimum fiat deposit is 100.</span>
+                </div>
               </label>
-              <div style={styles.buttonRow}>
-                <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
-                  <CreditCard size={18} />
-                  <span>{isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}</span>
-                </button>
-              </div>
+              <button type="button" style={styles.primaryButton} onClick={openPaystackCheckout} disabled={!canStartFiatDeposit || isPaystackLoading || !paystackScriptLoaded || !authToken}>
+                <CreditCard size={18} />
+                <span>{isPaystackLoading ? 'Opening Paystack...' : !paystackScriptLoaded ? 'Loading Paystack...' : 'Deposit with Paystack'}</span>
+              </button>
               {!authToken ? (
                 <div style={styles.mutedCard}>
                   Please sign in first so we can attach your account to the deposit.
