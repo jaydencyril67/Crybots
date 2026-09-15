@@ -370,8 +370,6 @@ const SigninPage = () => {
 
   const handleStartSignin = async (selectedMethod: SignInMethod) => {
     setSubmitError('');
-    setTwoFactorRequired(false);
-    setTwoFactorMessage('');
     setMethod(selectedMethod);
 
     if (selectedMethod === 'password') {
