@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, BadgeDollarSign, Building2, CreditCard, ShieldCheck, Wallet } from 'lucide-react';
+import { BadgeDollarSign, Building2, CreditCard, ShieldCheck, Wallet } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
-import { navigate } from '../utils/navigate';
 
 const authToken = window.localStorage.getItem('token') ?? '';
 
@@ -41,17 +40,6 @@ const styles = {
     gap: '12px',
     marginBottom: '18px',
     flexWrap: 'wrap' as const,
-  },
-  backButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.04)',
-    color: '#eef4ff',
-    borderRadius: '999px',
-    padding: '10px 14px',
-    cursor: 'pointer',
   },
   title: {
     margin: '18px 0 0',
@@ -94,12 +82,6 @@ const styles = {
     fontSize: '1rem',
     fontWeight: 700,
     margin: 0,
-  },
-  optionText: {
-    margin: '8px 0 0',
-    color: '#9aaac9',
-    lineHeight: 1.6,
-    fontSize: '0.92rem',
   },
   form: {
     display: 'grid',
@@ -282,9 +264,6 @@ const DepositPage = () => {
         <AppHeader />
         <div style={styles.card}>
           <div style={styles.headerRow}>
-            <button type="button" style={styles.backButton} onClick={() => navigate('dashboard')}>
-              <ArrowLeft size={18} /> Back
-            </button>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
               <ShieldCheck size={18} />
               <span>Secure deposits</span>
@@ -293,17 +272,17 @@ const DepositPage = () => {
 
           <h1 style={styles.title}>Deposit funds</h1>
           <p style={styles.subtitle}>
-            Choose fiat or crypto. Fiat deposits are available now through Paystack; crypto deposits will be added next.
+            Deposit funds with Paystack or switch to crypto when you need it.
           </p>
 
           <div style={styles.selector}>
             <button type="button" style={{ ...styles.option, ...(method === 'fiat' ? styles.optionActive : {}) }} onClick={() => setMethod('fiat')}>
               <h2 style={styles.optionTitle}><BadgeDollarSign size={18} /> Fiat deposit</h2>
-              <p style={styles.optionText}>Fund your account with card or supported local payment methods through Paystack.</p>
+
             </button>
             <button type="button" style={{ ...styles.option, ...(method === 'crypto' ? styles.optionActive : {}) }} onClick={() => setMethod('crypto')}>
               <h2 style={styles.optionTitle}><Wallet size={18} /> Crypto deposit</h2>
-              <p style={styles.optionText}>We’ll add on-chain deposits with network and wallet address selection soon.</p>
+
             </button>
           </div>
 
