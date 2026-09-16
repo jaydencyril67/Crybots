@@ -274,19 +274,7 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
   const [avatarDragging, setAvatarDragging] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(() => {
-    try {
-      const raw = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
-      if (!raw) {
-        return null;
-      }
-
-      const parsed = JSON.parse(raw) as { profilePicture?: string };
-      return parsed.profilePicture ?? null;
-    } catch {
-      return null;
-    }
-  });
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -828,9 +816,6 @@ const SettingsPage = () => {
       const nextProfile = data?.user ?? null;
       const nextAvatarUrl = nextProfile?.profilePicture ?? uploadedFile.url;
       if (nextProfile) {
-        const cachedUser = { ...nextProfile, profilePicture: nextAvatarUrl };
-        window.localStorage.setItem('user', JSON.stringify(cachedUser));
-        window.localStorage.setItem('kingshall_user', JSON.stringify(cachedUser));
         setAvatarPreview(nextAvatarUrl);
       } else {
         setAvatarPreview(nextAvatarUrl);

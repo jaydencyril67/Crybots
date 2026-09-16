@@ -276,14 +276,7 @@ type MeResponse = {
 };
 
 const ProfilePage = () => {
-  const profile = useMemo(() => {
-    try {
-      const raw = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
-      return raw ? JSON.parse(raw) as ProfileDetails : null;
-    } catch {
-      return null;
-    }
-  }, []);
+  const profile = useMemo(() => null, []);
 
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(profile);
   const [balanceError, setBalanceError] = useState<string | null>(null);
@@ -311,16 +304,12 @@ const ProfilePage = () => {
         }
 
         const serverProfile = meResponse.data.user ?? null;
-        const cachedProfile = profile ?? null;
-        const mergedProfile = serverProfile
-          ? { ...cachedProfile, ...serverProfile, profilePicture: serverProfile.profilePicture ?? cachedProfile?.profilePicture }
-          : cachedProfile;
-        const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) };
+        const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
         setBalance(nextBalance);
-        setLiveProfile(mergedProfile);
-        if (mergedProfile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(mergedProfile));
-          window.localStorage.setItem('user', JSON.stringify(mergedProfile));
+        setLiveProfile(serverProfile);
+        if (serverProfile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(serverProfile));
+          window.localStorage.setItem('user', JSON.stringify(serverProfile));
         }
         setBalanceError(null);
       } catch {
@@ -328,12 +317,8 @@ const ProfilePage = () => {
           return;
         }
 
-        setBalance({ usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) });
-        setLiveProfile(profile);
-        if (profile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
-          window.localStorage.setItem('user', JSON.stringify(profile));
-        }
+        setBalance({ usdtBalance: null });
+        setLiveProfile(null);
         setBalanceError(null);
       }
     };
