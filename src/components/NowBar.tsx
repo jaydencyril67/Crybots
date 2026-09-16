@@ -8,7 +8,7 @@ const EDGE_LIGHT_COLORS = {
   pink: 'rgba(236, 72, 153, 0.9)',
   green: 'rgba(34, 197, 94, 0.9)',
   amber: 'rgba(245, 158, 11, 0.9)',
-  cyan: 'rgba(34, 211, 238, 0.9)',
+  violet: 'rgba(139, 92, 246, 0.9)',
   red: 'rgba(239, 68, 68, 0.9)',
 } as const;
 
@@ -76,7 +76,6 @@ const styles = {
     alignSelf: 'stretch',
   },
   barExpanded: {
-    '--edge-light': 'transparent',
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
@@ -279,7 +278,9 @@ const NowBar = ({ actions }: NowBarProps) => {
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
   const [holdTimer, setHoldTimer] = useState<number | null>(null);
+  const [idleTimer, setIdleTimer] = useState<number | null>(null);
   const [pressing, setPressing] = useState(false);
+  const barRef = React.useRef<HTMLDivElement | null>(null);
   const [currentPath, setCurrentPath] = useState(getActivePath());
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
@@ -299,6 +300,8 @@ const NowBar = ({ actions }: NowBarProps) => {
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
     window.addEventListener('storage', syncEdgeLight);
     window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
+    window.addEventListener('wheel', handleInteraction, { passive: true });
+    window.addEventListener('scroll', handleInteraction, { passive: true });
 
     return () => {
       window.removeEventListener('popstate', syncPath);
@@ -306,6 +309,8 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.removeEventListener('ke:navigation-start', syncPath as EventListener);
       window.removeEventListener('storage', syncEdgeLight);
       window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
+      window.removeEventListener('wheel', handleInteraction);
+      window.removeEventListener('scroll', handleInteraction);
     };
   }, []);
 
@@ -313,10 +318,26 @@ const NowBar = ({ actions }: NowBarProps) => {
     if (holdTimer) {
       window.clearTimeout(holdTimer);
     }
-  }, [holdTimer]);
+    if (idleTimer) {
+      window.clearTimeout(idleTimer);
+    }
+  }, [holdTimer, idleTimer]);
+
+  const resetIdleTimer = () => {
+    if (idleTimer) {
+      window.clearTimeout(idleTimer);
+    }
+
+    const timer = window.setTimeout(() => {
+      setView('title');
+    }, 10000);
+
+    setIdleTimer(timer);
+  };
 
   const startHold = () => {
     setPressing(true);
+    resetIdleTimer();
     const timer = window.setTimeout(() => {
       setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
     }, 380);
@@ -331,9 +352,14 @@ const NowBar = ({ actions }: NowBarProps) => {
     }
   };
 
+  const handleInteraction = () => {
+    resetIdleTimer();
+  };
+
   return (
     <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
       <div
+        ref={barRef}
         style={{
           ...styles.bar,
           ...(edgeLight.enabled ? { '--edge-light': edgeLightColor } : {}),
@@ -343,6 +369,7 @@ const NowBar = ({ actions }: NowBarProps) => {
         tabIndex={0}
         aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
         onClick={() => {
+          handleInteraction();
           if (!pressing) {
             setView(view === 'title' ? 'actions' : 'title');
           }
@@ -354,6 +381,7 @@ const NowBar = ({ actions }: NowBarProps) => {
         onTouchEnd={stopHold}
         onTouchCancel={stopHold}
         onKeyDown={(event) => {
+          handleInteraction();
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             setView(view === 'title' ? 'actions' : 'title');
