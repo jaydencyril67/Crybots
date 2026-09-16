@@ -811,10 +811,6 @@ const SettingsPage = () => {
       const nextProfile = data?.user ?? null;
       const nextAvatarUrl = nextProfile?.profilePicture ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : null;
       setAvatarPreview(nextAvatarUrl);
-      if (nextProfile) {
-        window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
-        window.localStorage.setItem('user', JSON.stringify(nextProfile));
-      }
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
