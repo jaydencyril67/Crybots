@@ -13,7 +13,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, MoveVertical, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2, RotateCcw } from 'lucide-react';
+import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, MoveVertical, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -48,11 +48,9 @@ type AvatarEditorState = {
 };
 
 const AVATAR_FRAME_SIZE = 512;
-const AVATAR_CONTROL_LIMIT = 140;
 const AVATAR_MIN_ZOOM = 1;
 const AVATAR_MAX_ZOOM = 3;
 const AVATAR_ZOOM_STEP = 0.01;
-const AVATAR_DRAG_STEP = 2;
 
 const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoom: number) => {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -635,11 +633,28 @@ const SettingsPage = () => {
     event.target.value = '';
   };
 
+  const AVATAR_CONTROL_LIMIT = 140;
+  const AVATAR_DRAG_STEP = 2;
+
   const clampAvatarValue = (value: number) => Math.max(-AVATAR_CONTROL_LIMIT, Math.min(AVATAR_CONTROL_LIMIT, value));
   const clampAvatarZoom = (value: number) => Math.max(AVATAR_MIN_ZOOM, Math.min(AVATAR_MAX_ZOOM, value));
 
   const updateAvatarEditor = (updater: (current: AvatarEditorState) => AvatarEditorState) => {
     setAvatarEditor((current) => (current ? updater(current) : current));
+  };
+
+  const avatarDisplayStyle = {
+    position: 'relative' as const,
+    width: 'min(72vw, 360px)',
+    maxWidth: '100%',
+    aspectRatio: '1 / 1',
+    borderRadius: '50%',
+    overflow: 'hidden',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.04)',
+    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+    touchAction: 'none' as const,
+    cursor: avatarEditor ? 'grab' : 'default',
   };
 
   const handleAvatarDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -828,22 +843,17 @@ const SettingsPage = () => {
 
             <section style={styles.card}>
               <h2 style={styles.cardTitle}><UserCircle2 size={18} /> Profile picture</h2>
-              <p style={styles.cardText}>Select an image, crop it, move it around, and upload the edited version just like a WhatsApp-style avatar editor.</p>
+              <p style={styles.cardText}>Choose a photo, adjust it in the modal, and save a clean cropped avatar.</p>
               <div style={{ display: 'grid', gap: '14px', marginTop: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                  <div
-                    style={{
-                      width: '96px',
-                      height: '96px',
-                      borderRadius: '50%',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      background: avatarPreview ? `url(${avatarPreview}) center/cover no-repeat` : 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.26), rgba(14,18,33,1) 58%)',
-                      display: 'grid',
-                      placeItems: 'center',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {avatarPreview ? null : <UserCircle2 size={42} />}
+                  <div style={{ ...avatarDisplayStyle, width: '96px', height: '96px', flex: '0 0 auto' }}>
+                    {avatarPreview ? (
+                      <div style={{ position: 'absolute', inset: 0, background: `url(${avatarPreview}) center/cover no-repeat` }} />
+                    ) : (
+                      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.26), rgba(14,18,33,1) 58%)' }}>
+                        <UserCircle2 size={42} />
+                      </div>
+                    )}
                   </div>
                   <label style={{ ...styles.button, ...styles.primaryButton, display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                     <Upload size={16} />
