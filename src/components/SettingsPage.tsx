@@ -322,7 +322,7 @@ const SettingsPage = () => {
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
-        setAvatarPreview(user?.profilePicture ?? null);
+        setAvatarPreview(user?.profilePicture ? `${user.profilePicture}${user.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : null);
 
       } catch {
         navigate('/signin');
@@ -814,7 +814,7 @@ const SettingsPage = () => {
         profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
-      const nextAvatarUrl = nextProfile?.profilePicture ?? uploadedFile.url;
+      const nextAvatarUrl = nextProfile?.profilePicture ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : `${uploadedFile.url}${uploadedFile.url.includes('?') ? '&' : '?'}v=${Date.now()}`;
       if (nextProfile) {
         setAvatarPreview(nextAvatarUrl);
       } else {
