@@ -15,6 +15,7 @@ import SettingsPage from './components/SettingsPage';
 import DepositPage from './components/DepositPage';
 import WithdrawalsPage from './components/WithdrawalsPage';
 import TransferPage from './components/TransferPage';
+import TransactionHistoryPage from './components/TransactionHistoryPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppSplashOverlay from './components/AppSplashOverlay';
@@ -51,6 +52,7 @@ const getRouteKey = () => {
   if (pathname === '/withdrawals' || hash === '#/withdrawals') return 'withdrawals';
   if (pathname === '/transfer' || hash === '#/transfer') return 'transfer';
   if (pathname === '/deposit' || hash === '#/deposit') return 'deposit';
+  if (pathname === '/transactions' || hash === '#/transactions') return 'transactions';
   return 'landing';
 };
 
@@ -68,6 +70,7 @@ const routeToKey = (path: string) => {
   if (path === '/withdrawals' || path === '#/withdrawals') return 'withdrawals';
   if (path === '/transfer' || path === '#/transfer') return 'transfer';
   if (path === '/deposit' || path === '#/deposit') return 'deposit';
+  if (path === '/transactions' || path === '#/transactions') return 'transactions';
   return 'landing';
 };
 
@@ -121,11 +124,12 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'withdrawals') return <ProtectedRoute><WithdrawalsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'transfer') return <ProtectedRoute><TransferPage /></ProtectedRoute>;
     if (displayedRouteKey === 'deposit') return <ProtectedRoute><DepositPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
 
     return <LandingPage />;
   }, [displayedRouteKey]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit';
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions';
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
