@@ -311,12 +311,20 @@ const ProfilePage = () => {
         }
 
         const nextProfile = meResponse.data.user ?? profile ?? null;
+        const cachedProfile = profile ?? null;
+        const resolvedProfile = nextProfile
+          ? {
+              ...cachedProfile,
+              ...nextProfile,
+              ...(nextProfile.profilePicture || cachedProfile?.profilePicture ? { profilePicture: nextProfile.profilePicture || cachedProfile?.profilePicture } : {}),
+            }
+          : cachedProfile;
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) };
         setBalance(nextBalance);
-        setLiveProfile(nextProfile);
-        if (nextProfile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
-          window.localStorage.setItem('user', JSON.stringify(nextProfile));
+        setLiveProfile(resolvedProfile);
+        if (resolvedProfile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(resolvedProfile));
+          window.localStorage.setItem('user', JSON.stringify(resolvedProfile));
         }
         setBalanceError(null);
       } catch {

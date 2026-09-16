@@ -71,11 +71,13 @@ const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoo
     throw new Error('Unable to prepare image editor.');
   }
 
-  const scale = Math.max(image.width, image.height) * zoom;
-  const renderWidth = scale;
-  const renderHeight = scale;
-  const offsetX = ((image.width - renderWidth) / 2) - cropX;
-  const offsetY = ((image.height - renderHeight) / 2) - cropY;
+  const imageAspect = image.width / image.height;
+  const coverWidth = imageAspect >= 1 ? image.width * zoom : image.height * imageAspect * zoom;
+  const coverHeight = imageAspect >= 1 ? image.width / imageAspect * zoom : image.height * zoom;
+  const cropOffsetX = cropX * (coverWidth / size);
+  const cropOffsetY = cropY * (coverHeight / size);
+  const sourceX = (image.width - coverWidth) / 2 - cropOffsetX;
+  const sourceY = (image.height - coverHeight) / 2 - cropOffsetY;
 
   context.clearRect(0, 0, size, size);
   context.save();
@@ -83,7 +85,7 @@ const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoo
   context.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
   context.closePath();
   context.clip();
-  context.drawImage(image, offsetX, offsetY, renderWidth, renderHeight);
+  context.drawImage(image, sourceX, sourceY, coverWidth, coverHeight);
   context.restore();
 
   return canvas.toDataURL('image/png');
@@ -646,6 +648,9 @@ const SettingsPage = () => {
   const closeAvatarEditor = () => {
     setAvatarEditor(null);
     setAvatarDragging(false);
+    avatarPointers.current.clear();
+    avatarPinchState.current = null;
+    avatarZoomTarget.current = null;
   };
 
   const avatarDisplayStyle = {
@@ -678,6 +683,10 @@ const SettingsPage = () => {
     event.currentTarget.setPointerCapture(event.pointerId);
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
+      if (avatarPointers.current.size > 1) {
+        return;
+      }
+
       const deltaX = moveEvent.clientX - startX;
       const deltaY = moveEvent.clientY - startY;
       const easedDeltaX = Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.92);
@@ -704,6 +713,8 @@ const SettingsPage = () => {
 
   const avatarPointers = React.useRef<Map<number, { x: number; y: number }>>(new Map());
   const avatarPinchState = React.useRef<{ distance: number; zoom: number } | null>(null);
+  const avatarZoomRaf = React.useRef<number | null>(null);
+  const avatarZoomTarget = React.useRef<number | null>(null);
 
   const getPointerDistance = (first: { x: number; y: number }, second: { x: number; y: number }) => Math.hypot(second.x - first.x, second.y - first.y);
 
@@ -731,10 +742,21 @@ const SettingsPage = () => {
       }
 
       const pinchScale = distance / Math.max(avatarPinchState.current.distance, AVATAR_PINCH_MIN_DISTANCE);
-      updateAvatarEditor((current) => ({
-        ...current,
-        zoom: clampAvatarZoom(avatarPinchState.current ? avatarPinchState.current.zoom * pinchScale : current.zoom),
-      }));
+      const easedZoom = avatarPinchState.current.zoom + (avatarPinchState.current.zoom * (pinchScale - 1)) * 0.65;
+      avatarZoomTarget.current = clampAvatarZoom(easedZoom);
+
+      if (avatarZoomRaf.current === null) {
+        avatarZoomRaf.current = window.requestAnimationFrame(() => {
+          avatarZoomRaf.current = null;
+          if (avatarZoomTarget.current !== null) {
+            const nextZoom = avatarZoomTarget.current;
+            updateAvatarEditor((current) => ({
+              ...current,
+              zoom: nextZoom,
+            }));
+          }
+        });
+      }
       return;
     }
 
@@ -745,6 +767,11 @@ const SettingsPage = () => {
     avatarPointers.current.delete(event.pointerId);
     if (avatarPointers.current.size < 2) {
       avatarPinchState.current = null;
+      avatarZoomTarget.current = null;
+      if (avatarZoomRaf.current !== null) {
+        window.cancelAnimationFrame(avatarZoomRaf.current);
+        avatarZoomRaf.current = null;
+      }
     }
   };
 
@@ -792,12 +819,14 @@ const SettingsPage = () => {
         profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
+      const nextAvatarUrl = nextProfile?.profilePicture ?? uploadedFile.url;
       if (nextProfile) {
-        window.localStorage.setItem('user', JSON.stringify(nextProfile));
-        window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
-        setAvatarPreview(nextProfile.profilePicture ?? uploadedFile.url);
+        const cachedUser = { ...nextProfile, profilePicture: nextAvatarUrl };
+        window.localStorage.setItem('user', JSON.stringify(cachedUser));
+        window.localStorage.setItem('kingshall_user', JSON.stringify(cachedUser));
+        setAvatarPreview(nextAvatarUrl);
       } else {
-        setAvatarPreview(uploadedFile.url);
+        setAvatarPreview(nextAvatarUrl);
       }
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
@@ -1087,7 +1116,7 @@ const SettingsPage = () => {
                 <div
                   style={{
                     position: 'relative',
-                    minHeight: 'min(74vh, 560px)',
+                    minHeight: 'min(78vh, 620px)',
                     borderRadius: '28px',
                     overflow: 'hidden',
                     border: '1px solid rgba(255,255,255,0.08)',
@@ -1127,10 +1156,10 @@ const SettingsPage = () => {
                         position: 'absolute',
                         left: '50%',
                         top: '50%',
-                        width: 'min(74vw, 320px)',
-                        height: 'min(74vw, 320px)',
-                        maxWidth: 'calc(100% - 32px)',
-                        maxHeight: 'calc(100% - 32px)',
+                        width: 'min(82vw, 360px)',
+                        height: 'min(82vw, 360px)',
+                        maxWidth: 'calc(100% - 24px)',
+                        maxHeight: 'calc(100% - 24px)',
                         transform: 'translate(-50%, -50%)',
                         border: '2px solid rgba(255,255,255,0.9)',
                         boxShadow: '0 0 0 999px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.16)',
