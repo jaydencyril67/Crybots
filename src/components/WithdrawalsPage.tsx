@@ -92,6 +92,7 @@ const styles = {
   customPickerWeekdays: { display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '6px' },
   customPickerWeekday: { textAlign: 'center' as const, color: 'rgba(255,255,255,0.56)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const },
   customPickerCalendar: { display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '6px' },
+  customPickerGrid: { display: 'flex', gap: '10px', flexWrap: 'wrap' as const },
   customPickerDay: { borderRadius: '14px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', minHeight: '42px', cursor: 'pointer', fontWeight: 700 },
   customPickerDaySelected: { border: '1px solid rgba(103,232,249,0.65)', background: 'rgba(103,232,249,0.16)', color: '#cffafe' },
   customPickerDayToday: { boxShadow: 'inset 0 0 0 1px rgba(196,181,253,0.6)' },
