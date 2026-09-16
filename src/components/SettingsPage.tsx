@@ -13,7 +13,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, LockKeyhole, ShieldCheck, Trash2, WalletCards, Landmark } from 'lucide-react';
+import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, MoveVertical, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -25,6 +25,8 @@ type MeResponse = {
     uid?: string;
     email?: string;
     walletAddress?: string;
+    profilePicture?: string;
+    profilePictureFileId?: string;
   };
 };
 
@@ -36,6 +38,50 @@ type StatusState = {
 type WalletValidationState = {
   valid: boolean;
   message: string;
+};
+
+type AvatarEditorState = {
+  source: string;
+  cropX: number;
+  cropY: number;
+  zoom: number;
+};
+
+const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoom: number) => {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const nextImage = new Image();
+    nextImage.crossOrigin = 'anonymous';
+    nextImage.onload = () => resolve(nextImage);
+    nextImage.onerror = reject;
+    nextImage.src = source;
+  });
+
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext('2d');
+
+  if (!context) {
+    throw new Error('Unable to prepare image editor.');
+  }
+
+  const scale = Math.max(image.width, image.height) * zoom;
+  const renderWidth = scale;
+  const renderHeight = scale;
+  const offsetX = ((image.width - renderWidth) / 2) - cropX;
+  const offsetY = ((image.height - renderHeight) / 2) - cropY;
+
+  context.clearRect(0, 0, size, size);
+  context.save();
+  context.beginPath();
+  context.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+  context.closePath();
+  context.clip();
+  context.drawImage(image, offsetX, offsetY, renderWidth, renderHeight);
+  context.restore();
+
+  return canvas.toDataURL('image/png');
 };
 
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
@@ -219,6 +265,9 @@ const SettingsPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
+  const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
   const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
@@ -265,6 +314,9 @@ const SettingsPage = () => {
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
+        if (user?.profilePicture) {
+          setAvatarPreview(user.profilePicture);
+        }
 
       
       } catch {
@@ -533,6 +585,66 @@ const SettingsPage = () => {
     return 'Enter exactly 5 digits to check availability.';
   }, [uid, uidAvailable, uidChecking]);
 
+  const openAvatarEditor = async (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const source = typeof reader.result === 'string' ? reader.result : '';
+      if (!source) {
+        showStatus('error', 'Unable to read that image.');
+        return;
+      }
+
+      setAvatarEditor({
+        source,
+        cropX: 0,
+        cropY: 0,
+        zoom: 1,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      showStatus('error', 'Please choose an image file.');
+      return;
+    }
+
+    void openAvatarEditor(file);
+    event.target.value = '';
+  };
+
+  const handleUploadAvatar = async () => {
+    if (!avatarEditor) {
+      return;
+    }
+
+    setAvatarUploading(true);
+    try {
+      const avatarDataUrl = await avatarToDataUrl(avatarEditor.source, avatarEditor.cropX, avatarEditor.cropY, avatarEditor.zoom);
+      const { data } = await api.patch('/api/settings/profile-picture', {
+        profilePicture: avatarDataUrl,
+      });
+      const nextProfile = data?.user ?? null;
+      if (nextProfile) {
+        window.localStorage.setItem('user', JSON.stringify(nextProfile));
+        window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
+        setAvatarPreview(nextProfile.profilePicture ?? avatarDataUrl);
+      }
+      setAvatarEditor(null);
+      showStatus('success', 'Profile picture updated successfully.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to update profile picture.');
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
   return (
     <div style={styles.page}>
       <Helmet>
@@ -549,6 +661,34 @@ const SettingsPage = () => {
                 message={status.message}
               />
             ) : null}
+
+            <section style={styles.card}>
+              <h2 style={styles.cardTitle}><UserCircle2 size={18} /> Profile picture</h2>
+              <p style={styles.cardText}>Select an image, crop it, move it around, and upload the edited version just like a WhatsApp-style avatar editor.</p>
+              <div style={{ display: 'grid', gap: '14px', marginTop: '14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                  <div
+                    style={{
+                      width: '96px',
+                      height: '96px',
+                      borderRadius: '50%',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      background: avatarPreview ? `url(${avatarPreview}) center/cover no-repeat` : 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.26), rgba(14,18,33,1) 58%)',
+                      display: 'grid',
+                      placeItems: 'center',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {avatarPreview ? null : <UserCircle2 size={42} />}
+                  </div>
+                  <label style={{ ...styles.button, ...styles.primaryButton, display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <Upload size={16} />
+                    <span>Choose photo</span>
+                    <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} />
+                  </label>
+                </div>
+              </div>
+            </section>
 
             <div style={styles.grid}>
               <section style={styles.card}>
@@ -754,6 +894,64 @@ const SettingsPage = () => {
 
           </div>
         </div>
+        {avatarEditor ? (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 80,
+              background: 'rgba(3, 6, 17, 0.78)',
+              display: 'grid',
+              placeItems: 'center',
+              padding: '18px',
+            }}
+          >
+            <div style={{ width: 'min(920px, 100%)', borderRadius: '28px', background: '#0b1221', border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.5)' }}>
+              <div style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem' }}>Edit profile photo</h3>
+                  <p style={{ margin: '6px 0 0', color: '#9db0d1', fontSize: '0.9rem' }}>Drag and zoom your photo before saving.</p>
+                </div>
+                <button type="button" style={styles.button} onClick={() => setAvatarEditor(null)} disabled={avatarUploading}>Cancel</button>
+              </div>
+              <div style={{ padding: '20px', display: 'grid', gap: '18px', gridTemplateColumns: 'minmax(0, 1fr) 280px' }}>
+                <div style={{ position: 'relative', minHeight: '420px', borderRadius: '24px', background: 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.14), rgba(14,18,33,1) 58%)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundImage: `url(${avatarEditor.source})`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: `${50 + avatarEditor.cropX / 8}% ${50 + avatarEditor.cropY / 8}%`,
+                      backgroundSize: `${100 * avatarEditor.zoom}% auto`,
+                      transform: 'translateZ(0)',
+                    }}
+                  />
+                  <div style={{ position: 'absolute', inset: '18px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.35)', boxShadow: '0 0 0 999px rgba(0,0,0,0.22)' }} />
+                </div>
+                <div style={{ display: 'grid', gap: '14px', alignContent: 'start' }}>
+                  <div style={styles.field}>
+                    <span style={styles.label}><Crop size={14} /> Zoom</span>
+                    <input type="range" min="1" max="3" step="0.01" value={avatarEditor.zoom} onChange={(event) => setAvatarEditor((current) => current ? { ...current, zoom: Number(event.target.value) } : current)} />
+                  </div>
+                  <div style={styles.field}>
+                    <span style={styles.label}><MoveHorizontal size={14} /> Align horizontally</span>
+                    <input type="range" min="-100" max="100" step="1" value={avatarEditor.cropX} onChange={(event) => setAvatarEditor((current) => current ? { ...current, cropX: Number(event.target.value) } : current)} />
+                  </div>
+                  <div style={styles.field}>
+                    <span style={styles.label}><MoveVertical size={14} /> Align vertically</span>
+                    <input type="range" min="-100" max="100" step="1" value={avatarEditor.cropY} onChange={(event) => setAvatarEditor((current) => current ? { ...current, cropY: Number(event.target.value) } : current)} />
+                  </div>
+                  <div style={styles.buttonRow}>
+                    <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading}>
+                      {avatarUploading ? 'Uploading...' : 'Save photo'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
         <NowBar />
       </div>
     </div>
