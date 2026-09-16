@@ -14,7 +14,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(2 * 72px)',
+    height: 'calc(1.5 * 72px)',
   },
   bar: {
     display: 'flex',
