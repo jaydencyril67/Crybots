@@ -218,6 +218,27 @@ const SettingsPage = () => {
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const raw = window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY);
+      if (!raw) {
+        return;
+      }
+
+      const parsed = JSON.parse(raw) as { enabled?: boolean; color?: EdgeLightColorKey };
+      setEdgeLightEnabled(Boolean(parsed.enabled));
+      if (parsed.color && EDGE_LIGHT_COLOR_OPTIONS.some((option) => option.key === parsed.color)) {
+        setEdgeLightColor(parsed.color);
+      }
+    } catch {
+      // Ignore invalid localStorage data and keep defaults.
+    }
+  }, []);
+
   const uidDigits = uid.replace(/\D/g, '').slice(0, 5);
   const uidReadyToSave = Boolean(uidEditorActive && uidDigits.length === 5 && uidAvailable !== false && uidDigits !== initialUid);
   const showUidSaveButton = Boolean(activeCard === 'uid' && uidReadyToSave) || uidCardSaving;
