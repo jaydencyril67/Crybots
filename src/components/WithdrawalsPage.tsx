@@ -256,7 +256,7 @@ const WithdrawalsPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Currency</span>
-                  <input style={styles.input} value={currency} onChange={(event) => setCurrency(event.target.value.toUpperCase())} placeholder={assetType === 'crypto' ? 'USDT' : 'NGN'} />
+                  <input style={styles.input} value={currency} onChange={(event) => setCurrency(event.target.value.toUpperCase())} placeholder='USDT' />
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Bound wallet</span>
