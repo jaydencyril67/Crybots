@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDownToLine, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
+import { ArrowDownToLine, ArrowRightLeft, CalendarClock, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const styles = {
@@ -131,7 +131,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Withdraw',
-    icon: <ArrowDownToLine size={18} />,
+    icon: <ArrowRightLeft size={18} />,
     onClick: () => {
       navigate('/withdrawals');
     },
@@ -152,6 +152,14 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/profile');
     },
     active: getActivePath() === '/profile',
+  },
+  {
+    label: 'Transactions',
+    icon: <CalendarClock size={18} />,
+    onClick: () => {
+      navigate('/transactions');
+    },
+    active: getActivePath() === '/transactions',
   },
   {
     label: 'Settings',

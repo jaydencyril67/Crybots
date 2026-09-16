@@ -12,9 +12,6 @@ type MeResponse = {
     uid?: string;
     email?: string;
     walletAddress?: string;
-    fiatBankName?: string;
-    fiatAccountName?: string;
-    fiatAccountNumber?: string;
   };
 };
 
@@ -157,14 +154,10 @@ const SettingsPage = () => {
   const [uidCardSaving, setUidCardSaving] = useState(false);
   const [passwordCardSaving, setPasswordCardSaving] = useState(false);
   const [walletCardSaving, setWalletCardSaving] = useState(false);
-  const [fiatCardSaving, setFiatCardSaving] = useState(false);
   const [securityCodeCardSaving, setSecurityCodeCardSaving] = useState(false);
-  const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'uid' | 'fiat' | 'securityCode' | null>(null);
+  const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'uid' | 'securityCode' | null>(null);
   const [initialUid, setInitialUid] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
-  const [fiatBankName, setFiatBankName] = useState('');
-  const [fiatAccountName, setFiatAccountName] = useState('');
-  const [fiatAccountNumber, setFiatAccountNumber] = useState('');
   const [securityCode, setSecurityCode] = useState('');
   const [securityCodeConfirm, setSecurityCodeConfirm] = useState('');
   const [currentSecurityPassword, setCurrentSecurityPassword] = useState('');
@@ -190,9 +183,7 @@ const SettingsPage = () => {
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
-        setFiatBankName(user?.fiatBankName ?? '');
-        setFiatAccountName(user?.fiatAccountName ?? '');
-        setFiatAccountNumber(user?.fiatAccountNumber ?? '');
+
       
       } catch {
         navigate('/signin');
@@ -254,7 +245,7 @@ const SettingsPage = () => {
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
-  const fiatCanSave = fiatBankName.trim() !== '' && fiatAccountName.trim() !== '' && fiatAccountNumber.trim().length >= 6;
+
   const securityCodeValid = securityCode.trim().replace(/\D/g, '').length === 6 && securityCode === securityCodeConfirm;
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
@@ -358,27 +349,7 @@ const SettingsPage = () => {
     }
   };
 
-  const handleSaveFiatAccount = async () => {
-    if (!fiatCanSave) {
-      showStatus('error', 'Enter a bank name, account name, and valid account number.');
-      return;
-    }
 
-    setFiatCardSaving(true);
-    try {
-      await api.patch('/api/withdrawals/fiat-account', {
-        bankName: fiatBankName,
-        accountName: fiatAccountName,
-        accountNumber: fiatAccountNumber,
-      });
-      showStatus('success', 'Fiat account saved successfully.');
-      setActiveCard(null);
-    } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to save fiat account.');
-    } finally {
-      setFiatCardSaving(false);
-    }
-  };
 
   const handleSaveSecurityCode = async () => {
     if (!currentPassword) {
@@ -559,29 +530,7 @@ const SettingsPage = () => {
               </section>
 
               <section style={styles.card}>
-                <h2 style={styles.cardTitle}><Landmark size={18} /> Fiat account binding</h2>
-                <p style={styles.cardText}>Bind a receiving fiat account for withdrawals and cash-out requests.</p>
-                <div style={styles.formGrid}>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Bank name</span>
-                    <input style={styles.input} value={fiatBankName} onChange={(event) => { setFiatBankName(event.target.value); setActiveCard('fiat'); }} onFocus={() => setActiveCard('fiat')} />
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Account name</span>
-                    <input style={styles.input} value={fiatAccountName} onChange={(event) => { setFiatAccountName(event.target.value); setActiveCard('fiat'); }} onFocus={() => setActiveCard('fiat')} />
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Account number</span>
-                    <input style={styles.input} value={fiatAccountNumber} onChange={(event) => { setFiatAccountNumber(event.target.value); setActiveCard('fiat'); }} onFocus={() => setActiveCard('fiat')} />
-                  </label>
-                </div>
-                {((activeCard === 'fiat' && fiatCanSave) || fiatCardSaving) ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveFiatAccount()} disabled={fiatCardSaving || !fiatCanSave}>
-                      {fiatCardSaving ? 'Saving...' : 'Save fiat account'}
-                    </button>
-                  </div>
-                ) : null}
+
               </section>
 
               <section style={styles.card}>

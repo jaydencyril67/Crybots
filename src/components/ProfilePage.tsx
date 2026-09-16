@@ -266,7 +266,6 @@ type ProfileDetails = {
   email?: string;
   uid?: string;
   usdtBalance?: number;
-  fiatBalance?: number;
 };
 
 type MeResponse = {
@@ -285,9 +284,8 @@ const ProfilePage = () => {
 
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(profile);
   const [balanceError, setBalanceError] = useState<string | null>(null);
-  const [balance, setBalance] = useState<{ usdtBalance: number | null; fiatBalance: number | null } | null>(() => ({
+  const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
     usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null),
-    fiatBalance: typeof profile?.fiatBalance === 'number' ? profile.fiatBalance : null,
   }));
 
   useEffect(() => {
@@ -310,7 +308,7 @@ const ProfilePage = () => {
         }
 
         const nextProfile = meResponse.data.user ?? profile ?? null;
-        const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null), fiatBalance: typeof meResponse.data.user?.fiatBalance === 'number' ? meResponse.data.user.fiatBalance : null };
+        const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) };
         setBalance(nextBalance);
         setLiveProfile(nextProfile);
         if (nextProfile) {
@@ -323,7 +321,7 @@ const ProfilePage = () => {
           return;
         }
 
-        setBalance({ usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null), fiatBalance: typeof profile?.fiatBalance === 'number' ? profile.fiatBalance : null });
+        setBalance({ usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) });
         setLiveProfile(profile);
         if (profile) {
           window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
@@ -357,7 +355,7 @@ const ProfilePage = () => {
   const email = profileDetails?.email || 'Not available';
   const uid = profileDetails?.uid || 'Pending confirmation';
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : 0;
-  const fiatBalance = typeof balance?.fiatBalance === 'number' ? balance.fiatBalance : typeof profileDetails?.fiatBalance === 'number' ? profileDetails.fiatBalance : 0;
+
 
   const handleLogout = () => {
     window.localStorage.removeItem('token');
@@ -417,10 +415,7 @@ const ProfilePage = () => {
                     <span style={styles.metaLabel}><Coins size={16} /> USDT Balance</span>
                     <span style={styles.metaValue}>{usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</span>
                   </div>
-                  <div style={styles.metaCard}>
-                    <span style={styles.metaLabel}><Wallet size={16} /> Fiat Balance</span>
-                    <span style={styles.metaValue}>{fiatBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
-                  </div>
+
                 </div>
               </section>
             </div>
