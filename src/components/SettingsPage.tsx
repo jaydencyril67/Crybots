@@ -738,7 +738,41 @@ const SettingsPage = () => {
 
     setAvatarUploading(true);
     try {
-      const avatarDataUrl = avatarEditor.source;
+      const avatarCanvas = document.createElement('canvas');
+      const avatarImage = new Image();
+      avatarImage.crossOrigin = 'anonymous';
+      avatarImage.src = avatarEditor.source;
+      await new Promise<void>((resolve, reject) => {
+        avatarImage.onload = () => resolve();
+        avatarImage.onerror = () => reject(new Error('Unable to prepare the cropped avatar.'));
+      });
+
+      const avatarSize = 512;
+      avatarCanvas.width = avatarSize;
+      avatarCanvas.height = avatarSize;
+      const avatarContext = avatarCanvas.getContext('2d');
+
+      if (!avatarContext) {
+        throw new Error('Unable to prepare the cropped avatar.');
+      }
+
+      const displayedSize = avatarSize / avatarEditor.zoom;
+      const sourceX = (avatarImage.width - displayedSize) / 2 - avatarEditor.cropX;
+      const sourceY = (avatarImage.height - displayedSize) / 2 - avatarEditor.cropY;
+
+      avatarContext.drawImage(
+        avatarImage,
+        sourceX,
+        sourceY,
+        displayedSize,
+        displayedSize,
+        0,
+        0,
+        avatarSize,
+        avatarSize,
+      );
+
+      const avatarDataUrl = avatarCanvas.toDataURL('image/png');
       const authResponse = await api.get('/api/imagekit/auth');
       const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
@@ -775,11 +809,11 @@ const SettingsPage = () => {
         profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
-      const nextAvatarUrl = nextProfile?.profilePicture ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : `${uploadedFile.url}${uploadedFile.url.includes('?') ? '&' : '?'}v=${Date.now()}`;
+      const nextAvatarUrl = nextProfile?.profilePicture ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : null;
+      setAvatarPreview(nextAvatarUrl);
       if (nextProfile) {
-        setAvatarPreview(nextAvatarUrl);
-      } else {
-        setAvatarPreview(nextAvatarUrl);
+        window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
+        window.localStorage.setItem('user', JSON.stringify(nextProfile));
       }
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
