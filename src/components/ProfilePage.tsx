@@ -305,10 +305,6 @@ const ProfilePage = () => {
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
         setBalance(nextBalance);
         setLiveProfile(serverProfile);
-        if (serverProfile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(serverProfile));
-          window.localStorage.setItem('user', JSON.stringify(serverProfile));
-        }
         setBalanceError(null);
       } catch {
         if (!isMounted) {
@@ -374,7 +370,9 @@ const ProfilePage = () => {
                   <div
                     style={{
                       ...styles.avatar,
-                      backgroundImage: liveProfile?.profilePicture ? `url(${liveProfile.profilePicture})` : styles.avatar.background,
+                      backgroundImage: liveProfile?.profilePicture
+                        ? `url(${liveProfile.profilePicture}${liveProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()})`
+                        : styles.avatar.background,
                     }}
                   >
                     {liveProfile?.profilePicture ? null : <CircleUserRound style={styles.avatarIcon} />}

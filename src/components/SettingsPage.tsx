@@ -775,12 +775,9 @@ const SettingsPage = () => {
         profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
-      const nextAvatarUrl = nextProfile?.profilePicture ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : `${uploadedFile.url}${uploadedFile.url.includes('?') ? '&' : '?'}v=${Date.now()}`;
-      if (nextProfile) {
-        setAvatarPreview(nextAvatarUrl);
-      } else {
-        setAvatarPreview(nextAvatarUrl);
-      }
+      setAvatarPreview(nextProfile?.profilePicture
+        ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}`
+        : null);
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
