@@ -252,10 +252,10 @@ const WithdrawalsPage = () => {
                 {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><input style={styles.input} type="datetime-local" value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} /></div> : null}
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
-                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
+                  <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
                 </div>
                 <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination}>
+                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || !securityCodeSet || !securityCode}>
                     {withdrawing ? 'Submitting...' : 'Submit withdrawal'}
                   </button>
                 </div>
@@ -271,11 +271,8 @@ const WithdrawalsPage = () => {
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security code</h2>
-                <p style={styles.cardText}>Set or change your withdrawal security code. Password verification is required.</p>
-                <div style={styles.field as React.CSSProperties}><span style={styles.label}>Current password</span><input style={styles.input} type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></div>
-                <div style={styles.field as React.CSSProperties}><span style={styles.label}>Security code</span><input style={styles.input} type="password" value={newSecurityCode} onChange={(event) => setNewSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? 'Change security code' : 'Set security code'} /></div>
-                <div style={styles.buttonRow}><button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveSecurityCode()} disabled={savingSecurityCode}>{savingSecurityCode ? 'Saving...' : securityCodeSet ? 'Change code' : 'Bind code'}</button></div>
-                <p style={styles.cardText}>Scheduled withdrawals are held for review until the selected date and time.</p>
+                <p style={styles.cardText}>Use the settings page to bind or change your security code. Withdrawals only work after it has been set.</p>
+                <p style={styles.cardText}>If you have not set a security code yet, go to Settings and bind one first before submitting a withdrawal.</p>
               </section>
             </div>
             <section style={styles.card}>
