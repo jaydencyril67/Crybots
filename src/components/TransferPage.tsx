@@ -88,7 +88,9 @@ const styles = {
   field: { display: 'grid', gap: '8px' },
   label: { fontSize: '0.78rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
-  select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
+  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
+  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
   helper: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
@@ -105,6 +107,7 @@ const TransferPage = () => {
   const [recipientValid, setRecipientValid] = useState(false);
   const [recipientDetails, setRecipientDetails] = useState<TransferRecipientCheckResponse['user'] | null>(null);
   const [recipientChecking, setRecipientChecking] = useState(false);
+  const [isRecipientMenuOpen, setIsRecipientMenuOpen] = useState(false);
   const [amount, setAmount] = useState('');
   const [securityCode, setSecurityCode] = useState('');
   const [securityCodeBound, setSecurityCodeBound] = useState(false);
@@ -202,30 +205,27 @@ const TransferPage = () => {
                 <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Recipient type</span>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' }}>
-                    {(['uid', 'email'] as const).map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        style={{
-                          borderRadius: '16px',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          background: recipientMethod === option ? 'rgba(125,211,252,0.12)' : 'rgba(7,12,24,0.92)',
-                          color: '#fff',
-                          padding: '12px 14px',
-                          fontSize: '0.9rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          ...(recipientMethod === option ? { border: '1px solid rgba(125,211,252,0.55)' } : {}),
-                        }}
-                        onClick={() => setRecipientMethod(option)}
-                        aria-pressed={recipientMethod === option}
-                      >
-                        {option === 'uid' ? 'UID' : 'Email'}
-                      </button>
-                    ))}
-                  </div>
+                  <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
+                    <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
+                    <span>▾</span>
+                  </button>
+                  {isRecipientMenuOpen ? (
+                    <div style={styles.selectMenu}>
+                      {(['uid', 'email'] as const).map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          style={styles.selectOption}
+                          onClick={() => {
+                            setRecipientMethod(option);
+                            setIsRecipientMenuOpen(false);
+                          }}
+                        >
+                          {option === 'uid' ? 'UID' : 'Email'}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>

@@ -79,7 +79,9 @@ const styles = {
   field: { display: 'grid', gap: '8px' },
   label: { fontSize: '0.82rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
-  select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
+  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)' },
+  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
   helper: { fontSize: '0.85rem', color: '#95a8ca', lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%' },
@@ -96,6 +98,8 @@ const WithdrawalsPage = () => {
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [assetType, setAssetType] = useState<'crypto' | 'fiat'>('crypto');
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
+  const [isAssetMenuOpen, setIsAssetMenuOpen] = useState(false);
+  const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USDT');
   const [destinationValue, setDestinationValue] = useState('');
@@ -206,35 +210,51 @@ const WithdrawalsPage = () => {
                 <p style={styles.cardText}>Choose an asset type, pick instant or scheduled processing, and send funds to your bound account.</p>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Asset type</span>
-                  <div style={styles.customPickerRow as React.CSSProperties}>
-                    {(['crypto', 'fiat'] as const).map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        style={{ ...styles.customPickerButton, ...(assetType === option ? styles.customPickerButtonActive : {}) }}
-                        onClick={() => setAssetType(option)}
-                        aria-pressed={assetType === option}
-                      >
-                        {option === 'crypto' ? 'Crypto' : 'Fiat'}
-                      </button>
-                    ))}
-                  </div>
+                  <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
+                    <span>{assetType === 'crypto' ? 'Crypto' : 'Fiat'}</span>
+                    <span>▾</span>
+                  </button>
+                  {isAssetMenuOpen ? (
+                    <div style={styles.selectMenu}>
+                      {(['crypto', 'fiat'] as const).map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          style={styles.selectOption}
+                          onClick={() => {
+                            setAssetType(option);
+                            setIsAssetMenuOpen(false);
+                          }}
+                        >
+                          {option === 'crypto' ? 'Crypto' : 'Fiat'}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Withdrawal method</span>
-                  <div style={styles.customPickerRow as React.CSSProperties}>
-                    {(['instant', 'scheduled'] as const).map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        style={{ ...styles.customPickerButton, ...(method === option ? styles.customPickerButtonActive : {}) }}
-                        onClick={() => setMethod(option)}
-                        aria-pressed={method === option}
-                      >
-                        {option === 'instant' ? 'Instant' : 'Scheduled'}
-                      </button>
-                    ))}
-                  </div>
+                  <button type="button" style={styles.selectTrigger} onClick={() => setIsMethodMenuOpen((current) => !current)}>
+                    <span>{method === 'instant' ? 'Instant' : 'Scheduled'}</span>
+                    <span>▾</span>
+                  </button>
+                  {isMethodMenuOpen ? (
+                    <div style={styles.selectMenu}>
+                      {(['instant', 'scheduled'] as const).map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          style={styles.selectOption}
+                          onClick={() => {
+                            setMethod(option);
+                            setIsMethodMenuOpen(false);
+                          }}
+                        >
+                          {option === 'instant' ? 'Instant' : 'Scheduled'}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Amount</span>
