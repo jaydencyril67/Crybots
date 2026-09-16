@@ -71,11 +71,13 @@ const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoo
     throw new Error('Unable to prepare image editor.');
   }
 
-  const scale = Math.max(image.width, image.height) * zoom;
-  const renderWidth = scale;
-  const renderHeight = scale;
-  const offsetX = ((image.width - renderWidth) / 2) - cropX;
-  const offsetY = ((image.height - renderHeight) / 2) - cropY;
+  const imageAspect = image.width / image.height;
+  const coverWidth = imageAspect >= 1 ? image.width * zoom : image.height * imageAspect * zoom;
+  const coverHeight = imageAspect >= 1 ? image.width / imageAspect * zoom : image.height * zoom;
+  const cropOffsetX = cropX * (coverWidth / size);
+  const cropOffsetY = cropY * (coverHeight / size);
+  const sourceX = (image.width - coverWidth) / 2 - cropOffsetX;
+  const sourceY = (image.height - coverHeight) / 2 - cropOffsetY;
 
   context.clearRect(0, 0, size, size);
   context.save();
@@ -83,7 +85,7 @@ const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoo
   context.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
   context.closePath();
   context.clip();
-  context.drawImage(image, offsetX, offsetY, renderWidth, renderHeight);
+  context.drawImage(image, sourceX, sourceY, coverWidth, coverHeight);
   context.restore();
 
   return canvas.toDataURL('image/png');
@@ -646,6 +648,9 @@ const SettingsPage = () => {
   const closeAvatarEditor = () => {
     setAvatarEditor(null);
     setAvatarDragging(false);
+    avatarPointers.current.clear();
+    avatarPinchState.current = null;
+    avatarZoomTarget.current = null;
   };
 
   const avatarDisplayStyle = {
@@ -814,12 +819,14 @@ const SettingsPage = () => {
         profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
+      const nextAvatarUrl = nextProfile?.profilePicture ?? uploadedFile.url;
       if (nextProfile) {
-        window.localStorage.setItem('user', JSON.stringify(nextProfile));
-        window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
-        setAvatarPreview(nextProfile.profilePicture ?? uploadedFile.url);
+        const cachedUser = { ...nextProfile, profilePicture: nextAvatarUrl };
+        window.localStorage.setItem('user', JSON.stringify(cachedUser));
+        window.localStorage.setItem('kingshall_user', JSON.stringify(cachedUser));
+        setAvatarPreview(nextAvatarUrl);
       } else {
-        setAvatarPreview(uploadedFile.url);
+        setAvatarPreview(nextAvatarUrl);
       }
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');

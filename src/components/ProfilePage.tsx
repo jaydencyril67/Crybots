@@ -311,12 +311,14 @@ const ProfilePage = () => {
         }
 
         const nextProfile = meResponse.data.user ?? profile ?? null;
+        const cachedProfile = profile ?? null;
+        const resolvedProfile = nextProfile ? { ...cachedProfile, ...nextProfile, profilePicture: nextProfile.profilePicture ?? cachedProfile?.profilePicture ?? null } : cachedProfile;
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) };
         setBalance(nextBalance);
-        setLiveProfile(nextProfile);
-        if (nextProfile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
-          window.localStorage.setItem('user', JSON.stringify(nextProfile));
+        setLiveProfile(resolvedProfile);
+        if (resolvedProfile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(resolvedProfile));
+          window.localStorage.setItem('user', JSON.stringify(resolvedProfile));
         }
         setBalanceError(null);
       } catch {
@@ -327,8 +329,9 @@ const ProfilePage = () => {
         setBalance({ usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) });
         setLiveProfile(profile);
         if (profile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
-          window.localStorage.setItem('user', JSON.stringify(profile));
+          const resolvedProfile = { ...profile, profilePicture: profile.profilePicture ?? null };
+          window.localStorage.setItem('kingshall_user', JSON.stringify(resolvedProfile));
+          window.localStorage.setItem('user', JSON.stringify(resolvedProfile));
         }
         setBalanceError(null);
       }
