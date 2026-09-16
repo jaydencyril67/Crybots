@@ -276,9 +276,7 @@ type MeResponse = {
 };
 
 const ProfilePage = () => {
-  const profile = useMemo<ProfileDetails | null>(() => null, []);
-
-  const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(profile);
+  const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
     usdtBalance: null,
@@ -340,9 +338,9 @@ const ProfilePage = () => {
       window.removeEventListener('focus', handleFocus);
       unsubscribe();
     };
-  }, [profile]);
+  }, []);
 
-  const profileDetails = liveProfile ?? profile;
+  const profileDetails = liveProfile;
   const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profileDetails?.email || 'Not available';
   const uid = profileDetails?.uid || 'Pending confirmation';
