@@ -6,7 +6,6 @@ const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'pink', label: 'Pink', value: 'rgba(236, 72, 153, 0.9)' },
   { key: 'green', label: 'Green', value: 'rgba(34, 197, 94, 0.9)' },
   { key: 'amber', label: 'Amber', value: 'rgba(245, 158, 11, 0.9)' },
-  { key: 'violet', label: 'Violet', value: 'rgba(139, 92, 246, 0.9)' },
   { key: 'red', label: 'Red', value: 'rgba(239, 68, 68, 0.9)' },
 ] as const;
 
