@@ -434,6 +434,7 @@ const SettingsPage = () => {
       EDGE_LIGHT_STORAGE_KEY,
       JSON.stringify({ enabled, color }),
     );
+    window.dispatchEvent(new Event('nowbar-edge-light-changed'));
     setEdgeLightSavedEnabled(enabled);
     setEdgeLightSavedColor(color);
   };

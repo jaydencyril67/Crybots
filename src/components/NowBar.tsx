@@ -12,13 +12,15 @@ const EDGE_LIGHT_COLORS = {
 
 type EdgeLightColor = keyof typeof EDGE_LIGHT_COLORS;
 
+const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
+
 const getEdgeLightSettings = () => {
   if (typeof window === 'undefined') {
     return { enabled: false, color: 'blue' as EdgeLightColor };
   }
 
   try {
-    const raw = window.localStorage.getItem('nowbar_edge_light');
+    const raw = window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY);
     if (!raw) {
       return { enabled: false, color: 'blue' as EdgeLightColor };
     }
@@ -269,7 +271,8 @@ const createDefaultActions = (): NowBarAction[] => [
 ];
 
 const NowBar = ({ actions }: NowBarProps) => {
-  const edgeLight = useMemo(() => getEdgeLightSettings(), []);
+  const [edgeLightVersion, setEdgeLightVersion] = useState(0);
+  const edgeLight = useMemo(() => getEdgeLightSettings(), [edgeLightVersion]);
   const edgeLightColor = EDGE_LIGHT_COLORS[edgeLight.color];
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
@@ -285,14 +288,22 @@ const NowBar = ({ actions }: NowBarProps) => {
       setCurrentPath(getActivePath());
     };
 
+    const syncEdgeLight = () => {
+      setEdgeLightVersion((current) => current + 1);
+    };
+
     window.addEventListener('popstate', syncPath);
     window.addEventListener('hashchange', syncPath);
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
+    window.addEventListener('storage', syncEdgeLight);
+    window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
 
     return () => {
       window.removeEventListener('popstate', syncPath);
       window.removeEventListener('hashchange', syncPath);
       window.removeEventListener('ke:navigation-start', syncPath as EventListener);
+      window.removeEventListener('storage', syncEdgeLight);
+      window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
     };
   }, []);
 
