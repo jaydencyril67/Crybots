@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CalendarClock, Coins, Landmark, ShieldCheck, TimerReset } from 'lucide-react';
+import { CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -10,14 +10,10 @@ import { navigate } from '../utils/navigate';
 type WithdrawalDetailsResponse = {
   user?: {
     walletAddress?: string;
-    fiatBankName?: string;
-    fiatAccountName?: string;
-    fiatAccountNumber?: string;
     securityCodeSet?: boolean;
   };
   balances?: {
     usdtBalance?: number;
-    fiatBalance?: number;
   };
 };
 
@@ -96,7 +92,7 @@ const styles = {
 const WithdrawalsPage = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
-  const [assetType, setAssetType] = useState<'crypto' | 'fiat'>('crypto');
+  const [assetType, setAssetType] = useState<'crypto'>('crypto');
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
   const [isAssetMenuOpen, setIsAssetMenuOpen] = useState(false);
   const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
@@ -108,19 +104,15 @@ const WithdrawalsPage = () => {
   const [scheduledFor, setScheduledFor] = useState('');
   const [securityCode, setSecurityCode] = useState('');
   const [currentWallet, setCurrentWallet] = useState('');
-  const [fiatAccount, setFiatAccount] = useState({ bankName: '', accountName: '', accountNumber: '' });
-  const [balances, setBalances] = useState({ usdtBalance: 0, fiatBalance: 0 });
+  const [balances, setBalances] = useState({ usdtBalance: 0 });
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
-  const [savingAccount, setSavingAccount] = useState(false);
+
   const [savingSecurityCode, setSavingSecurityCode] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
   const [password, setPassword] = useState('');
   const [newSecurityCode, setNewSecurityCode] = useState('');
 
-  const availableDestination = useMemo(() => {
-    if (assetType === 'crypto') return currentWallet;
-    return fiatAccount.accountNumber;
-  }, [assetType, currentWallet, fiatAccount.accountNumber]);
+  const availableDestination = useMemo(() => currentWallet, [currentWallet]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -138,13 +130,9 @@ const WithdrawalsPage = () => {
       try {
         const { data } = await api.get<WithdrawalDetailsResponse>('/api/withdrawals/me');
         setCurrentWallet(data.user?.walletAddress ?? '');
-        setFiatAccount({
-          bankName: data.user?.fiatBankName ?? '',
-          accountName: data.user?.fiatAccountName ?? '',
-          accountNumber: data.user?.fiatAccountNumber ?? '',
-        });
+
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
-        setBalances({ usdtBalance: data.balances?.usdtBalance ?? 0, fiatBalance: data.balances?.fiatBalance ?? 0 });
+        setBalances({ usdtBalance: data.balances?.usdtBalance ?? 0 });
         if (data.user?.walletAddress) setDestinationValue(data.user.walletAddress);
       } catch {
         navigate('/signin');
@@ -159,20 +147,10 @@ const WithdrawalsPage = () => {
   }, []);
 
   useEffect(() => {
-    setDestinationValue(assetType === 'crypto' ? currentWallet : fiatAccount.accountNumber);
-  }, [assetType, currentWallet, fiatAccount.accountNumber]);
+    setDestinationValue(currentWallet);
+  }, [currentWallet]);
 
-  const handleSaveFiatAccount = async () => {
-    setSavingAccount(true);
-    try {
-      await api.patch('/api/withdrawals/fiat-account', fiatAccount);
-      setMessage({ kind: 'success', text: 'Fiat account saved successfully.' });
-    } catch (error: any) {
-      setMessage({ kind: 'error', text: error?.response?.data?.message || 'Unable to save fiat account.' });
-    } finally {
-      setSavingAccount(false);
-    }
-  };
+
 
   const handleSaveSecurityCode = async () => {
     setSavingSecurityCode(true);
@@ -222,17 +200,17 @@ const WithdrawalsPage = () => {
             {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
             <div style={styles.grid}>
               <section style={styles.card}>
-                <h2 style={styles.cardTitle}><Coins size={18} /> Withdraw crypto or fiat</h2>
-                <p style={styles.cardText}>Choose an asset type, pick instant or scheduled processing, and send funds to your bound account.</p>
+                <h2 style={styles.cardTitle}><Coins size={18} /> Withdraw USDT</h2>
+                <p style={styles.cardText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
                 <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Asset type</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
-                    <span>{assetType === 'crypto' ? 'Crypto' : 'Fiat'}</span>
+                    <span>Crypto</span>
                     <span style={{ transform: isAssetMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                   </button>
                   {isAssetMenuOpen ? (
                     <div style={styles.selectMenu}>
-                      {(['crypto', 'fiat'] as const).map((option) => (
+                      {(['crypto'] as const).map((option) => (
                         <button
                           key={option}
                           type="button"
@@ -242,7 +220,7 @@ const WithdrawalsPage = () => {
                             setIsAssetMenuOpen(false);
                           }}
                         >
-                          {option === 'crypto' ? 'Crypto' : 'Fiat'}
+                          Crypto
                         </button>
                       ))}
                     </div>
@@ -281,9 +259,9 @@ const WithdrawalsPage = () => {
                   <input style={styles.input} value={currency} onChange={(event) => setCurrency(event.target.value.toUpperCase())} placeholder={assetType === 'crypto' ? 'USDT' : 'NGN'} />
                 </div>
                 <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>{assetType === 'crypto' ? 'Bound wallet' : 'Bound fiat account'}</span>
+                  <span style={styles.label}>Bound wallet</span>
                   <input style={styles.input} value={availableDestination} readOnly />
-                  <span style={styles.helper}>{assetType === 'crypto' ? 'Use your bound TRC-20 wallet.' : 'Use the fiat account saved in settings.'}</span>
+                  <span style={styles.helper}>Use your bound TRC-20 wallet.</span>
                 </div>
                 {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><input style={styles.input} type="datetime-local" value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} /></div> : null}
                 <div style={styles.field as React.CSSProperties}>
@@ -295,16 +273,9 @@ const WithdrawalsPage = () => {
                     {withdrawing ? 'Submitting...' : 'Submit withdrawal'}
                   </button>
                 </div>
-                <p style={styles.cardText}>Crypto balance: {balances.usdtBalance.toFixed(2)} USDT · Fiat balance: {balances.fiatBalance.toFixed(2)}</p>
+                <p style={styles.cardText}>Crypto balance: {balances.usdtBalance.toFixed(2)} USDT</p>
               </section>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><Landmark size={18} /> Fiat account binding</h2>
-                <p style={styles.cardText}>Bind a receiving fiat account for scheduled or instant cash-out requests.</p>
-                <div style={styles.field as React.CSSProperties}><span style={styles.label}>Bank name</span><input style={styles.input} value={fiatAccount.bankName} onChange={(event) => setFiatAccount((current) => ({ ...current, bankName: event.target.value }))} /></div>
-                <div style={styles.field as React.CSSProperties}><span style={styles.label}>Account name</span><input style={styles.input} value={fiatAccount.accountName} onChange={(event) => setFiatAccount((current) => ({ ...current, accountName: event.target.value }))} /></div>
-                <div style={styles.field as React.CSSProperties}><span style={styles.label}>Account number</span><input style={styles.input} value={fiatAccount.accountNumber} onChange={(event) => setFiatAccount((current) => ({ ...current, accountNumber: event.target.value }))} /></div>
-                <div style={styles.buttonRow}><button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveFiatAccount()} disabled={savingAccount}>{savingAccount ? 'Saving...' : 'Save fiat account'}</button></div>
-              </section>
+
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security code</h2>
                 <p style={styles.cardText}>Use the settings page to bind or change your security code. Withdrawals only work after it has been set.</p>
