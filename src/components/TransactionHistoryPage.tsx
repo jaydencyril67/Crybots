@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import AppHeader from './AppHeader';
+import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
 
@@ -476,14 +477,13 @@ const TransactionHistoryPage = () => {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td style={styles.loadingState} colSpan={6}>Loading transaction history…</td>
+                      <td style={styles.loadingState} colSpan={6}><LoadingDots /></td>
                     </tr>
                   ) : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => (
                     <tr key={transaction.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
                       <td style={styles.td}>
                         <div style={styles.meta}>
                           <strong>{transaction.title}</strong>
-                          <span style={styles.muted}>{getTypeLabel(transaction.type)} · {transaction.direction}</span>
                         </div>
                       </td>
                       <td style={styles.td}><strong>{transaction.amount}</strong></td>
