@@ -476,7 +476,7 @@ const TransactionHistoryPage = () => {
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td style={styles.loadingState} colSpan={6}>Loading transaction history…</td>
+                      <td style={styles.loadingState} colSpan={6}><LoadingDots /></td>
                     </tr>
                   ) : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => (
                     <tr key={transaction.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
