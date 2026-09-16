@@ -117,7 +117,7 @@ const styles = {
   label: { fontSize: '0.82rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
   select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
-  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer', position: 'relative' as const, zIndex: 21 },
+  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
   selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)', transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out', position: 'absolute' as const, top: 'calc(100% + 8px)', left: 0, right: 0, zIndex: 9999 },
   selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   tableWrap: {
@@ -371,11 +371,11 @@ const TransactionHistoryPage = () => {
                       <input style={{ ...styles.input, paddingLeft: '42px' }} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search reference, title, or user" />
                     </div>
                   </div>
-                  <div ref={typeMenuRef} id="transaction-type-menu" style={{ ...(styles.field as React.CSSProperties), position: 'relative' }}>
+                  <div ref={typeMenuRef} id="transaction-type-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Type</span>
                     <button type="button" style={styles.selectTrigger} onClick={() => setIsTypeMenuOpen((current) => !current)}>
                       <span>{typeFilter === 'all' ? 'All types' : getTypeLabel(typeFilter)}</span>
-                      <ChevronDown size={16} style={{ transform: isTypeMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                      <span style={{ transform: isTypeMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                     </button>
                     {isTypeMenuOpen ? (
                       <div style={styles.selectMenu}>
@@ -395,11 +395,11 @@ const TransactionHistoryPage = () => {
                       </div>
                     ) : null}
                   </div>
-                  <div ref={directionMenuRef} id="transaction-direction-menu" style={{ ...(styles.field as React.CSSProperties), position: 'relative' }}>
+                  <div ref={directionMenuRef} id="transaction-direction-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Direction</span>
                     <button type="button" style={styles.selectTrigger} onClick={() => setIsDirectionMenuOpen((current) => !current)}>
                       <span>{directionFilter === 'all' ? 'All directions' : directionFilter === 'inbound' ? 'Inbound' : 'Outbound'}</span>
-                      <ChevronDown size={16} style={{ transform: isDirectionMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                      <span style={{ transform: isDirectionMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                     </button>
                     {isDirectionMenuOpen ? (
                       <div style={styles.selectMenu}>
@@ -419,11 +419,11 @@ const TransactionHistoryPage = () => {
                       </div>
                     ) : null}
                   </div>
-                  <div ref={statusMenuRef} id="transaction-status-menu" style={{ ...(styles.field as React.CSSProperties), position: 'relative' }}>
+                  <div ref={statusMenuRef} id="transaction-status-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Status</span>
                     <button type="button" style={styles.selectTrigger} onClick={() => setIsStatusMenuOpen((current) => !current)}>
                       <span>{statusFilter === 'all' ? 'All statuses' : statusFilter === 'completed' ? 'Completed' : statusFilter === 'pending' ? 'Pending' : 'Failed'}</span>
-                      <ChevronDown size={16} style={{ transform: isStatusMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                      <span style={{ transform: isStatusMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                     </button>
                     {isStatusMenuOpen ? (
                       <div style={styles.selectMenu}>
