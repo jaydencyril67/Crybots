@@ -17,7 +17,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(1.7 * 72px)',
+    height: 'calc(1.4 * 72px)',
   },
   bar: {
     display: 'flex',
@@ -41,7 +41,7 @@ const styles = {
   },
   barExpanded: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     gap: '8px',
@@ -91,11 +91,11 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
-    minHeight: '56px',
-    padding: '12px 14px',
-    borderRadius: '20px',
+    minHeight: '48px',
+    padding: '10px 12px',
+    borderRadius: '18px',
     justifyContent: 'flex-start',
-    gap: '12px',
+    gap: '10px',
   },
   buttonEmpty: {
     opacity: 0.7,
