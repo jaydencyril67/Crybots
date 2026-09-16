@@ -581,7 +581,7 @@ const DashboardPage = () => {
                 <div style={styles.metricCard}>
                   <ChartNoAxesColumnIncreasing style={styles.iconLarge} />
                   <p style={styles.metricLabel}>Coins tracking</p>
-                  <p style={styles.metricValue}>{isCoinsLoaded ? liveCoins.length : 'Loading...'}</p>
+                  <p style={styles.metricValue}>{isCoinsLoaded ? liveCoins.length : <LoadingDots />}</p>
                 </div>
                 <div style={styles.metricCard}>
                   <Wallet style={styles.iconLarge} />
