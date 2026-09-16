@@ -14,6 +14,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
+    height: 'min(58vh, 420px)',
     maxHeight: 'min(58vh, 420px)',
   },
   bar: {
@@ -45,7 +46,7 @@ const styles = {
     borderRadius: '26px',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    maxHeight: 'inherit',
+    maxHeight: '100%',
     minHeight: 0,
     whiteSpace: 'normal' as const,
     alignContent: 'start' as const,
