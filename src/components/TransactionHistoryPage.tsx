@@ -122,6 +122,7 @@ const styles = {
   selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   tableWrap: {
     overflowX: 'auto' as const,
+    overflowY: 'hidden' as const,
     borderRadius: '22px',
     border: '1px solid rgba(255,255,255,0.08)',
     background: 'rgba(255,255,255,0.03)',

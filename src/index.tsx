@@ -132,11 +132,9 @@ const RouteTransition = () => {
   const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions';
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', minHeight: '100vh', overflowX: 'hidden' }}>
       <div
         style={{
-          transform: 'translateX(0)',
-          transition: 'transform 120ms ease',
           minHeight: '100vh',
         }}
       >
