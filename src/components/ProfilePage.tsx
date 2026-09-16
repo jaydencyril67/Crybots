@@ -310,21 +310,19 @@ const ProfilePage = () => {
           return;
         }
 
-        const nextProfile = meResponse.data.user ?? profile ?? null;
+        const serverProfile = meResponse.data.user ?? null;
         const cachedProfile = profile ?? null;
-        const resolvedProfile = nextProfile
-          ? {
-              ...cachedProfile,
-              ...nextProfile,
-              ...(nextProfile.profilePicture || cachedProfile?.profilePicture ? { profilePicture: nextProfile.profilePicture || cachedProfile?.profilePicture } : {}),
-            }
-          : cachedProfile;
+        const mergedProfile = {
+          ...cachedProfile,
+          ...serverProfile,
+          profilePicture: serverProfile?.profilePicture ?? cachedProfile?.profilePicture,
+        } as ProfileDetails | null;
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) };
         setBalance(nextBalance);
-        setLiveProfile(resolvedProfile);
-        if (resolvedProfile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(resolvedProfile));
-          window.localStorage.setItem('user', JSON.stringify(resolvedProfile));
+        setLiveProfile(mergedProfile);
+        if (mergedProfile) {
+          window.localStorage.setItem('kingshall_user', JSON.stringify(mergedProfile));
+          window.localStorage.setItem('user', JSON.stringify(mergedProfile));
         }
         setBalanceError(null);
       } catch {
@@ -335,8 +333,9 @@ const ProfilePage = () => {
         setBalance({ usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) });
         setLiveProfile(profile);
         if (profile) {
-          window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
-          window.localStorage.setItem('user', JSON.stringify(profile));
+          const cachedProfile = { ...profile, profilePicture: profile.profilePicture ?? undefined };
+          window.localStorage.setItem('kingshall_user', JSON.stringify(cachedProfile));
+          window.localStorage.setItem('user', JSON.stringify(cachedProfile));
         }
         setBalanceError(null);
       }
