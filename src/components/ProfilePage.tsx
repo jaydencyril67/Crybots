@@ -108,6 +108,8 @@ const styles = {
     background: 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.26), rgba(14,18,33,1) 58%)',
     border: '1px solid rgba(255,255,255,0.08)',
     overflow: 'hidden',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
   },
   avatarIcon: {
     width: '56px',
@@ -266,6 +268,7 @@ type ProfileDetails = {
   email?: string;
   uid?: string;
   usdtBalance?: number;
+  profilePicture?: string;
 };
 
 type MeResponse = {
@@ -381,8 +384,13 @@ const ProfilePage = () => {
             <div style={styles.profileStack}>
               <section style={{ ...styles.panel, ...styles.avatarPanel }}>
                 <div style={styles.avatarShell}>
-                  <div style={styles.avatar}>
-                    <CircleUserRound style={styles.avatarIcon} />
+                  <div
+                    style={{
+                      ...styles.avatar,
+                      backgroundImage: liveProfile?.profilePicture ? `url(${liveProfile.profilePicture})` : styles.avatar.background,
+                    }}
+                  >
+                    {liveProfile?.profilePicture ? null : <CircleUserRound style={styles.avatarIcon} />}
                   </div>
                  </div>
               </section>
