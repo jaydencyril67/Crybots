@@ -230,6 +230,7 @@ const TransactionHistoryPage = () => {
   const [isDirectionMenuOpen, setIsDirectionMenuOpen] = useState(false);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
+  const [transactionHistoryPage, setTransactionHistoryPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -249,6 +250,7 @@ const TransactionHistoryPage = () => {
           : [];
 
         setTransactions(normalizedTransactions);
+        setTransactionHistoryPage(1);
         if (!Array.isArray(data?.transactions)) {
           setError('The backend returned no transaction records.');
         }
@@ -297,6 +299,40 @@ const TransactionHistoryPage = () => {
   const totalCount = transactions.length;
   const filteredCount = filteredTransactions.length;
   const completedCount = transactions.filter((transaction) => transaction.status === 'completed').length;
+  const transactionHistoryPageSize = 15;
+  const transactionHistoryTotalPages = Math.max(1, Math.ceil(filteredTransactions.length / transactionHistoryPageSize));
+  const transactionHistoryCurrentPage = Math.min(transactionHistoryPage, transactionHistoryTotalPages);
+  const transactionHistoryStartIndex = (transactionHistoryCurrentPage - 1) * transactionHistoryPageSize;
+  const transactionHistoryRows = filteredTransactions.slice(transactionHistoryStartIndex, transactionHistoryStartIndex + transactionHistoryPageSize);
+  const transactionHistoryPageItems = useMemo(() => {
+    if (transactionHistoryTotalPages <= 7) {
+      return Array.from({ length: transactionHistoryTotalPages }, (_, index) => index + 1);
+    }
+
+    const visiblePages = new Set<number>([1, transactionHistoryTotalPages, transactionHistoryCurrentPage]);
+    if (transactionHistoryCurrentPage > 1) visiblePages.add(transactionHistoryCurrentPage - 1);
+    if (transactionHistoryCurrentPage < transactionHistoryTotalPages) visiblePages.add(transactionHistoryCurrentPage + 1);
+    if (transactionHistoryCurrentPage <= 3) {
+      visiblePages.add(2);
+      visiblePages.add(3);
+    }
+    if (transactionHistoryCurrentPage >= transactionHistoryTotalPages - 2) {
+      visiblePages.add(transactionHistoryTotalPages - 1);
+      visiblePages.add(transactionHistoryTotalPages - 2);
+    }
+
+    return Array.from(visiblePages)
+      .filter((page) => page >= 1 && page <= transactionHistoryTotalPages)
+      .sort((left, right) => left - right)
+      .flatMap((page, index, pages) => {
+        const nextPage = pages[index + 1];
+        if (nextPage && nextPage - page > 1) {
+          return [page, 'ellipsis' as const, nextPage];
+        }
+        return [page];
+      })
+      .filter((item, index, items) => item !== 'ellipsis' || items[index - 1] !== 'ellipsis');
+  }, [transactionHistoryCurrentPage, transactionHistoryTotalPages]);
 
   return (
     <div style={styles.page}>
@@ -439,8 +475,8 @@ const TransactionHistoryPage = () => {
                     <tr>
                       <td style={styles.loadingState} colSpan={6}>Loading transaction history…</td>
                     </tr>
-                  ) : filteredTransactions.length > 0 ? filteredTransactions.map((transaction) => (
-                    <tr key={transaction.id}>
+                  ) : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => (
+                    <tr key={transaction.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
                       <td style={styles.td}>
                         <div style={styles.meta}>
                           <strong>{transaction.title}</strong>
@@ -473,10 +509,35 @@ const TransactionHistoryPage = () => {
               </table>
             </section>
 
-            <section style={styles.card}>
-              <h2 style={styles.cardTitle}><CalendarDays size={18} /> Activity log note</h2>
-              <p style={styles.cardText}>Each transaction record should be backed by server-side audit data in production, including timestamp, actor, transaction category, and processing status. The current page uses the same card, label, and spacing style patterns as the rest of the app and remains horizontally scrollable for small screens.</p>
-            </section>
+            {filteredTransactions.length > transactionHistoryPageSize ? (
+              <div style={styles.card}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '12px', alignItems: 'center' }}>
+                  <p style={styles.cardText}>Showing {transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredTransactions.length)} of {filteredTransactions.length} transactions</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                    <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => setTransactionHistoryPage((current) => Math.max(1, current - 1))} disabled={transactionHistoryCurrentPage === 1}>Prev</button>
+                    {transactionHistoryPageItems.map((item, index) =>
+                      item === 'ellipsis' ? (
+                        <span key={`transaction-ellipsis-${index}`} style={styles.muted}>…</span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          style={{
+                            ...styles.selectOption,
+                            minWidth: '42px',
+                            ...(item === transactionHistoryCurrentPage ? { borderColor: 'rgba(125,211,252,0.55)', background: 'rgba(125,211,252,0.12)' } : {}),
+                          }}
+                          onClick={() => setTransactionHistoryPage(item)}
+                        >
+                          {item}
+                        </button>
+                      ),
+                    )}
+                    <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => setTransactionHistoryPage((current) => Math.min(transactionHistoryTotalPages, current + 1))} disabled={transactionHistoryCurrentPage === transactionHistoryTotalPages}>Next</button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
         <NowBar />
