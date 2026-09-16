@@ -251,9 +251,6 @@ const NowBar = ({ actions }: NowBarProps) => {
     }
   };
 
-  const toggleLayoutMode = () => {
-    setLayoutMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
-  };
 
   const handlePressStart = () => {
     if (holdTimerRef.current) {
@@ -261,7 +258,8 @@ const NowBar = ({ actions }: NowBarProps) => {
     }
 
     holdTimerRef.current = window.setTimeout(() => {
-      setView((currentView) => (currentView === 'title' ? 'actions' : 'title'));
+      setLayoutMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
+      setView('actions');
       holdTimerRef.current = null;
     }, 220);
   };
