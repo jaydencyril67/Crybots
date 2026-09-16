@@ -278,6 +278,12 @@ const styles = {
     fontSize: '0.92rem',
     lineHeight: 1.5,
   },
+  loadingState: {
+    padding: '24px 18px',
+    textAlign: 'center' as const,
+    color: '#9db0d1',
+    fontSize: '0.92rem',
+  },
 };
 
 const getTypeLabel = (type: Exclude<TransactionType, 'all'>) => {
