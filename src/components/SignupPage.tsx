@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, CreditCard, Lock, Mail } from 'lucide-react';
 import AppHeader from './AppHeader';
 import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
@@ -236,6 +236,20 @@ const styles = {
     lineHeight: 1.7,
     fontSize: '15px',
   },
+  customPickerButton: { borderRadius: '18px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(6,10,20,0.9)', color: '#fff', padding: '13px 14px', fontSize: '0.98rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', width: '100%' },
+  customPickerDisplay: { borderRadius: '18px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(8,12,24,0.96)', padding: '14px', color: '#eef4ff', fontSize: '0.92rem', lineHeight: 1.5, display: 'grid', gap: '12px' },
+  customPickerHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' },
+  customPickerNavButton: { width: '40px', height: '40px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' },
+  customPickerMonthLabel: { color: '#fff', fontSize: '0.95rem', fontWeight: 800, letterSpacing: '0.02em' },
+  customPickerWeekdays: { display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '6px' },
+  customPickerWeekday: { textAlign: 'center' as const, color: 'rgba(255,255,255,0.56)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const },
+  customPickerCalendar: { display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '6px' },
+  customPickerDay: { borderRadius: '14px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', minHeight: '42px', cursor: 'pointer', fontWeight: 700 },
+  customPickerDaySelected: { border: '1px solid rgba(103,232,249,0.65)', background: 'rgba(103,232,249,0.16)', color: '#cffafe' },
+  customPickerDayToday: { boxShadow: 'inset 0 0 0 1px rgba(196,181,253,0.6)' },
+  customPickerDayDisabled: { opacity: 0.35, cursor: 'not-allowed' },
+  customPickerSpacer: { minHeight: '42px' },
+  customPickerHint: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5, margin: 0 },
   form: {
     marginTop: '18px',
     display: 'grid',
@@ -350,9 +364,15 @@ const SignupPage = () => {
   const [passwordError, setPasswordError] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dobMonthMenuOpen, setDobMonthMenuOpen] = useState(false);
+  const [isDobPickerOpen, setIsDobPickerOpen] = useState(false);
+  const [dobViewMonth, setDobViewMonth] = useState(() => {
+    const today = new Date();
+    return new Date(today.getFullYear() - 18, today.getMonth(), 1);
+  });
+  const dobPickerRef = useRef<HTMLDivElement | null>(null);
 
   const current = steps[stepIndex];
+  const dobMonthLabel = dobViewMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
   const progress = ((stepIndex + 1) / steps.length) * 100;
   const isLastStep = stepIndex === steps.length - 1;
 
@@ -377,6 +397,48 @@ const SignupPage = () => {
     }
     setSubmitError('');
   };
+
+  const selectDob = (date: Date) => {
+    const isoDate = date.toISOString().slice(0, 10);
+    updateField('dob', isoDate);
+    setIsDobPickerOpen(false);
+  };
+
+  const moveDobMonth = (delta: number) => {
+    setDobViewMonth((currentMonth) => new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1));
+  };
+
+  const dobCalendarDays = useMemo(() => {
+    const start = new Date(dobViewMonth.getFullYear(), dobViewMonth.getMonth(), 1);
+    const end = new Date(dobViewMonth.getFullYear(), dobViewMonth.getMonth() + 1, 0);
+    const firstDayIndex = start.getDay();
+    const days: Array<{ date: Date | null; key: string; label: string; disabled: boolean; isSelected: boolean; isToday: boolean }> = [];
+
+    for (let i = 0; i < firstDayIndex; i += 1) {
+      days.push({ date: null, key: `blank-${i}`, label: '', disabled: true, isSelected: false, isToday: false });
+    }
+
+    for (let day = 1; day <= end.getDate(); day += 1) {
+      const date = new Date(dobViewMonth.getFullYear(), dobViewMonth.getMonth(), day);
+      const isoDate = date.toISOString().slice(0, 10);
+      const today = new Date();
+      const selected = form.dob === isoDate;
+      const disabled = !isAtLeast18(isoDate);
+      days.push({
+        date,
+        key: isoDate,
+        label: String(day),
+        disabled,
+        isSelected: selected,
+        isToday:
+          today.getFullYear() === date.getFullYear() &&
+          today.getMonth() === date.getMonth() &&
+          today.getDate() === date.getDate(),
+      });
+    }
+
+    return days;
+  }, [dobViewMonth, form.dob]);
 
   const emailInputStyle =
     form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
@@ -556,39 +618,71 @@ const SignupPage = () => {
         );
       case 'dob':
         return (
-          <div style={styles.field}>
+          <div style={styles.field} ref={dobPickerRef}>
             <label style={styles.label} htmlFor={current.field}>
               Date of birth
             </label>
-            <div style={styles.field}>
-            <label style={styles.label} htmlFor={current.field}>
-              Date of birth
-            </label>
-            <div style={styles.customPickerRow}>
-              <button type="button" style={styles.customPickerButton} onClick={() => setDobMonthMenuOpen((currentOpen) => !currentOpen)}>
-                {form.dob || 'Pick your date of birth'}
-              </button>
-            </div>
-            {dobMonthMenuOpen ? (
+            <button
+              type="button"
+              style={{
+                ...styles.customPickerButton,
+                ...(form.dob && !dobMeetsRequirement
+                  ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+                  : null),
+              }}
+              onClick={() => setIsDobPickerOpen((currentOpen) => !currentOpen)}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+                <CalendarDays style={styles.icon} />
+                <span>{form.dob || 'Pick your date of birth'}</span>
+              </span>
+              <span aria-hidden="true">▾</span>
+            </button>
+            {isDobPickerOpen ? (
               <div style={styles.customPickerDisplay}>
-                <p style={styles.customPickerHint}>Enter your date of birth in the format YYYY-MM-DD. Native calendar pickers are disabled here.</p>
-                <input
-                  id={current.field}
-                  style={{
-                    ...styles.input,
-                    ...(form.dob && !dobMeetsRequirement
-                      ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
-                      : null),
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="YYYY-MM-DD"
-                  value={form.dob}
-                  onChange={(event) => updateField('dob', event.target.value)}
-                />
+                <div style={styles.customPickerHeader}>
+                  <button type="button" style={styles.customPickerNavButton} onClick={() => moveDobMonth(-1)} aria-label="Previous month">
+                    <ChevronLeft style={styles.icon} />
+                  </button>
+                  <strong style={styles.customPickerMonthLabel}>{dobMonthLabel}</strong>
+                  <button type="button" style={styles.customPickerNavButton} onClick={() => moveDobMonth(1)} aria-label="Next month">
+                    <ChevronRight style={styles.icon} />
+                  </button>
+                </div>
+                <div style={styles.customPickerWeekdays}>
+                  {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                    <span key={day} style={styles.customPickerWeekday}>
+                      {day}
+                    </span>
+                  ))}
+                </div>
+                <div style={styles.customPickerCalendar}>
+                  {dobCalendarDays.map((day) => (
+                    day.date ? (
+                      <button
+                        key={day.key}
+                        type="button"
+                        style={{
+                          ...styles.customPickerDay,
+                          ...(day.isSelected ? styles.customPickerDaySelected : null),
+                          ...(day.isToday ? styles.customPickerDayToday : null),
+                          ...(day.disabled ? styles.customPickerDayDisabled : null),
+                        }}
+                        onClick={() => selectDob(day.date as Date)}
+                        disabled={day.disabled}
+                        aria-pressed={day.isSelected}
+                        aria-label={`${day.date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}${day.disabled ? ' unavailable' : ''}`}
+                      >
+                        {day.label}
+                      </button>
+                    ) : (
+                      <span key={day.key} style={styles.customPickerSpacer} />
+                    )
+                  ))}
+                </div>
+                <p style={styles.customPickerHint}>Choose a date from the grid. Dates under 18 years old are disabled.</p>
               </div>
             ) : null}
-          </div>
             {dobError ? <NotificationBanner tone="error" title="Check your details" message={dobError} /> : null}
           </div>
         );
