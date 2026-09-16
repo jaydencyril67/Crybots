@@ -256,18 +256,6 @@ const NowBar = ({ actions }: NowBarProps) => {
   };
 
   const handlePressStart = () => {
-    clearHoldTimer();
-    holdTimerRef.current = window.setTimeout(() => {
-      toggleLayoutMode();
-      holdTimerRef.current = null;
-    }, 450);
-  };
-
-  const handlePressEnd = () => {
-    clearHoldTimer();
-  };
-
-  const handlePressStart = () => {
     if (holdTimerRef.current) {
       window.clearTimeout(holdTimerRef.current);
     }
