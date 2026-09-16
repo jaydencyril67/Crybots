@@ -70,7 +70,6 @@ const styles = {
     padding: '0 2px 4px',
     scrollPaddingLeft: '2px',
     scrollPaddingRight: '2px',
-    scrollSnapType: 'x proximity' as const,
     WebkitOverflowScrolling: 'touch' as const,
   },
   packageCard: {
@@ -81,7 +80,6 @@ const styles = {
     display: 'grid',
     gap: '10px',
     minWidth: 0,
-    scrollSnapAlign: 'start',
     justifyItems: 'center',
     textAlign: 'center' as const,
   },
@@ -138,7 +136,6 @@ const styles = {
       padding: '0 4px 4px',
       scrollPaddingLeft: '4px',
       scrollPaddingRight: '4px',
-      scrollSnapType: 'x mandatory' as const,
     },
     stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '16px 14px', width: '100%', minWidth: 0 },
