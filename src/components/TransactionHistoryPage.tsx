@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import AppHeader from './AppHeader';
@@ -232,10 +232,25 @@ const TransactionHistoryPage = () => {
   const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false);
   const [isDirectionMenuOpen, setIsDirectionMenuOpen] = useState(false);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const typeMenuRef = useRef<HTMLDivElement | null>(null);
+  const directionMenuRef = useRef<HTMLDivElement | null>(null);
+  const statusMenuRef = useRef<HTMLDivElement | null>(null);
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
   const [transactionHistoryPage, setTransactionHistoryPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (typeMenuRef.current && !typeMenuRef.current.contains(event.target as Node)) setIsTypeMenuOpen(false);
+      if (directionMenuRef.current && !directionMenuRef.current.contains(event.target as Node)) setIsDirectionMenuOpen(false);
+      if (statusMenuRef.current && !statusMenuRef.current.contains(event.target as Node)) setIsStatusMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   useEffect(() => {
     const loadTransactions = async () => {
@@ -356,7 +371,7 @@ const TransactionHistoryPage = () => {
                       <input style={{ ...styles.input, paddingLeft: '42px' }} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search reference, title, or user" />
                     </div>
                   </div>
-                  <div id="transaction-type-menu" style={styles.field as React.CSSProperties}>
+                  <div ref={typeMenuRef} id="transaction-type-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Type</span>
                     <button type="button" style={styles.selectTrigger} onClick={() => setIsTypeMenuOpen((current) => !current)}>
                       <span>{typeFilter === 'all' ? 'All types' : getTypeLabel(typeFilter)}</span>
@@ -380,7 +395,7 @@ const TransactionHistoryPage = () => {
                       </div>
                     ) : null}
                   </div>
-                  <div id="transaction-direction-menu" style={styles.field as React.CSSProperties}>
+                  <div ref={directionMenuRef} id="transaction-direction-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Direction</span>
                     <button type="button" style={styles.selectTrigger} onClick={() => setIsDirectionMenuOpen((current) => !current)}>
                       <span>{directionFilter === 'all' ? 'All directions' : directionFilter === 'inbound' ? 'Inbound' : 'Outbound'}</span>
@@ -404,7 +419,7 @@ const TransactionHistoryPage = () => {
                       </div>
                     ) : null}
                   </div>
-                  <div id="transaction-status-menu" style={styles.field as React.CSSProperties}>
+                  <div ref={statusMenuRef} id="transaction-status-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Status</span>
                     <button type="button" style={styles.selectTrigger} onClick={() => setIsStatusMenuOpen((current) => !current)}>
                       <span>{statusFilter === 'all' ? 'All statuses' : statusFilter === 'completed' ? 'Completed' : statusFilter === 'pending' ? 'Pending' : 'Failed'}</span>
