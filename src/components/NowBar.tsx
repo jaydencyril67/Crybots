@@ -14,7 +14,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    maxHeight: 'min(58vh, 420px)',
+    height: 'calc(2 * 72px)',
   },
   bar: {
     display: 'flex',
@@ -45,7 +45,7 @@ const styles = {
     borderRadius: '26px',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    maxHeight: 'inherit',
+    height: '100%',
     minHeight: 0,
     whiteSpace: 'normal' as const,
     alignContent: 'start' as const,
@@ -69,6 +69,7 @@ const styles = {
     minWidth: 0,
     width: '100%',
     justifyContent: 'stretch',
+    minHeight: 0,
   },
   button: {
     width: '100%',
