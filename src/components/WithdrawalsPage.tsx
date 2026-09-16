@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CalendarClock, Coins, Landmark, ShieldCheck, TimerReset } from 'lucide-react';
+import { CalendarClock, ChevronLeft, ChevronRight, Coins, Landmark, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -84,11 +84,20 @@ const styles = {
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%' },
   primaryButton: { background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)', border: 'none' },
-  customPickerRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' },
-  customPickerButton: { borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', fontSize: '0.92rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const },
-  customPickerButtonActive: { border: '1px solid rgba(125,211,252,0.55)', background: 'rgba(125,211,252,0.12)' },
-  customPickerDisplay: { borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', padding: '13px 14px', color: '#eef4ff', fontSize: '0.92rem', lineHeight: 1.5 },
-  customPickerHint: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
+  customPickerButton: { borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', fontSize: '0.92rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', width: '100%' },
+  customPickerDisplay: { borderRadius: '18px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(8,12,24,0.96)', padding: '14px', color: '#eef4ff', fontSize: '0.92rem', lineHeight: 1.5, display: 'grid', gap: '12px' },
+  customPickerHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' },
+  customPickerNavButton: { width: '40px', height: '40px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' },
+  customPickerMonthLabel: { color: '#fff', fontSize: '0.95rem', fontWeight: 800, letterSpacing: '0.02em' },
+  customPickerWeekdays: { display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '6px' },
+  customPickerWeekday: { textAlign: 'center' as const, color: 'rgba(255,255,255,0.56)', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const },
+  customPickerCalendar: { display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: '6px' },
+  customPickerDay: { borderRadius: '14px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', minHeight: '42px', cursor: 'pointer', fontWeight: 700 },
+  customPickerDaySelected: { border: '1px solid rgba(103,232,249,0.65)', background: 'rgba(103,232,249,0.16)', color: '#cffafe' },
+  customPickerDayToday: { boxShadow: 'inset 0 0 0 1px rgba(196,181,253,0.6)' },
+  customPickerDayDisabled: { opacity: 0.35, cursor: 'not-allowed' },
+  customPickerSpacer: { minHeight: '42px' },
+  customPickerHint: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5, margin: 0 },
 };
 
 const WithdrawalsPage = () => {
@@ -102,6 +111,8 @@ const WithdrawalsPage = () => {
   const [currency, setCurrency] = useState('USDT');
   const [destinationValue, setDestinationValue] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
+  const [scheduledMonth, setScheduledMonth] = useState(() => new Date());
+  const scheduledPickerRef = useRef<HTMLDivElement | null>(null);
   const [securityCode, setSecurityCode] = useState('');
   const [currentWallet, setCurrentWallet] = useState('');
   const [fiatAccount, setFiatAccount] = useState({ bankName: '', accountName: '', accountNumber: '' });
@@ -143,6 +154,47 @@ const WithdrawalsPage = () => {
   useEffect(() => {
     setDestinationValue(assetType === 'crypto' ? currentWallet : fiatAccount.accountNumber);
   }, [assetType, currentWallet, fiatAccount.accountNumber]);
+
+  const moveScheduledMonth = (delta: number) => {
+    setScheduledMonth((currentMonth) => new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1));
+  };
+
+  const selectScheduledDate = (date: Date) => {
+    const currentTime = scheduledFor.split('T')[1] || '09:00';
+    const [hours, minutes] = currentTime.split(':');
+    const selected = new Date(date.getFullYear(), date.getMonth(), date.getDate(), Number(hours), Number(minutes));
+    const padded = `${selected.getFullYear()}-${String(selected.getMonth() + 1).padStart(2, '0')}-${String(selected.getDate()).padStart(2, '0')}T${String(selected.getHours()).padStart(2, '0')}:${String(selected.getMinutes()).padStart(2, '0')}`;
+    setScheduledFor(padded);
+  };
+
+  const scheduledCalendarDays = useMemo(() => {
+    const start = new Date(scheduledMonth.getFullYear(), scheduledMonth.getMonth(), 1);
+    const end = new Date(scheduledMonth.getFullYear(), scheduledMonth.getMonth() + 1, 0);
+    const firstDayIndex = start.getDay();
+    const days: Array<{ date: Date | null; key: string; label: string; disabled: boolean; isSelected: boolean; isToday: boolean }> = [];
+
+    for (let i = 0; i < firstDayIndex; i += 1) {
+      days.push({ date: null, key: `blank-${i}`, label: '', disabled: true, isSelected: false, isToday: false });
+    }
+
+    for (let day = 1; day <= end.getDate(); day += 1) {
+      const date = new Date(scheduledMonth.getFullYear(), scheduledMonth.getMonth(), day);
+      const isoDate = date.toISOString().slice(0, 10);
+      const today = new Date();
+      const selected = scheduledFor.startsWith(isoDate);
+      const disabled = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      days.push({
+        date,
+        key: isoDate,
+        label: String(day),
+        disabled,
+        isSelected: selected,
+        isToday: today.getFullYear() === date.getFullYear() && today.getMonth() === date.getMonth() && today.getDate() === date.getDate(),
+      });
+    }
+
+    return days;
+  }, [scheduledMonth, scheduledFor]);
 
   const handleSaveFiatAccount = async () => {
     setSavingAccount(true);
@@ -243,7 +295,60 @@ const WithdrawalsPage = () => {
                   <input style={styles.input} value={availableDestination} readOnly />
                   <span style={styles.helper}>{assetType === 'crypto' ? 'Use your bound TRC-20 wallet.' : 'Use the fiat account saved in settings.'}</span>
                 </div>
-                {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><input style={styles.input} value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} placeholder="YYYY-MM-DD HH:mm" /></div> : null}
+                {method === 'scheduled' ? (
+                  <div style={styles.field as React.CSSProperties} ref={scheduledPickerRef}>
+                    <span style={styles.label}>Schedule date and time</span>
+                    <button type="button" style={styles.customPickerButton} onClick={() => setScheduledFor((current) => current)}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+                        <CalendarClock size={18} />
+                        <span>{scheduledFor ? scheduledFor.replace('T', ' · ') : 'Pick schedule date and time'}</span>
+                      </span>
+                      <span aria-hidden="true">▾</span>
+                    </button>
+                    <div style={styles.customPickerDisplay}>
+                      <div style={styles.customPickerHeader}>
+                        <button type="button" style={styles.customPickerNavButton} onClick={() => moveScheduledMonth(-1)} aria-label="Previous month">
+                          <ChevronLeft size={18} />
+                        </button>
+                        <strong style={styles.customPickerMonthLabel}>{scheduledMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</strong>
+                        <button type="button" style={styles.customPickerNavButton} onClick={() => moveScheduledMonth(1)} aria-label="Next month">
+                          <ChevronRight size={18} />
+                        </button>
+                      </div>
+                      <div style={styles.customPickerWeekdays}>
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                          <span key={day} style={styles.customPickerWeekday}>{day}</span>
+                        ))}
+                      </div>
+                      <div style={styles.customPickerCalendar}>
+                        {scheduledCalendarDays.map((day) => day.date ? (
+                          <button
+                            key={day.key}
+                            type="button"
+                            disabled={day.disabled}
+                            aria-pressed={day.isSelected}
+                            style={{
+                              ...styles.customPickerDay,
+                              ...(day.isSelected ? styles.customPickerDaySelected : null),
+                              ...(day.isToday ? styles.customPickerDayToday : null),
+                              ...(day.disabled ? styles.customPickerDayDisabled : null),
+                            }}
+                            onClick={() => selectScheduledDate(day.date as Date)}
+                          >
+                            {day.label}
+                          </button>
+                        ) : (
+                          <span key={day.key} style={styles.customPickerSpacer} />
+                        ))}
+                      </div>
+                      <div style={styles.field as React.CSSProperties}>
+                        <span style={styles.label}>Time</span>
+                        <input style={styles.input} type="time" value={scheduledFor.split('T')[1] || ''} onChange={(event) => setScheduledFor((current) => `${current.split('T')[0] || new Date().toISOString().slice(0, 10)}T${event.target.value}`)} />
+                      </div>
+                      <p style={styles.customPickerHint}>Pick a date from the grid and then choose the time in-app. Native date/time controls are disabled.</p>
+                    </div>
+                  </div>
+                ) : null}
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
                   <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
