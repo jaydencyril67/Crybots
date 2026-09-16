@@ -217,6 +217,34 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
+  const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
+  const [edgeLightSavedColor, setEdgeLightSavedColor] = useState<EdgeLightColorKey>('blue');
+  const [edgeLightCardSaving, setEdgeLightCardSaving] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const raw = window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY);
+      if (!raw) {
+        return;
+      }
+
+      const parsed = JSON.parse(raw) as { enabled?: boolean; color?: EdgeLightColorKey };
+      const nextEnabled = Boolean(parsed.enabled);
+      const nextColor = parsed.color && EDGE_LIGHT_COLOR_OPTIONS.some((option) => option.key === parsed.color)
+        ? parsed.color
+        : 'blue';
+      setEdgeLightEnabled(nextEnabled);
+      setEdgeLightColor(nextColor);
+      setEdgeLightSavedEnabled(nextEnabled);
+      setEdgeLightSavedColor(nextColor);
+    } catch {
+      // Ignore invalid localStorage data and keep defaults.
+    }
+  }, []);
 
   const uidDigits = uid.replace(/\D/g, '').slice(0, 5);
   const uidReadyToSave = Boolean(uidEditorActive && uidDigits.length === 5 && uidAvailable !== false && uidDigits !== initialUid);
@@ -401,12 +429,38 @@ const SettingsPage = () => {
 
 
 
-  const handleSaveEdgeLight = () => {
+  const persistEdgeLight = (enabled: boolean, color: EdgeLightColorKey) => {
     window.localStorage.setItem(
       EDGE_LIGHT_STORAGE_KEY,
-      JSON.stringify({ enabled: edgeLightEnabled, color: edgeLightColor }),
+      JSON.stringify({ enabled, color }),
     );
-    showStatus('success', 'NowBar edge lighting updated.');
+    setEdgeLightSavedEnabled(enabled);
+    setEdgeLightSavedColor(color);
+  };
+
+  const handleToggleEdgeLight = () => {
+    setEdgeLightEnabled((current) => {
+      const nextEnabled = !current;
+      persistEdgeLight(nextEnabled, edgeLightColor);
+      showStatus('success', nextEnabled ? 'NowBar edge lighting turned on.' : 'NowBar edge lighting turned off.');
+      return nextEnabled;
+    });
+  };
+
+  const handleSetEdgeLightColor = (nextColor: EdgeLightColorKey) => {
+    setEdgeLightColor(nextColor);
+    persistEdgeLight(edgeLightEnabled, nextColor);
+    showStatus('success', 'NowBar edge lighting color updated.');
+  };
+
+  const handleSaveEdgeLight = () => {
+    setEdgeLightCardSaving(true);
+    try {
+      persistEdgeLight(edgeLightEnabled, edgeLightColor);
+      showStatus('success', 'NowBar edge lighting updated.');
+    } finally {
+      setEdgeLightCardSaving(false);
+    }
   };
 
   const handleSaveSecurityCode = async () => {
@@ -555,7 +609,7 @@ const SettingsPage = () => {
                   <button
                     type="button"
                     style={{ ...styles.togglePill, ...(edgeLightEnabled ? styles.togglePillActive : {}) }}
-                    onClick={() => setEdgeLightEnabled((current) => !current)}
+                    onClick={handleToggleEdgeLight}
                   >
                     {edgeLightEnabled ? 'On' : 'Off'}
                   </button>
@@ -567,7 +621,7 @@ const SettingsPage = () => {
                       type="button"
                       aria-label={`${option.label} edge light`}
                       title={option.label}
-                      onClick={() => setEdgeLightColor(option.key)}
+                      onClick={() => handleSetEdgeLightColor(option.key)}
                       style={{
                         ...styles.colorSwatch,
                         background: option.value,
@@ -576,11 +630,13 @@ const SettingsPage = () => {
                     />
                   ))}
                 </div>
-                <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={handleSaveEdgeLight}>
-                    Save edge lighting
-                  </button>
-                </div>
+                {((edgeLightEnabled !== edgeLightSavedEnabled || edgeLightColor !== edgeLightSavedColor) || edgeLightCardSaving) ? (
+                  <div style={styles.buttonRow}>
+                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={handleSaveEdgeLight} disabled={edgeLightCardSaving}>
+                      {edgeLightCardSaving ? 'Saving...' : 'Save edge lighting'}
+                    </button>
+                  </div>
+                ) : null}
               </section>
 
               <section style={styles.card}>
