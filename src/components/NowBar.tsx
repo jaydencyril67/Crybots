@@ -12,6 +12,10 @@ const styles = {
     width: 'min(560px, calc(100vw - 32px))',
     pointerEvents: 'none' as const,
   },
+  dockExpanded: {
+    width: 'min(560px, calc(100vw - 24px))',
+    maxHeight: 'min(72vh, 620px)',
+  },
   bar: {
     display: 'flex',
     alignItems: 'center',
@@ -31,6 +35,17 @@ const styles = {
     scrollBehavior: 'smooth' as const,
     WebkitOverflowScrolling: 'touch' as const,
   },
+  barExpanded: {
+    alignItems: 'stretch',
+    flexWrap: 'wrap' as const,
+    gap: '10px',
+    padding: '14px',
+    borderRadius: '26px',
+    overflowX: 'hidden' as const,
+    overflowY: 'auto' as const,
+    whiteSpace: 'normal' as const,
+    alignContent: 'flex-start' as const,
+  },
   rail: {
     position: 'absolute' as const,
     inset: '50% 10px auto',
@@ -44,6 +59,11 @@ const styles = {
     minWidth: '92px',
     display: 'flex',
     justifyContent: 'center',
+  },
+  slotExpanded: {
+    flex: '1 1 calc(50% - 5px)',
+    minWidth: 'calc(50% - 5px)',
+    justifyContent: 'stretch',
   },
   button: {
     width: '100%',
@@ -60,6 +80,13 @@ const styles = {
     justifyContent: 'center',
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
+  buttonExpanded: {
+    minHeight: '56px',
+    padding: '12px 14px',
+    borderRadius: '20px',
+    justifyContent: 'flex-start',
+    gap: '12px',
+  },
   buttonEmpty: {
     opacity: 0.7,
     border: '1px dashed rgba(255,255,255,0.12)',
@@ -69,6 +96,13 @@ const styles = {
     height: '20px',
     display: 'grid',
     placeItems: 'center',
+  },
+  labelExpanded: {
+    fontSize: '0.92rem',
+    fontWeight: 700,
+    letterSpacing: '0.01em',
+    textAlign: 'left' as const,
+    whiteSpace: 'normal' as const,
   },
   iconWrap: {
     width: '18px',
@@ -103,6 +137,8 @@ type NowBarProps = {
 };
 
 type NowBarView = 'title' | 'actions';
+
+type NowBarMode = 'compact' | 'expanded';
 
 const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
 
@@ -187,9 +223,13 @@ const createDefaultActions = (): NowBarAction[] => [
 
 const NowBar = ({ actions }: NowBarProps) => {
   const [view, setView] = useState<NowBarView>('title');
+  const [mode, setMode] = useState<NowBarMode>('compact');
+  const [holdTimer, setHoldTimer] = useState<number | null>(null);
+  const [pressing, setPressing] = useState(false);
   const [currentPath, setCurrentPath] = useState(getActivePath());
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
+  const isExpanded = mode === 'expanded';
 
   useEffect(() => {
     const syncPath = () => {
@@ -207,14 +247,46 @@ const NowBar = ({ actions }: NowBarProps) => {
     };
   }, []);
 
+  useEffect(() => () => {
+    if (holdTimer) {
+      window.clearTimeout(holdTimer);
+    }
+  }, [holdTimer]);
+
+  const startHold = () => {
+    setPressing(true);
+    const timer = window.setTimeout(() => {
+      setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
+    }, 380);
+    setHoldTimer(timer);
+  };
+
+  const stopHold = () => {
+    setPressing(false);
+    if (holdTimer) {
+      window.clearTimeout(holdTimer);
+      setHoldTimer(null);
+    }
+  };
+
   return (
-    <div style={styles.dock} aria-label="Quick navigation bar">
+    <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
       <div
-        style={styles.bar}
+        style={{ ...styles.bar, ...(isExpanded ? styles.barExpanded : {}) }}
         role="button"
         tabIndex={0}
         aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
-        onClick={() => setView(view === 'title' ? 'actions' : 'title')}
+        onClick={() => {
+          if (!pressing) {
+            setView(view === 'title' ? 'actions' : 'title');
+          }
+        }}
+        onMouseDown={startHold}
+        onMouseUp={stopHold}
+        onMouseLeave={stopHold}
+        onTouchStart={startHold}
+        onTouchEnd={stopHold}
+        onTouchCancel={stopHold}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
@@ -231,17 +303,19 @@ const NowBar = ({ actions }: NowBarProps) => {
           </div>
         ) : (
           resolvedActions.map((action, index) => (
-            <div key={`now-bar-slot-${index}`} style={styles.slot}>
+            <div key={`now-bar-slot-${index}`} style={{ ...styles.slot, ...(isExpanded ? styles.slotExpanded : {}) }}>
               <button
                 type="button"
                 aria-label={action.label}
                 onClick={action.onClick}
                 style={{
                   ...styles.button,
+                  ...(isExpanded ? styles.buttonExpanded : {}),
                   ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
                 }}
               >
                 <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+                {isExpanded ? <span style={styles.labelExpanded}>{action.label}</span> : null}
               </button>
             </div>
           ))
