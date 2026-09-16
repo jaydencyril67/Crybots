@@ -678,6 +678,10 @@ const SettingsPage = () => {
     event.currentTarget.setPointerCapture(event.pointerId);
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
+      if (avatarPointers.current.size > 1) {
+        return;
+      }
+
       const deltaX = moveEvent.clientX - startX;
       const deltaY = moveEvent.clientY - startY;
       const easedDeltaX = Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.92);
@@ -733,7 +737,8 @@ const SettingsPage = () => {
       }
 
       const pinchScale = distance / Math.max(avatarPinchState.current.distance, AVATAR_PINCH_MIN_DISTANCE);
-      avatarZoomTarget.current = clampAvatarZoom(avatarPinchState.current.zoom * pinchScale);
+      const easedZoom = avatarPinchState.current.zoom + (avatarPinchState.current.zoom * (pinchScale - 1)) * 0.65;
+      avatarZoomTarget.current = clampAvatarZoom(easedZoom);
 
       if (avatarZoomRaf.current === null) {
         avatarZoomRaf.current = window.requestAnimationFrame(() => {
@@ -1104,7 +1109,7 @@ const SettingsPage = () => {
                 <div
                   style={{
                     position: 'relative',
-                    minHeight: 'min(74vh, 560px)',
+                    minHeight: 'min(78vh, 620px)',
                     borderRadius: '28px',
                     overflow: 'hidden',
                     border: '1px solid rgba(255,255,255,0.08)',
@@ -1144,10 +1149,10 @@ const SettingsPage = () => {
                         position: 'absolute',
                         left: '50%',
                         top: '50%',
-                        width: 'min(74vw, 320px)',
-                        height: 'min(74vw, 320px)',
-                        maxWidth: 'calc(100% - 32px)',
-                        maxHeight: 'calc(100% - 32px)',
+                        width: 'min(82vw, 360px)',
+                        height: 'min(82vw, 360px)',
+                        maxWidth: 'calc(100% - 24px)',
+                        maxHeight: 'calc(100% - 24px)',
                         transform: 'translate(-50%, -50%)',
                         border: '2px solid rgba(255,255,255,0.9)',
                         boxShadow: '0 0 0 999px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.16)',
