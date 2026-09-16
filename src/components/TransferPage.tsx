@@ -202,10 +202,30 @@ const TransferPage = () => {
                 <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Recipient type</span>
-                  <select style={styles.select} value={recipientMethod} onChange={(event) => setRecipientMethod(event.target.value as 'uid' | 'email')}>
-                    <option value="uid">UID</option>
-                    <option value="email">Email</option>
-                  </select>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' }}>
+                    {(['uid', 'email'] as const).map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        style={{
+                          borderRadius: '16px',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          background: recipientMethod === option ? 'rgba(125,211,252,0.12)' : 'rgba(7,12,24,0.92)',
+                          color: '#fff',
+                          padding: '12px 14px',
+                          fontSize: '0.9rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          ...(recipientMethod === option ? { border: '1px solid rgba(125,211,252,0.55)' } : {}),
+                        }}
+                        onClick={() => setRecipientMethod(option)}
+                        aria-pressed={recipientMethod === option}
+                      >
+                        {option === 'uid' ? 'UID' : 'Email'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>

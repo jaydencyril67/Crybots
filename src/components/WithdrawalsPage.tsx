@@ -206,17 +206,35 @@ const WithdrawalsPage = () => {
                 <p style={styles.cardText}>Choose an asset type, pick instant or scheduled processing, and send funds to your bound account.</p>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Asset type</span>
-                  <select style={styles.select} value={assetType} onChange={(event) => setAssetType(event.target.value as 'crypto' | 'fiat')}>
-                    <option value="crypto">Crypto</option>
-                    <option value="fiat">Fiat</option>
-                  </select>
+                  <div style={styles.customPickerRow as React.CSSProperties}>
+                    {(['crypto', 'fiat'] as const).map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        style={{ ...styles.customPickerButton, ...(assetType === option ? styles.customPickerButtonActive : {}) }}
+                        onClick={() => setAssetType(option)}
+                        aria-pressed={assetType === option}
+                      >
+                        {option === 'crypto' ? 'Crypto' : 'Fiat'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Withdrawal method</span>
-                  <select style={styles.select} value={method} onChange={(event) => setMethod(event.target.value as 'instant' | 'scheduled')}>
-                    <option value="instant">Instant</option>
-                    <option value="scheduled">Scheduled</option>
-                  </select>
+                  <div style={styles.customPickerRow as React.CSSProperties}>
+                    {(['instant', 'scheduled'] as const).map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        style={{ ...styles.customPickerButton, ...(method === option ? styles.customPickerButtonActive : {}) }}
+                        onClick={() => setMethod(option)}
+                        aria-pressed={method === option}
+                      >
+                        {option === 'instant' ? 'Instant' : 'Scheduled'}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Amount</span>
