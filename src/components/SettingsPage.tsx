@@ -266,7 +266,19 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(() => {
+    try {
+      const raw = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
+      if (!raw) {
+        return null;
+      }
+
+      const parsed = JSON.parse(raw) as { profilePicture?: string };
+      return parsed.profilePicture ?? null;
+    } catch {
+      return null;
+    }
+  });
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -314,11 +326,8 @@ const SettingsPage = () => {
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
-        if (user?.profilePicture) {
-          setAvatarPreview(user.profilePicture);
-        }
+        setAvatarPreview(user?.profilePicture ?? null);
 
-      
       } catch {
         navigate('/signin');
       }
