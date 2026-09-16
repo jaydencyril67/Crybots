@@ -52,45 +52,6 @@ const AVATAR_MIN_ZOOM = 1;
 const AVATAR_MAX_ZOOM = 3;
 const AVATAR_ZOOM_STEP = 0.01;
 
-const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoom: number) => {
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const nextImage = new Image();
-    nextImage.crossOrigin = 'anonymous';
-    nextImage.onload = () => resolve(nextImage);
-    nextImage.onerror = reject;
-    nextImage.src = source;
-  });
-
-  const size = AVATAR_FRAME_SIZE;
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const context = canvas.getContext('2d');
-
-  if (!context) {
-    throw new Error('Unable to prepare image editor.');
-  }
-
-  const frameSize = size;
-  const renderScale = zoom;
-  const aspectRatio = image.width / image.height;
-  const fittedWidth = aspectRatio >= 1 ? frameSize * renderScale : frameSize * aspectRatio * renderScale;
-  const fittedHeight = aspectRatio >= 1 ? frameSize / aspectRatio * renderScale : frameSize * renderScale;
-  const visibleWidth = frameSize / renderScale;
-  const visibleHeight = frameSize / renderScale;
-  const offsetX = (frameSize - fittedWidth) / 2 + cropX;
-  const offsetY = (frameSize - fittedHeight) / 2 + cropY;
-  const sourceX = Math.max(0, (-offsetX / fittedWidth) * image.width);
-  const sourceY = Math.max(0, (-offsetY / fittedHeight) * image.height);
-  const sourceWidth = Math.min(image.width - sourceX, (visibleWidth / fittedWidth) * image.width);
-  const sourceHeight = Math.min(image.height - sourceY, (visibleHeight / fittedHeight) * image.height);
-
-  context.clearRect(0, 0, size, size);
-  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, size, size);
-
-  return canvas.toDataURL('image/png');
-};
-
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
 const trc20WalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
 
@@ -777,7 +738,7 @@ const SettingsPage = () => {
 
     setAvatarUploading(true);
     try {
-      const avatarDataUrl = await avatarToDataUrl(avatarEditor.source, avatarEditor.cropX, avatarEditor.cropY, avatarEditor.zoom);
+      const avatarDataUrl = avatarEditor.source;
       const authResponse = await api.get('/api/imagekit/auth');
       const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
