@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRightLeft, CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
+import { CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
+import { api } from '../utils/api';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward' | 'fee';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
@@ -14,6 +15,8 @@ type TransactionRecord = {
   direction: Exclude<TransactionDirection, 'all'>;
   title: string;
   amount: string;
+  amountValue: number;
+  currency: string;
   status: Exclude<TransactionStatus, 'all'>;
   date: string;
   time: string;
@@ -312,7 +315,7 @@ const TransactionHistoryPage = () => {
       const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
       const haystack = `${transaction.title} ${transaction.reference} ${transaction.counterpart ?? ''} ${transaction.description}`.toLowerCase();
       const matchesQuery = query.trim().length === 0 || haystack.includes(query.toLowerCase());
-      const amountValue = Number(transaction.amount.replace(/[^0-9.-]/g, ''));
+      const amountValue = Number.isFinite(transaction.amountValue) ? Math.abs(transaction.amountValue) : Number(transaction.amount.replace(/[^0-9.-]/g, ''));
       const minValue = amountMin ? Number(amountMin) : Number.NEGATIVE_INFINITY;
       const maxValue = amountMax ? Number(amountMax) : Number.POSITIVE_INFINITY;
       const matchesAmount = amountValue >= minValue && amountValue <= maxValue;
