@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRightLeft, AtSign, BadgeCheck, Hash, UserRound } from 'lucide-react';
+import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -22,6 +22,7 @@ type TransferDetailsResponse = {
   user?: {
     uid?: string;
     email?: string;
+    securityCodeSet?: boolean;
   };
   balances?: {
     usdtBalance?: number;
@@ -87,7 +88,9 @@ const styles = {
   field: { display: 'grid', gap: '8px' },
   label: { fontSize: '0.78rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
-  select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
+  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)', transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
+  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   helper: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
@@ -104,9 +107,11 @@ const TransferPage = () => {
   const [recipientValid, setRecipientValid] = useState(false);
   const [recipientDetails, setRecipientDetails] = useState<TransferRecipientCheckResponse['user'] | null>(null);
   const [recipientChecking, setRecipientChecking] = useState(false);
+  const [isRecipientMenuOpen, setIsRecipientMenuOpen] = useState(false);
+  const recipientMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
   const [securityCode, setSecurityCode] = useState('');
-  const [password, setPassword] = useState('');
+  const [securityCodeBound, setSecurityCodeBound] = useState(false);
   const [usdtBalance, setUsdtBalance] = useState(0);
   const [transferring, setTransferring] = useState(false);
 
@@ -122,6 +127,7 @@ const TransferPage = () => {
       try {
         const { data } = await api.get<TransferDetailsResponse>('/api/transfers/me');
         setUsdtBalance(data.balances?.usdtBalance ?? 0);
+        setSecurityCodeBound(Boolean(data.user?.securityCodeSet));
       } catch {
         navigate('/signin');
       } finally {
@@ -133,6 +139,14 @@ const TransferPage = () => {
   }, []);
 
   useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (recipientMenuRef.current && !recipientMenuRef.current.contains(event.target as Node)) {
+        setIsRecipientMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
     const value = recipientValue.trim();
     setRecipientValid(false);
     setRecipientDetails(null);
@@ -159,6 +173,7 @@ const TransferPage = () => {
 
     return () => {
       window.clearTimeout(timeout);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [recipientMethod, recipientValue]);
 
@@ -172,13 +187,11 @@ const TransferPage = () => {
         recipientValue: recipientValue.trim(),
         amount: Number(amount),
         securityCode,
-        currentPassword: password,
       });
       setUsdtBalance(data.balances?.usdtBalance ?? usdtBalance);
       setMessage({ kind: 'success', text: data.message || 'Transfer completed successfully.' });
       setAmount('');
       setSecurityCode('');
-      setPassword('');
     } catch (error: any) {
       setMessage({ kind: 'error', text: error?.response?.data?.message || 'Unable to complete transfer.' });
     } finally {
@@ -200,12 +213,29 @@ const TransferPage = () => {
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><ArrowRightLeft size={18} /> Send USDT to another user</h2>
                 <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
-                <div style={styles.field as React.CSSProperties}>
+                <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Recipient type</span>
-                  <select style={styles.select} value={recipientMethod} onChange={(event) => setRecipientMethod(event.target.value as 'uid' | 'email')}>
-                    <option value="uid">UID</option>
-                    <option value="email">Email</option>
-                  </select>
+                  <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
+                    <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
+                    <span style={{ transform: isRecipientMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
+                  </button>
+                  {isRecipientMenuOpen ? (
+                    <div style={styles.selectMenu}>
+                      {(['uid', 'email'] as const).map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          style={styles.selectOption}
+                          onClick={() => {
+                            setRecipientMethod(option);
+                            setIsRecipientMenuOpen(false);
+                          }}
+                        >
+                          {option === 'uid' ? 'UID' : 'Email'}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>
@@ -225,14 +255,10 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
-                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" />
-                </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Current password</span>
-                  <input style={styles.input} type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="For backup verification" />
+                  <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit code' : 'Set security code to continue'} disabled={!securityCodeBound} />
                 </div>
                 <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid}>
+                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>
                     {transferring ? 'Sending...' : 'Send USDT'}
                   </button>
                 </div>
@@ -241,7 +267,6 @@ const TransferPage = () => {
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><BadgeCheck size={18} /> Transfer rules</h2>
                 <p style={styles.cardText}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
-                <p style={styles.cardText}>If you already set a withdrawal security code, the transfer uses that code. Otherwise, your current password is used as the fallback verification method.</p>
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><UserRound size={18} /> Recipient validation</h2>
@@ -250,7 +275,7 @@ const TransferPage = () => {
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><Hash size={18} /> Security verification</h2>
-                <p style={styles.cardText}>Transfers are protected by your security code or your current password if a security code has not been bound yet.</p>
+                <p style={styles.cardText}>Bind a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
                 <p style={styles.cardText}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
               </section>
             </div>
