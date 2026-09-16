@@ -212,7 +212,6 @@ const getTypeLabel = (type: Exclude<TransactionType, 'all'>) => {
   if (type === 'transfer') return 'Transfer';
   if (type === 'staking') return 'Staking';
   if (type === 'trade') return 'Trade';
-  if (type === 'fee') return 'Fee';
   return 'Reward';
 };
 
