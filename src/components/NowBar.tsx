@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowDownToLine, ArrowRightLeft, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpDown, Banknote, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -204,7 +204,7 @@ const getCurrentPageTitle = (path: string) => {
 const createDefaultActions = (): NowBarAction[] => [
   {
     label: 'Deposit',
-    icon: <WalletCards size={18} />,
+    icon: <Banknote size={18} />,
     onClick: () => {
       navigate('/deposit');
     },
@@ -220,7 +220,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Staking',
-    icon: <Landmark size={18} />,
+    icon: <Coins size={18} />,
     onClick: () => {
       navigate('/staking');
     },
@@ -228,7 +228,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Withdraw',
-    icon: <ArrowRightLeft size={18} />,
+    icon: <ArrowUpDown size={18} />,
     onClick: () => {
       navigate('/withdrawals');
     },
@@ -236,7 +236,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Transfer',
-    icon: <ArrowDownToLine size={18} />,
+    icon: <ArrowLeftRight size={18} />,
     onClick: () => {
       navigate('/transfer');
     },
@@ -244,7 +244,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Profile',
-    icon: <UserRound size={18} />,
+    icon: <CircleUserRound size={18} />,
     onClick: () => {
       navigate('/profile');
     },
