@@ -368,8 +368,8 @@ const NowBar = ({ actions }: NowBarProps) => {
         tabIndex={0}
         aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
         onClick={() => {
-          handleInteraction();
           if (!pressing) {
+            handleInteraction();
             setView(view === 'title' ? 'actions' : 'title');
           }
         }}
@@ -380,9 +380,9 @@ const NowBar = ({ actions }: NowBarProps) => {
         onTouchEnd={stopHold}
         onTouchCancel={stopHold}
         onKeyDown={(event) => {
-          handleInteraction();
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
+            handleInteraction();
             setView(view === 'title' ? 'actions' : 'title');
           }
         }}
