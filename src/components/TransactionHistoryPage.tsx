@@ -5,7 +5,7 @@ import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 import api from '../api/axios';
 
-type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward' | 'fee';
+type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
 type TransactionStatus = 'all' | 'completed' | 'pending' | 'failed';
 
@@ -364,7 +364,7 @@ const TransactionHistoryPage = () => {
                     </button>
                     {isTypeMenuOpen ? (
                       <div style={styles.selectMenu}>
-                        {(['all', 'deposit', 'withdrawal', 'transfer', 'staking', 'trade', 'reward', 'fee'] as const).map((option) => (
+                        {(['all', 'deposit', 'withdrawal', 'transfer', 'staking', 'trade', 'reward'] as const).map((option) => (
                           <button
                             key={option}
                             type="button"
@@ -486,7 +486,6 @@ const TransactionHistoryPage = () => {
                         <div style={styles.meta}>
                           <strong>{transaction.title}</strong>
                           <span style={styles.muted}>{getTypeLabel(transaction.type)} · {transaction.direction}</span>
-                          <span style={styles.muted}>{transaction.counterpart ? `${transaction.counterpart} · ` : ''}{transaction.description}</span>
                         </div>
                       </td>
                       <td style={styles.td}><strong>{transaction.amount}</strong></td>
