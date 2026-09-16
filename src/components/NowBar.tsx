@@ -1,5 +1,5 @@
-import React from 'react';
-import { ArrowDownToLine, ArrowRightLeft, CalendarClock, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowDownToLine, ArrowRightLeft, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const styles = {
@@ -102,7 +102,21 @@ type NowBarProps = {
   actions?: NowBarAction[];
 };
 
+type NowBarView = 'title' | 'actions';
+
 const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
+
+const getCurrentPageTitle = (path: string) => {
+  if (path === '/dashboard') return 'DASHBOARD';
+  if (path === '/profile') return 'PROFILE';
+  if (path === '/staking') return 'STAKING';
+  if (path === '/settings') return 'SETTINGS';
+  if (path === '/withdrawals') return 'WITHDRAWALS';
+  if (path === '/transfer') return 'TRANSFER';
+  if (path === '/deposit') return 'DEPOSIT';
+  if (path === '/transactions') return 'TRANSACTIONS';
+  return 'NOWBAR';
+};
 
 const createDefaultActions = (): NowBarAction[] => [
   {
@@ -172,26 +186,66 @@ const createDefaultActions = (): NowBarAction[] => [
 ];
 
 const NowBar = ({ actions }: NowBarProps) => {
-  const resolvedActions = actions || createDefaultActions();
+  const [view, setView] = useState<NowBarView>('title');
+  const [currentPath, setCurrentPath] = useState(getActivePath());
+  const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
+  const currentPageTitle = getCurrentPageTitle(currentPath);
+
+  useEffect(() => {
+    const syncPath = () => {
+      setCurrentPath(getActivePath());
+    };
+
+    window.addEventListener('popstate', syncPath);
+    window.addEventListener('hashchange', syncPath);
+    window.addEventListener('ke:navigation-start', syncPath as EventListener);
+
+    return () => {
+      window.removeEventListener('popstate', syncPath);
+      window.removeEventListener('hashchange', syncPath);
+      window.removeEventListener('ke:navigation-start', syncPath as EventListener);
+    };
+  }, []);
+
   return (
     <div style={styles.dock} aria-label="Quick navigation bar">
-      <div style={styles.bar}>
+      <div
+        style={styles.bar}
+        role="button"
+        tabIndex={0}
+        aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
+        onClick={() => setView(view === 'title' ? 'actions' : 'title')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setView(view === 'title' ? 'actions' : 'title');
+          }
+        }}
+      >
         <div style={styles.rail} />
-        {resolvedActions.map((action, index) => (
-          <div key={`now-bar-slot-${index}`} style={styles.slot}>
-            <button
-              type="button"
-              aria-label={action.label}
-              onClick={action.onClick}
-              style={{
-                ...styles.button,
-                ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
-              }}
-            >
-              <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
-            </button>
+        {view === 'title' ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e5eefc', width: '100%', justifyContent: 'center', padding: '2px 4px' }}>
+            <span style={styles.orb} />
+            <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.02em' }}>{currentPageTitle}</span>
+            <ChevronDown size={16} style={{ opacity: 0.8 }} />
           </div>
-        ))}
+        ) : (
+          resolvedActions.map((action, index) => (
+            <div key={`now-bar-slot-${index}`} style={styles.slot}>
+              <button
+                type="button"
+                aria-label={action.label}
+                onClick={action.onClick}
+                style={{
+                  ...styles.button,
+                  ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
+                }}
+              >
+                <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+              </button>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
