@@ -222,6 +222,9 @@ const TransactionHistoryPage = () => {
   const [query, setQuery] = useState('');
   const [amountMin, setAmountMin] = useState('');
   const [amountMax, setAmountMax] = useState('');
+  const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false);
+  const [isDirectionMenuOpen, setIsDirectionMenuOpen] = useState(false);
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -246,6 +249,22 @@ const TransactionHistoryPage = () => {
     };
 
     void loadTransactions();
+  }, []);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const insideTypeMenu = document.getElementById('transaction-type-menu')?.contains(target) ?? false;
+      const insideDirectionMenu = document.getElementById('transaction-direction-menu')?.contains(target) ?? false;
+      const insideStatusMenu = document.getElementById('transaction-status-menu')?.contains(target) ?? false;
+
+      if (!insideTypeMenu) setIsTypeMenuOpen(false);
+      if (!insideDirectionMenu) setIsDirectionMenuOpen(false);
+      if (!insideStatusMenu) setIsStatusMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
   const filteredTransactions = useMemo(() => {
@@ -291,35 +310,77 @@ const TransactionHistoryPage = () => {
                       <input style={{ ...styles.input, paddingLeft: '42px' }} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search reference, title, or user" />
                     </div>
                   </div>
-                  <div style={styles.field as React.CSSProperties}>
+                  <div id="transaction-type-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Type</span>
-                    <select style={styles.select} value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as TransactionType)}>
-                      <option value="all">All types</option>
-                      <option value="deposit">Deposit</option>
-                      <option value="withdrawal">Withdrawal</option>
-                      <option value="transfer">Transfer</option>
-                      <option value="staking">Staking</option>
-                      <option value="trade">Trade</option>
-                      <option value="reward">Reward</option>
-                      <option value="fee">Fee</option>
-                    </select>
+                    <button type="button" style={styles.selectTrigger} onClick={() => setIsTypeMenuOpen((current) => !current)}>
+                      <span>{typeFilter === 'all' ? 'All types' : getTypeLabel(typeFilter)}</span>
+                      <ChevronDown size={16} style={{ transform: isTypeMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                    </button>
+                    {isTypeMenuOpen ? (
+                      <div style={styles.selectMenu}>
+                        {(['all', 'deposit', 'withdrawal', 'transfer', 'staking', 'trade', 'reward', 'fee'] as const).map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            style={styles.selectOption}
+                            onClick={() => {
+                              setTypeFilter(option);
+                              setIsTypeMenuOpen(false);
+                            }}
+                          >
+                            {option === 'all' ? 'All types' : getTypeLabel(option)}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                  <div style={styles.field as React.CSSProperties}>
+                  <div id="transaction-direction-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Direction</span>
-                    <select style={styles.select} value={directionFilter} onChange={(event) => setDirectionFilter(event.target.value as TransactionDirection)}>
-                      <option value="all">All directions</option>
-                      <option value="inbound">Inbound</option>
-                      <option value="outbound">Outbound</option>
-                    </select>
+                    <button type="button" style={styles.selectTrigger} onClick={() => setIsDirectionMenuOpen((current) => !current)}>
+                      <span>{directionFilter === 'all' ? 'All directions' : directionFilter === 'inbound' ? 'Inbound' : 'Outbound'}</span>
+                      <ChevronDown size={16} style={{ transform: isDirectionMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                    </button>
+                    {isDirectionMenuOpen ? (
+                      <div style={styles.selectMenu}>
+                        {(['all', 'inbound', 'outbound'] as const).map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            style={styles.selectOption}
+                            onClick={() => {
+                              setDirectionFilter(option);
+                              setIsDirectionMenuOpen(false);
+                            }}
+                          >
+                            {option === 'all' ? 'All directions' : option === 'inbound' ? 'Inbound' : 'Outbound'}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                  <div style={styles.field as React.CSSProperties}>
+                  <div id="transaction-status-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Status</span>
-                    <select style={styles.select} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as TransactionStatus)}>
-                      <option value="all">All statuses</option>
-                      <option value="completed">Completed</option>
-                      <option value="pending">Pending</option>
-                      <option value="failed">Failed</option>
-                    </select>
+                    <button type="button" style={styles.selectTrigger} onClick={() => setIsStatusMenuOpen((current) => !current)}>
+                      <span>{statusFilter === 'all' ? 'All statuses' : statusFilter === 'completed' ? 'Completed' : statusFilter === 'pending' ? 'Pending' : 'Failed'}</span>
+                      <ChevronDown size={16} style={{ transform: isStatusMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                    </button>
+                    {isStatusMenuOpen ? (
+                      <div style={styles.selectMenu}>
+                        {(['all', 'completed', 'pending', 'failed'] as const).map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            style={styles.selectOption}
+                            onClick={() => {
+                              setStatusFilter(option);
+                              setIsStatusMenuOpen(false);
+                            }}
+                          >
+                            {option === 'all' ? 'All statuses' : option === 'completed' ? 'Completed' : option === 'pending' ? 'Pending' : 'Failed'}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                   <div style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Min amount</span>
