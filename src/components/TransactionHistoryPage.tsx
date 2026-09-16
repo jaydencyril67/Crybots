@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
-import { api } from '../utils/api';
+import api from '../api/axios';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward' | 'fee';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
