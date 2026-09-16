@@ -683,7 +683,7 @@ const SettingsPage = () => {
     event.currentTarget.setPointerCapture(event.pointerId);
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
-      if (avatarPointers.current.size > 1) {
+      if (avatarDragLocked.current || avatarPointers.current.size > 1) {
         return;
       }
 
@@ -715,11 +715,15 @@ const SettingsPage = () => {
   const avatarPinchState = React.useRef<{ distance: number; zoom: number } | null>(null);
   const avatarZoomRaf = React.useRef<number | null>(null);
   const avatarZoomTarget = React.useRef<number | null>(null);
+  const avatarDragLocked = React.useRef(false);
 
   const getPointerDistance = (first: { x: number; y: number }, second: { x: number; y: number }) => Math.hypot(second.x - first.x, second.y - first.y);
 
   const handleAvatarPointerMove = (event: PointerEvent) => {
     avatarPointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (avatarPointers.current.size >= 2) {
+      avatarDragLocked.current = true;
+    }
 
     if (!avatarEditor) {
       return;
@@ -735,15 +739,16 @@ const SettingsPage = () => {
 
       if (!avatarPinchState.current) {
         avatarPinchState.current = {
-          distance,
+          distance: Math.max(distance, AVATAR_PINCH_MIN_DISTANCE),
           zoom: avatarEditor.zoom,
         };
+        avatarZoomTarget.current = avatarEditor.zoom;
         return;
       }
 
       const pinchScale = distance / Math.max(avatarPinchState.current.distance, AVATAR_PINCH_MIN_DISTANCE);
-      const easedZoom = avatarPinchState.current.zoom + (avatarPinchState.current.zoom * (pinchScale - 1)) * 0.65;
-      avatarZoomTarget.current = clampAvatarZoom(easedZoom);
+      const nextZoom = clampAvatarZoom(avatarPinchState.current.zoom * pinchScale);
+      avatarZoomTarget.current = nextZoom;
 
       if (avatarZoomRaf.current === null) {
         avatarZoomRaf.current = window.requestAnimationFrame(() => {
@@ -761,6 +766,7 @@ const SettingsPage = () => {
     }
 
     avatarPinchState.current = null;
+    avatarDragLocked.current = false;
   };
 
   const handleAvatarPointerUp = (event: PointerEvent) => {
@@ -768,6 +774,7 @@ const SettingsPage = () => {
     if (avatarPointers.current.size < 2) {
       avatarPinchState.current = null;
       avatarZoomTarget.current = null;
+      avatarDragLocked.current = false;
       if (avatarZoomRaf.current !== null) {
         window.cancelAnimationFrame(avatarZoomRaf.current);
         avatarZoomRaf.current = null;
