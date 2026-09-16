@@ -112,6 +112,8 @@ const WithdrawalsPage = () => {
   const [destinationValue, setDestinationValue] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
   const [scheduledMonth, setScheduledMonth] = useState(() => new Date());
+  const [scheduledHour, setScheduledHour] = useState(() => '09');
+  const [scheduledMinute, setScheduledMinute] = useState(() => '00');
   const scheduledPickerRef = useRef<HTMLDivElement | null>(null);
   const [securityCode, setSecurityCode] = useState('');
   const [currentWallet, setCurrentWallet] = useState('');
@@ -159,12 +161,29 @@ const WithdrawalsPage = () => {
     setScheduledMonth((currentMonth) => new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1));
   };
 
-  const selectScheduledDate = (date: Date) => {
-    const currentTime = scheduledFor.split('T')[1] || '09:00';
-    const [hours, minutes] = currentTime.split(':');
-    const selected = new Date(date.getFullYear(), date.getMonth(), date.getDate(), Number(hours), Number(minutes));
+  const updateScheduledFor = (date: Date, hour = scheduledHour, minute = scheduledMinute) => {
+    const selected = new Date(date.getFullYear(), date.getMonth(), date.getDate(), Number(hour), Number(minute));
     const padded = `${selected.getFullYear()}-${String(selected.getMonth() + 1).padStart(2, '0')}-${String(selected.getDate()).padStart(2, '0')}T${String(selected.getHours()).padStart(2, '0')}:${String(selected.getMinutes()).padStart(2, '0')}`;
     setScheduledFor(padded);
+  };
+
+  const selectScheduledDate = (date: Date) => {
+    updateScheduledFor(date);
+  };
+
+  const hourOptions = Array.from({ length: 24 }, (_, hour) => String(hour).padStart(2, '0'));
+  const minuteOptions = ['00', '15', '30', '45'];
+
+  const selectScheduledHour = (hour: string) => {
+    setScheduledHour(hour);
+    const currentDate = scheduledFor ? new Date(scheduledFor) : new Date(scheduledMonth.getFullYear(), scheduledMonth.getMonth(), 1);
+    updateScheduledFor(currentDate, hour, scheduledMinute);
+  };
+
+  const selectScheduledMinute = (minute: string) => {
+    setScheduledMinute(minute);
+    const currentDate = scheduledFor ? new Date(scheduledFor) : new Date(scheduledMonth.getFullYear(), scheduledMonth.getMonth(), 1);
+    updateScheduledFor(currentDate, scheduledHour, minute);
   };
 
   const scheduledCalendarDays = useMemo(() => {
@@ -264,7 +283,7 @@ const WithdrawalsPage = () => {
                     {assetType === 'crypto' ? 'Crypto' : 'Fiat'}
                   </button>
                   {isAssetMenuOpen ? (
-                    <div style={styles.summaryRow}>
+                    <div style={styles.customPickerPanel}>
                       <button type="button" style={styles.button} onClick={() => { setAssetType('crypto'); setIsAssetMenuOpen(false); }}>Crypto</button>
                       <button type="button" style={styles.button} onClick={() => { setAssetType('fiat'); setIsAssetMenuOpen(false); }}>Fiat</button>
                     </div>
@@ -276,7 +295,7 @@ const WithdrawalsPage = () => {
                     {method === 'instant' ? 'Instant' : 'Scheduled'}
                   </button>
                   {isMethodMenuOpen ? (
-                    <div style={styles.summaryRow}>
+                    <div style={styles.customPickerPanel}>
                       <button type="button" style={styles.button} onClick={() => { setMethod('instant'); setIsMethodMenuOpen(false); }}>Instant</button>
                       <button type="button" style={styles.button} onClick={() => { setMethod('scheduled'); setIsMethodMenuOpen(false); }}>Scheduled</button>
                     </div>
@@ -342,10 +361,44 @@ const WithdrawalsPage = () => {
                         ))}
                       </div>
                       <div style={styles.field as React.CSSProperties}>
-                        <span style={styles.label}>Time</span>
-                        <input style={styles.input} type="time" value={scheduledFor.split('T')[1] || ''} onChange={(event) => setScheduledFor((current) => `${current.split('T')[0] || new Date().toISOString().slice(0, 10)}T${event.target.value}`)} />
+                        <span style={styles.label}>Hour</span>
+                        <div style={styles.summaryRow}>
+                          {hourOptions.map((hour) => (
+                            <button
+                              key={hour}
+                              type="button"
+                              style={{
+                                ...styles.button,
+                                ...(scheduledHour === hour ? styles.customPickerDaySelected : null),
+                              }}
+                              onClick={() => selectScheduledHour(hour)}
+                              aria-pressed={scheduledHour === hour}
+                            >
+                              {hour}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <p style={styles.customPickerHint}>Pick a date from the grid and then choose the time in-app. Native date/time controls are disabled.</p>
+                      <div style={styles.field as React.CSSProperties}>
+                        <span style={styles.label}>Minute</span>
+                        <div style={styles.summaryRow}>
+                          {minuteOptions.map((minute) => (
+                            <button
+                              key={minute}
+                              type="button"
+                              style={{
+                                ...styles.button,
+                                ...(scheduledMinute === minute ? styles.customPickerDaySelected : null),
+                              }}
+                              onClick={() => selectScheduledMinute(minute)}
+                              aria-pressed={scheduledMinute === minute}
+                            >
+                              {minute}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <p style={styles.customPickerHint}>Pick a date from the grid and then choose the hour and minute in-app. Native date/time controls are disabled.</p>
                     </div>
                   </div>
                 ) : null}
