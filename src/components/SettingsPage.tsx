@@ -704,6 +704,8 @@ const SettingsPage = () => {
 
   const avatarPointers = React.useRef<Map<number, { x: number; y: number }>>(new Map());
   const avatarPinchState = React.useRef<{ distance: number; zoom: number } | null>(null);
+  const avatarZoomRaf = React.useRef<number | null>(null);
+  const avatarZoomTarget = React.useRef<number | null>(null);
 
   const getPointerDistance = (first: { x: number; y: number }, second: { x: number; y: number }) => Math.hypot(second.x - first.x, second.y - first.y);
 
@@ -731,10 +733,20 @@ const SettingsPage = () => {
       }
 
       const pinchScale = distance / Math.max(avatarPinchState.current.distance, AVATAR_PINCH_MIN_DISTANCE);
-      updateAvatarEditor((current) => ({
-        ...current,
-        zoom: clampAvatarZoom(avatarPinchState.current ? avatarPinchState.current.zoom * pinchScale : current.zoom),
-      }));
+      avatarZoomTarget.current = clampAvatarZoom(avatarPinchState.current.zoom * pinchScale);
+
+      if (avatarZoomRaf.current === null) {
+        avatarZoomRaf.current = window.requestAnimationFrame(() => {
+          avatarZoomRaf.current = null;
+          if (avatarZoomTarget.current !== null) {
+            const nextZoom = avatarZoomTarget.current;
+            updateAvatarEditor((current) => ({
+              ...current,
+              zoom: nextZoom,
+            }));
+          }
+        });
+      }
       return;
     }
 
@@ -745,6 +757,11 @@ const SettingsPage = () => {
     avatarPointers.current.delete(event.pointerId);
     if (avatarPointers.current.size < 2) {
       avatarPinchState.current = null;
+      avatarZoomTarget.current = null;
+      if (avatarZoomRaf.current !== null) {
+        window.cancelAnimationFrame(avatarZoomRaf.current);
+        avatarZoomRaf.current = null;
+      }
     }
   };
 
