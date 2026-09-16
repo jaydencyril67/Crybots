@@ -627,19 +627,53 @@ const SettingsPage = () => {
     setAvatarUploading(true);
     try {
       const avatarDataUrl = await avatarToDataUrl(avatarEditor.source, avatarEditor.cropX, avatarEditor.cropY, avatarEditor.zoom);
+      const authResponse = await api.get('/api/imagekit/auth');
+      const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
+
+      if (!auth.publicKey || !auth.token || !auth.expire || !auth.signature) {
+        throw new Error('Unable to prepare image upload.');
+      }
+
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', avatarDataUrl);
+      uploadFormData.append('fileName', `avatar-${Date.now()}.png`);
+      uploadFormData.append('useUniqueFileName', 'true');
+      uploadFormData.append('token', auth.token);
+      uploadFormData.append('expire', String(auth.expire));
+      uploadFormData.append('signature', auth.signature);
+      uploadFormData.append('publicKey', auth.publicKey);
+      uploadFormData.append('folder', 'kingshall/avatars');
+
+      const uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Unable to upload profile picture.');
+      }
+
+      const uploadedFile = await uploadResponse.json() as { url?: string; fileId?: string };
+      if (!uploadedFile.url) {
+        throw new Error('Image upload did not return a usable URL.');
+      }
+
       const { data } = await api.patch('/api/settings/profile-picture', {
-        profilePicture: avatarDataUrl,
+        profilePicture: uploadedFile.url,
+        profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
       if (nextProfile) {
         window.localStorage.setItem('user', JSON.stringify(nextProfile));
         window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
-        setAvatarPreview(nextProfile.profilePicture ?? avatarDataUrl);
+        setAvatarPreview(nextProfile.profilePicture ?? uploadedFile.url);
+      } else {
+        setAvatarPreview(uploadedFile.url);
       }
       setAvatarEditor(null);
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update profile picture.');
+      showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update profile picture.');
     } finally {
       setAvatarUploading(false);
     }
