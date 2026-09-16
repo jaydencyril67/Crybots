@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Cropper from 'react-easy-crop';
+import getCroppedImg from '../utils/cropImage';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
@@ -42,13 +44,9 @@ type WalletValidationState = {
 
 type AvatarEditorState = {
   source: string;
-  cropX: number;
-  cropY: number;
-  zoom: number;
 };
 
 const AVATAR_FRAME_SIZE = 512;
-const AVATAR_MIN_ZOOM = 1;
 const AVATAR_MAX_ZOOM = 3;
 const AVATAR_ZOOM_STEP = 0.01;
 
@@ -234,9 +232,11 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
-  const [avatarDragging, setAvatarDragging] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarCrop, setAvatarCrop] = useState({ x: 0, y: 0 });
+  const [avatarZoom, setAvatarZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
   const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
@@ -560,12 +560,10 @@ const SettingsPage = () => {
         return;
       }
 
-      setAvatarEditor({
-        source,
-        cropX: 0,
-        cropY: 0,
-        zoom: 1,
-      });
+      setAvatarEditor({ source });
+      setAvatarCrop({ x: 0, y: 0 });
+      setAvatarZoom(1);
+      setCroppedAreaPixels(null);
     };
     reader.readAsDataURL(file);
   };
@@ -585,21 +583,11 @@ const SettingsPage = () => {
     event.target.value = '';
   };
 
-  const AVATAR_PINCH_MIN_DISTANCE = 80;
-
-  const clampAvatarValue = (value: number) => Math.max(-180, Math.min(180, value));
-  const clampAvatarZoom = (value: number) => Math.max(AVATAR_MIN_ZOOM, Math.min(AVATAR_MAX_ZOOM, value));
-
-  const updateAvatarEditor = (updater: (current: AvatarEditorState) => AvatarEditorState) => {
-    setAvatarEditor((current) => (current ? updater(current) : current));
-  };
-
   const closeAvatarEditor = () => {
     setAvatarEditor(null);
-    setAvatarDragging(false);
-    avatarPointers.current.clear();
-    avatarPinchState.current = null;
-    avatarZoomTarget.current = null;
+    setAvatarCrop({ x: 0, y: 0 });
+    setAvatarZoom(1);
+    setCroppedAreaPixels(null);
   };
 
   const avatarDisplayStyle = {
@@ -612,132 +600,18 @@ const SettingsPage = () => {
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.04)',
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
-    touchAction: 'none' as const,
-    cursor: avatarEditor ? 'grab' : 'default',
-  };
-
-  const handleAvatarDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!avatarEditor) {
-      return;
-    }
-
-    event.preventDefault();
-    setAvatarDragging(true);
-
-    const startX = event.clientX;
-    const startY = event.clientY;
-    const initialCropX = avatarEditor.cropX;
-    const initialCropY = avatarEditor.cropY;
-
-    event.currentTarget.setPointerCapture(event.pointerId);
-
-    const handlePointerMove = (moveEvent: PointerEvent) => {
-      if (avatarDragLocked.current || avatarPointers.current.size > 1) {
-        return;
-      }
-
-      const deltaX = moveEvent.clientX - startX;
-      const deltaY = moveEvent.clientY - startY;
-      const easedDeltaX = Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.92);
-      const easedDeltaY = Math.sign(deltaY) * Math.pow(Math.abs(deltaY), 0.92);
-
-      updateAvatarEditor((current) => ({
-        ...current,
-        cropX: clampAvatarValue(initialCropX + easedDeltaX),
-        cropY: clampAvatarValue(initialCropY + easedDeltaY),
-      }));
-    };
-
-    const handlePointerUp = () => {
-      setAvatarDragging(false);
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-      window.removeEventListener('pointercancel', handlePointerUp);
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('pointercancel', handlePointerUp);
-  };
-
-  const avatarPointers = React.useRef<Map<number, { x: number; y: number }>>(new Map());
-  const avatarPinchState = React.useRef<{ distance: number; zoom: number } | null>(null);
-  const avatarZoomRaf = React.useRef<number | null>(null);
-  const avatarZoomTarget = React.useRef<number | null>(null);
-  const avatarDragLocked = React.useRef(false);
-
-  const getPointerDistance = (first: { x: number; y: number }, second: { x: number; y: number }) => Math.hypot(second.x - first.x, second.y - first.y);
-
-  const handleAvatarPointerMove = (event: PointerEvent) => {
-    avatarPointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
-    if (avatarPointers.current.size >= 2) {
-      avatarDragLocked.current = true;
-    }
-
-    if (!avatarEditor) {
-      return;
-    }
-
-    const pointers = Array.from(avatarPointers.current.values());
-
-    if (pointers.length >= 2) {
-      const [first, second] = pointers;
-      const distance = getPointerDistance(first, second);
-      const midpointX = (first.x + second.x) / 2;
-      const midpointY = (first.y + second.y) / 2;
-
-      if (!avatarPinchState.current) {
-        avatarPinchState.current = {
-          distance: Math.max(distance, AVATAR_PINCH_MIN_DISTANCE),
-          zoom: avatarEditor.zoom,
-        };
-        avatarZoomTarget.current = avatarEditor.zoom;
-        return;
-      }
-
-      const pinchScale = distance / Math.max(avatarPinchState.current.distance, AVATAR_PINCH_MIN_DISTANCE);
-      const nextZoom = clampAvatarZoom(avatarPinchState.current.zoom * pinchScale);
-      avatarZoomTarget.current = nextZoom;
-
-      if (avatarZoomRaf.current === null) {
-        avatarZoomRaf.current = window.requestAnimationFrame(() => {
-          avatarZoomRaf.current = null;
-          if (avatarZoomTarget.current !== null) {
-            const nextZoom = avatarZoomTarget.current;
-            updateAvatarEditor((current) => ({
-              ...current,
-              zoom: nextZoom,
-            }));
-          }
-        });
-      }
-      return;
-    }
-
-    avatarPinchState.current = null;
-    avatarDragLocked.current = false;
-  };
-
-  const handleAvatarPointerUp = (event: PointerEvent) => {
-    avatarPointers.current.delete(event.pointerId);
-    if (avatarPointers.current.size < 2) {
-      avatarPinchState.current = null;
-      avatarZoomTarget.current = null;
-      avatarDragLocked.current = false;
-      if (avatarZoomRaf.current !== null) {
-        window.cancelAnimationFrame(avatarZoomRaf.current);
-        avatarZoomRaf.current = null;
-      }
-    }
   };
 
   const handleUploadAvatar = async () => {
-    if (!avatarEditor) {
+    if (!avatarEditor || !croppedAreaPixels) {
       return;
     }
 
     setAvatarUploading(true);
     try {
+      const croppedBlob = await getCroppedImg(avatarEditor.source, croppedAreaPixels);
+      const croppedFile = new File([croppedBlob], `avatar-${Date.now()}.png`, { type: 'image/png' });
+
       const authResponse = await api.get('/api/imagekit/auth');
       const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
@@ -746,8 +620,8 @@ const SettingsPage = () => {
       }
 
       const uploadFormData = new FormData();
-      uploadFormData.append('file', avatarEditor.source);
-      uploadFormData.append('fileName', `avatar-${Date.now()}.png`);
+      uploadFormData.append('file', croppedFile);
+      uploadFormData.append('fileName', croppedFile.name);
       uploadFormData.append('useUniqueFileName', 'true');
       uploadFormData.append('token', auth.token);
       uploadFormData.append('expire', String(auth.expire));
@@ -1030,29 +904,8 @@ const SettingsPage = () => {
           </div>
         </div>
         {avatarEditor ? (
-          <div
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 80,
-              background: 'rgba(3, 7, 20, 0.82)',
-              backdropFilter: 'blur(18px)',
-              WebkitBackdropFilter: 'blur(18px)',
-              display: 'grid',
-              placeItems: 'center',
-              padding: '18px',
-            }}
-          >
-            <div
-              style={{
-                width: 'min(980px, 100%)',
-                borderRadius: '30px',
-                background: 'linear-gradient(180deg, rgba(13,18,32,0.98), rgba(8,12,23,0.98))',
-                border: '1px solid rgba(255,255,255,0.08)',
-                boxShadow: '0 32px 100px rgba(0,0,0,0.62)',
-                overflow: 'hidden',
-              }}
-            >
+          <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(3, 7, 20, 0.82)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', display: 'grid', placeItems: 'center', padding: '18px' }}>
+            <div style={{ width: 'min(720px, 100%)', borderRadius: '30px', background: 'linear-gradient(180deg, rgba(13,18,32,0.98), rgba(8,12,23,0.98))', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 32px 100px rgba(0,0,0,0.62)', overflow: 'hidden' }}>
               <div style={{ padding: '16px 18px 0', display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'center' }}>
                 <span style={{ color: '#c6d3ea', fontSize: '0.92rem', fontWeight: 600 }}>Adjust photo</span>
                 <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>
@@ -1061,65 +914,35 @@ const SettingsPage = () => {
               </div>
 
               <div style={{ padding: '18px', display: 'grid', gap: '16px' }}>
-                <div
-                  style={{
-                    position: 'relative',
-                    minHeight: 'min(78vh, 620px)',
-                    borderRadius: '28px',
-                    overflow: 'hidden',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'linear-gradient(180deg, rgba(13,18,32,0.98), rgba(8,12,23,0.98))',
-                    touchAction: 'none',
-                    userSelect: 'none',
-                  }}
-                  onPointerDown={handleAvatarDragStart}
-                  onPointerMove={(event) => {
-                    if (avatarDragging) {
-                      handleAvatarPointerMove(event.nativeEvent);
-                    }
-                  }}
-                  onPointerUp={(event) => handleAvatarPointerUp(event.nativeEvent)}
-                  onPointerCancel={(event) => handleAvatarPointerUp(event.nativeEvent)}
-                >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      backgroundImage: `url(${avatarEditor.source})`,
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: `${50 + avatarEditor.cropX / 8}% ${50 + avatarEditor.cropY / 8}%`,
-                      backgroundSize: `${100 * avatarEditor.zoom}% auto`,
-                      backgroundPositionX: `calc(50% + ${avatarEditor.cropX}px)`,
-                      backgroundPositionY: `calc(50% + ${avatarEditor.cropY}px)`,
-                      transform: 'translateZ(0)',
-                      filter: 'saturate(1.03) contrast(1.02)',
-                      transition: avatarDragging ? 'none' : 'background-position 90ms linear, background-size 90ms linear',
-                      cursor: avatarDragging ? 'grabbing' : 'grab',
-                    }}
+                <div style={{ position: 'relative', minHeight: 'min(74vh, 560px)', borderRadius: '28px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(8,12,23,0.94)' }}>
+                  <Cropper
+                    image={avatarEditor.source}
+                    crop={avatarCrop}
+                    zoom={avatarZoom}
+                    aspect={1}
+                    cropShape="round"
+                    showGrid={false}
+                    onCropChange={setAvatarCrop}
+                    onCropComplete={(_, areaPixels) => setCroppedAreaPixels(areaPixels)}
+                    onZoomChange={setAvatarZoom}
+                    minZoom={1}
+                    maxZoom={AVATAR_MAX_ZOOM}
+                    style={{ containerStyle: { background: 'transparent' } }}
                   />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(6,10,18,0.08), rgba(6,10,18,0.16))' }} />
-                  <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '50%',
-                        width: 'min(82vw, 360px)',
-                        height: 'min(82vw, 360px)',
-                        maxWidth: 'calc(100% - 24px)',
-                        maxHeight: 'calc(100% - 24px)',
-                        transform: 'translate(-50%, -50%)',
-                        border: '2px solid rgba(255,255,255,0.9)',
-                        boxShadow: '0 0 0 999px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.16)',
-                        borderRadius: '18px',
-                      }}
-                    />
-                  </div>
-                  <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '16px', display: 'flex', justifyContent: 'center' }}>
-                    <div style={{ borderRadius: '999px', padding: '8px 12px', background: 'rgba(8,12,23,0.68)', border: '1px solid rgba(255,255,255,0.08)', color: '#c6d3ea', fontSize: '0.82rem' }}>
-                      Drag to position · Pinch to zoom
-                    </div>
-                  </div>
+                  <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', boxShadow: 'inset 0 0 0 999px rgba(0,0,0,0.30)' }} />
+                </div>
+
+                <div style={{ display: 'grid', gap: '10px' }}>
+                  <label style={{ color: '#c6d3ea', fontSize: '0.9rem', fontWeight: 600 }}>Zoom</label>
+                  <input
+                    type="range"
+                    min={1}
+                    max={AVATAR_MAX_ZOOM}
+                    step={AVATAR_ZOOM_STEP}
+                    value={avatarZoom}
+                    onChange={(event) => setAvatarZoom(Number(event.target.value))}
+                    style={{ width: '100%' }}
+                  />
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
