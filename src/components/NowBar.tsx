@@ -4,16 +4,16 @@ import { navigate } from '../utils/navigate';
 
 const styles = {
   dock: {
-    position: 'fixed' as const,
-    left: '50%',
-    bottom: '18px',
-    transform: 'translateX(-50%)',
     zIndex: 40,
     width: 'min(560px, calc(100vw - 32px))',
     pointerEvents: 'none' as const,
     display: 'flex',
     alignItems: 'flex-end',
     justifyContent: 'center',
+    position: 'fixed' as const,
+    left: '50%',
+    bottom: '18px',
+    transform: 'translateX(-50%)',
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
@@ -44,6 +44,7 @@ const styles = {
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
+    alignSelf: 'flex-end',
     gap: '8px',
     padding: '12px',
     borderRadius: '26px',
