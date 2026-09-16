@@ -17,7 +17,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(1.7 * 72px)',
+    height: 'calc(1.4 * 72px)',
   },
   bar: {
     display: 'flex',
@@ -41,7 +41,7 @@ const styles = {
   },
   barExpanded: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     gap: '8px',
