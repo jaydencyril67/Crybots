@@ -91,11 +91,11 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
-    minHeight: '56px',
-    padding: '12px 14px',
-    borderRadius: '20px',
+    minHeight: '48px',
+    padding: '10px 12px',
+    borderRadius: '18px',
     justifyContent: 'flex-start',
-    gap: '12px',
+    gap: '10px',
   },
   buttonEmpty: {
     opacity: 0.7,
