@@ -22,7 +22,6 @@ type TransactionRecord = {
   time: string;
   counterpart?: string;
   reference: string;
-  description: string;
 };
 
 type TransactionHistoryResponse = {
@@ -244,7 +243,7 @@ const TransactionHistoryPage = () => {
         const { data } = await api.get<TransactionHistoryResponse>('/api/transactions/me');
         const normalizedTransactions = Array.isArray(data?.transactions)
           ? data.transactions
-              .filter((transaction): transaction is TransactionRecord => Boolean(transaction?.id && transaction.type && transaction.direction && transaction.status && transaction.title && transaction.amount && transaction.currency && transaction.date && transaction.time && transaction.reference && transaction.description && typeof transaction.amountValue === 'number'))
+              .filter((transaction): transaction is TransactionRecord => Boolean(transaction?.id && transaction.type && transaction.direction && transaction.status && transaction.title && transaction.amount && transaction.currency && transaction.date && transaction.time && transaction.reference && typeof transaction.amountValue === 'number'))
               .map((transaction) => ({
                 ...transaction,
                 counterpart: transaction.counterpart || undefined,
@@ -288,7 +287,7 @@ const TransactionHistoryPage = () => {
       const matchesType = typeFilter === 'all' || transaction.type === typeFilter;
       const matchesDirection = directionFilter === 'all' || transaction.direction === directionFilter;
       const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
-      const haystack = `${transaction.title} ${transaction.reference} ${transaction.counterpart ?? ''} ${transaction.description}`.toLowerCase();
+      const haystack = `${transaction.title} ${transaction.reference} ${transaction.counterpart ?? ''}`.toLowerCase();
       const matchesQuery = query.trim().length === 0 || haystack.includes(query.toLowerCase());
       const amountValue = Number.isFinite(transaction.amountValue) ? Math.abs(transaction.amountValue) : Number(transaction.amount.replace(/[^0-9.-]/g, ''));
       const minValue = amountMin ? Number(amountMin) : Number.NEGATIVE_INFINITY;
