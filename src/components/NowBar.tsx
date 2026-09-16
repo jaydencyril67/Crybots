@@ -267,22 +267,6 @@ const NowBar = ({ actions }: NowBarProps) => {
     clearHoldTimer();
   };
 
-  const handleBarClick = () => {
-    if (view === 'actions' && layoutMode === 'compact') {
-      setView('title');
-      return;
-    }
-
-    if (view === 'title') {
-      setView('actions');
-      return;
-    }
-
-    if (layoutMode === 'expanded') {
-      setView('title');
-    }
-  };
-
   const handlePressStart = () => {
     if (holdTimerRef.current) {
       window.clearTimeout(holdTimerRef.current);
