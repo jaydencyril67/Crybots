@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Wallet } from 'lucide-react';
+import { ShieldCheck, Wallet } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 
