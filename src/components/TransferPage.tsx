@@ -106,7 +106,8 @@ const TransferPage = () => {
   const [recipientChecking, setRecipientChecking] = useState(false);
   const [amount, setAmount] = useState('');
   const [securityCode, setSecurityCode] = useState('');
-  const [password, setPassword] = useState('');
+  const [passcodeBound, setPasscodeBound] = useState(true);
+  const [isRecipientMenuOpen, setIsRecipientMenuOpen] = useState(false);
   const [usdtBalance, setUsdtBalance] = useState(0);
   const [transferring, setTransferring] = useState(false);
 
@@ -122,6 +123,7 @@ const TransferPage = () => {
       try {
         const { data } = await api.get<TransferDetailsResponse>('/api/transfers/me');
         setUsdtBalance(data.balances?.usdtBalance ?? 0);
+        setPasscodeBound(Boolean((data.user as { securityCodeHash?: string } | undefined)?.securityCodeHash));
       } catch {
         navigate('/signin');
       } finally {
@@ -172,13 +174,11 @@ const TransferPage = () => {
         recipientValue: recipientValue.trim(),
         amount: Number(amount),
         securityCode,
-        currentPassword: password,
       });
       setUsdtBalance(data.balances?.usdtBalance ?? usdtBalance);
       setMessage({ kind: 'success', text: data.message || 'Transfer completed successfully.' });
       setAmount('');
       setSecurityCode('');
-      setPassword('');
     } catch (error: any) {
       setMessage({ kind: 'error', text: error?.response?.data?.message || 'Unable to complete transfer.' });
     } finally {
@@ -187,6 +187,9 @@ const TransferPage = () => {
   };
 
   if (loading) return null;
+
+  const passcodePlaceholder = passcodeBound ? '6-digit code' : 'Bind a passcode in Settings first';
+  const passcodeHelper = passcodeBound ? 'Enter your 6-digit security passcode to approve this transfer.' : 'No passcode bound yet. Please bind one in Settings before transferring.';
 
   return (
     <div style={styles.page}>
@@ -202,10 +205,19 @@ const TransferPage = () => {
                 <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Recipient type</span>
-                  <select style={styles.select} value={recipientMethod} onChange={(event) => setRecipientMethod(event.target.value as 'uid' | 'email')}>
-                    <option value="uid">UID</option>
-                    <option value="email">Email</option>
-                  </select>
+                  <button
+                    type="button"
+                    style={styles.button}
+                    onClick={() => setIsRecipientMenuOpen((current) => !current)}
+                  >
+                    {recipientMethod === 'email' ? 'Email' : 'UID'}
+                  </button>
+                  {isRecipientMenuOpen ? (
+                    <div style={styles.summaryRow}>
+                      <button type="button" style={styles.button} onClick={() => { setRecipientMethod('uid'); setIsRecipientMenuOpen(false); }}>UID</button>
+                      <button type="button" style={styles.button} onClick={() => { setRecipientMethod('email'); setIsRecipientMenuOpen(false); }}>Email</button>
+                    </div>
+                  ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>
@@ -225,12 +237,15 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
-                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" />
+                  <input
+                    style={styles.input}
+                    type="password"
+                    value={securityCode}
+                    onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder={passcodePlaceholder}
+                  />
                 </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Current password</span>
-                  <input style={styles.input} type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="For backup verification" />
-                </div>
+                <div style={styles.helper}>{passcodeHelper}</div>
                 <div style={styles.buttonRow}>
                   <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid}>
                     {transferring ? 'Sending...' : 'Send USDT'}
@@ -241,7 +256,7 @@ const TransferPage = () => {
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><BadgeCheck size={18} /> Transfer rules</h2>
                 <p style={styles.cardText}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
-                <p style={styles.cardText}>If you already set a withdrawal security code, the transfer uses that code. Otherwise, your current password is used as the fallback verification method.</p>
+                <p style={styles.cardText}>Transfers require your security passcode only. If you have not bound one yet, bind it in Settings before sending USDT.</p>
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><UserRound size={18} /> Recipient validation</h2>
@@ -250,7 +265,7 @@ const TransferPage = () => {
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><Hash size={18} /> Security verification</h2>
-                <p style={styles.cardText}>Transfers are protected by your security code or your current password if a security code has not been bound yet.</p>
+                <p style={styles.cardText}>Transfers are protected by your security passcode. If one is not bound yet, you’ll be prompted to set it in Settings first.</p>
                 <p style={styles.cardText}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
               </section>
             </div>

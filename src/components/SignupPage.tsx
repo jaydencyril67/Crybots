@@ -350,6 +350,7 @@ const SignupPage = () => {
   const [passwordError, setPasswordError] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dobMonthMenuOpen, setDobMonthMenuOpen] = useState(false);
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -559,23 +560,35 @@ const SignupPage = () => {
             <label style={styles.label} htmlFor={current.field}>
               Date of birth
             </label>
-            <input
-              id={current.field}
-              style={{
-                ...styles.input,
-                ...(form.dob && !dobMeetsRequirement
-                  ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
-                  : null),
-              }}
-              type="date"
-              value={form.dob}
-              onChange={(event) => updateField('dob', event.target.value)}
-              max={(() => {
-                const date = new Date();
-                date.setFullYear(date.getFullYear() - 18);
-                return date.toISOString().split('T')[0];
-              })()}
-            />
+            <div style={styles.field}>
+            <label style={styles.label} htmlFor={current.field}>
+              Date of birth
+            </label>
+            <div style={styles.customPickerRow}>
+              <button type="button" style={styles.customPickerButton} onClick={() => setDobMonthMenuOpen((currentOpen) => !currentOpen)}>
+                {form.dob || 'Pick your date of birth'}
+              </button>
+            </div>
+            {dobMonthMenuOpen ? (
+              <div style={styles.customPickerDisplay}>
+                <p style={styles.customPickerHint}>Enter your date of birth in the format YYYY-MM-DD. Native calendar pickers are disabled here.</p>
+                <input
+                  id={current.field}
+                  style={{
+                    ...styles.input,
+                    ...(form.dob && !dobMeetsRequirement
+                      ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+                      : null),
+                  }}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="YYYY-MM-DD"
+                  value={form.dob}
+                  onChange={(event) => updateField('dob', event.target.value)}
+                />
+              </div>
+            ) : null}
+          </div>
             {dobError ? <NotificationBanner tone="error" title="Check your details" message={dobError} /> : null}
           </div>
         );

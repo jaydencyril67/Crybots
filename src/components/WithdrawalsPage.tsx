@@ -96,6 +96,8 @@ const WithdrawalsPage = () => {
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [assetType, setAssetType] = useState<'crypto' | 'fiat'>('crypto');
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
+  const [isAssetMenuOpen, setIsAssetMenuOpen] = useState(false);
+  const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USDT');
   const [destinationValue, setDestinationValue] = useState('');
@@ -206,17 +208,27 @@ const WithdrawalsPage = () => {
                 <p style={styles.cardText}>Choose an asset type, pick instant or scheduled processing, and send funds to your bound account.</p>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Asset type</span>
-                  <select style={styles.select} value={assetType} onChange={(event) => setAssetType(event.target.value as 'crypto' | 'fiat')}>
-                    <option value="crypto">Crypto</option>
-                    <option value="fiat">Fiat</option>
-                  </select>
+                  <button type="button" style={styles.button} onClick={() => setIsAssetMenuOpen((current) => !current)}>
+                    {assetType === 'crypto' ? 'Crypto' : 'Fiat'}
+                  </button>
+                  {isAssetMenuOpen ? (
+                    <div style={styles.summaryRow}>
+                      <button type="button" style={styles.button} onClick={() => { setAssetType('crypto'); setIsAssetMenuOpen(false); }}>Crypto</button>
+                      <button type="button" style={styles.button} onClick={() => { setAssetType('fiat'); setIsAssetMenuOpen(false); }}>Fiat</button>
+                    </div>
+                  ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Withdrawal method</span>
-                  <select style={styles.select} value={method} onChange={(event) => setMethod(event.target.value as 'instant' | 'scheduled')}>
-                    <option value="instant">Instant</option>
-                    <option value="scheduled">Scheduled</option>
-                  </select>
+                  <button type="button" style={styles.button} onClick={() => setIsMethodMenuOpen((current) => !current)}>
+                    {method === 'instant' ? 'Instant' : 'Scheduled'}
+                  </button>
+                  {isMethodMenuOpen ? (
+                    <div style={styles.summaryRow}>
+                      <button type="button" style={styles.button} onClick={() => { setMethod('instant'); setIsMethodMenuOpen(false); }}>Instant</button>
+                      <button type="button" style={styles.button} onClick={() => { setMethod('scheduled'); setIsMethodMenuOpen(false); }}>Scheduled</button>
+                    </div>
+                  ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Amount</span>
@@ -231,7 +243,7 @@ const WithdrawalsPage = () => {
                   <input style={styles.input} value={availableDestination} readOnly />
                   <span style={styles.helper}>{assetType === 'crypto' ? 'Use your bound TRC-20 wallet.' : 'Use the fiat account saved in settings.'}</span>
                 </div>
-                {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><input style={styles.input} type="datetime-local" value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} /></div> : null}
+                {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><input style={styles.input} value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} placeholder="YYYY-MM-DD HH:mm" /></div> : null}
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
                   <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
