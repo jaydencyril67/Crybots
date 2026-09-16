@@ -276,12 +276,12 @@ type MeResponse = {
 };
 
 const ProfilePage = () => {
-  const profile = useMemo(() => null, []);
+  const profile = useMemo<ProfileDetails | null>(() => null, []);
 
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(profile);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
-    usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null),
+    usdtBalance: null,
   }));
 
   useEffect(() => {
