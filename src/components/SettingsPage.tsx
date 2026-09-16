@@ -13,7 +13,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, Crop, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
+import { CheckCircle2, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -634,10 +634,9 @@ const SettingsPage = () => {
     event.target.value = '';
   };
 
-  const AVATAR_CONTROL_LIMIT = 140;
-  const AVATAR_DRAG_STEP = 2;
+  const AVATAR_PINCH_MIN_DISTANCE = 80;
 
-  const clampAvatarValue = (value: number) => Math.max(-AVATAR_CONTROL_LIMIT, Math.min(AVATAR_CONTROL_LIMIT, value));
+  const clampAvatarValue = (value: number) => Math.max(-180, Math.min(180, value));
   const clampAvatarZoom = (value: number) => Math.max(AVATAR_MIN_ZOOM, Math.min(AVATAR_MAX_ZOOM, value));
 
   const updateAvatarEditor = (updater: (current: AvatarEditorState) => AvatarEditorState) => {
@@ -703,17 +702,50 @@ const SettingsPage = () => {
     window.addEventListener('pointercancel', handlePointerUp);
   };
 
-  const handleAvatarWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+  const avatarPointers = React.useRef<Map<number, { x: number; y: number }>>(new Map());
+  const avatarPinchState = React.useRef<{ distance: number; zoom: number } | null>(null);
+
+  const getPointerDistance = (first: { x: number; y: number }, second: { x: number; y: number }) => Math.hypot(second.x - first.x, second.y - first.y);
+
+  const handleAvatarPointerMove = (event: PointerEvent) => {
+    avatarPointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
     if (!avatarEditor) {
       return;
     }
 
-    event.preventDefault();
-    const direction = event.deltaY > 0 ? 1 : -1;
-    updateAvatarEditor((current) => ({
-      ...current,
-      zoom: clampAvatarZoom(current.zoom + direction * 0.08),
-    }));
+    const pointers = Array.from(avatarPointers.current.values());
+
+    if (pointers.length >= 2) {
+      const [first, second] = pointers;
+      const distance = getPointerDistance(first, second);
+      const midpointX = (first.x + second.x) / 2;
+      const midpointY = (first.y + second.y) / 2;
+
+      if (!avatarPinchState.current) {
+        avatarPinchState.current = {
+          distance,
+          zoom: avatarEditor.zoom,
+        };
+        return;
+      }
+
+      const pinchScale = distance / Math.max(avatarPinchState.current.distance, AVATAR_PINCH_MIN_DISTANCE);
+      updateAvatarEditor((current) => ({
+        ...current,
+        zoom: clampAvatarZoom(avatarPinchState.current ? avatarPinchState.current.zoom * pinchScale : current.zoom),
+      }));
+      return;
+    }
+
+    avatarPinchState.current = null;
+  };
+
+  const handleAvatarPointerUp = (event: PointerEvent) => {
+    avatarPointers.current.delete(event.pointerId);
+    if (avatarPointers.current.size < 2) {
+      avatarPinchState.current = null;
+    }
   };
 
   const handleUploadAvatar = async () => {
@@ -1044,130 +1076,82 @@ const SettingsPage = () => {
                 overflow: 'hidden',
               }}
             >
-              <div style={{ padding: '16px 18px 0', display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ padding: '16px 18px 0', display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'center' }}>
+                <span style={{ color: '#c6d3ea', fontSize: '0.92rem', fontWeight: 600 }}>Adjust photo</span>
                 <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>
                   Cancel
                 </button>
               </div>
 
-              <div style={{ padding: '22px', display: 'grid', gap: '20px', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(280px, 340px)' }}>
-                <div style={{ display: 'grid', gap: '14px' }}>
-                  <div style={{ position: 'relative', minHeight: '520px', borderRadius: '28px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'radial-gradient(circle at 30% 18%, rgba(34,211,238,0.18), rgba(13,18,32,1) 58%)' }}>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        backgroundImage: `url(${avatarEditor.source})`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: `${50 + avatarEditor.cropX / 8}% ${50 + avatarEditor.cropY / 8}%`,
-                        backgroundSize: `${100 * avatarEditor.zoom}% auto`,
-                        transform: 'translateZ(0)',
-                        filter: 'saturate(1.02) contrast(1.02)',
-                        transition: 'background-position 90ms linear, background-size 90ms linear',
-                      }}
-                    />
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(6,10,18,0.08), rgba(6,10,18,0.18))' }} />
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: '24px',
-                        borderRadius: '50%',
-                        border: '2px solid rgba(255,255,255,0.72)',
-                        boxShadow: '0 0 0 999px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.18)',
-                        pointerEvents: 'none',
-                      }}
-                    />
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      aria-label="Drag photo to reposition"
-                      onPointerDown={handleAvatarDragStart}
-                      onKeyDown={(event) => {
-                        if (!avatarEditor) {
-                          return;
-                        }
-
-                        if (event.key === 'ArrowLeft') {
-                          event.preventDefault();
-                          updateAvatarEditor((current) => ({ ...current, cropX: clampAvatarValue(current.cropX - AVATAR_DRAG_STEP) }));
-                        }
-
-                        if (event.key === 'ArrowRight') {
-                          event.preventDefault();
-                          updateAvatarEditor((current) => ({ ...current, cropX: clampAvatarValue(current.cropX + AVATAR_DRAG_STEP) }));
-                        }
-
-                        if (event.key === 'ArrowUp') {
-                          event.preventDefault();
-                          updateAvatarEditor((current) => ({ ...current, cropY: clampAvatarValue(current.cropY - AVATAR_DRAG_STEP) }));
-                        }
-
-                        if (event.key === 'ArrowDown') {
-                          event.preventDefault();
-                          updateAvatarEditor((current) => ({ ...current, cropY: clampAvatarValue(current.cropY + AVATAR_DRAG_STEP) }));
-                        }
-
-                        if (event.key === '+' || event.key === '=') {
-                          event.preventDefault();
-                          updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(current.zoom + 0.08) }));
-                        }
-
-                        if (event.key === '-' || event.key === '_') {
-                          event.preventDefault();
-                          updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(current.zoom - 0.08) }));
-                        }
-                      }}
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        cursor: 'grab',
-                        touchAction: 'none',
-                      }}
-                    />
-                    <div style={{ position: 'absolute', left: '24px', right: '24px', bottom: '24px', display: 'flex', justifyContent: 'center' }}>
-                      <div style={{ borderRadius: '999px', padding: '8px 12px', background: 'rgba(8,12,23,0.72)', border: '1px solid rgba(255,255,255,0.08)', color: '#c6d3ea', fontSize: '0.82rem' }}>
-                        Drag, pinch, or use the controls to frame your photo
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gap: '14px', alignContent: 'start' }}>
-                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
-                      <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><Crop size={14} /> Zoom</span>
-                      <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{Math.round(avatarEditor.zoom * 100)}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={AVATAR_MIN_ZOOM}
-                      max={AVATAR_MAX_ZOOM}
-                      step={AVATAR_ZOOM_STEP}
-                      value={avatarEditor.zoom}
-                      onChange={(event) => updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(Number(event.target.value)) }))}
-                    />
-                  </div>
-
-                  <div style={{ display: 'grid', gap: '10px', maxWidth: '420px', margin: '0 auto', width: '100%' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                    <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><Crop size={14} /> Zoom</span>
-                    <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{Math.round(avatarEditor.zoom * 100)}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={AVATAR_MIN_ZOOM}
-                    max={AVATAR_MAX_ZOOM}
-                    step={AVATAR_ZOOM_STEP}
-                    value={avatarEditor.zoom}
-                    onChange={(event) => updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(Number(event.target.value)) }))}
+              <div style={{ padding: '18px', display: 'grid', gap: '16px' }}>
+                <div
+                  style={{
+                    position: 'relative',
+                    minHeight: 'min(74vh, 560px)',
+                    borderRadius: '28px',
+                    overflow: 'hidden',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'linear-gradient(180deg, rgba(13,18,32,0.98), rgba(8,12,23,0.98))',
+                    touchAction: 'none',
+                    userSelect: 'none',
+                  }}
+                  onPointerDown={handleAvatarDragStart}
+                  onPointerMove={(event) => {
+                    if (avatarDragging) {
+                      handleAvatarPointerMove(event.nativeEvent);
+                    }
+                  }}
+                  onPointerUp={(event) => handleAvatarPointerUp(event.nativeEvent)}
+                  onPointerCancel={(event) => handleAvatarPointerUp(event.nativeEvent)}
+                >
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundImage: `url(${avatarEditor.source})`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: `${50 + avatarEditor.cropX / 8}% ${50 + avatarEditor.cropY / 8}%`,
+                      backgroundSize: `${100 * avatarEditor.zoom}% auto`,
+                      backgroundPositionX: `calc(50% + ${avatarEditor.cropX}px)`,
+                      backgroundPositionY: `calc(50% + ${avatarEditor.cropY}px)`,
+                      transform: 'translateZ(0)',
+                      filter: 'saturate(1.03) contrast(1.02)',
+                      transition: avatarDragging ? 'none' : 'background-position 90ms linear, background-size 90ms linear',
+                      cursor: avatarDragging ? 'grabbing' : 'grab',
+                    }}
                   />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(6,10,18,0.08), rgba(6,10,18,0.16))' }} />
+                  <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '50%',
+                        width: 'min(74vw, 320px)',
+                        height: 'min(74vw, 320px)',
+                        maxWidth: 'calc(100% - 32px)',
+                        maxHeight: 'calc(100% - 32px)',
+                        transform: 'translate(-50%, -50%)',
+                        border: '2px solid rgba(255,255,255,0.9)',
+                        boxShadow: '0 0 0 999px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.16)',
+                        borderRadius: '18px',
+                      }}
+                    />
+                  </div>
+                  <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '16px', display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ borderRadius: '999px', padding: '8px 12px', background: 'rgba(8,12,23,0.68)', border: '1px solid rgba(255,255,255,0.08)', color: '#c6d3ea', fontSize: '0.82rem' }}>
+                      Drag to position · Pinch to zoom
+                    </div>
+                  </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '420px', margin: '4px auto 0', width: '100%' }}>
-                  <button type="button" style={{ ...styles.button, ...styles.primaryButton, flex: '1 1 160px' }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading}>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                  <button type="button" style={{ ...styles.button, padding: '12px 18px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>
+                    Cancel
+                  </button>
+                  <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '12px 18px' }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading}>
                     {avatarUploading ? 'Saving...' : 'Save'}
                   </button>
-                </div>
                 </div>
               </div>
             </div>
