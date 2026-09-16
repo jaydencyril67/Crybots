@@ -13,7 +13,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, MoveVertical, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2, RotateCcw } from 'lucide-react';
+import { CheckCircle2, Crop, LockKeyhole, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -48,11 +48,9 @@ type AvatarEditorState = {
 };
 
 const AVATAR_FRAME_SIZE = 512;
-const AVATAR_CONTROL_LIMIT = 140;
 const AVATAR_MIN_ZOOM = 1;
 const AVATAR_MAX_ZOOM = 3;
 const AVATAR_ZOOM_STEP = 0.01;
-const AVATAR_DRAG_STEP = 2;
 
 const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoom: number) => {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -642,111 +640,78 @@ const SettingsPage = () => {
     setAvatarEditor((current) => (current ? updater(current) : current));
   };
 
-  const handleAvatarDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handleUploadAvatar = async () => {
     if (!avatarEditor) {
       return;
     }
 
-    const startX = event.clientX;
-    const startY = event.clientY;
-    const initialCropX = avatarEditor.cropX;
-    const initialCropY = avatarEditor.cropY;
+    setAvatarUploading(true);
+    try {
+      const avatarDataUrl = await avatarToDataUrl(avatarEditor.source, avatarEditor.cropX, avatarEditor.cropY, avatarEditor.zoom);
+      const authResponse = await api.get('/api/imagekit/auth');
+      const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
-    event.currentTarget.setPointerCapture(event.pointerId);
+      if (!auth.publicKey || !auth.token || !auth.expire || !auth.signature) {
+        throw new Error('Unable to prepare image upload.');
+      }
 
-    const handlePointerMove = (moveEvent: PointerEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const deltaY = moveEvent.clientY - startY;
-      const easedDeltaX = Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.92);
-      const easedDeltaY = Math.sign(deltaY) * Math.pow(Math.abs(deltaY), 0.92);
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', avatarDataUrl);
+      uploadFormData.append('fileName', `avatar-${Date.now()}.png`);
+      uploadFormData.append('useUniqueFileName', 'true');
+      uploadFormData.append('token', auth.token);
+      uploadFormData.append('expire', String(auth.expire));
+      uploadFormData.append('signature', auth.signature);
+      uploadFormData.append('publicKey', auth.publicKey);
+      uploadFormData.append('folder', 'kingshall/avatars');
 
-      updateAvatarEditor((current) => ({
-        ...current,
-        cropX: clampAvatarValue(initialCropX + easedDeltaX),
-        cropY: clampAvatarValue(initialCropY + easedDeltaY),
-      }));
-    };
+      const uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
 
-    const handlePointerUp = () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-      window.removeEventListener('pointercancel', handlePointerUp);
-    };
+      if (!uploadResponse.ok) {
+        throw new Error('Unable to upload profile picture.');
+      }
 
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('pointercancel', handlePointerUp);
+      const uploadedFile = await uploadResponse.json() as { url?: string; fileId?: string };
+      if (!uploadedFile.url) {
+        throw new Error('Image upload did not return a usable URL.');
+      }
+
+      const { data } = await api.patch('/api/settings/profile-picture', {
+        profilePicture: uploadedFile.url,
+        profilePictureFileId: uploadedFile.fileId,
+      });
+      const nextProfile = data?.user ?? null;
+      if (nextProfile) {
+        window.localStorage.setItem('user', JSON.stringify(nextProfile));
+        window.localStorage.setItem('kingshall_user', JSON.stringify(nextProfile));
+        setAvatarPreview(nextProfile.profilePicture ?? uploadedFile.url);
+      } else {
+        setAvatarPreview(uploadedFile.url);
+      }
+      setAvatarEditor(null);
+      showStatus('success', 'Profile picture updated successfully.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update profile picture.');
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
-  const handleAvatarPinchStart = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!avatarEditor) {
-      return;
-    }
-
-    const surface = event.currentTarget;
-    const activePointers = new Map<number, PointerEvent>();
-    let initialDistance = 0;
-    let initialZoom = avatarEditor.zoom;
-    let rafId: number | null = null;
-
-    const scheduleZoomUpdate = (nextZoom: number) => {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
-
-      rafId = window.requestAnimationFrame(() => {
-        updateAvatarEditor((current) => ({
-          ...current,
-          zoom: clampAvatarZoom(nextZoom),
-        }));
-        rafId = null;
-      });
-    };
-
-    const updatePinch = () => {
-      if (activePointers.size !== 2) {
-        return;
-      }
-
-      const [first, second] = Array.from(activePointers.values());
-      const distance = Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
-      if (!initialDistance) {
-        initialDistance = distance;
-        initialZoom = avatarEditor.zoom;
-        return;
-      }
-
-      const scale = distance / initialDistance;
-      scheduleZoomUpdate(initialZoom * scale);
-    };
-
-    const handlePointerMove = (moveEvent: PointerEvent) => {
-      if (!activePointers.has(moveEvent.pointerId)) {
-        return;
-      }
-
-      activePointers.set(moveEvent.pointerId, moveEvent);
-      updatePinch();
-    };
-
-    const handlePointerUp = (upEvent: PointerEvent) => {
-      activePointers.delete(upEvent.pointerId);
-      if (activePointers.size < 2) {
-        window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('pointerup', handlePointerUp);
-        window.removeEventListener('pointercancel', handlePointerUp);
-        if (rafId !== null) {
-          cancelAnimationFrame(rafId);
-        }
-      }
-    };
-
-    activePointers.set(event.pointerId, event.nativeEvent);
-    surface.setPointerCapture(event.pointerId);
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('pointercancel', handlePointerUp);
+  const avatarDisplayStyle = {
+    position: 'relative' as const,
+    width: 'min(72vw, 360px)',
+    maxWidth: '100%',
+    aspectRatio: '1 / 1',
+    borderRadius: '50%',
+    overflow: 'hidden',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.04)',
+    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+    touchAction: 'none' as const,
+    cursor: avatarEditor ? 'grab' : 'default',
   };
 
   const handleUploadAvatar = async () => {
@@ -828,22 +793,17 @@ const SettingsPage = () => {
 
             <section style={styles.card}>
               <h2 style={styles.cardTitle}><UserCircle2 size={18} /> Profile picture</h2>
-              <p style={styles.cardText}>Select an image, crop it, move it around, and upload the edited version just like a WhatsApp-style avatar editor.</p>
+              <p style={styles.cardText}>Choose a photo, adjust it in the modal, and save a clean cropped avatar.</p>
               <div style={{ display: 'grid', gap: '14px', marginTop: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-                  <div
-                    style={{
-                      width: '96px',
-                      height: '96px',
-                      borderRadius: '50%',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      background: avatarPreview ? `url(${avatarPreview}) center/cover no-repeat` : 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.26), rgba(14,18,33,1) 58%)',
-                      display: 'grid',
-                      placeItems: 'center',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {avatarPreview ? null : <UserCircle2 size={42} />}
+                  <div style={{ ...avatarDisplayStyle, width: '96px', height: '96px', flex: '0 0 auto' }}>
+                    {avatarPreview ? (
+                      <div style={{ position: 'absolute', inset: 0, background: `url(${avatarPreview}) center/cover no-repeat` }} />
+                    ) : (
+                      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.26), rgba(14,18,33,1) 58%)' }}>
+                        <UserCircle2 size={42} />
+                      </div>
+                    )}
                   </div>
                   <label style={{ ...styles.button, ...styles.primaryButton, display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                     <Upload size={16} />
