@@ -1044,17 +1044,10 @@ const SettingsPage = () => {
                 overflow: 'hidden',
               }}
             >
-              <div style={{ padding: '20px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(34,211,238,0.2), rgba(139,92,246,0.2))', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', placeItems: 'center', color: '#d8f3ff' }}>
-                    <Crop size={20} />
-                  </div>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.01em' }}>Edit profile photo</h3>
-                    <p style={{ margin: '6px 0 0', color: '#9db0d1', fontSize: '0.92rem' }}>Drag the photo and zoom it just like WhatsApp.</p>
-                  </div>
-                </div>
-                <button type="button" style={{ ...styles.button, background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Cancel</button>
+              <div style={{ padding: '16px 18px 0', display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>
+                  Cancel
+                </button>
               </div>
 
               <div style={{ padding: '22px', display: 'grid', gap: '20px', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(280px, 340px)' }}>
