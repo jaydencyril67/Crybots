@@ -13,8 +13,8 @@ const styles = {
     pointerEvents: 'none' as const,
   },
   dockExpanded: {
-    width: 'min(560px, calc(100vw - 24px))',
-    maxHeight: 'min(72vh, 620px)',
+    width: 'min(560px, calc(100vw - 16px))',
+    maxHeight: 'min(58vh, 420px)',
   },
   bar: {
     display: 'flex',
@@ -38,14 +38,18 @@ const styles = {
   barExpanded: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
-    gap: '10px',
-    padding: '14px',
+    gap: '8px',
+    padding: '12px',
     borderRadius: '26px',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
+    maxHeight: 'inherit',
+    minHeight: 0,
     whiteSpace: 'normal' as const,
-    alignContent: 'flex-start' as const,
+    alignContent: 'start' as const,
+    WebkitOverflowScrolling: 'touch' as const,
   },
   rail: {
     position: 'absolute' as const,
