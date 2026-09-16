@@ -25,93 +25,10 @@ type TransactionRecord = {
   description: string;
 };
 
-const sampleTransactions: TransactionRecord[] = [
-  {
-    id: 'txn_1001',
-    type: 'transfer',
-    direction: 'outbound',
-    title: 'USDT transfer sent',
-    amount: '-250.00 USDT',
-    amountValue: -250,
-    status: 'completed',
-    date: '2026-09-16',
-    time: '10:24:18',
-    counterpart: 'user_kingshall',
-    reference: 'TRF-9K4H-1001',
-    description: 'Transfer sent to another user wallet.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1002',
-    type: 'withdrawal',
-    direction: 'outbound',
-    title: 'USDT withdrawal submitted',
-    amount: '-120.00 USDT',
-    amountValue: -120,
-    status: 'pending',
-    date: '2026-09-15',
-    time: '18:41:02',
-    reference: 'WDR-2Q8M-1002',
-    description: 'Withdrawal queued for processing.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1003',
-    type: 'deposit',
-    direction: 'inbound',
-    title: 'Wallet deposit received',
-    amount: '+500.00 USDT',
-    amountValue: 500,
-    status: 'completed',
-    date: '2026-09-14',
-    time: '09:15:45',
-    reference: 'DPT-7L1A-1003',
-    description: 'Deposit credited to your balance.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1004',
-    type: 'staking',
-    direction: 'inbound',
-    title: 'Staking reward paid',
-    amount: '+18.75 USDT',
-    amountValue: 18.75,
-    status: 'completed',
-    date: '2026-09-14',
-    time: '06:00:00',
-    reference: 'STK-4N3P-1004',
-    description: 'Daily staking reward payout.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1005',
-    type: 'trade',
-    direction: 'outbound',
-    title: 'Market order executed',
-    amount: '-80.00 USDT',
-    amountValue: -80,
-    status: 'failed',
-    date: '2026-09-13',
-    time: '21:08:19',
-    reference: 'TRD-8A6C-1005',
-    description: 'Trade could not be executed due to insufficient liquidity.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1006',
-    type: 'fee',
-    direction: 'outbound',
-    title: 'Network fee charged',
-    amount: '-1.20 USDT',
-    amountValue: -1.2,
-    status: 'completed',
-    date: '2026-09-12',
-    time: '15:52:10',
-    reference: 'FEE-5T7K-1006',
-    description: 'Blockchain network fee applied to a withdrawal.',
-    currency: 'USDT',
-  },
-];
+type TransactionHistoryResponse = {
+  transactions?: Array<Partial<TransactionRecord> & { type?: TransactionRecord['type']; direction?: TransactionRecord['direction']; status?: TransactionRecord['status'] }>;
+};
+
 
 const styles = {
   page: {
@@ -200,6 +117,9 @@ const styles = {
   label: { fontSize: '0.82rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
   select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
+  selectTrigger: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { position: 'absolute' as const, top: 'calc(100% + 8px)', left: 0, right: 0, display: 'flex', flexDirection: 'column' as const, gap: '4px', padding: '8px', borderRadius: '18px', border: '1px solid rgba(99,102,241,0.18)', background: 'linear-gradient(180deg, rgba(12, 16, 35, 0.98) 0%, rgba(9, 12, 28, 0.98) 100%)', boxShadow: '0 24px 60px rgba(0, 0, 0, 0.3)', zIndex: 20 },
+  selectOption: { width: '100%', border: 'none', background: 'transparent', color: '#e8eefc', textAlign: 'left' as const, padding: '12px 14px', borderRadius: '14px', cursor: 'pointer', fontSize: '0.92rem', fontWeight: 600 },
   tableWrap: {
     overflowX: 'auto' as const,
     borderRadius: '22px',
@@ -309,7 +229,11 @@ const TransactionHistoryPage = () => {
   const [query, setQuery] = useState('');
   const [amountMin, setAmountMin] = useState('');
   const [amountMax, setAmountMax] = useState('');
-  const [transactions, setTransactions] = useState<TransactionRecord[]>(sampleTransactions);
+  const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false);
+  const [isDirectionMenuOpen, setIsDirectionMenuOpen] = useState(false);
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
+  const [transactionHistoryPage, setTransactionHistoryPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -318,21 +242,46 @@ const TransactionHistoryPage = () => {
       setLoading(true);
       setError('');
       try {
-        const { data } = await api.get<{ transactions?: TransactionRecord[] }>('/api/transactions/me');
-        if (Array.isArray(data?.transactions) && data.transactions.length > 0) {
-          setTransactions(data.transactions);
-        } else {
-          setTransactions(sampleTransactions);
+        const { data } = await api.get<TransactionHistoryResponse>('/api/transactions/me');
+        const normalizedTransactions = Array.isArray(data?.transactions)
+          ? data.transactions
+              .filter((transaction): transaction is TransactionRecord => Boolean(transaction?.id && transaction.type && transaction.direction && transaction.status && transaction.title && transaction.amount && transaction.currency && transaction.date && transaction.time && transaction.reference && transaction.description && typeof transaction.amountValue === 'number'))
+              .map((transaction) => ({
+                ...transaction,
+                counterpart: transaction.counterpart || undefined,
+              }))
+          : [];
+
+        setTransactions(normalizedTransactions);
+        setTransactionHistoryPage(1);
+        if (!Array.isArray(data?.transactions)) {
+          setError('The backend returned no transaction records.');
         }
       } catch {
-        setTransactions(sampleTransactions);
-        setError('Showing local transaction history preview because the backend transaction feed is unavailable.');
+        setTransactions([]);
+        setError('Unable to load transaction history from the backend.');
       } finally {
         setLoading(false);
       }
     };
 
     void loadTransactions();
+  }, []);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
+      const insideTypeMenu = document.getElementById('transaction-type-menu')?.contains(target) ?? false;
+      const insideDirectionMenu = document.getElementById('transaction-direction-menu')?.contains(target) ?? false;
+      const insideStatusMenu = document.getElementById('transaction-status-menu')?.contains(target) ?? false;
+
+      if (!insideTypeMenu) setIsTypeMenuOpen(false);
+      if (!insideDirectionMenu) setIsDirectionMenuOpen(false);
+      if (!insideStatusMenu) setIsStatusMenuOpen(false);
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
   const filteredTransactions = useMemo(() => {
@@ -352,7 +301,41 @@ const TransactionHistoryPage = () => {
 
   const totalCount = transactions.length;
   const filteredCount = filteredTransactions.length;
-  const completedCount = transactions.filter((transaction) => transaction.status === 'completed').length;
+  const completedCount = filteredTransactions.filter((transaction) => transaction.status === 'completed').length;
+  const transactionHistoryPageSize = 15;
+  const transactionHistoryTotalPages = Math.max(1, Math.ceil(filteredTransactions.length / transactionHistoryPageSize));
+  const transactionHistoryCurrentPage = Math.min(transactionHistoryPage, transactionHistoryTotalPages);
+  const transactionHistoryStartIndex = (transactionHistoryCurrentPage - 1) * transactionHistoryPageSize;
+  const transactionHistoryRows = filteredTransactions.slice(transactionHistoryStartIndex, transactionHistoryStartIndex + transactionHistoryPageSize);
+  const transactionHistoryPageItems = useMemo(() => {
+    if (transactionHistoryTotalPages <= 7) {
+      return Array.from({ length: transactionHistoryTotalPages }, (_, index) => index + 1);
+    }
+
+    const visiblePages = new Set<number>([1, transactionHistoryTotalPages, transactionHistoryCurrentPage]);
+    if (transactionHistoryCurrentPage > 1) visiblePages.add(transactionHistoryCurrentPage - 1);
+    if (transactionHistoryCurrentPage < transactionHistoryTotalPages) visiblePages.add(transactionHistoryCurrentPage + 1);
+    if (transactionHistoryCurrentPage <= 3) {
+      visiblePages.add(2);
+      visiblePages.add(3);
+    }
+    if (transactionHistoryCurrentPage >= transactionHistoryTotalPages - 2) {
+      visiblePages.add(transactionHistoryTotalPages - 1);
+      visiblePages.add(transactionHistoryTotalPages - 2);
+    }
+
+    return Array.from(visiblePages)
+      .filter((page) => page >= 1 && page <= transactionHistoryTotalPages)
+      .sort((left, right) => left - right)
+      .flatMap((page, index, pages) => {
+        const nextPage = pages[index + 1];
+        if (nextPage && nextPage - page > 1) {
+          return [page, 'ellipsis' as const, nextPage];
+        }
+        return [page];
+      })
+      .filter((item, index, items) => item !== 'ellipsis' || items[index - 1] !== 'ellipsis');
+  }, [transactionHistoryCurrentPage, transactionHistoryTotalPages]);
 
   return (
     <div style={styles.page}>
@@ -361,11 +344,6 @@ const TransactionHistoryPage = () => {
         <AppHeader />
         <div style={styles.panel}>
           <div style={styles.body}>
-            <section style={styles.header}>
-              <h1 style={styles.title}><History size={22} /> Transaction history</h1>
-              <p style={styles.subtitle}>Review deposits, withdrawals, transfers, staking rewards, and trading activity in one place. Filter by type, status, or search to quickly find a specific transaction with its date, time, and reference details.</p>
-            </section>
-
             <section style={styles.topGrid}>
               <div style={styles.card}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
@@ -378,35 +356,77 @@ const TransactionHistoryPage = () => {
                       <input style={{ ...styles.input, paddingLeft: '42px' }} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search reference, title, or user" />
                     </div>
                   </div>
-                  <div style={styles.field as React.CSSProperties}>
+                  <div id="transaction-type-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Type</span>
-                    <select style={styles.select} value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as TransactionType)}>
-                      <option value="all">All types</option>
-                      <option value="deposit">Deposit</option>
-                      <option value="withdrawal">Withdrawal</option>
-                      <option value="transfer">Transfer</option>
-                      <option value="staking">Staking</option>
-                      <option value="trade">Trade</option>
-                      <option value="reward">Reward</option>
-                      <option value="fee">Fee</option>
-                    </select>
+                    <button type="button" style={styles.selectTrigger} onClick={() => setIsTypeMenuOpen((current) => !current)}>
+                      <span>{typeFilter === 'all' ? 'All types' : getTypeLabel(typeFilter)}</span>
+                      <ChevronDown size={16} style={{ transform: isTypeMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                    </button>
+                    {isTypeMenuOpen ? (
+                      <div style={styles.selectMenu}>
+                        {(['all', 'deposit', 'withdrawal', 'transfer', 'staking', 'trade', 'reward', 'fee'] as const).map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            style={styles.selectOption}
+                            onClick={() => {
+                              setTypeFilter(option);
+                              setIsTypeMenuOpen(false);
+                            }}
+                          >
+                            {option === 'all' ? 'All types' : getTypeLabel(option)}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                  <div style={styles.field as React.CSSProperties}>
+                  <div id="transaction-direction-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Direction</span>
-                    <select style={styles.select} value={directionFilter} onChange={(event) => setDirectionFilter(event.target.value as TransactionDirection)}>
-                      <option value="all">All directions</option>
-                      <option value="inbound">Inbound</option>
-                      <option value="outbound">Outbound</option>
-                    </select>
+                    <button type="button" style={styles.selectTrigger} onClick={() => setIsDirectionMenuOpen((current) => !current)}>
+                      <span>{directionFilter === 'all' ? 'All directions' : directionFilter === 'inbound' ? 'Inbound' : 'Outbound'}</span>
+                      <ChevronDown size={16} style={{ transform: isDirectionMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                    </button>
+                    {isDirectionMenuOpen ? (
+                      <div style={styles.selectMenu}>
+                        {(['all', 'inbound', 'outbound'] as const).map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            style={styles.selectOption}
+                            onClick={() => {
+                              setDirectionFilter(option);
+                              setIsDirectionMenuOpen(false);
+                            }}
+                          >
+                            {option === 'all' ? 'All directions' : option === 'inbound' ? 'Inbound' : 'Outbound'}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
-                  <div style={styles.field as React.CSSProperties}>
+                  <div id="transaction-status-menu" style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Status</span>
-                    <select style={styles.select} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as TransactionStatus)}>
-                      <option value="all">All statuses</option>
-                      <option value="completed">Completed</option>
-                      <option value="pending">Pending</option>
-                      <option value="failed">Failed</option>
-                    </select>
+                    <button type="button" style={styles.selectTrigger} onClick={() => setIsStatusMenuOpen((current) => !current)}>
+                      <span>{statusFilter === 'all' ? 'All statuses' : statusFilter === 'completed' ? 'Completed' : statusFilter === 'pending' ? 'Pending' : 'Failed'}</span>
+                      <ChevronDown size={16} style={{ transform: isStatusMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                    </button>
+                    {isStatusMenuOpen ? (
+                      <div style={styles.selectMenu}>
+                        {(['all', 'completed', 'pending', 'failed'] as const).map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            style={styles.selectOption}
+                            onClick={() => {
+                              setStatusFilter(option);
+                              setIsStatusMenuOpen(false);
+                            }}
+                          >
+                            {option === 'all' ? 'All statuses' : option === 'completed' ? 'Completed' : option === 'pending' ? 'Pending' : 'Failed'}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                   <div style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Min amount</span>
@@ -429,10 +449,12 @@ const TransactionHistoryPage = () => {
                   <div style={styles.stat}>
                     <p style={styles.statLabel}>Filtered results</p>
                     <p style={styles.statValue}>{filteredCount}</p>
+                    <p style={styles.cardText}>Showing {filteredCount === 0 ? 0 : transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredCount)} of {filteredCount}</p>
                   </div>
                   <div style={styles.stat}>
                     <p style={styles.statLabel}>Completed</p>
                     <p style={styles.statValue}>{completedCount}</p>
+                    <p style={styles.cardText}>Completed in the current filter set</p>
                   </div>
                 </div>
                 <p style={styles.cardText}><ShieldCheck size={16} style={{ display: 'inline-block', marginRight: '6px', verticalAlign: 'text-bottom' }} />All entries show type, status, date, time, and reference so you can audit account activity easily on mobile or desktop.</p>
@@ -458,8 +480,8 @@ const TransactionHistoryPage = () => {
                     <tr>
                       <td style={styles.loadingState} colSpan={6}>Loading transaction history…</td>
                     </tr>
-                  ) : filteredTransactions.length > 0 ? filteredTransactions.map((transaction) => (
-                    <tr key={transaction.id}>
+                  ) : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => (
+                    <tr key={transaction.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
                       <td style={styles.td}>
                         <div style={styles.meta}>
                           <strong>{transaction.title}</strong>
@@ -492,10 +514,35 @@ const TransactionHistoryPage = () => {
               </table>
             </section>
 
-            <section style={styles.card}>
-              <h2 style={styles.cardTitle}><CalendarDays size={18} /> Activity log note</h2>
-              <p style={styles.cardText}>Each transaction record should be backed by server-side audit data in production, including timestamp, actor, transaction category, and processing status. The current page uses the same card, label, and spacing style patterns as the rest of the app and remains horizontally scrollable for small screens.</p>
-            </section>
+            {filteredTransactions.length > transactionHistoryPageSize ? (
+              <div style={styles.card}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '12px', alignItems: 'center' }}>
+                  <p style={styles.cardText}>Showing {transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredTransactions.length)} of {filteredTransactions.length} transactions</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                    <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => setTransactionHistoryPage((current) => Math.max(1, current - 1))} disabled={transactionHistoryCurrentPage === 1}>Prev</button>
+                    {transactionHistoryPageItems.map((item, index) =>
+                      item === 'ellipsis' ? (
+                        <span key={`transaction-ellipsis-${index}`} style={styles.muted}>…</span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          style={{
+                            ...styles.selectOption,
+                            minWidth: '42px',
+                            ...(item === transactionHistoryCurrentPage ? { borderColor: 'rgba(125,211,252,0.55)', background: 'rgba(125,211,252,0.12)' } : {}),
+                          }}
+                          onClick={() => setTransactionHistoryPage(item)}
+                        >
+                          {item}
+                        </button>
+                      ),
+                    )}
+                    <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => setTransactionHistoryPage((current) => Math.min(transactionHistoryTotalPages, current + 1))} disabled={transactionHistoryCurrentPage === transactionHistoryTotalPages}>Next</button>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
         <NowBar />
