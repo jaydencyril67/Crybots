@@ -13,7 +13,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, MoveVertical, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
+import { CheckCircle2, Crop, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -271,6 +271,7 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
+  const [avatarDragging, setAvatarDragging] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(() => {
     try {
       const raw = window.localStorage.getItem('kingshall_user') || window.localStorage.getItem('user');
@@ -643,6 +644,11 @@ const SettingsPage = () => {
     setAvatarEditor((current) => (current ? updater(current) : current));
   };
 
+  const closeAvatarEditor = () => {
+    setAvatarEditor(null);
+    setAvatarDragging(false);
+  };
+
   const avatarDisplayStyle = {
     position: 'relative' as const,
     width: 'min(72vw, 360px)',
@@ -661,6 +667,9 @@ const SettingsPage = () => {
     if (!avatarEditor) {
       return;
     }
+
+    event.preventDefault();
+    setAvatarDragging(true);
 
     const startX = event.clientX;
     const startY = event.clientY;
@@ -683,6 +692,7 @@ const SettingsPage = () => {
     };
 
     const handlePointerUp = () => {
+      setAvatarDragging(false);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
       window.removeEventListener('pointercancel', handlePointerUp);
@@ -693,75 +703,17 @@ const SettingsPage = () => {
     window.addEventListener('pointercancel', handlePointerUp);
   };
 
-  const handleAvatarPinchStart = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handleAvatarWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     if (!avatarEditor) {
       return;
     }
 
-    const surface = event.currentTarget;
-    const activePointers = new Map<number, PointerEvent>();
-    let initialDistance = 0;
-    let initialZoom = avatarEditor.zoom;
-    let rafId: number | null = null;
-
-    const scheduleZoomUpdate = (nextZoom: number) => {
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
-      }
-
-      rafId = window.requestAnimationFrame(() => {
-        updateAvatarEditor((current) => ({
-          ...current,
-          zoom: clampAvatarZoom(nextZoom),
-        }));
-        rafId = null;
-      });
-    };
-
-    const updatePinch = () => {
-      if (activePointers.size !== 2) {
-        return;
-      }
-
-      const [first, second] = Array.from(activePointers.values());
-      const distance = Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
-      if (!initialDistance) {
-        initialDistance = distance;
-        initialZoom = avatarEditor.zoom;
-        return;
-      }
-
-      const scale = distance / initialDistance;
-      scheduleZoomUpdate(initialZoom * scale);
-    };
-
-    const handlePointerMove = (moveEvent: PointerEvent) => {
-      if (!activePointers.has(moveEvent.pointerId)) {
-        return;
-      }
-
-      activePointers.set(moveEvent.pointerId, moveEvent);
-      updatePinch();
-    };
-
-    const handlePointerUp = (upEvent: PointerEvent) => {
-      activePointers.delete(upEvent.pointerId);
-      if (activePointers.size < 2) {
-        window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('pointerup', handlePointerUp);
-        window.removeEventListener('pointercancel', handlePointerUp);
-        if (rafId !== null) {
-          cancelAnimationFrame(rafId);
-        }
-      }
-    };
-
-    activePointers.set(event.pointerId, event.nativeEvent);
-    surface.setPointerCapture(event.pointerId);
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    window.addEventListener('pointercancel', handlePointerUp);
+    event.preventDefault();
+    const direction = event.deltaY > 0 ? 1 : -1;
+    updateAvatarEditor((current) => ({
+      ...current,
+      zoom: clampAvatarZoom(current.zoom + direction * 0.08),
+    }));
   };
 
   const handleUploadAvatar = async () => {
@@ -815,7 +767,7 @@ const SettingsPage = () => {
       } else {
         setAvatarPreview(uploadedFile.url);
       }
-      setAvatarEditor(null);
+      closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update profile picture.');
@@ -1102,7 +1054,7 @@ const SettingsPage = () => {
                     <p style={{ margin: '6px 0 0', color: '#9db0d1', fontSize: '0.92rem' }}>Drag the photo and zoom it just like WhatsApp.</p>
                   </div>
                 </div>
-                <button type="button" style={{ ...styles.button, background: 'rgba(255,255,255,0.06)' }} onClick={() => setAvatarEditor(null)} disabled={avatarUploading}>Cancel</button>
+                <button type="button" style={{ ...styles.button, background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Cancel</button>
               </div>
 
               <div style={{ padding: '22px', display: 'grid', gap: '20px', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(280px, 340px)' }}>
@@ -1137,7 +1089,6 @@ const SettingsPage = () => {
                       tabIndex={0}
                       aria-label="Drag photo to reposition"
                       onPointerDown={handleAvatarDragStart}
-                      onPointerDownCapture={handleAvatarPinchStart}
                       onKeyDown={(event) => {
                         if (!avatarEditor) {
                           return;
