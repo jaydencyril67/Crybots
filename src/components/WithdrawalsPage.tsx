@@ -363,7 +363,7 @@ const WithdrawalsPage = () => {
                       </div>
                       <div style={styles.field as React.CSSProperties}>
                         <span style={styles.label}>Hour</span>
-                        <div style={styles.summaryRow}>
+                        <div style={styles.customPickerGrid}>
                           {hourOptions.map((hour) => (
                             <button
                               key={hour}
@@ -382,7 +382,7 @@ const WithdrawalsPage = () => {
                       </div>
                       <div style={styles.field as React.CSSProperties}>
                         <span style={styles.label}>Minute</span>
-                        <div style={styles.summaryRow}>
+                        <div style={styles.customPickerGrid}>
                           {minuteOptions.map((minute) => (
                             <button
                               key={minute}
