@@ -163,9 +163,12 @@ const styles = {
   },
   colorSwatches: {
     display: 'flex',
-    flexWrap: 'wrap' as const,
+    flexWrap: 'nowrap' as const,
     gap: '10px',
     marginTop: '12px',
+    overflowX: 'auto' as const,
+    overflowY: 'hidden' as const,
+    WebkitOverflowScrolling: 'touch' as const,
   },
   colorSwatch: {
     width: '38px',
