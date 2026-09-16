@@ -11,13 +11,11 @@ const styles = {
     zIndex: 40,
     width: 'min(560px, calc(100vw - 32px))',
     pointerEvents: 'none' as const,
-    display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(1.7 * 72px)',
+    height: 'auto',
+    maxHeight: 'calc(1.7 * 72px)',
   },
   bar: {
     display: 'flex',
@@ -41,7 +39,7 @@ const styles = {
   },
   barExpanded: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     gap: '8px',
@@ -284,7 +282,8 @@ const NowBar = ({ actions }: NowBarProps) => {
 
   return (
     <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
-      <div
+      <div style={isExpanded ? { display: 'flex', justifyContent: 'center' } : undefined}>
+        <div
         style={{ ...styles.bar, ...(isExpanded ? styles.barExpanded : {}) }}
         role="button"
         tabIndex={0}
@@ -333,6 +332,7 @@ const NowBar = ({ actions }: NowBarProps) => {
             </div>
           ))
         )}
+        </div>
       </div>
     </div>
   );
