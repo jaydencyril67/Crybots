@@ -401,11 +401,30 @@ const SettingsPage = () => {
 
 
 
-  const handleSaveEdgeLight = () => {
+  const persistEdgeLight = (enabled: boolean, color: EdgeLightColorKey) => {
     window.localStorage.setItem(
       EDGE_LIGHT_STORAGE_KEY,
-      JSON.stringify({ enabled: edgeLightEnabled, color: edgeLightColor }),
+      JSON.stringify({ enabled, color }),
     );
+  };
+
+  const handleToggleEdgeLight = () => {
+    setEdgeLightEnabled((current) => {
+      const nextEnabled = !current;
+      persistEdgeLight(nextEnabled, edgeLightColor);
+      showStatus('success', nextEnabled ? 'NowBar edge lighting turned on.' : 'NowBar edge lighting turned off.');
+      return nextEnabled;
+    });
+  };
+
+  const handleSetEdgeLightColor = (nextColor: EdgeLightColorKey) => {
+    setEdgeLightColor(nextColor);
+    persistEdgeLight(edgeLightEnabled, nextColor);
+    showStatus('success', 'NowBar edge lighting color updated.');
+  };
+
+  const handleSaveEdgeLight = () => {
+    persistEdgeLight(edgeLightEnabled, edgeLightColor);
     showStatus('success', 'NowBar edge lighting updated.');
   };
 
@@ -555,7 +574,7 @@ const SettingsPage = () => {
                   <button
                     type="button"
                     style={{ ...styles.togglePill, ...(edgeLightEnabled ? styles.togglePillActive : {}) }}
-                    onClick={() => setEdgeLightEnabled((current) => !current)}
+                    onClick={handleToggleEdgeLight}
                   >
                     {edgeLightEnabled ? 'On' : 'Off'}
                   </button>
@@ -567,7 +586,7 @@ const SettingsPage = () => {
                       type="button"
                       aria-label={`${option.label} edge light`}
                       title={option.label}
-                      onClick={() => setEdgeLightColor(option.key)}
+                      onClick={() => handleSetEdgeLightColor(option.key)}
                       style={{
                         ...styles.colorSwatch,
                         background: option.value,
