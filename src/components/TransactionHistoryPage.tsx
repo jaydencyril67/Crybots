@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import AppHeader from './AppHeader';
+import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
 
