@@ -71,22 +71,24 @@ const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoo
     throw new Error('Unable to prepare image editor.');
   }
 
-  const imageAspect = image.width / image.height;
-  const coverWidth = imageAspect >= 1 ? image.width * zoom : image.height * imageAspect * zoom;
-  const coverHeight = imageAspect >= 1 ? image.width / imageAspect * zoom : image.height * zoom;
-  const cropOffsetX = cropX * (coverWidth / size);
-  const cropOffsetY = cropY * (coverHeight / size);
-  const sourceX = (image.width - coverWidth) / 2 - cropOffsetX;
-  const sourceY = (image.height - coverHeight) / 2 - cropOffsetY;
+  const isLandscape = image.width >= image.height;
+  const displayWidth = isLandscape ? size * zoom : (size * image.width / image.height) * zoom;
+  const displayHeight = isLandscape ? (size * image.height / image.width) * zoom : size * zoom;
+  const renderedLeft = (size - displayWidth) / 2 + cropX;
+  const renderedTop = (size - displayHeight) / 2 + cropY;
+  const cropScaleX = image.width / displayWidth;
+  const cropScaleY = image.height / displayHeight;
+  const sourceX = Math.max(0, -renderedLeft * cropScaleX);
+  const sourceY = Math.max(0, -renderedTop * cropScaleY);
+  const sourceWidth = Math.min(image.width - sourceX, size * cropScaleX);
+  const sourceHeight = Math.min(image.height - sourceY, size * cropScaleY);
+  const destX = Math.max(0, renderedLeft);
+  const destY = Math.max(0, renderedTop);
+  const destWidth = Math.min(size - destX, sourceWidth / cropScaleX);
+  const destHeight = Math.min(size - destY, sourceHeight / cropScaleY);
 
   context.clearRect(0, 0, size, size);
-  context.save();
-  context.beginPath();
-  context.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-  context.closePath();
-  context.clip();
-  context.drawImage(image, sourceX, sourceY, coverWidth, coverHeight);
-  context.restore();
+  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
 
   return canvas.toDataURL('image/png');
 };
@@ -658,7 +660,7 @@ const SettingsPage = () => {
     width: 'min(72vw, 360px)',
     maxWidth: '100%',
     aspectRatio: '1 / 1',
-    borderRadius: '50%',
+    borderRadius: '18px',
     overflow: 'hidden',
     border: '1px solid rgba(255,255,255,0.12)',
     background: 'rgba(255,255,255,0.04)',
