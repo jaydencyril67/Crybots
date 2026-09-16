@@ -337,7 +337,7 @@ const NowBar = ({ actions }: NowBarProps) => {
     resetIdleTimer();
     const timer = window.setTimeout(() => {
       setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
-    }, 760);
+    }, 700);
     setHoldTimer(timer);
   };
 
