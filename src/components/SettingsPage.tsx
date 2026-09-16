@@ -738,22 +738,16 @@ const SettingsPage = () => {
 
     setAvatarUploading(true);
     try {
-      const avatarDataUrl = avatarEditor.source;
-      const authResponse = await api.get('/api/imagekit/auth');
-      const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
-
-      if (!auth.publicKey || !auth.token || !auth.expire || !auth.signature) {
-        throw new Error('Unable to prepare image upload.');
+      const uploadPreset = import.meta.env.VITE_IMAGEKIT_UPLOAD_PRESET as string | undefined;
+      if (!uploadPreset) {
+        throw new Error('Image upload is not configured.');
       }
 
       const uploadFormData = new FormData();
-      uploadFormData.append('file', avatarDataUrl);
+      uploadFormData.append('file', avatarEditor.source);
       uploadFormData.append('fileName', `avatar-${Date.now()}.png`);
       uploadFormData.append('useUniqueFileName', 'true');
-      uploadFormData.append('token', auth.token);
-      uploadFormData.append('expire', String(auth.expire));
-      uploadFormData.append('signature', auth.signature);
-      uploadFormData.append('publicKey', auth.publicKey);
+      uploadFormData.append('upload_preset', uploadPreset);
       uploadFormData.append('folder', 'kingshall/avatars');
 
       const uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
@@ -775,12 +769,8 @@ const SettingsPage = () => {
         profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
-      const nextAvatarUrl = nextProfile?.profilePicture ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : `${uploadedFile.url}${uploadedFile.url.includes('?') ? '&' : '?'}v=${Date.now()}`;
-      if (nextProfile) {
-        setAvatarPreview(nextAvatarUrl);
-      } else {
-        setAvatarPreview(nextAvatarUrl);
-      }
+      const nextAvatarUrl = nextProfile?.profilePicture ?? uploadedFile.url;
+      setAvatarPreview(nextAvatarUrl ? `${nextAvatarUrl}${nextAvatarUrl.includes('?') ? '&' : '?'}v=${Date.now()}` : null);
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
