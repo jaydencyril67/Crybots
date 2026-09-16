@@ -118,6 +118,7 @@ const styles = {
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
   select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
   selectTrigger: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { position: 'absolute' as const, top: 'calc(100% + 8px)', left: 0, right: 0, display: 'flex', flexDirection: 'column' as const, gap: '4px', padding: '8px', borderRadius: '18px', border: '1px solid rgba(99,102,241,0.18)', background: 'linear-gradient(180deg, rgba(12, 16, 35, 0.98) 0%, rgba(9, 12, 28, 0.98) 100%)', boxShadow: '0 24px 60px rgba(0, 0, 0, 0.3)', zIndex: 20 },
   tableWrap: {
     overflowX: 'auto' as const,
     borderRadius: '22px',
