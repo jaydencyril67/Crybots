@@ -298,7 +298,7 @@ const TransactionHistoryPage = () => {
 
   const totalCount = transactions.length;
   const filteredCount = filteredTransactions.length;
-  const completedCount = transactions.filter((transaction) => transaction.status === 'completed').length;
+  const completedCount = filteredTransactions.filter((transaction) => transaction.status === 'completed').length;
   const transactionHistoryPageSize = 15;
   const transactionHistoryTotalPages = Math.max(1, Math.ceil(filteredTransactions.length / transactionHistoryPageSize));
   const transactionHistoryCurrentPage = Math.min(transactionHistoryPage, transactionHistoryTotalPages);
