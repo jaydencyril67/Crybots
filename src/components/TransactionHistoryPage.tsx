@@ -483,7 +483,6 @@ const TransactionHistoryPage = () => {
                       <td style={styles.td}>
                         <div style={styles.meta}>
                           <strong>{transaction.title}</strong>
-                          <span style={styles.muted}>{getTypeLabel(transaction.type)} · {transaction.direction}</span>
                         </div>
                       </td>
                       <td style={styles.td}><strong>{transaction.amount}</strong></td>
