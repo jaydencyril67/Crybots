@@ -25,93 +25,6 @@ type TransactionRecord = {
   description: string;
 };
 
-const sampleTransactions: TransactionRecord[] = [
-  {
-    id: 'txn_1001',
-    type: 'transfer',
-    direction: 'outbound',
-    title: 'USDT transfer sent',
-    amount: '-250.00 USDT',
-    amountValue: -250,
-    status: 'completed',
-    date: '2026-09-16',
-    time: '10:24:18',
-    counterpart: 'user_kingshall',
-    reference: 'TRF-9K4H-1001',
-    description: 'Transfer sent to another user wallet.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1002',
-    type: 'withdrawal',
-    direction: 'outbound',
-    title: 'USDT withdrawal submitted',
-    amount: '-120.00 USDT',
-    amountValue: -120,
-    status: 'pending',
-    date: '2026-09-15',
-    time: '18:41:02',
-    reference: 'WDR-2Q8M-1002',
-    description: 'Withdrawal queued for processing.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1003',
-    type: 'deposit',
-    direction: 'inbound',
-    title: 'Wallet deposit received',
-    amount: '+500.00 USDT',
-    amountValue: 500,
-    status: 'completed',
-    date: '2026-09-14',
-    time: '09:15:45',
-    reference: 'DPT-7L1A-1003',
-    description: 'Deposit credited to your balance.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1004',
-    type: 'staking',
-    direction: 'inbound',
-    title: 'Staking reward paid',
-    amount: '+18.75 USDT',
-    amountValue: 18.75,
-    status: 'completed',
-    date: '2026-09-14',
-    time: '06:00:00',
-    reference: 'STK-4N3P-1004',
-    description: 'Daily staking reward payout.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1005',
-    type: 'trade',
-    direction: 'outbound',
-    title: 'Market order executed',
-    amount: '-80.00 USDT',
-    amountValue: -80,
-    status: 'failed',
-    date: '2026-09-13',
-    time: '21:08:19',
-    reference: 'TRD-8A6C-1005',
-    description: 'Trade could not be executed due to insufficient liquidity.',
-    currency: 'USDT',
-  },
-  {
-    id: 'txn_1006',
-    type: 'fee',
-    direction: 'outbound',
-    title: 'Network fee charged',
-    amount: '-1.20 USDT',
-    amountValue: -1.2,
-    status: 'completed',
-    date: '2026-09-12',
-    time: '15:52:10',
-    reference: 'FEE-5T7K-1006',
-    description: 'Blockchain network fee applied to a withdrawal.',
-    currency: 'USDT',
-  },
-];
 
 const styles = {
   page: {
@@ -309,7 +222,7 @@ const TransactionHistoryPage = () => {
   const [query, setQuery] = useState('');
   const [amountMin, setAmountMin] = useState('');
   const [amountMax, setAmountMax] = useState('');
-  const [transactions, setTransactions] = useState<TransactionRecord[]>(sampleTransactions);
+  const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -319,14 +232,14 @@ const TransactionHistoryPage = () => {
       setError('');
       try {
         const { data } = await api.get<{ transactions?: TransactionRecord[] }>('/api/transactions/me');
-        if (Array.isArray(data?.transactions) && data.transactions.length > 0) {
+        if (Array.isArray(data?.transactions)) {
           setTransactions(data.transactions);
         } else {
-          setTransactions(sampleTransactions);
+          setTransactions([]);
         }
       } catch {
-        setTransactions(sampleTransactions);
-        setError('Showing local transaction history preview because the backend transaction feed is unavailable.');
+        setTransactions([]);
+        setError('Unable to load transaction history from the backend.');
       } finally {
         setLoading(false);
       }
