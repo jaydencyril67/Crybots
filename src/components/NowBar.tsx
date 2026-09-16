@@ -286,6 +286,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   useEffect(() => {
     const syncPath = () => {
       setCurrentPath(getActivePath());
+      setView('title');
     };
 
     const syncEdgeLight = () => {
