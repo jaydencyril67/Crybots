@@ -76,7 +76,6 @@ const styles = {
     alignSelf: 'stretch',
   },
   barExpanded: {
-    '--edge-light': 'transparent',
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
