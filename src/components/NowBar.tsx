@@ -13,14 +13,14 @@ const styles = {
     pointerEvents: 'none' as const,
   },
   dockExpanded: {
-    width: 'min(560px, calc(100vw - 16px))',
+    width: 'min(560px, calc(100vw - 32px))',
     height: 'auto',
     maxHeight: 'calc(1.7 * 72px)',
   },
   bar: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '8px',
     padding: '10px 12px',
     borderRadius: '28px',
     border: '1px solid rgba(255,255,255,0.12)',
@@ -40,11 +40,11 @@ const styles = {
   barExpanded: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    gridAutoRows: 'minmax(54px, auto)',
+    gridAutoRows: 'minmax(46px, auto)',
     alignItems: 'stretch',
-    gap: '8px',
-    padding: '12px',
-    borderRadius: '26px',
+    gap: '6px',
+    padding: '8px',
+    borderRadius: '24px',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     height: '100%',
@@ -89,9 +89,9 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
-    minHeight: '56px',
-    padding: '12px 14px',
-    borderRadius: '20px',
+    minHeight: '46px',
+    padding: '8px 10px',
+    borderRadius: '16px',
     justifyContent: 'flex-start',
     gap: '12px',
   },
@@ -100,18 +100,18 @@ const styles = {
     border: '1px dashed rgba(255,255,255,0.12)',
   },
   iconOnly: {
-    width: '20px',
-    height: '20px',
+    width: '16px',
+    height: '16px',
     display: 'grid',
     placeItems: 'center',
   },
   labelExpanded: {
-    fontSize: '0.92rem',
+    fontSize: '0.86rem',
     fontWeight: 700,
     letterSpacing: '0.01em',
     textAlign: 'left' as const,
     whiteSpace: 'normal' as const,
-    lineHeight: 1.1,
+    lineHeight: 1.05,
     overflow: 'hidden' as const,
     textOverflow: 'ellipsis' as const,
   },
@@ -282,41 +282,41 @@ const NowBar = ({ actions }: NowBarProps) => {
 
   return (
     <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
-      <div style={isExpanded ? { display: 'flex', justifyContent: 'center' } : undefined}>
+      <div style={isExpanded ? { display: 'flex', justifyContent: 'center', width: '100%' } : undefined}>
         <div
-        style={{ ...styles.bar, ...(isExpanded ? styles.barExpanded : {}) }}
-        role="button"
-        tabIndex={0}
-        aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
-        onClick={() => {
+          style={{ ...styles.bar, ...(isExpanded ? styles.barExpanded : {}) }}
+          role="button"
+          tabIndex={0}
+          aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
+          onClick={() => {
           if (!pressing) {
             setView(view === 'title' ? 'actions' : 'title');
           }
         }}
-        onMouseDown={startHold}
-        onMouseUp={stopHold}
-        onMouseLeave={stopHold}
-        onTouchStart={startHold}
-        onTouchEnd={stopHold}
-        onTouchCancel={stopHold}
-        onKeyDown={(event) => {
+          onMouseDown={startHold}
+          onMouseUp={stopHold}
+          onMouseLeave={stopHold}
+          onTouchStart={startHold}
+          onTouchEnd={stopHold}
+          onTouchCancel={stopHold}
+          onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             setView(view === 'title' ? 'actions' : 'title');
           }
         }}
-      >
-        <div style={styles.rail} />
-        {view === 'title' ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e5eefc', width: '100%', justifyContent: 'center', padding: '2px 4px' }}>
-            <span style={styles.orb} />
-            <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.02em' }}>{currentPageTitle}</span>
-            <ChevronDown size={16} style={{ opacity: 0.8 }} />
-          </div>
-        ) : (
-          resolvedActions.map((action, index) => (
-            <div key={`now-bar-slot-${index}`} style={{ ...styles.slot, ...(isExpanded ? styles.slotExpanded : {}) }}>
-              <button
+          >
+          <div style={styles.rail} />
+          {view === 'title' ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e5eefc', width: '100%', justifyContent: 'center', padding: '2px 4px' }}>
+              <span style={styles.orb} />
+              <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.02em' }}>{currentPageTitle}</span>
+              <ChevronDown size={16} style={{ opacity: 0.8 }} />
+            </div>
+          ) : (
+            resolvedActions.map((action, index) => (
+              <div key={`now-bar-slot-${index}`} style={{ ...styles.slot, ...(isExpanded ? styles.slotExpanded : {}) }}>
+                <button
                 type="button"
                 aria-label={action.label}
                 onClick={action.onClick}
@@ -326,12 +326,12 @@ const NowBar = ({ actions }: NowBarProps) => {
                   ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
                 }}
               >
-                <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
-                {isExpanded ? <span style={styles.labelExpanded}>{action.label}</span> : null}
-              </button>
-            </div>
-          ))
-        )}
+                  <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+                  {isExpanded ? <span style={styles.labelExpanded}>{action.label}</span> : null}
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
