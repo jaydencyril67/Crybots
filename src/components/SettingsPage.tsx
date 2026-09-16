@@ -71,24 +71,22 @@ const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoo
     throw new Error('Unable to prepare image editor.');
   }
 
-  const isLandscape = image.width >= image.height;
-  const displayWidth = isLandscape ? size * zoom : (size * image.width / image.height) * zoom;
-  const displayHeight = isLandscape ? (size * image.height / image.width) * zoom : size * zoom;
-  const renderedLeft = (size - displayWidth) / 2 + cropX;
-  const renderedTop = (size - displayHeight) / 2 + cropY;
-  const cropScaleX = image.width / displayWidth;
-  const cropScaleY = image.height / displayHeight;
-  const sourceX = Math.max(0, -renderedLeft * cropScaleX);
-  const sourceY = Math.max(0, -renderedTop * cropScaleY);
-  const sourceWidth = Math.min(image.width - sourceX, size * cropScaleX);
-  const sourceHeight = Math.min(image.height - sourceY, size * cropScaleY);
-  const destX = Math.max(0, renderedLeft);
-  const destY = Math.max(0, renderedTop);
-  const destWidth = Math.min(size - destX, sourceWidth / cropScaleX);
-  const destHeight = Math.min(size - destY, sourceHeight / cropScaleY);
+  const frameSize = size;
+  const renderScale = zoom;
+  const aspectRatio = image.width / image.height;
+  const fittedWidth = aspectRatio >= 1 ? frameSize * renderScale : frameSize * aspectRatio * renderScale;
+  const fittedHeight = aspectRatio >= 1 ? frameSize / aspectRatio * renderScale : frameSize * renderScale;
+  const visibleWidth = frameSize / renderScale;
+  const visibleHeight = frameSize / renderScale;
+  const offsetX = (frameSize - fittedWidth) / 2 + cropX;
+  const offsetY = (frameSize - fittedHeight) / 2 + cropY;
+  const sourceX = Math.max(0, (-offsetX / fittedWidth) * image.width);
+  const sourceY = Math.max(0, (-offsetY / fittedHeight) * image.height);
+  const sourceWidth = Math.min(image.width - sourceX, (visibleWidth / fittedWidth) * image.width);
+  const sourceHeight = Math.min(image.height - sourceY, (visibleHeight / fittedHeight) * image.height);
 
   context.clearRect(0, 0, size, size);
-  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, size, size);
 
   return canvas.toDataURL('image/png');
 };
