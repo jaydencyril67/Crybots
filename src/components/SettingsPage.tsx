@@ -633,6 +633,10 @@ const SettingsPage = () => {
     event.target.value = '';
   };
 
+  const AVATAR_CONTROL_LIMIT = 140;
+  const AVATAR_DRAG_STEP = 2;
+
+  const clampAvatarValue = (value: number) => Math.max(-AVATAR_CONTROL_LIMIT, Math.min(AVATAR_CONTROL_LIMIT, value));
   const clampAvatarZoom = (value: number) => Math.max(AVATAR_MIN_ZOOM, Math.min(AVATAR_MAX_ZOOM, value));
 
   const updateAvatarEditor = (updater: (current: AvatarEditorState) => AvatarEditorState) => {
@@ -651,6 +655,113 @@ const SettingsPage = () => {
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
     touchAction: 'none' as const,
     cursor: avatarEditor ? 'grab' : 'default',
+  };
+
+  const handleAvatarDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!avatarEditor) {
+      return;
+    }
+
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const initialCropX = avatarEditor.cropX;
+    const initialCropY = avatarEditor.cropY;
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+      const easedDeltaX = Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.92);
+      const easedDeltaY = Math.sign(deltaY) * Math.pow(Math.abs(deltaY), 0.92);
+
+      updateAvatarEditor((current) => ({
+        ...current,
+        cropX: clampAvatarValue(initialCropX + easedDeltaX),
+        cropY: clampAvatarValue(initialCropY + easedDeltaY),
+      }));
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+  };
+
+  const handleAvatarPinchStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!avatarEditor) {
+      return;
+    }
+
+    const surface = event.currentTarget;
+    const activePointers = new Map<number, PointerEvent>();
+    let initialDistance = 0;
+    let initialZoom = avatarEditor.zoom;
+    let rafId: number | null = null;
+
+    const scheduleZoomUpdate = (nextZoom: number) => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+
+      rafId = window.requestAnimationFrame(() => {
+        updateAvatarEditor((current) => ({
+          ...current,
+          zoom: clampAvatarZoom(nextZoom),
+        }));
+        rafId = null;
+      });
+    };
+
+    const updatePinch = () => {
+      if (activePointers.size !== 2) {
+        return;
+      }
+
+      const [first, second] = Array.from(activePointers.values());
+      const distance = Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+      if (!initialDistance) {
+        initialDistance = distance;
+        initialZoom = avatarEditor.zoom;
+        return;
+      }
+
+      const scale = distance / initialDistance;
+      scheduleZoomUpdate(initialZoom * scale);
+    };
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      if (!activePointers.has(moveEvent.pointerId)) {
+        return;
+      }
+
+      activePointers.set(moveEvent.pointerId, moveEvent);
+      updatePinch();
+    };
+
+    const handlePointerUp = (upEvent: PointerEvent) => {
+      activePointers.delete(upEvent.pointerId);
+      if (activePointers.size < 2) {
+        window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerup', handlePointerUp);
+        window.removeEventListener('pointercancel', handlePointerUp);
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+      }
+    };
+
+    activePointers.set(event.pointerId, event.nativeEvent);
+    surface.setPointerCapture(event.pointerId);
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
   };
 
   const handleUploadAvatar = async () => {
