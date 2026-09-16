@@ -8,7 +8,7 @@ const EDGE_LIGHT_COLORS = {
   pink: 'rgba(236, 72, 153, 0.9)',
   green: 'rgba(34, 197, 94, 0.9)',
   amber: 'rgba(245, 158, 11, 0.9)',
-  cyan: 'rgba(34, 211, 238, 0.9)',
+  violet: 'rgba(139, 92, 246, 0.9)',
   red: 'rgba(239, 68, 68, 0.9)',
 } as const;
 
