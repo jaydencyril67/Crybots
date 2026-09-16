@@ -305,11 +305,6 @@ const TransactionHistoryPage = () => {
         <AppHeader />
         <div style={styles.panel}>
           <div style={styles.body}>
-            <section style={styles.header}>
-              <h1 style={styles.title}><History size={22} /> Transaction history</h1>
-              <p style={styles.subtitle}>Review deposits, withdrawals, transfers, staking rewards, and trading activity in one place. Filter by type, status, or search to quickly find a specific transaction with its date, time, and reference details.</p>
-            </section>
-
             <section style={styles.topGrid}>
               <div style={styles.card}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
