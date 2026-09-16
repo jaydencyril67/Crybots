@@ -36,8 +36,9 @@ const styles = {
     WebkitOverflowScrolling: 'touch' as const,
   },
   barExpanded: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
     alignItems: 'stretch',
-    flexWrap: 'wrap' as const,
     gap: '10px',
     padding: '14px',
     borderRadius: '26px',
@@ -61,8 +62,8 @@ const styles = {
     justifyContent: 'center',
   },
   slotExpanded: {
-    flex: '1 1 calc(50% - 5px)',
-    minWidth: 'calc(50% - 5px)',
+    minWidth: 0,
+    width: '100%',
     justifyContent: 'stretch',
   },
   button: {
@@ -103,6 +104,9 @@ const styles = {
     letterSpacing: '0.01em',
     textAlign: 'left' as const,
     whiteSpace: 'normal' as const,
+    lineHeight: 1.1,
+    overflow: 'hidden' as const,
+    textOverflow: 'ellipsis' as const,
   },
   iconWrap: {
     width: '18px',
