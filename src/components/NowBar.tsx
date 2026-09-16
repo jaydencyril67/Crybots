@@ -59,7 +59,7 @@ const styles = {
     borderRadius: '28px',
     border: '1.5px solid rgba(255,255,255,0.28)',
     background: 'linear-gradient(180deg, rgba(20,24,40,0.88), rgba(10,14,24,0.82))',
-    boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)',
+    boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
     pointerEvents: 'auto' as const,
@@ -323,7 +323,8 @@ const NowBar = ({ actions }: NowBarProps) => {
       <div
         style={{
           ...styles.bar,
-          ...(isExpanded ? { ...styles.barExpanded, ...(edgeLight.enabled ? { '--edge-light': edgeLightColor } : {}) } : {}),
+          ...(edgeLight.enabled ? { '--edge-light': edgeLightColor } : {}),
+          ...(isExpanded ? styles.barExpanded : {}),
         }}
         role="button"
         tabIndex={0}
