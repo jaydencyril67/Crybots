@@ -51,7 +51,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(1.5 * 72px)',
+    height: 'calc(1.6 * 72px)',
     boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
   },
   bar: {
@@ -335,7 +335,7 @@ const NowBar = ({ actions }: NowBarProps) => {
     resetIdleTimer();
     const timer = window.setTimeout(() => {
       setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
-    }, 380);
+    }, 760);
     setHoldTimer(timer);
   };
 
