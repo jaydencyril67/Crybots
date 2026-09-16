@@ -216,6 +216,7 @@ const createDefaultActions = (): NowBarAction[] => [
 
 const NowBar = ({ actions }: NowBarProps) => {
   const [view, setView] = useState<NowBarView>('title');
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('compact');
   const [currentPath, setCurrentPath] = useState(getActivePath());
   const holdTimerRef = useRef<number | null>(null);
   const isExpanded = view === 'actions';
