@@ -446,10 +446,12 @@ const TransactionHistoryPage = () => {
                   <div style={styles.stat}>
                     <p style={styles.statLabel}>Filtered results</p>
                     <p style={styles.statValue}>{filteredCount}</p>
+                    <p style={styles.cardText}>Showing {filteredCount === 0 ? 0 : transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredCount)} of {filteredCount}</p>
                   </div>
                   <div style={styles.stat}>
                     <p style={styles.statLabel}>Completed</p>
                     <p style={styles.statValue}>{completedCount}</p>
+                    <p style={styles.cardText}>Completed in the current filter set</p>
                   </div>
                 </div>
                 <p style={styles.cardText}><ShieldCheck size={16} style={{ display: 'inline-block', marginRight: '6px', verticalAlign: 'text-bottom' }} />All entries show type, status, date, time, and reference so you can audit account activity easily on mobile or desktop.</p>
