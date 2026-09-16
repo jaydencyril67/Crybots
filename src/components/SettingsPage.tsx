@@ -633,7 +633,6 @@ const SettingsPage = () => {
     event.target.value = '';
   };
 
-  const clampAvatarValue = (value: number) => Math.max(-AVATAR_CONTROL_LIMIT, Math.min(AVATAR_CONTROL_LIMIT, value));
   const clampAvatarZoom = (value: number) => Math.max(AVATAR_MIN_ZOOM, Math.min(AVATAR_MAX_ZOOM, value));
 
   const updateAvatarEditor = (updater: (current: AvatarEditorState) => AvatarEditorState) => {
