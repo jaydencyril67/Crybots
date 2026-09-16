@@ -1,6 +1,37 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowDownToLine, ArrowRightLeft, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpDown, Banknote, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
+
+const EDGE_LIGHT_COLORS = {
+  blue: 'rgba(56, 189, 248, 0.9)',
+  purple: 'rgba(168, 85, 247, 0.9)',
+  pink: 'rgba(236, 72, 153, 0.9)',
+  green: 'rgba(34, 197, 94, 0.9)',
+  amber: 'rgba(245, 158, 11, 0.9)',
+} as const;
+
+type EdgeLightColor = keyof typeof EDGE_LIGHT_COLORS;
+
+const getEdgeLightSettings = () => {
+  if (typeof window === 'undefined') {
+    return { enabled: false, color: 'blue' as EdgeLightColor };
+  }
+
+  try {
+    const raw = window.localStorage.getItem('nowbar_edge_light');
+    if (!raw) {
+      return { enabled: false, color: 'blue' as EdgeLightColor };
+    }
+
+    const parsed = JSON.parse(raw) as { enabled?: boolean; color?: EdgeLightColor };
+    return {
+      enabled: Boolean(parsed.enabled),
+      color: parsed.color && EDGE_LIGHT_COLORS[parsed.color] ? parsed.color : ('blue' as EdgeLightColor),
+    };
+  } catch {
+    return { enabled: false, color: 'blue' as EdgeLightColor };
+  }
+};
 
 const styles = {
   dock: {
@@ -17,7 +48,8 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(1.4 * 72px)',
+    height: 'calc(1.5 * 72px)',
+    boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
   },
   bar: {
     display: 'flex',
@@ -25,9 +57,9 @@ const styles = {
     gap: '12px',
     padding: '10px 12px',
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.12)',
+    border: '1.5px solid rgba(255,255,255,0.28)',
     background: 'linear-gradient(180deg, rgba(20,24,40,0.88), rgba(10,14,24,0.82))',
-    boxShadow: '0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
+    boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
     pointerEvents: 'auto' as const,
@@ -40,6 +72,7 @@ const styles = {
     alignSelf: 'stretch',
   },
   barExpanded: {
+    '--edge-light': 'transparent',
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
@@ -171,7 +204,7 @@ const getCurrentPageTitle = (path: string) => {
 const createDefaultActions = (): NowBarAction[] => [
   {
     label: 'Deposit',
-    icon: <WalletCards size={18} />,
+    icon: <Banknote size={18} />,
     onClick: () => {
       navigate('/deposit');
     },
@@ -187,7 +220,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Staking',
-    icon: <Landmark size={18} />,
+    icon: <Coins size={18} />,
     onClick: () => {
       navigate('/staking');
     },
@@ -195,7 +228,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Withdraw',
-    icon: <ArrowRightLeft size={18} />,
+    icon: <ArrowUpDown size={18} />,
     onClick: () => {
       navigate('/withdrawals');
     },
@@ -203,7 +236,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Transfer',
-    icon: <ArrowDownToLine size={18} />,
+    icon: <ArrowLeftRight size={18} />,
     onClick: () => {
       navigate('/transfer');
     },
@@ -211,7 +244,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'Profile',
-    icon: <UserRound size={18} />,
+    icon: <CircleUserRound size={18} />,
     onClick: () => {
       navigate('/profile');
     },
@@ -236,6 +269,8 @@ const createDefaultActions = (): NowBarAction[] => [
 ];
 
 const NowBar = ({ actions }: NowBarProps) => {
+  const edgeLight = useMemo(() => getEdgeLightSettings(), []);
+  const edgeLightColor = EDGE_LIGHT_COLORS[edgeLight.color];
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
   const [holdTimer, setHoldTimer] = useState<number | null>(null);
@@ -286,7 +321,11 @@ const NowBar = ({ actions }: NowBarProps) => {
   return (
     <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
       <div
-        style={{ ...styles.bar, ...(isExpanded ? styles.barExpanded : {}) }}
+        style={{
+          ...styles.bar,
+          ...(edgeLight.enabled ? { '--edge-light': edgeLightColor } : {}),
+          ...(isExpanded ? styles.barExpanded : {}),
+        }}
         role="button"
         tabIndex={0}
         aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}

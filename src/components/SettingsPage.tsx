@@ -1,4 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
+
+const EDGE_LIGHT_COLOR_OPTIONS = [
+  { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
+  { key: 'purple', label: 'Purple', value: 'rgba(168, 85, 247, 0.9)' },
+  { key: 'pink', label: 'Pink', value: 'rgba(236, 72, 153, 0.9)' },
+  { key: 'green', label: 'Green', value: 'rgba(34, 197, 94, 0.9)' },
+  { key: 'amber', label: 'Amber', value: 'rgba(245, 158, 11, 0.9)' },
+] as const;
+
+type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
+
+const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, LockKeyhole, ShieldCheck, Trash2, WalletCards, Landmark } from 'lucide-react';
 import api from '../api/axios';
@@ -127,6 +139,42 @@ const styles = {
     background: 'rgba(255,255,255,0.06)',
     cursor: 'pointer',
   },
+  toggleRow: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    alignItems: 'center',
+    gap: '12px',
+    marginTop: '14px',
+  },
+  togglePill: {
+    borderRadius: '999px',
+    border: '1px solid rgba(255,255,255,0.12)',
+    padding: '10px 14px',
+    fontWeight: 700,
+    color: '#ffffff',
+    background: 'rgba(255,255,255,0.06)',
+    cursor: 'pointer',
+  },
+  togglePillActive: {
+    background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)',
+    border: 'none',
+  },
+  colorSwatches: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '10px',
+    marginTop: '12px',
+  },
+  colorSwatch: {
+    width: '38px',
+    height: '38px',
+    borderRadius: '999px',
+    border: '2px solid rgba(255,255,255,0.14)',
+    cursor: 'pointer',
+  },
+  colorSwatchActive: {
+    boxShadow: '0 0 0 3px rgba(255,255,255,0.18)',
+  },
   primaryButton: {
     background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)',
     border: 'none',
@@ -167,6 +215,8 @@ const SettingsPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
+  const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
+  const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
 
   const uidDigits = uid.replace(/\D/g, '').slice(0, 5);
   const uidReadyToSave = Boolean(uidEditorActive && uidDigits.length === 5 && uidAvailable !== false && uidDigits !== initialUid);
@@ -351,6 +401,14 @@ const SettingsPage = () => {
 
 
 
+  const handleSaveEdgeLight = () => {
+    window.localStorage.setItem(
+      EDGE_LIGHT_STORAGE_KEY,
+      JSON.stringify({ enabled: edgeLightEnabled, color: edgeLightColor }),
+    );
+    showStatus('success', 'NowBar edge lighting updated.');
+  };
+
   const handleSaveSecurityCode = async () => {
     if (!currentPassword) {
       showStatus('error', 'Enter your current password to update your security code.');
@@ -489,6 +547,41 @@ const SettingsPage = () => {
                 ) : null}
               </section>
 
+
+              <section style={styles.card}>
+                <h2 style={styles.cardTitle}>⚡ NowBar edge lighting</h2>
+                <p style={styles.cardText}>Turn on a glowing edge around the NowBar and choose a color.</p>
+                <div style={styles.toggleRow}>
+                  <button
+                    type="button"
+                    style={{ ...styles.togglePill, ...(edgeLightEnabled ? styles.togglePillActive : {}) }}
+                    onClick={() => setEdgeLightEnabled((current) => !current)}
+                  >
+                    {edgeLightEnabled ? 'On' : 'Off'}
+                  </button>
+                </div>
+                <div style={styles.colorSwatches}>
+                  {EDGE_LIGHT_COLOR_OPTIONS.map((option) => (
+                    <button
+                      key={option.key}
+                      type="button"
+                      aria-label={`${option.label} edge light`}
+                      title={option.label}
+                      onClick={() => setEdgeLightColor(option.key)}
+                      style={{
+                        ...styles.colorSwatch,
+                        background: option.value,
+                        ...(edgeLightColor === option.key ? styles.colorSwatchActive : {}),
+                      }}
+                    />
+                  ))}
+                </div>
+                <div style={styles.buttonRow}>
+                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={handleSaveEdgeLight}>
+                    Save edge lighting
+                  </button>
+                </div>
+              </section>
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><WalletCards size={18} /> Withdrawal wallet</h2>
