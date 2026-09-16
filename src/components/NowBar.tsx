@@ -8,9 +8,13 @@ const EDGE_LIGHT_COLORS = {
   pink: 'rgba(236, 72, 153, 0.9)',
   green: 'rgba(34, 197, 94, 0.9)',
   amber: 'rgba(245, 158, 11, 0.9)',
+  cyan: 'rgba(34, 211, 238, 0.9)',
+  red: 'rgba(239, 68, 68, 0.9)',
 } as const;
 
 type EdgeLightColor = keyof typeof EDGE_LIGHT_COLORS;
+
+const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 
 const getEdgeLightSettings = () => {
   if (typeof window === 'undefined') {
@@ -18,7 +22,7 @@ const getEdgeLightSettings = () => {
   }
 
   try {
-    const raw = window.localStorage.getItem('nowbar_edge_light');
+    const raw = window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY);
     if (!raw) {
       return { enabled: false, color: 'blue' as EdgeLightColor };
     }
@@ -194,7 +198,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/profile') return 'PROFILE';
   if (path === '/staking') return 'STAKING';
   if (path === '/settings') return 'SETTINGS';
-  if (path === '/withdrawals') return 'WITHDRAWALS';
+  if (path === '/withdrawals') return 'WITHDRAW';
   if (path === '/transfer') return 'TRANSFER';
   if (path === '/deposit') return 'DEPOSIT';
   if (path === '/transactions') return 'TRANSACTIONS';
@@ -269,7 +273,8 @@ const createDefaultActions = (): NowBarAction[] => [
 ];
 
 const NowBar = ({ actions }: NowBarProps) => {
-  const edgeLight = useMemo(() => getEdgeLightSettings(), []);
+  const [edgeLightVersion, setEdgeLightVersion] = useState(0);
+  const edgeLight = useMemo(() => getEdgeLightSettings(), [edgeLightVersion]);
   const edgeLightColor = EDGE_LIGHT_COLORS[edgeLight.color];
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
@@ -285,14 +290,22 @@ const NowBar = ({ actions }: NowBarProps) => {
       setCurrentPath(getActivePath());
     };
 
+    const syncEdgeLight = () => {
+      setEdgeLightVersion((current) => current + 1);
+    };
+
     window.addEventListener('popstate', syncPath);
     window.addEventListener('hashchange', syncPath);
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
+    window.addEventListener('storage', syncEdgeLight);
+    window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
 
     return () => {
       window.removeEventListener('popstate', syncPath);
       window.removeEventListener('hashchange', syncPath);
       window.removeEventListener('ke:navigation-start', syncPath as EventListener);
+      window.removeEventListener('storage', syncEdgeLight);
+      window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
     };
   }, []);
 
