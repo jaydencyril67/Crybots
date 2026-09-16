@@ -11,10 +11,13 @@ const styles = {
     zIndex: 40,
     width: 'min(560px, calc(100vw - 32px))',
     pointerEvents: 'none' as const,
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(2 * 72px)',
+    height: 'calc(1.7 * 72px)',
   },
   bar: {
     display: 'flex',
@@ -34,6 +37,7 @@ const styles = {
     scrollbarWidth: 'none' as const,
     scrollBehavior: 'smooth' as const,
     WebkitOverflowScrolling: 'touch' as const,
+    alignSelf: 'stretch',
   },
   barExpanded: {
     display: 'grid',
