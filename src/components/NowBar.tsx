@@ -266,13 +266,6 @@ const NowBar = ({ actions }: NowBarProps) => {
     }, 220);
   };
 
-  const clearHoldTimer = () => {
-    if (holdTimerRef.current) {
-      window.clearTimeout(holdTimerRef.current);
-      holdTimerRef.current = null;
-    }
-  };
-
   const barContent = isExpanded ? (
     <div style={styles.grid}>
       {resolvedActions.map((action, index) => (
