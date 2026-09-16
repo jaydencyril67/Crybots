@@ -89,7 +89,7 @@ const styles = {
   customPickerHint: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
 };
 
-const WithdrawalsPage = () => {
+const WithdrawPage = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [assetType, setAssetType] = useState<'crypto'>('crypto');
@@ -294,4 +294,4 @@ const WithdrawalsPage = () => {
   );
 };
 
-export default WithdrawalsPage;
+export default WithdrawPage;
