@@ -192,6 +192,13 @@ const styles = {
   buttonLink: {
     textDecoration: 'none',
   },
+  buttonLinkButton: {
+    border: 'none',
+    background: 'transparent',
+    padding: 0,
+    font: 'inherit',
+    color: 'inherit',
+  },
   statsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
@@ -460,11 +467,9 @@ const LandingPage = () => {
               </p>
 
               <div style={styles.buttonRow}>
-                <a href="/signup" style={styles.buttonLink}>
-                  <div style={styles.buttonPrimary}>
-                    Get started
-                  </div>
-                </a>
+                <button type="button" onClick={handleDashboardClick} style={{ ...styles.buttonPrimary, cursor: 'pointer' }}>
+                  Get started
+                </button>
                 <button type="button" onClick={handleDashboardClick} style={{ ...styles.buttonSecondary, cursor: 'pointer' }}>
                   Dashboard
                 </button>
