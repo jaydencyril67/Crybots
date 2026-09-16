@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDownToLine, ArrowRightLeft, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
@@ -30,6 +30,7 @@ const styles = {
     scrollbarWidth: 'none' as const,
     scrollBehavior: 'smooth' as const,
     WebkitOverflowScrolling: 'touch' as const,
+    touchAction: 'pan-x',
   },
   rail: {
     position: 'absolute' as const,
@@ -44,6 +45,20 @@ const styles = {
     minWidth: '92px',
     display: 'flex',
     justifyContent: 'center',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gap: '10px',
+    width: '100%',
+    maxHeight: '42vh',
+    overflowY: 'auto' as const,
+    overflowX: 'hidden' as const,
+    paddingRight: '4px',
+    scrollbarWidth: 'none' as const,
+  },
+  gridSlot: {
+    minWidth: 0,
   },
   button: {
     width: '100%',
@@ -60,6 +75,11 @@ const styles = {
     justifyContent: 'center',
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
+  buttonExpanded: {
+    justifyContent: 'flex-start',
+    gap: '10px',
+    padding: '12px 14px',
+  },
   buttonEmpty: {
     opacity: 0.7,
     border: '1px dashed rgba(255,255,255,0.12)',
@@ -69,6 +89,13 @@ const styles = {
     height: '20px',
     display: 'grid',
     placeItems: 'center',
+  },
+  buttonLabel: {
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    letterSpacing: '0.01em',
+    lineHeight: 1,
+    whiteSpace: 'nowrap' as const,
   },
   iconWrap: {
     width: '18px',
@@ -103,6 +130,8 @@ type NowBarProps = {
 };
 
 type NowBarView = 'title' | 'actions';
+
+type LayoutMode = 'compact' | 'expanded';
 
 const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
 
@@ -188,6 +217,8 @@ const createDefaultActions = (): NowBarAction[] => [
 const NowBar = ({ actions }: NowBarProps) => {
   const [view, setView] = useState<NowBarView>('title');
   const [currentPath, setCurrentPath] = useState(getActivePath());
+  const holdTimerRef = useRef<number | null>(null);
+  const isExpanded = view === 'actions';
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
 
@@ -207,45 +238,145 @@ const NowBar = ({ actions }: NowBarProps) => {
     };
   }, []);
 
+  useEffect(() => () => {
+    if (holdTimerRef.current !== null) {
+      window.clearTimeout(holdTimerRef.current);
+    }
+  }, []);
+
+  const clearHoldTimer = () => {
+    if (holdTimerRef.current !== null) {
+      window.clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  };
+
+  const toggleLayoutMode = () => {
+    setLayoutMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
+  };
+
+  const handlePressStart = () => {
+    clearHoldTimer();
+    holdTimerRef.current = window.setTimeout(() => {
+      toggleLayoutMode();
+      holdTimerRef.current = null;
+    }, 450);
+  };
+
+  const handlePressEnd = () => {
+    clearHoldTimer();
+  };
+
+  const handleBarClick = () => {
+    if (view === 'actions' && layoutMode === 'compact') {
+      setView('title');
+      return;
+    }
+
+    if (view === 'title') {
+      setView('actions');
+      return;
+    }
+
+    if (layoutMode === 'expanded') {
+      setView('title');
+    }
+  };
+
+  const handlePressStart = () => {
+    if (holdTimerRef.current) {
+      window.clearTimeout(holdTimerRef.current);
+    }
+
+    holdTimerRef.current = window.setTimeout(() => {
+      setView((currentView) => (currentView === 'title' ? 'actions' : 'title'));
+      holdTimerRef.current = null;
+    }, 220);
+  };
+
+  const clearHoldTimer = () => {
+    if (holdTimerRef.current) {
+      window.clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  };
+
+  const barContent = isExpanded ? (
+    <div style={styles.grid}>
+      {resolvedActions.map((action, index) => (
+        <div key={`now-bar-slot-${index}`} style={styles.gridSlot}>
+          <button
+            type="button"
+            aria-label={action.label}
+            onClick={action.onClick}
+            style={{
+              ...styles.button,
+              ...styles.buttonExpanded,
+              ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
+            }}
+          >
+            <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+            <span style={styles.buttonLabel}>{action.label}</span>
+          </button>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e5eefc', width: '100%', justifyContent: 'center', padding: '2px 4px' }}>
+        <span style={styles.orb} />
+        <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.02em' }}>{currentPageTitle}</span>
+        <ChevronDown size={16} style={{ opacity: 0.8 }} />
+      </div>
+      <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', overflowY: 'hidden', scrollbarWidth: 'none' as const, WebkitOverflowScrolling: 'touch' as const }}>
+        {resolvedActions.map((action, index) => (
+          <div key={`now-bar-slot-${index}`} style={styles.slot}>
+            <button
+              type="button"
+              aria-label={action.label}
+              onClick={action.onClick}
+              style={{
+                ...styles.button,
+                ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
+              }}
+            >
+              <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div style={styles.dock} aria-label="Quick navigation bar">
       <div
-        style={styles.bar}
+        style={{
+          ...styles.bar,
+          flexDirection: isExpanded ? 'column' : 'row',
+          alignItems: isExpanded ? 'stretch' : 'center',
+          overflowX: isExpanded ? 'hidden' : 'auto',
+          overflowY: isExpanded ? 'auto' : 'hidden',
+          maxHeight: isExpanded ? '42vh' : 'auto',
+          borderRadius: isExpanded ? '26px' : '28px',
+          padding: isExpanded ? '14px' : '10px 12px',
+        }}
         role="button"
         tabIndex={0}
-        aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
-        onClick={() => setView(view === 'title' ? 'actions' : 'title')}
+        aria-label={isExpanded ? 'Navigation buttons expanded. Hold again to collapse.' : `${currentPageTitle} page. Hold to expand navigation buttons.`}
+        onPointerDown={handlePressStart}
+        onPointerUp={clearHoldTimer}
+        onPointerLeave={clearHoldTimer}
+        onPointerCancel={clearHoldTimer}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            setView(view === 'title' ? 'actions' : 'title');
+            setView((currentView) => (currentView === 'title' ? 'actions' : 'title'));
           }
         }}
       >
         <div style={styles.rail} />
-        {view === 'title' ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e5eefc', width: '100%', justifyContent: 'center', padding: '2px 4px' }}>
-            <span style={styles.orb} />
-            <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.02em' }}>{currentPageTitle}</span>
-            <ChevronDown size={16} style={{ opacity: 0.8 }} />
-          </div>
-        ) : (
-          resolvedActions.map((action, index) => (
-            <div key={`now-bar-slot-${index}`} style={styles.slot}>
-              <button
-                type="button"
-                aria-label={action.label}
-                onClick={action.onClick}
-                style={{
-                  ...styles.button,
-                  ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
-                }}
-              >
-                <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
-              </button>
-            </div>
-          ))
-        )}
+        {barContent}
       </div>
     </div>
   );
