@@ -13,7 +13,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, MoveVertical, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
+import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, MoveVertical, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2, RotateCcw } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -47,6 +47,13 @@ type AvatarEditorState = {
   zoom: number;
 };
 
+const AVATAR_FRAME_SIZE = 512;
+const AVATAR_CONTROL_LIMIT = 140;
+const AVATAR_MIN_ZOOM = 1;
+const AVATAR_MAX_ZOOM = 3;
+const AVATAR_ZOOM_STEP = 0.01;
+const AVATAR_DRAG_STEP = 2;
+
 const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoom: number) => {
   const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const nextImage = new Image();
@@ -56,7 +63,7 @@ const avatarToDataUrl = async (source: string, cropX: number, cropY: number, zoo
     nextImage.src = source;
   });
 
-  const size = 512;
+  const size = AVATAR_FRAME_SIZE;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
@@ -628,6 +635,120 @@ const SettingsPage = () => {
     event.target.value = '';
   };
 
+  const clampAvatarValue = (value: number) => Math.max(-AVATAR_CONTROL_LIMIT, Math.min(AVATAR_CONTROL_LIMIT, value));
+  const clampAvatarZoom = (value: number) => Math.max(AVATAR_MIN_ZOOM, Math.min(AVATAR_MAX_ZOOM, value));
+
+  const updateAvatarEditor = (updater: (current: AvatarEditorState) => AvatarEditorState) => {
+    setAvatarEditor((current) => (current ? updater(current) : current));
+  };
+
+  const handleAvatarDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!avatarEditor) {
+      return;
+    }
+
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const initialCropX = avatarEditor.cropX;
+    const initialCropY = avatarEditor.cropY;
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const deltaY = moveEvent.clientY - startY;
+      const easedDeltaX = Math.sign(deltaX) * Math.pow(Math.abs(deltaX), 0.92);
+      const easedDeltaY = Math.sign(deltaY) * Math.pow(Math.abs(deltaY), 0.92);
+
+      updateAvatarEditor((current) => ({
+        ...current,
+        cropX: clampAvatarValue(initialCropX + easedDeltaX),
+        cropY: clampAvatarValue(initialCropY + easedDeltaY),
+      }));
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+  };
+
+  const handleAvatarPinchStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!avatarEditor) {
+      return;
+    }
+
+    const surface = event.currentTarget;
+    const activePointers = new Map<number, PointerEvent>();
+    let initialDistance = 0;
+    let initialZoom = avatarEditor.zoom;
+    let rafId: number | null = null;
+
+    const scheduleZoomUpdate = (nextZoom: number) => {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+
+      rafId = window.requestAnimationFrame(() => {
+        updateAvatarEditor((current) => ({
+          ...current,
+          zoom: clampAvatarZoom(nextZoom),
+        }));
+        rafId = null;
+      });
+    };
+
+    const updatePinch = () => {
+      if (activePointers.size !== 2) {
+        return;
+      }
+
+      const [first, second] = Array.from(activePointers.values());
+      const distance = Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+      if (!initialDistance) {
+        initialDistance = distance;
+        initialZoom = avatarEditor.zoom;
+        return;
+      }
+
+      const scale = distance / initialDistance;
+      scheduleZoomUpdate(initialZoom * scale);
+    };
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      if (!activePointers.has(moveEvent.pointerId)) {
+        return;
+      }
+
+      activePointers.set(moveEvent.pointerId, moveEvent);
+      updatePinch();
+    };
+
+    const handlePointerUp = (upEvent: PointerEvent) => {
+      activePointers.delete(upEvent.pointerId);
+      if (activePointers.size < 2) {
+        window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerup', handlePointerUp);
+        window.removeEventListener('pointercancel', handlePointerUp);
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+      }
+    };
+
+    activePointers.set(event.pointerId, event.nativeEvent);
+    surface.setPointerCapture(event.pointerId);
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+  };
+
   const handleUploadAvatar = async () => {
     if (!avatarEditor) {
       return;
@@ -943,52 +1064,179 @@ const SettingsPage = () => {
               position: 'fixed',
               inset: 0,
               zIndex: 80,
-              background: 'rgba(3, 6, 17, 0.78)',
+              background: 'rgba(3, 7, 20, 0.82)',
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
               display: 'grid',
               placeItems: 'center',
               padding: '18px',
             }}
           >
-            <div style={{ width: 'min(920px, 100%)', borderRadius: '28px', background: '#0b1221', border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.5)' }}>
-              <div style={{ padding: '18px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.05rem' }}>Edit profile photo</h3>
-                  <p style={{ margin: '6px 0 0', color: '#9db0d1', fontSize: '0.9rem' }}>Drag and zoom your photo before saving.</p>
+            <div
+              style={{
+                width: 'min(980px, 100%)',
+                borderRadius: '30px',
+                background: 'linear-gradient(180deg, rgba(13,18,32,0.98), rgba(8,12,23,0.98))',
+                border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 32px 100px rgba(0,0,0,0.62)',
+                overflow: 'hidden',
+              }}
+            >
+              <div style={{ padding: '20px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(34,211,238,0.2), rgba(139,92,246,0.2))', border: '1px solid rgba(255,255,255,0.08)', display: 'grid', placeItems: 'center', color: '#d8f3ff' }}>
+                    <Crop size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.01em' }}>Edit profile photo</h3>
+                    <p style={{ margin: '6px 0 0', color: '#9db0d1', fontSize: '0.92rem' }}>Drag the photo and zoom it just like WhatsApp.</p>
+                  </div>
                 </div>
-                <button type="button" style={styles.button} onClick={() => setAvatarEditor(null)} disabled={avatarUploading}>Cancel</button>
+                <button type="button" style={{ ...styles.button, background: 'rgba(255,255,255,0.06)' }} onClick={() => setAvatarEditor(null)} disabled={avatarUploading}>Cancel</button>
               </div>
-              <div style={{ padding: '20px', display: 'grid', gap: '18px', gridTemplateColumns: 'minmax(0, 1fr) 280px' }}>
-                <div style={{ position: 'relative', minHeight: '420px', borderRadius: '24px', background: 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.14), rgba(14,18,33,1) 58%)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      backgroundImage: `url(${avatarEditor.source})`,
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: `${50 + avatarEditor.cropX / 8}% ${50 + avatarEditor.cropY / 8}%`,
-                      backgroundSize: `${100 * avatarEditor.zoom}% auto`,
-                      transform: 'translateZ(0)',
-                    }}
-                  />
-                  <div style={{ position: 'absolute', inset: '18px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.35)', boxShadow: '0 0 0 999px rgba(0,0,0,0.22)' }} />
+
+              <div style={{ padding: '22px', display: 'grid', gap: '20px', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(280px, 340px)' }}>
+                <div style={{ display: 'grid', gap: '14px' }}>
+                  <div style={{ position: 'relative', minHeight: '520px', borderRadius: '28px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'radial-gradient(circle at 30% 18%, rgba(34,211,238,0.18), rgba(13,18,32,1) 58%)' }}>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundImage: `url(${avatarEditor.source})`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: `${50 + avatarEditor.cropX / 8}% ${50 + avatarEditor.cropY / 8}%`,
+                        backgroundSize: `${100 * avatarEditor.zoom}% auto`,
+                        transform: 'translateZ(0)',
+                        filter: 'saturate(1.02) contrast(1.02)',
+                        transition: 'background-position 90ms linear, background-size 90ms linear',
+                      }}
+                    />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(6,10,18,0.08), rgba(6,10,18,0.18))' }} />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: '24px',
+                        borderRadius: '50%',
+                        border: '2px solid rgba(255,255,255,0.72)',
+                        boxShadow: '0 0 0 999px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.18)',
+                        pointerEvents: 'none',
+                      }}
+                    />
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Drag photo to reposition"
+                      onPointerDown={handleAvatarDragStart}
+                      onPointerDownCapture={handleAvatarPinchStart}
+                      onKeyDown={(event) => {
+                        if (!avatarEditor) {
+                          return;
+                        }
+
+                        if (event.key === 'ArrowLeft') {
+                          event.preventDefault();
+                          updateAvatarEditor((current) => ({ ...current, cropX: clampAvatarValue(current.cropX - AVATAR_DRAG_STEP) }));
+                        }
+
+                        if (event.key === 'ArrowRight') {
+                          event.preventDefault();
+                          updateAvatarEditor((current) => ({ ...current, cropX: clampAvatarValue(current.cropX + AVATAR_DRAG_STEP) }));
+                        }
+
+                        if (event.key === 'ArrowUp') {
+                          event.preventDefault();
+                          updateAvatarEditor((current) => ({ ...current, cropY: clampAvatarValue(current.cropY - AVATAR_DRAG_STEP) }));
+                        }
+
+                        if (event.key === 'ArrowDown') {
+                          event.preventDefault();
+                          updateAvatarEditor((current) => ({ ...current, cropY: clampAvatarValue(current.cropY + AVATAR_DRAG_STEP) }));
+                        }
+
+                        if (event.key === '+' || event.key === '=') {
+                          event.preventDefault();
+                          updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(current.zoom + 0.08) }));
+                        }
+
+                        if (event.key === '-' || event.key === '_') {
+                          event.preventDefault();
+                          updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(current.zoom - 0.08) }));
+                        }
+                      }}
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        cursor: 'grab',
+                        touchAction: 'none',
+                      }}
+                    />
+                    <div style={{ position: 'absolute', left: '24px', right: '24px', bottom: '24px', display: 'flex', justifyContent: 'center' }}>
+                      <div style={{ borderRadius: '999px', padding: '8px 12px', background: 'rgba(8,12,23,0.72)', border: '1px solid rgba(255,255,255,0.08)', color: '#c6d3ea', fontSize: '0.82rem' }}>
+                        Drag, pinch, or use the controls to frame your photo
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
                 <div style={{ display: 'grid', gap: '14px', alignContent: 'start' }}>
-                  <div style={styles.field}>
-                    <span style={styles.label}><Crop size={14} /> Zoom</span>
-                    <input type="range" min="1" max="3" step="0.01" value={avatarEditor.zoom} onChange={(event) => setAvatarEditor((current) => current ? { ...current, zoom: Number(event.target.value) } : current)} />
+                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
+                      <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><Crop size={14} /> Zoom</span>
+                      <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{Math.round(avatarEditor.zoom * 100)}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={AVATAR_MIN_ZOOM}
+                      max={AVATAR_MAX_ZOOM}
+                      step={AVATAR_ZOOM_STEP}
+                      value={avatarEditor.zoom}
+                      onChange={(event) => updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(Number(event.target.value)) }))}
+                    />
                   </div>
-                  <div style={styles.field}>
-                    <span style={styles.label}><MoveHorizontal size={14} /> Align horizontally</span>
-                    <input type="range" min="-100" max="100" step="1" value={avatarEditor.cropX} onChange={(event) => setAvatarEditor((current) => current ? { ...current, cropX: Number(event.target.value) } : current)} />
+
+                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
+                      <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><MoveHorizontal size={14} /> Left / Right</span>
+                      <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{avatarEditor.cropX}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={-AVATAR_CONTROL_LIMIT}
+                      max={AVATAR_CONTROL_LIMIT}
+                      step={AVATAR_DRAG_STEP}
+                      value={avatarEditor.cropX}
+                      onChange={(event) => updateAvatarEditor((current) => ({ ...current, cropX: Number(event.target.value) }))}
+                    />
                   </div>
-                  <div style={styles.field}>
-                    <span style={styles.label}><MoveVertical size={14} /> Align vertically</span>
-                    <input type="range" min="-100" max="100" step="1" value={avatarEditor.cropY} onChange={(event) => setAvatarEditor((current) => current ? { ...current, cropY: Number(event.target.value) } : current)} />
+
+                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
+                      <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><MoveVertical size={14} /> Up / Down</span>
+                      <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{avatarEditor.cropY}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={-AVATAR_CONTROL_LIMIT}
+                      max={AVATAR_CONTROL_LIMIT}
+                      step={AVATAR_DRAG_STEP}
+                      value={avatarEditor.cropY}
+                      onChange={(event) => updateAvatarEditor((current) => ({ ...current, cropY: Number(event.target.value) }))}
+                    />
                   </div>
-                  <div style={styles.buttonRow}>
-                    <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading}>
-                      {avatarUploading ? 'Uploading...' : 'Save photo'}
-                    </button>
+
+                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px', display: 'grid', gap: '12px' }}>
+                    <p style={{ margin: 0, color: '#9db0d1', fontSize: '0.9rem', lineHeight: 1.6 }}>Drag the image in the circle, then fine-tune with the sliders before saving.</p>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <button type="button" style={{ ...styles.button, background: 'rgba(255,255,255,0.06)', display: 'inline-flex', alignItems: 'center', gap: '8px', flex: '1 1 120px' }} onClick={() => updateAvatarEditor((current) => ({ ...current, cropX: 0, cropY: 0, zoom: 1 }))} disabled={avatarUploading}>
+                        <RotateCcw size={16} /> Reset
+                      </button>
+                      <button type="button" style={{ ...styles.button, ...styles.primaryButton, flex: '1 1 160px' }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading}>
+                        {avatarUploading ? 'Uploading...' : 'Save photo'}
+                      </button>
+                      <button type="button" style={{ ...styles.button, flex: '1 1 120px' }} onClick={() => setAvatarEditor(null)} disabled={avatarUploading}>
+                        Discard
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
