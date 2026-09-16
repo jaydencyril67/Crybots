@@ -530,10 +530,6 @@ const SettingsPage = () => {
               </section>
 
               <section style={styles.card}>
-
-              </section>
-
-              <section style={styles.card}>
                 <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security code</h2>
                 <p style={styles.cardText}>Set or change a withdrawal security code. Changing it requires your password.</p>
                 <div style={styles.formGrid}>
