@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRightLeft, AtSign, BadgeCheck, Hash, UserRound } from 'lucide-react';
+import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -22,6 +22,7 @@ type TransferDetailsResponse = {
   user?: {
     uid?: string;
     email?: string;
+    securityCodeSet?: boolean;
   };
   balances?: {
     usdtBalance?: number;
@@ -106,7 +107,7 @@ const TransferPage = () => {
   const [recipientChecking, setRecipientChecking] = useState(false);
   const [amount, setAmount] = useState('');
   const [securityCode, setSecurityCode] = useState('');
-  const [password, setPassword] = useState('');
+  const [securityCodeBound, setSecurityCodeBound] = useState(false);
   const [usdtBalance, setUsdtBalance] = useState(0);
   const [transferring, setTransferring] = useState(false);
 
@@ -122,6 +123,7 @@ const TransferPage = () => {
       try {
         const { data } = await api.get<TransferDetailsResponse>('/api/transfers/me');
         setUsdtBalance(data.balances?.usdtBalance ?? 0);
+        setSecurityCodeBound(Boolean(data.user?.securityCodeSet));
       } catch {
         navigate('/signin');
       } finally {
@@ -172,13 +174,11 @@ const TransferPage = () => {
         recipientValue: recipientValue.trim(),
         amount: Number(amount),
         securityCode,
-        currentPassword: password,
       });
       setUsdtBalance(data.balances?.usdtBalance ?? usdtBalance);
       setMessage({ kind: 'success', text: data.message || 'Transfer completed successfully.' });
       setAmount('');
       setSecurityCode('');
-      setPassword('');
     } catch (error: any) {
       setMessage({ kind: 'error', text: error?.response?.data?.message || 'Unable to complete transfer.' });
     } finally {
@@ -225,14 +225,10 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
-                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" />
-                </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Current password</span>
-                  <input style={styles.input} type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="For backup verification" />
+                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit code' : 'Bind security code to continue'} />
                 </div>
                 <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid}>
+                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCode}>
                     {transferring ? 'Sending...' : 'Send USDT'}
                   </button>
                 </div>
@@ -241,7 +237,6 @@ const TransferPage = () => {
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><BadgeCheck size={18} /> Transfer rules</h2>
                 <p style={styles.cardText}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
-                <p style={styles.cardText}>If you already set a withdrawal security code, the transfer uses that code. Otherwise, your current password is used as the fallback verification method.</p>
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><UserRound size={18} /> Recipient validation</h2>
@@ -250,7 +245,7 @@ const TransferPage = () => {
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><Hash size={18} /> Security verification</h2>
-                <p style={styles.cardText}>Transfers are protected by your security code or your current password if a security code has not been bound yet.</p>
+                <p style={styles.cardText}>Bind a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
                 <p style={styles.cardText}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
               </section>
             </div>
