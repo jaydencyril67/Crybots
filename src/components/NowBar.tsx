@@ -297,8 +297,7 @@ const NowBar = ({ actions }: NowBarProps) => {
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
     window.addEventListener('storage', syncEdgeLight);
     window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
-    window.addEventListener('wheel', handleInteraction, { passive: true });
-    window.addEventListener('scroll', handleInteraction, { passive: true });
+
 
     return () => {
       window.removeEventListener('popstate', syncPath);
@@ -306,8 +305,7 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.removeEventListener('ke:navigation-start', syncPath as EventListener);
       window.removeEventListener('storage', syncEdgeLight);
       window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
-      window.removeEventListener('wheel', handleInteraction);
-      window.removeEventListener('scroll', handleInteraction);
+
     };
   }, []);
 
