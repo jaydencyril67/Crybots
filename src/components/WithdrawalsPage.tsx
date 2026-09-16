@@ -283,7 +283,7 @@ const WithdrawalsPage = () => {
                     {assetType === 'crypto' ? 'Crypto' : 'Fiat'}
                   </button>
                   {isAssetMenuOpen ? (
-                    <div style={styles.customPickerPanel}>
+                    <div style={styles.customPickerGrid}>
                       <button type="button" style={styles.button} onClick={() => { setAssetType('crypto'); setIsAssetMenuOpen(false); }}>Crypto</button>
                       <button type="button" style={styles.button} onClick={() => { setAssetType('fiat'); setIsAssetMenuOpen(false); }}>Fiat</button>
                     </div>
@@ -295,7 +295,7 @@ const WithdrawalsPage = () => {
                     {method === 'instant' ? 'Instant' : 'Scheduled'}
                   </button>
                   {isMethodMenuOpen ? (
-                    <div style={styles.customPickerPanel}>
+                    <div style={styles.customPickerGrid}>
                       <button type="button" style={styles.button} onClick={() => { setMethod('instant'); setIsMethodMenuOpen(false); }}>Instant</button>
                       <button type="button" style={styles.button} onClick={() => { setMethod('scheduled'); setIsMethodMenuOpen(false); }}>Scheduled</button>
                     </div>
