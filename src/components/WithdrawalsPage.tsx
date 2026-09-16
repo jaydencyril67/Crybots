@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CalendarClock, Coins, Landmark, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
@@ -100,6 +100,8 @@ const WithdrawalsPage = () => {
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
   const [isAssetMenuOpen, setIsAssetMenuOpen] = useState(false);
   const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
+  const assetMenuRef = useRef<HTMLDivElement | null>(null);
+  const methodMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('USDT');
   const [destinationValue, setDestinationValue] = useState('');
@@ -121,6 +123,17 @@ const WithdrawalsPage = () => {
   }, [assetType, currentWallet, fiatAccount.accountNumber]);
 
   useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (assetMenuRef.current && !assetMenuRef.current.contains(event.target as Node)) {
+        setIsAssetMenuOpen(false);
+      }
+      if (methodMenuRef.current && !methodMenuRef.current.contains(event.target as Node)) {
+        setIsMethodMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
     const loadDetails = async () => {
       try {
         const { data } = await api.get<WithdrawalDetailsResponse>('/api/withdrawals/me');
@@ -140,6 +153,9 @@ const WithdrawalsPage = () => {
       }
     };
     void loadDetails();
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
   }, []);
 
   useEffect(() => {
@@ -208,11 +224,11 @@ const WithdrawalsPage = () => {
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><Coins size={18} /> Withdraw crypto or fiat</h2>
                 <p style={styles.cardText}>Choose an asset type, pick instant or scheduled processing, and send funds to your bound account.</p>
-                <div style={styles.field as React.CSSProperties}>
+                <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Asset type</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
                     <span>{assetType === 'crypto' ? 'Crypto' : 'Fiat'}</span>
-                    <span>▾</span>
+                    <span style={{ transform: isAssetMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                   </button>
                   {isAssetMenuOpen ? (
                     <div style={styles.selectMenu}>
@@ -232,11 +248,11 @@ const WithdrawalsPage = () => {
                     </div>
                   ) : null}
                 </div>
-                <div style={styles.field as React.CSSProperties}>
+                <div ref={methodMenuRef} style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Withdrawal method</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsMethodMenuOpen((current) => !current)}>
                     <span>{method === 'instant' ? 'Instant' : 'Scheduled'}</span>
-                    <span>▾</span>
+                    <span style={{ transform: isMethodMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                   </button>
                   {isMethodMenuOpen ? (
                     <div style={styles.selectMenu}>

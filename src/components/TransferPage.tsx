@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
@@ -108,6 +108,7 @@ const TransferPage = () => {
   const [recipientDetails, setRecipientDetails] = useState<TransferRecipientCheckResponse['user'] | null>(null);
   const [recipientChecking, setRecipientChecking] = useState(false);
   const [isRecipientMenuOpen, setIsRecipientMenuOpen] = useState(false);
+  const recipientMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
   const [securityCode, setSecurityCode] = useState('');
   const [securityCodeBound, setSecurityCodeBound] = useState(false);
@@ -138,6 +139,14 @@ const TransferPage = () => {
   }, []);
 
   useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (recipientMenuRef.current && !recipientMenuRef.current.contains(event.target as Node)) {
+        setIsRecipientMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
     const value = recipientValue.trim();
     setRecipientValid(false);
     setRecipientDetails(null);
@@ -164,6 +173,7 @@ const TransferPage = () => {
 
     return () => {
       window.clearTimeout(timeout);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [recipientMethod, recipientValue]);
 
@@ -203,11 +213,11 @@ const TransferPage = () => {
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><ArrowRightLeft size={18} /> Send USDT to another user</h2>
                 <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
-                <div style={styles.field as React.CSSProperties}>
+                <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Recipient type</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
                     <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
-                    <span>▾</span>
+                    <span style={{ transform: isRecipientMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                   </button>
                   {isRecipientMenuOpen ? (
                     <div style={styles.selectMenu}>
