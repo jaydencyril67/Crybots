@@ -13,7 +13,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, Crop, LockKeyhole, MoveHorizontal, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
+import { CheckCircle2, Crop, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
@@ -1148,50 +1148,26 @@ const SettingsPage = () => {
                     />
                   </div>
 
-                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
-                      <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><MoveHorizontal size={14} /> Left / Right</span>
-                      <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{avatarEditor.cropX}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={-AVATAR_CONTROL_LIMIT}
-                      max={AVATAR_CONTROL_LIMIT}
-                      step={AVATAR_DRAG_STEP}
-                      value={avatarEditor.cropX}
-                      onChange={(event) => updateAvatarEditor((current) => ({ ...current, cropX: Number(event.target.value) }))}
-                    />
+                  <div style={{ display: 'grid', gap: '10px', maxWidth: '420px', margin: '0 auto', width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                    <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><Crop size={14} /> Zoom</span>
+                    <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{Math.round(avatarEditor.zoom * 100)}%</span>
                   </div>
+                  <input
+                    type="range"
+                    min={AVATAR_MIN_ZOOM}
+                    max={AVATAR_MAX_ZOOM}
+                    step={AVATAR_ZOOM_STEP}
+                    value={avatarEditor.zoom}
+                    onChange={(event) => updateAvatarEditor((current) => ({ ...current, zoom: clampAvatarZoom(Number(event.target.value)) }))}
+                  />
+                </div>
 
-                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '10px' }}>
-                      <span style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}><MoveVertical size={14} /> Up / Down</span>
-                      <span style={{ color: '#9db0d1', fontSize: '0.85rem', fontWeight: 700 }}>{avatarEditor.cropY}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={-AVATAR_CONTROL_LIMIT}
-                      max={AVATAR_CONTROL_LIMIT}
-                      step={AVATAR_DRAG_STEP}
-                      value={avatarEditor.cropY}
-                      onChange={(event) => updateAvatarEditor((current) => ({ ...current, cropY: Number(event.target.value) }))}
-                    />
-                  </div>
-
-                  <div style={{ ...styles.card, background: 'rgba(255,255,255,0.03)', padding: '16px', display: 'grid', gap: '12px' }}>
-                    <p style={{ margin: 0, color: '#9db0d1', fontSize: '0.9rem', lineHeight: 1.6 }}>Drag the image in the circle, then fine-tune with the sliders before saving.</p>
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                      <button type="button" style={{ ...styles.button, background: 'rgba(255,255,255,0.06)', display: 'inline-flex', alignItems: 'center', gap: '8px', flex: '1 1 120px' }} onClick={() => updateAvatarEditor((current) => ({ ...current, cropX: 0, cropY: 0, zoom: 1 }))} disabled={avatarUploading}>
-                        <RotateCcw size={16} /> Reset
-                      </button>
-                      <button type="button" style={{ ...styles.button, ...styles.primaryButton, flex: '1 1 160px' }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading}>
-                        {avatarUploading ? 'Uploading...' : 'Save photo'}
-                      </button>
-                      <button type="button" style={{ ...styles.button, flex: '1 1 120px' }} onClick={() => setAvatarEditor(null)} disabled={avatarUploading}>
-                        Discard
-                      </button>
-                    </div>
-                  </div>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', maxWidth: '420px', margin: '4px auto 0', width: '100%' }}>
+                  <button type="button" style={{ ...styles.button, ...styles.primaryButton, flex: '1 1 160px' }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading}>
+                    {avatarUploading ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
                 </div>
               </div>
             </div>
