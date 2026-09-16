@@ -639,6 +639,20 @@ const SettingsPage = () => {
     setAvatarEditor((current) => (current ? updater(current) : current));
   };
 
+  const avatarDisplayStyle = {
+    position: 'relative' as const,
+    width: 'min(72vw, 360px)',
+    maxWidth: '100%',
+    aspectRatio: '1 / 1',
+    borderRadius: '50%',
+    overflow: 'hidden',
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.04)',
+    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+    touchAction: 'none' as const,
+    cursor: avatarEditor ? 'grab' : 'default',
+  };
+
   const handleUploadAvatar = async () => {
     if (!avatarEditor) {
       return;
