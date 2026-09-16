@@ -312,11 +312,9 @@ const ProfilePage = () => {
 
         const serverProfile = meResponse.data.user ?? null;
         const cachedProfile = profile ?? null;
-        const mergedProfile = {
-          ...cachedProfile,
-          ...serverProfile,
-          profilePicture: serverProfile?.profilePicture ?? cachedProfile?.profilePicture,
-        } as ProfileDetails | null;
+        const mergedProfile = serverProfile
+          ? { ...cachedProfile, ...serverProfile, profilePicture: serverProfile.profilePicture ?? cachedProfile?.profilePicture }
+          : cachedProfile;
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) };
         setBalance(nextBalance);
         setLiveProfile(mergedProfile);
@@ -333,9 +331,8 @@ const ProfilePage = () => {
         setBalance({ usdtBalance: getCachedBalance() ?? (typeof profile?.usdtBalance === 'number' ? profile.usdtBalance : null) });
         setLiveProfile(profile);
         if (profile) {
-          const cachedProfile = { ...profile, profilePicture: profile.profilePicture ?? undefined };
-          window.localStorage.setItem('kingshall_user', JSON.stringify(cachedProfile));
-          window.localStorage.setItem('user', JSON.stringify(cachedProfile));
+          window.localStorage.setItem('kingshall_user', JSON.stringify(profile));
+          window.localStorage.setItem('user', JSON.stringify(profile));
         }
         setBalanceError(null);
       }
