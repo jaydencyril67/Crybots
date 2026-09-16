@@ -1,15 +1,17 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRightLeft, CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward' | 'fee';
+type TransactionDirection = 'all' | 'inbound' | 'outbound';
 type TransactionStatus = 'all' | 'completed' | 'pending' | 'failed';
 
 type TransactionRecord = {
   id: string;
   type: Exclude<TransactionType, 'all'>;
+  direction: Exclude<TransactionDirection, 'all'>;
   title: string;
   amount: string;
   status: Exclude<TransactionStatus, 'all'>;
@@ -24,6 +26,7 @@ const sampleTransactions: TransactionRecord[] = [
   {
     id: 'txn_1001',
     type: 'transfer',
+    direction: 'outbound',
     title: 'USDT transfer sent',
     amount: '-250.00 USDT',
     status: 'completed',
@@ -36,6 +39,7 @@ const sampleTransactions: TransactionRecord[] = [
   {
     id: 'txn_1002',
     type: 'withdrawal',
+    direction: 'outbound',
     title: 'Crypto withdrawal submitted',
     amount: '-120.00 USDT',
     status: 'pending',
@@ -47,6 +51,7 @@ const sampleTransactions: TransactionRecord[] = [
   {
     id: 'txn_1003',
     type: 'deposit',
+    direction: 'inbound',
     title: 'Wallet deposit received',
     amount: '+500.00 USDT',
     status: 'completed',
@@ -58,6 +63,7 @@ const sampleTransactions: TransactionRecord[] = [
   {
     id: 'txn_1004',
     type: 'staking',
+    direction: 'inbound',
     title: 'Staking reward paid',
     amount: '+18.75 USDT',
     status: 'completed',
@@ -69,6 +75,7 @@ const sampleTransactions: TransactionRecord[] = [
   {
     id: 'txn_1005',
     type: 'trade',
+    direction: 'outbound',
     title: 'Market order executed',
     amount: '-80.00 USDT',
     status: 'failed',
@@ -80,6 +87,7 @@ const sampleTransactions: TransactionRecord[] = [
   {
     id: 'txn_1006',
     type: 'fee',
+    direction: 'outbound',
     title: 'Network fee charged',
     amount: '-1.20 USDT',
     status: 'completed',
@@ -266,22 +274,55 @@ const getStatusStyle = (status: Exclude<TransactionStatus, 'all'>) => {
 
 const TransactionHistoryPage = () => {
   const [typeFilter, setTypeFilter] = useState<TransactionType>('all');
+  const [directionFilter, setDirectionFilter] = useState<TransactionDirection>('all');
   const [statusFilter, setStatusFilter] = useState<TransactionStatus>('all');
   const [query, setQuery] = useState('');
+  const [amountMin, setAmountMin] = useState('');
+  const [amountMax, setAmountMax] = useState('');
+  const [transactions, setTransactions] = useState<TransactionRecord[]>(sampleTransactions);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadTransactions = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const { data } = await api.get<{ transactions?: TransactionRecord[] }>('/api/transactions/me');
+        if (Array.isArray(data?.transactions) && data.transactions.length > 0) {
+          setTransactions(data.transactions);
+        } else {
+          setTransactions(sampleTransactions);
+        }
+      } catch {
+        setTransactions(sampleTransactions);
+        setError('Showing local transaction history preview because the backend transaction feed is unavailable.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadTransactions();
+  }, []);
 
   const filteredTransactions = useMemo(() => {
-    return sampleTransactions.filter((transaction) => {
+    return transactions.filter((transaction) => {
       const matchesType = typeFilter === 'all' || transaction.type === typeFilter;
+      const matchesDirection = directionFilter === 'all' || transaction.direction === directionFilter;
       const matchesStatus = statusFilter === 'all' || transaction.status === statusFilter;
       const haystack = `${transaction.title} ${transaction.reference} ${transaction.counterpart ?? ''} ${transaction.description}`.toLowerCase();
       const matchesQuery = query.trim().length === 0 || haystack.includes(query.toLowerCase());
-      return matchesType && matchesStatus && matchesQuery;
+      const amountValue = Number(transaction.amount.replace(/[^0-9.-]/g, ''));
+      const minValue = amountMin ? Number(amountMin) : Number.NEGATIVE_INFINITY;
+      const maxValue = amountMax ? Number(amountMax) : Number.POSITIVE_INFINITY;
+      const matchesAmount = amountValue >= minValue && amountValue <= maxValue;
+      return matchesType && matchesDirection && matchesStatus && matchesAmount && matchesQuery;
     });
-  }, [query, statusFilter, typeFilter]);
+  }, [amountMax, amountMin, directionFilter, query, statusFilter, transactions, typeFilter]);
 
-  const totalCount = sampleTransactions.length;
+  const totalCount = transactions.length;
   const filteredCount = filteredTransactions.length;
-  const completedCount = sampleTransactions.filter((transaction) => transaction.status === 'completed').length;
+  const completedCount = transactions.filter((transaction) => transaction.status === 'completed').length;
 
   return (
     <div style={styles.page}>
@@ -321,6 +362,14 @@ const TransactionHistoryPage = () => {
                     </select>
                   </div>
                   <div style={styles.field as React.CSSProperties}>
+                    <span style={styles.label}>Direction</span>
+                    <select style={styles.select} value={directionFilter} onChange={(event) => setDirectionFilter(event.target.value as TransactionDirection)}>
+                      <option value="all">All directions</option>
+                      <option value="inbound">Inbound</option>
+                      <option value="outbound">Outbound</option>
+                    </select>
+                  </div>
+                  <div style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Status</span>
                     <select style={styles.select} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as TransactionStatus)}>
                       <option value="all">All statuses</option>
@@ -328,6 +377,14 @@ const TransactionHistoryPage = () => {
                       <option value="pending">Pending</option>
                       <option value="failed">Failed</option>
                     </select>
+                  </div>
+                  <div style={styles.field as React.CSSProperties}>
+                    <span style={styles.label}>Min amount</span>
+                    <input style={styles.input} value={amountMin} onChange={(event) => setAmountMin(event.target.value)} placeholder="0.00" inputMode="decimal" />
+                  </div>
+                  <div style={styles.field as React.CSSProperties}>
+                    <span style={styles.label}>Max amount</span>
+                    <input style={styles.input} value={amountMax} onChange={(event) => setAmountMax(event.target.value)} placeholder="9999.99" inputMode="decimal" />
                   </div>
                 </div>
               </div>
@@ -352,6 +409,8 @@ const TransactionHistoryPage = () => {
               </div>
             </section>
 
+            {error ? <div style={styles.message}>{error}</div> : null}
+
             <section style={styles.tableWrap}>
               <table style={styles.table}>
                 <thead>
@@ -365,13 +424,17 @@ const TransactionHistoryPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTransactions.length > 0 ? filteredTransactions.map((transaction) => (
+                  {loading ? (
+                    <tr>
+                      <td style={styles.loadingState} colSpan={6}>Loading transaction history…</td>
+                    </tr>
+                  ) : filteredTransactions.length > 0 ? filteredTransactions.map((transaction) => (
                     <tr key={transaction.id}>
                       <td style={styles.td}>
                         <div style={styles.meta}>
                           <strong>{transaction.title}</strong>
-                          <span style={styles.muted}>{getTypeLabel(transaction.type)}{transaction.counterpart ? ` · ${transaction.counterpart}` : ''}</span>
-                          <span style={styles.muted}>{transaction.description}</span>
+                          <span style={styles.muted}>{getTypeLabel(transaction.type)} · {transaction.direction}</span>
+                          <span style={styles.muted}>{transaction.counterpart ? `${transaction.counterpart} · ` : ''}{transaction.description}</span>
                         </div>
                       </td>
                       <td style={styles.td}><strong>{transaction.amount}</strong></td>
