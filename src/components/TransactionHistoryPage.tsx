@@ -269,6 +269,15 @@ const styles = {
     fontSize: '1.15rem',
     fontWeight: 900,
   },
+  message: {
+    padding: '14px 16px',
+    borderRadius: '16px',
+    border: '1px solid rgba(250,204,21,0.22)',
+    background: 'rgba(250,204,21,0.12)',
+    color: '#fde68a',
+    fontSize: '0.92rem',
+    lineHeight: 1.5,
+  },
 };
 
 const getTypeLabel = (type: Exclude<TransactionType, 'all'>) => {
