@@ -25,6 +25,10 @@ type TransactionRecord = {
   description: string;
 };
 
+type TransactionHistoryResponse = {
+  transactions?: Array<Partial<TransactionRecord> & { type?: TransactionRecord['type']; direction?: TransactionRecord['direction']; status?: TransactionRecord['status'] }>;
+};
+
 
 const styles = {
   page: {
@@ -234,11 +238,19 @@ const TransactionHistoryPage = () => {
       setLoading(true);
       setError('');
       try {
-        const { data } = await api.get<{ transactions?: TransactionRecord[] }>('/api/transactions/me');
-        if (Array.isArray(data?.transactions)) {
-          setTransactions(data.transactions);
-        } else {
-          setTransactions([]);
+        const { data } = await api.get<TransactionHistoryResponse>('/api/transactions/me');
+        const normalizedTransactions = Array.isArray(data?.transactions)
+          ? data.transactions
+              .filter((transaction): transaction is TransactionRecord => Boolean(transaction?.id && transaction.type && transaction.direction && transaction.status && transaction.title && transaction.amount && transaction.currency && transaction.date && transaction.time && transaction.reference && transaction.description && typeof transaction.amountValue === 'number'))
+              .map((transaction) => ({
+                ...transaction,
+                counterpart: transaction.counterpart || undefined,
+              }))
+          : [];
+
+        setTransactions(normalizedTransactions);
+        if (!Array.isArray(data?.transactions)) {
+          setError('The backend returned no transaction records.');
         }
       } catch {
         setTransactions([]);
