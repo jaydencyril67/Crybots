@@ -273,7 +273,6 @@ const ProfilePage = () => {
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
 
               <div style={styles.helper}>
-                <p style={styles.helperText}>You can keep building out this section later with more direct actions and settings.</p>
                 <button type="button" onClick={handleLogout} style={styles.helperAction}>
                   <LogOut size={16} /> Logout
                 </button>
