@@ -551,30 +551,19 @@ const SettingsPage = () => {
       return;
     }
 
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
     setAvatarUploading(true);
 
     try {
-      const authResponse = await api.get('/api/cloudinary/upload');
-      const auth = authResponse.data as { cloudName?: string; uploadPreset?: string };
-
-      if (!auth.cloudName || !auth.uploadPreset) {
-        throw new Error('Unable to prepare image upload.');
-      }
-
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
-      uploadFormData.append('upload_preset', auth.uploadPreset);
 
-      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${auth.cloudName}/image/upload`, {
-        method: 'POST',
-        body: uploadFormData,
+      const uploadResponse = await api.post('/api/cloudinary/upload', uploadFormData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      if (!uploadResponse.ok) {
-        throw new Error('Unable to upload profile picture.');
-      }
-
-      const uploadedFile = await uploadResponse.json() as { secure_url?: string };
+      const uploadedFile = uploadResponse.data as { secure_url?: string };
       if (!uploadedFile.secure_url) {
         throw new Error('Image upload did not return a usable URL.');
       }
