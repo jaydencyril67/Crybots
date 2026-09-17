@@ -50,6 +50,7 @@ const styles = {
     gap: '6px',
     textAlign: 'left' as const,
     minWidth: 0,
+    gridColumn: '1 / -1',
   },
   card: HYBRID_CARD_STYLES.card,
   '@media (max-width: 640px)': {
