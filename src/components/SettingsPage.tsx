@@ -948,23 +948,72 @@ const SettingsPage = () => {
                   {avatarUploading ? 'Saving...' : 'Done'}
                 </button>
               </div>
-              <div style={{ position: 'relative', minHeight: 0, overflow: 'hidden' }}>
-                <ImageCrop
-                  ref={cropEditorRef}
+              <div
+                ref={cropContainerRef}
+                style={{ position: 'relative', minHeight: 0, overflow: 'hidden', touchAction: 'none', display: 'grid', placeItems: 'center' }}
+                onPointerDown={(event) => {
+                  if (!cropReady) {
+                    return;
+                  }
+                  (event.currentTarget as HTMLDivElement).setPointerCapture(event.pointerId);
+                  cropStartRef.current = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+                }}
+                onPointerMove={(event) => {
+                  if (!cropStartRef.current || cropStartRef.current.pointerId !== event.pointerId || !avatarEditor) {
+                    return;
+                  }
+                  const dx = event.clientX - cropStartRef.current.x;
+                  const dy = event.clientY - cropStartRef.current.y;
+                  cropStartRef.current = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+                  setAvatarEditor({ ...avatarEditor, crop: { ...avatarEditor.crop, x: avatarEditor.crop.x + dx, y: avatarEditor.crop.y + dy } });
+                }}
+                onPointerUp={(event) => {
+                  if (cropStartRef.current?.pointerId === event.pointerId) {
+                    cropStartRef.current = null;
+                  }
+                }}
+                onPointerLeave={() => {
+                  cropStartRef.current = null;
+                }}
+                onWheel={(event) => {
+                  if (!avatarEditor) {
+                    return;
+                  }
+                  event.preventDefault();
+                  const nextScale = Math.min(3, Math.max(1, avatarEditor.crop.scale - event.deltaY * 0.001));
+                  setAvatarEditor({ ...avatarEditor, crop: { ...avatarEditor.crop, scale: nextScale } });
+                }}
+              >
+                <img
+                  ref={cropImageRef}
                   src={avatarEditor.source}
-                  width="100%"
-                  height="100%"
-                  aspectRatio={1}
-                  cropShape="round"
-                  showGrid
-                  showZoom
-                  showRotate
-                  backgroundColor="#050816"
-                  darkOverlayColor="rgba(3, 7, 20, 0.72)"
+                  alt="Avatar preview"
+                  onLoad={(event) => {
+                    const target = event.currentTarget;
+                    const boxSize = Math.min(target.naturalWidth, target.naturalHeight) || 320;
+                    setCropBoxSize(boxSize);
+                    setCropReady(true);
+                    const size = Math.min(cropContainerRef.current?.clientWidth || boxSize, cropContainerRef.current?.clientHeight || boxSize, boxSize);
+                    target.style.width = `${size}px`;
+                    target.style.height = `${size}px`;
+                  }}
+                  style={{
+                    width: cropBoxSize ? `${cropBoxSize}px` : 'min(72vw, 420px)',
+                    height: cropBoxSize ? `${cropBoxSize}px` : 'min(72vw, 420px)',
+                    objectFit: 'cover',
+                    borderRadius: '50%',
+                    transform: `translate(${avatarEditor.crop.x}px, ${avatarEditor.crop.y}px) scale(${avatarEditor.crop.scale})`,
+                    transition: cropReady ? 'transform 80ms linear' : 'none',
+                    boxShadow: '0 0 0 9999px rgba(3, 7, 20, 0.58)',
+                    cursor: cropReady ? 'grab' : 'default',
+                    userSelect: 'none',
+                    WebkitUserDrag: 'none',
+                  }}
+                  draggable={false}
                 />
               </div>
               <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                <span style={{ color: '#8ea2c7', fontSize: '0.9rem' }}>Drag to reposition, pinch to zoom, and rotate if needed.</span>
+                <span style={{ color: '#8ea2c7', fontSize: '0.9rem' }}>Drag to reposition or scroll to zoom before saving.</span>
                 <label style={{ ...styles.button, background: 'rgba(255,255,255,0.06)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                   <Upload size={16} />
                   <span>Choose another photo</span>
