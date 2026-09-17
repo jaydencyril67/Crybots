@@ -619,24 +619,21 @@ const SettingsPage = () => {
     const deltaY = event.clientY - dragState.startY;
 
     if (dragState.mode === 'move') {
-      setCropBox(clampCropBox({
+      setCropBox({
         ...dragState.startBox,
         x: dragState.startBox.x + deltaX,
         y: dragState.startBox.y + deltaY,
-      }));
+      });
       return;
     }
 
     const delta = Math.max(deltaX, deltaY);
     const nextSize = (dragState.startSize ?? dragState.startBox.size) + delta;
-    const nextX = dragState.startBox.x;
-    const nextY = dragState.startBox.y;
 
-    setCropBox(clampCropBox({
-      x: nextX,
-      y: nextY,
+    setCropBox({
+      ...dragState.startBox,
       size: nextSize,
-    }));
+    });
   };
 
   const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
