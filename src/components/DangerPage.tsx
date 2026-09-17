@@ -32,12 +32,12 @@ const styles = {
     display: 'grid',
     gap: '0',
     marginTop: '0',
-  }
+  },
   section: {
     display: 'grid',
     gap: '0',
     paddingTop: '0',
-  }
+  },
   sectionTitle: {
     margin: 0,
     fontSize: '1.45rem',
@@ -92,7 +92,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     marginBottom: '18px',
-  }
+  },
   actionButton: {
     borderRadius: '0',
     padding: '12px 0',
