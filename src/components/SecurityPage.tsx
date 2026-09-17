@@ -160,7 +160,10 @@ const styles = {
 
 const SecurityPage = () => {
   const [uid, setUid] = useState('');
-  const [password, setPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentSecurityPassword, setCurrentSecurityPassword] = useState('');
   const [securityCode, setSecurityCode] = useState('');
   const [confirmSecurityCode, setConfirmSecurityCode] = useState('');
   const [status, setStatus] = useState<{ kind: SaveState; text: string }>({ kind: 'idle', text: '' });
@@ -174,6 +177,7 @@ const SecurityPage = () => {
   const [savingPassword, setSavingPassword] = useState(false);
   const [savingSecurityCode, setSavingSecurityCode] = useState(false);
   const [saving2fa, setSaving2fa] = useState(false);
+  const [savingSecurityQuestion, setSavingSecurityQuestion] = useState(false);
   const [savingBiometric, setSavingBiometric] = useState(false);
   const [savingHardware, setSavingHardware] = useState(false);
 
@@ -216,27 +220,50 @@ const SecurityPage = () => {
   };
 
   const handlePasswordSave = async () => {
-    if (!password.trim()) return showStatus('error', 'Enter your current and new password details in the backend flow later.');
+    if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
+      return showStatus('error', 'Enter your current password, new password, and confirmation.');
+    }
+
+    if (newPassword !== confirmPassword) {
+      return showStatus('error', 'New password and confirmation must match.');
+    }
+
     if (!handleConfirm('Change your password now? Make sure you can remember the new one.')) return;
     setSavingPassword(true);
     try {
-      navigate('/settings');
-      showStatus('success', 'Password management is available in Settings for now.');
-      setPassword('');
+      await api.patch('/api/settings/password', {
+        currentPassword: currentPassword.trim(),
+        newPassword: newPassword.trim(),
+      });
+      showStatus('success', 'Password updated successfully.');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to update password.');
     } finally {
       setSavingPassword(false);
     }
   };
 
   const handleSecurityCodeSave = async () => {
+    if (!currentSecurityPassword.trim()) {
+      return showStatus('error', 'Enter your current password to update the security code.');
+    }
+
     if (securityCode.length !== 6 || securityCode !== confirmSecurityCode) {
       return showStatus('error', 'Security code must be 6 digits and match confirmation.');
     }
+
     if (!handleConfirm('Set or update your security code now?')) return;
     setSavingSecurityCode(true);
     try {
-      await api.patch('/api/security/code', { securityCode });
+      await api.patch('/api/withdrawals/security-code', {
+        currentPassword: currentSecurityPassword.trim(),
+        securityCode,
+      });
       setSecurityCodeSet(true);
+      setCurrentSecurityPassword('');
       setSecurityCode('');
       setConfirmSecurityCode('');
       showStatus('success', 'Security code updated successfully.');
@@ -274,6 +301,19 @@ const SecurityPage = () => {
       showStatus('success', 'Hardware security will be wired to the backend next.');
     } finally {
       setSavingHardware(false);
+    }
+  };
+
+  const handleSecurityQuestionSave = async () => {
+    if (!handleConfirm('Update your security question now?')) return;
+    setSavingSecurityQuestion(true);
+    try {
+      await api.patch('/api/settings/security-question', {});
+      showStatus('success', 'Security question updated successfully.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to update security question.');
+    } finally {
+      setSavingSecurityQuestion(false);
     }
   };
 
@@ -331,7 +371,9 @@ const SecurityPage = () => {
                 <p style={styles.rowLabel}><KeyRound size={16} /> Password</p>
                 <p style={styles.rowValue}>Change your account password</p>
                 <div style={styles.control}>
-                  <input style={styles.input} type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="New password or current flow placeholder" />
+                  <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" />
+                  <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
+                  <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
                   <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? 'Saving...' : 'Change password'}</button>
                 </div>
               </div>
@@ -340,6 +382,7 @@ const SecurityPage = () => {
                 <p style={styles.rowLabel}><LockKeyhole size={16} /> Security code</p>
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
                 <div style={styles.control}>
+                  <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
                   <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
                   <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? 'Saving...' : 'Save security code'}</button>
