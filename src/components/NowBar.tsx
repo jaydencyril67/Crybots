@@ -252,14 +252,6 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/transfer',
   },
   {
-    label: 'Details',
-    icon: <CircleUserRound size={18} />,
-    onClick: () => {
-      navigate('/profile');
-    },
-    active: getActivePath() === '/profile',
-  },
-  {
     label: 'Transactions',
     icon: <CalendarClock size={18} />,
     onClick: () => {
