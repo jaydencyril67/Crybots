@@ -672,11 +672,21 @@ const SettingsPage = () => {
     }
 
     const imageRect = image.getBoundingClientRect();
-    const overlaySize = imageRect.width || imageRect.height || 320;
-    const scaleX = image.naturalWidth / overlaySize || 1;
-    const scaleY = image.naturalHeight / overlaySize || 1;
-    const cropX = Math.max(0, Math.round(cropBox.x * scaleX));
-    const cropY = Math.max(0, Math.round(cropBox.y * scaleY));
+    const overlayRect = cropOverlayRef.current?.getBoundingClientRect();
+    const visibleImageRect = overlayRect
+      ? {
+          left: Math.max(imageRect.left, overlayRect.left),
+          top: Math.max(imageRect.top, overlayRect.top),
+          right: Math.min(imageRect.right, overlayRect.right),
+          bottom: Math.min(imageRect.bottom, overlayRect.bottom),
+        }
+      : imageRect;
+    const visibleWidth = Math.max(1, visibleImageRect.right - visibleImageRect.left);
+    const visibleHeight = Math.max(1, visibleImageRect.bottom - visibleImageRect.top);
+    const scaleX = image.naturalWidth / visibleWidth || 1;
+    const scaleY = image.naturalHeight / visibleHeight || 1;
+    const cropX = Math.max(0, Math.round((cropBox.x - (visibleImageRect.left - imageRect.left)) * scaleX));
+    const cropY = Math.max(0, Math.round((cropBox.y - (visibleImageRect.top - imageRect.top)) * scaleY));
     const cropSize = Math.max(1, Math.round(cropBox.size * Math.min(scaleX, scaleY)));
 
     setAvatarUploading(true);
