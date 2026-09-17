@@ -54,6 +54,7 @@ const styles = {
     boxSizing: 'border-box' as const,
     display: 'grid',
     gap: '8px',
+    textAlign: 'left' as const,
   },
   infoLabel: {
     margin: 0,
@@ -228,26 +229,26 @@ const ProfilePage = () => {
               </section>
 
               <div style={styles.infoList}>
-                <div style={styles.infoRow}>
+                <button type="button" style={styles.infoRow}>
                   <p style={styles.infoLabel}><UserRound size={16} /> Display name</p>
                   <p style={styles.infoValue}>{fullName}</p>
-                </div>
-                <div style={styles.infoRow}>
+                </button>
+                <button type="button" style={styles.infoRow}>
                   <p style={styles.infoLabel}><Mail size={16} /> Email</p>
                   <p style={styles.infoValue}>{email}</p>
-                </div>
-                <div style={styles.infoRow}>
+                </button>
+                <button type="button" style={styles.infoRow}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> Account status</p>
                   <p style={styles.infoValue}>Protected</p>
-                </div>
-                <div style={styles.infoRow}>
+                </button>
+                <button type="button" style={styles.infoRow}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> UID</p>
                   <p style={styles.infoValue}>{uid}</p>
-                </div>
-                <div style={styles.infoRow}>
+                </button>
+                <button type="button" style={styles.infoRow}>
                   <p style={styles.infoLabel}><Coins size={16} /> USDT Balance</p>
                   <p style={styles.infoValue}>{usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</p>
-                </div>
+                </button>
               </div>
 
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
