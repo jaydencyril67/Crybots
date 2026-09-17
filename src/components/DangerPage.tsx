@@ -88,6 +88,10 @@ const styles = {
     padding: '12px 0',
     outline: 'none',
   },
+  buttonRow: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
   actionButton: {
     borderRadius: '0',
     padding: '12px 0',
@@ -97,7 +101,7 @@ const styles = {
     fontWeight: 800,
     color: '#ffffff',
     background: 'transparent',
-    textAlign: 'left' as const,
+    textAlign: 'center' as const,
   },
   status: {
     marginTop: '2px',
@@ -168,7 +172,9 @@ const DangerPage = () => {
                 <label style={styles.label} htmlFor="danger-disable-reason">Reason</label>
                 <input id="danger-disable-reason" style={styles.input} value={disable.reason} onChange={(event) => setDisable((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for disabling" />
               </div>
-              <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>Disable Account</button>
+              <div style={styles.buttonRow}>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>Disable Account</button>
+              </div>
               {disable.status ? <div style={styles.status}>{disable.status}</div> : null}
             </section>
 
@@ -187,7 +193,9 @@ const DangerPage = () => {
                 <label style={styles.label} htmlFor="danger-self-exclude-reason">Reason</label>
                 <input id="danger-self-exclude-reason" style={styles.input} value={selfExclude.reason} onChange={(event) => setSelfExclude((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for self exclusion" />
               </div>
-              <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null}>Self Exclude Account</button>
+              <div style={styles.buttonRow}>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null}>Self Exclude Account</button>
+              </div>
               {selfExclude.status ? <div style={styles.status}>{selfExclude.status}</div> : null}
             </section>
 
@@ -202,7 +210,9 @@ const DangerPage = () => {
                 <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
                 <input id="danger-delete-confirmation" style={styles.input} value={remove.confirmation} onChange={(event) => setRemove((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DELETE" />
               </div>
-              <button type="button" style={styles.actionButton} onClick={() => submitAction('delete', remove, setRemove)} disabled={remove.loading !== null}>Delete Account</button>
+              <div style={styles.buttonRow}>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('delete', remove, setRemove)} disabled={remove.loading !== null}>Delete Account</button>
+              </div>
               {remove.status ? <div style={styles.status}>{remove.status}</div> : null}
             </section>
           </div>
