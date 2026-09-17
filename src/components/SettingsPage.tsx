@@ -694,9 +694,9 @@ const SettingsPage = () => {
     setAvatarUploading(true);
     try {
       const authResponse = await api.get('/api/imagekit/upload');
-      const auth = authResponse.data as { publicKey?: string };
+      const auth = authResponse.data as { publicKey?: string; uploadPreset?: string };
 
-      if (!auth.publicKey) {
+      if (!auth.publicKey || !auth.uploadPreset) {
         throw new Error('Unable to prepare image upload.');
       }
 
@@ -722,6 +722,7 @@ const SettingsPage = () => {
       uploadFormData.append('fileName', croppedFile.name);
       uploadFormData.append('useUniqueFileName', 'true');
       uploadFormData.append('publicKey', auth.publicKey);
+      uploadFormData.append('uploadPreset', auth.uploadPreset);
       uploadFormData.append('folder', 'kingshall/avatars');
 
       const uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
