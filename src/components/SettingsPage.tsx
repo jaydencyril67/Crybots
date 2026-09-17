@@ -605,51 +605,6 @@ const SettingsPage = () => {
     background: 'rgba(255,255,255,0.04)',
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
   };
-    setAvatarUploading(true);
-    try {
-      const authResponse = await api.get('/api/cloudinary/upload');
-      const auth = authResponse.data as { cloudName?: string; uploadPreset?: string };
-
-      if (!auth.cloudName || !auth.uploadPreset) {
-        throw new Error('Unable to prepare image upload.');
-      }
-
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
-      uploadFormData.append('upload_preset', auth.uploadPreset);
-
-      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${auth.cloudName}/image/upload`, {
-        method: 'POST',
-        body: uploadFormData,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Unable to upload profile picture.');
-      }
-
-      const uploadedFile = await uploadResponse.json() as { secure_url?: string };
-      if (!uploadedFile.secure_url) {
-        throw new Error('Image upload did not return a usable URL.');
-      }
-
-      await api.patch('/api/settings/profile-picture', {
-        profilePicture: uploadedFile.secure_url,
-      });
-      console.log('[SettingsPage] patch /api/settings/profile-picture succeeded, URL saved');
-
-      const { data: refreshedAccount } = await api.get<MeResponse>('/api/auth/me');
-      console.log('[SettingsPage] refreshed account after upload:', JSON.stringify(refreshedAccount));
-      console.log('[SettingsPage] refreshed profilePicture:', JSON.stringify(refreshedAccount?.user?.profilePicture));
-      setAvatarPreview(refreshedAccount?.user?.profilePicture ?? null);
-      closeAvatarEditor();
-      showStatus('success', 'Profile picture updated successfully.');
-    } catch (error: any) {
-      console.log('[SettingsPage] handleAvatarUpload error:', error?.response?.data || error?.message || error);
-      showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update profile picture.');
-    } finally {
-      setAvatarUploading(false);
-    }
-  };
 
   return (
     <div style={styles.page}>
