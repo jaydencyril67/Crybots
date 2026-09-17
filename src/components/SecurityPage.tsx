@@ -87,7 +87,7 @@ const styles = {
   row: {
     width: '100%',
     maxWidth: '100%',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'rgba(255,255,255,0.04)',
     border: '1px solid rgba(255,255,255,0.08)',
     borderRadius: '18px',
     padding: '16px',

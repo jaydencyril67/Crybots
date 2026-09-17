@@ -44,12 +44,13 @@ const styles = {
     padding: '16px',
     borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'rgba(255,255,255,0.04)',
     boxSizing: 'border-box' as const,
     display: 'grid',
     gap: '6px',
     textAlign: 'left' as const,
     minWidth: 0,
+    gridColumn: '1 / -1',
   },
   card: HYBRID_CARD_STYLES.card,
   '@media (max-width: 640px)': {
@@ -273,7 +274,6 @@ const ProfilePage = () => {
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
 
               <div style={styles.helper}>
-                <p style={styles.helperText}>You can keep building out this section later with more direct actions and settings.</p>
                 <button type="button" onClick={handleLogout} style={styles.helperAction}>
                   <LogOut size={16} /> Logout
                 </button>
