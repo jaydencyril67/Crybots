@@ -30,14 +30,14 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '18px',
-    marginTop: '10px',
-  },
+    gap: '0',
+    marginTop: '0',
+  }
   section: {
     display: 'grid',
-    gap: '8px',
+    gap: '0',
     paddingTop: '0',
-  },
+  }
   sectionTitle: {
     margin: 0,
     fontSize: '1.45rem',
@@ -91,7 +91,8 @@ const styles = {
   buttonRow: {
     display: 'flex',
     justifyContent: 'center',
-  },
+    marginBottom: '18px',
+  }
   actionButton: {
     borderRadius: '0',
     padding: '12px 0',
@@ -104,7 +105,7 @@ const styles = {
     textAlign: 'center' as const,
   },
   status: {
-    marginTop: '2px',
+    marginTop: '0',
     fontSize: '0.92rem',
     fontWeight: 700,
     color: '#ffffff',
