@@ -30,6 +30,7 @@ type MeResponse = {
   };
 };
 
+
 type StatusState = {
   kind: 'idle' | 'success' | 'error';
   message: string;
@@ -287,7 +288,7 @@ const SettingsPage = () => {
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
-        setAvatarPreview(user?.profilePicture ? `${user.profilePicture}${user.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}` : null);
+        setAvatarPreview(user?.profilePicture ?? null);
 
       } catch {
         navigate('/signin');
@@ -740,14 +741,13 @@ const SettingsPage = () => {
         throw new Error('Image upload did not return a usable URL.');
       }
 
-      const { data } = await api.patch('/api/settings/profile-picture', {
+      await api.patch('/api/settings/profile-picture', {
         profilePicture: uploadedFile.url,
         profilePictureFileId: uploadedFile.fileId,
       });
-      const nextProfile = data?.user ?? null;
-      setAvatarPreview(nextProfile?.profilePicture
-        ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}`
-        : null);
+
+      const { data: refreshedAccount } = await api.get<MeResponse>('/api/auth/me');
+      setAvatarPreview(refreshedAccount?.user?.profilePicture ?? null);
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
