@@ -43,27 +43,31 @@ const styles = {
   },
   buttonList: {
     display: 'grid',
-    gap: '6px',
+    gap: '10px',
     marginTop: '6px',
   },
   button: {
     width: '100%',
-    padding: '14px 0',
-    borderRadius: '0',
-    border: 'none',
-    borderBottom: '1px solid rgba(255,255,255,0.12)',
-    background: 'transparent',
+    padding: '16px 18px',
+    borderRadius: '18px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.04)',
     color: '#ffffff',
     fontSize: '1rem',
     fontWeight: 800,
     textAlign: 'left' as const,
     cursor: 'pointer',
+    boxSizing: 'border-box' as const,
   },
   buttonSubtext: {
     margin: '6px 0 0',
     fontSize: '0.86rem',
     color: '#b3b3b3',
     lineHeight: 1.6,
+  },
+  buttonStack: {
+    display: 'grid',
+    gap: '6px',
   },
 };
 
@@ -98,8 +102,10 @@ const PortfolioPage = () => {
             <div style={styles.buttonList}>
               {pageButtons.map((label) => (
                 <button key={label} type="button" style={getButtonStyle()} onClick={() => handleButtonClick(label)}>
-                  {label}
-                  {label === 'Danger' ? <p style={styles.buttonSubtext}>Account recovery and irreversible actions.</p> : null}
+                  <div style={styles.buttonStack}>
+                    <span>{label}</span>
+                    {label === 'Danger' ? <p style={styles.buttonSubtext}>Account recovery and irreversible actions.</p> : null}
+                  </div>
                 </button>
               ))}
             </div>
