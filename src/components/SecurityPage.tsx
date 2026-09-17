@@ -22,6 +22,8 @@ type SessionData = {
   deviceType: string;
   location: string;
   country: string;
+  city?: string;
+  region?: string;
   createdAt: string;
 };
 
@@ -462,6 +464,7 @@ const SecurityPage = () => {
                       <tr>
                         <th style={styles.tableHeadCell}>Device</th>
                         <th style={styles.tableHeadCell}>IP address</th>
+                        <th style={styles.tableHeadCell}>Location</th>
                         <th style={styles.tableHeadCell}>Country</th>
                         <th style={styles.tableHeadCell}>Login date</th>
                         <th style={styles.tableHeadCell}>Login time</th>
@@ -472,7 +475,7 @@ const SecurityPage = () => {
                     <tbody>
                       {sessions.length === 0 ? (
                         <tr>
-                          <td style={styles.tableCell} colSpan={7}>
+                          <td style={styles.tableCell} colSpan={8}>
                             <p style={styles.note}>No active sessions found.</p>
                           </td>
                         </tr>
@@ -489,9 +492,13 @@ const SecurityPage = () => {
                               <p style={styles.tableValue}>{session.ip || 'IP not available'}</p>
                             </td>
                             <td style={styles.tableCell}>
+                              <p style={styles.tableLabel}>Location</p>
+                              <p style={styles.tableValue}>{session.location || 'Location unavailable'}</p>
+                              <p style={styles.tableMeta}>{[session.city, session.region].filter(Boolean).join(', ') || 'Precise area unavailable'}</p>
+                            </td>
+                            <td style={styles.tableCell}>
                               <p style={styles.tableLabel}>Country</p>
                               <p style={styles.tableValue}>{session.country || 'Country unavailable'}</p>
-                              <p style={styles.tableMeta}>{session.location || 'Location unavailable'}</p>
                             </td>
                             <td style={styles.tableCell}>
                               <p style={styles.tableLabel}>Login date</p>

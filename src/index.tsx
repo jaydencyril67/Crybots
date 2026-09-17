@@ -22,6 +22,7 @@ import TransactionHistoryPage from './components/TransactionHistoryPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppSplashOverlay from './components/AppSplashOverlay';
+import api, { forceLogout } from './api/axios';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -86,6 +87,7 @@ const routeToKey = (path: string) => {
 const RouteTransition = () => {
   const [routeKey, setRouteKey] = useState(getRouteKey);
   const [displayedRouteKey, setDisplayedRouteKey] = useState(routeKey);
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem('token')));
 
   useEffect(() => {
     const syncRoute = () => {
@@ -119,6 +121,73 @@ const RouteTransition = () => {
     setDisplayedRouteKey(routeKey);
   }, [displayedRouteKey, routeKey]);
 
+  useEffect(() => {
+    const syncAuthState = () => {
+      setIsAuthenticated(Boolean(localStorage.getItem('token')));
+    };
+
+    const validateSession = async () => {
+      if (!localStorage.getItem('token')) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      try {
+        await api.get('/api/auth/me');
+      } catch (error: any) {
+        if (error?.response?.data?.forceLogout) {
+          forceLogout();
+          return;
+        }
+      }
+    };
+
+    const interval = window.setInterval(() => {
+      void validateSession();
+    }, 15000);
+
+    const connectForceLogoutStream = () => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        return null;
+      }
+
+      const stream = new EventSource(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/force-logout/stream`, {
+        withCredentials: true,
+      });
+
+      const handleForceLogout = () => {
+        forceLogout();
+        stream.close();
+      };
+
+      stream.addEventListener('force-logout', handleForceLogout);
+      stream.addEventListener('error', () => {
+        stream.close();
+        window.setTimeout(() => {
+          connectForceLogoutStream();
+        }, 5000);
+      });
+
+      return stream;
+    };
+
+    const forceLogoutStream = connectForceLogoutStream();
+
+    window.addEventListener('storage', syncAuthState);
+    window.addEventListener('ke:force-logout', syncAuthState);
+
+    void validateSession();
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('storage', syncAuthState);
+      window.removeEventListener('ke:force-logout', syncAuthState);
+      forceLogoutStream?.close();
+    };
+  }, []);
+
   const appContent = useMemo(() => {
     if (displayedRouteKey === 'signup') return <SignupPage />;
     if (displayedRouteKey === 'signup-confirmation-sent') return <SignupConfirmationSentPage />;
@@ -138,8 +207,12 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'deposit') return <ProtectedRoute><DepositPage /></ProtectedRoute>;
     if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
 
+    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions'].includes(displayedRouteKey)) {
+      return <LandingPage />;
+    }
+
     return <LandingPage />;
-  }, [displayedRouteKey]);
+  }, [displayedRouteKey, isAuthenticated]);
 
   const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions';
 
