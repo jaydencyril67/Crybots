@@ -239,7 +239,7 @@ const SettingsPage = () => {
   const cropInputRef = useRef<HTMLInputElement | null>(null);
   const avatarImageRef = useRef<HTMLImageElement | null>(null);
   const cropOverlayRef = useRef<HTMLDivElement | null>(null);
-  const cropDragStateRef = useRef<{ mode: 'move' | 'resize' | null; startX: number; startY: number; startBox: CropBox | null; startSize: number | null }>({ mode: null, startX: 0, startY: 0, startBox: null, startSize: null });
+  const cropDragStateRef = useRef<{ mode: 'move' | 'resize' | null; startX: number; startY: number; startBox: CropBox | null; startSize: number | null; offsetX: number; offsetY: number }>({ mode: null, startX: 0, startY: 0, startBox: null, startSize: null, offsetX: 0, offsetY: 0 });
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -606,6 +606,8 @@ const SettingsPage = () => {
       startY: event.clientY,
       startBox: cropBox,
       startSize: cropBox.size,
+      offsetX: event.clientX - cropBox.x,
+      offsetY: event.clientY - cropBox.y,
     };
   };
 
@@ -621,8 +623,8 @@ const SettingsPage = () => {
     if (dragState.mode === 'move') {
       setCropBox({
         ...dragState.startBox,
-        x: dragState.startBox.x + deltaX,
-        y: dragState.startBox.y + deltaY,
+        x: event.clientX - dragState.offsetX,
+        y: event.clientY - dragState.offsetY,
       });
       return;
     }
@@ -630,14 +632,10 @@ const SettingsPage = () => {
     const delta = Math.max(deltaX, deltaY);
     const nextSize = Math.max(48, (dragState.startSize ?? dragState.startBox.size) + delta);
 
-    setCropBox((currentBox) => {
-      const nextBox = {
-        ...dragState.startBox,
-        size: nextSize,
-      };
-
-      return clampCropBox(nextBox);
-    });
+    setCropBox(clampCropBox({
+      ...dragState.startBox,
+      size: nextSize,
+    }));
   };
 
   const handleCropPointerUp = (event: React.PointerEvent<HTMLElement>) => {
@@ -647,6 +645,8 @@ const SettingsPage = () => {
       dragState.startBox = null;
       dragState.startSize = null;
     }
+    dragState.offsetX = 0;
+    dragState.offsetY = 0;
     event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
