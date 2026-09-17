@@ -46,32 +46,27 @@ const styles = {
     gap: '10px',
     marginTop: '6px',
   },
-  button: {
+  card: {
+    display: 'grid',
+    gap: '6px',
     width: '100%',
     padding: '16px 18px',
     borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.08)',
     background: 'rgba(255,255,255,0.04)',
     color: '#ffffff',
-    fontSize: '1rem',
-    fontWeight: 800,
     textAlign: 'left' as const,
-    cursor: 'pointer',
     boxSizing: 'border-box' as const,
   },
-  buttonSubtext: {
-    margin: '6px 0 0',
+  cardSubtext: {
+    margin: 0,
     fontSize: '0.86rem',
     color: '#b3b3b3',
     lineHeight: 1.6,
   },
-  buttonStack: {
-    display: 'grid',
-    gap: '6px',
-  },
 };
 
-const getButtonStyle = () => styles.button;
+const getCardStyle = () => styles.card;
 
 const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
 
@@ -101,12 +96,10 @@ const PortfolioPage = () => {
 
             <div style={styles.buttonList}>
               {pageButtons.map((label) => (
-                <button key={label} type="button" style={getButtonStyle()} onClick={() => handleButtonClick(label)}>
-                  <div style={styles.buttonStack}>
-                    <span>{label}</span>
-                    {label === 'Danger' ? <p style={styles.buttonSubtext}>Account recovery and irreversible actions.</p> : null}
-                  </div>
-                </button>
+                <section key={label} style={getCardStyle()}>
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>{label}</h3>
+                  {label === 'Danger' ? <p style={styles.cardSubtext}>Account recovery and irreversible actions.</p> : null}
+                </section>
               ))}
             </div>
           </div>
