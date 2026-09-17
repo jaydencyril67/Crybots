@@ -55,7 +55,7 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '16px',
+    gap: '22px',
     marginTop: '18px',
   },
   sectionTitle: {
@@ -74,19 +74,19 @@ const styles = {
   },
   block: {
     display: 'grid',
-    gap: '10px',
+    gap: '12px',
     paddingTop: '8px',
   },
   rowList: {
     display: 'grid',
-    gap: '0',
+    gap: '10px',
   },
   row: {
     width: '100%',
     background: 'transparent',
     border: 'none',
     borderBottom: '1px solid rgba(255,255,255,0.1)',
-    padding: '14px 0',
+    padding: '16px 0',
     display: 'grid',
     gap: '6px',
     textAlign: 'left' as const,
