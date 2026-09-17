@@ -48,6 +48,12 @@ const getButtonStyle = (label: string, mode: 'light' | 'dark') => {
 const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
 
 const PortfolioPage = () => {
+  const handleButtonClick = (label: string) => {
+    if (label === 'Details') {
+      navigate('/profile');
+    }
+  };
+
   return (
     <HybridTheme mode="dark">
       <div style={styles.page}>
@@ -56,7 +62,7 @@ const PortfolioPage = () => {
           <div style={styles.content}>
             <div style={styles.buttonList}>
               {pageButtons.map((label) => (
-                <button key={label} type="button" style={getButtonStyle(label, 'dark')}>
+                <button key={label} type="button" style={getButtonStyle(label, 'dark')} onClick={() => handleButtonClick(label)}>
                   {label}
                 </button>
               ))}
