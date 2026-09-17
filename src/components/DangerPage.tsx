@@ -35,8 +35,12 @@ const styles = {
   },
   section: {
     display: 'grid',
-    gap: '0',
-    paddingTop: '0',
+    gap: '16px',
+    padding: '24px',
+    borderRadius: '20px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.06)',
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.14)',
   },
   sectionTitle: {
     margin: 0,
@@ -44,7 +48,6 @@ const styles = {
     fontWeight: 900,
     letterSpacing: '-0.02em',
     color: '#ffffff',
-    marginBottom: '12px',
   },
   sectionText: {
     margin: 0,
@@ -92,7 +95,7 @@ const styles = {
   buttonRow: {
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: '18px',
+    marginBottom: '0',
   },
   actionButton: {
     borderRadius: '0',
