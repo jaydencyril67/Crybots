@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import * as ImageCrop from '@cloudimage/image-crop';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
@@ -45,6 +44,13 @@ type AvatarEditorState = {
   source: string;
   fileName: string;
   file: File;
+  crop: AvatarCropState;
+};
+
+type AvatarCropState = {
+  x: number;
+  y: number;
+  scale: number;
 };
 
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
@@ -231,7 +237,11 @@ const SettingsPage = () => {
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const cropInputRef = useRef<HTMLInputElement | null>(null);
-  const cropEditorRef = useRef<any>(null);
+  const cropContainerRef = useRef<HTMLDivElement | null>(null);
+  const cropImageRef = useRef<HTMLImageElement | null>(null);
+  const cropStartRef = useRef<{ x: number; y: number; pointerId: number } | null>(null);
+  const [cropBoxSize, setCropBoxSize] = useState(0);
+  const [cropReady, setCropReady] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -549,7 +559,14 @@ const SettingsPage = () => {
 
   const openAvatarEditor = (file: File) => {
     const source = URL.createObjectURL(file);
-    setAvatarEditor({ source, fileName: file.name || `avatar-${Date.now()}.png`, file });
+    setAvatarEditor({
+      source,
+      fileName: file.name || `avatar-${Date.now()}.png`,
+      file,
+      crop: { x: 0, y: 0, scale: 1 },
+    });
+    setCropReady(false);
+    setCropBoxSize(0);
   };
 
   const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -575,6 +592,8 @@ const SettingsPage = () => {
     if (cropInputRef.current) {
       cropInputRef.current.value = '';
     }
+    setCropReady(false);
+    setCropBoxSize(0);
   };
 
   const avatarDisplayStyle = {
@@ -590,13 +609,35 @@ const SettingsPage = () => {
   };
 
   const handleCropDone = async () => {
-    const editor = cropEditorRef.current;
-    if (!editor?.getCroppedBlob) {
+    const editor = avatarEditor;
+    const image = cropImageRef.current;
+    if (!editor || !image || !cropBoxSize) {
       showStatus('error', 'Unable to prepare the cropped image.');
       return;
     }
 
-    const croppedBlob = await editor.getCroppedBlob();
+    const crop = editor.crop;
+    const naturalWidth = image.naturalWidth || image.width;
+    const naturalHeight = image.naturalHeight || image.height;
+    const baseSize = Math.min(naturalWidth, naturalHeight);
+    const cropSize = baseSize / Math.max(crop.scale, 0.1);
+    const centerX = naturalWidth / 2 - crop.x / crop.scale;
+    const centerY = naturalHeight / 2 - crop.y / crop.scale;
+    const sourceX = Math.max(0, Math.min(naturalWidth - cropSize, centerX - cropSize / 2));
+    const sourceY = Math.max(0, Math.min(naturalHeight - cropSize, centerY - cropSize / 2));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1024;
+    const context = canvas.getContext('2d');
+    if (!context) {
+      showStatus('error', 'Unable to prepare the cropped image.');
+      return;
+    }
+
+    context.drawImage(image, sourceX, sourceY, cropSize, cropSize, 0, 0, canvas.width, canvas.height);
+
+    const croppedBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png', 1));
     if (!croppedBlob) {
       showStatus('error', 'Adjust your photo before saving.');
       return;
@@ -604,9 +645,7 @@ const SettingsPage = () => {
 
     setAvatarUploading(true);
     try {
-      const croppedFile = croppedBlob instanceof File
-        ? croppedBlob
-        : new File([croppedBlob], `avatar-${Date.now()}.png`, { type: croppedBlob.type || 'image/png' });
+      const croppedFile = new File([croppedBlob], `avatar-${Date.now()}.png`, { type: croppedBlob.type || 'image/png' });
       const authResponse = await api.get('/api/imagekit/auth');
       const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
@@ -616,7 +655,7 @@ const SettingsPage = () => {
 
       const uploadFormData = new FormData();
       uploadFormData.append('file', croppedFile);
-      uploadFormData.append('fileName', avatarEditor?.fileName || croppedFile.name);
+      uploadFormData.append('fileName', editor.fileName || croppedFile.name);
       uploadFormData.append('useUniqueFileName', 'true');
       uploadFormData.append('token', auth.token);
       uploadFormData.append('expire', String(auth.expire));
