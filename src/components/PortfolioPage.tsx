@@ -1,6 +1,6 @@
 import React from 'react';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme from './HybridTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
@@ -19,32 +19,55 @@ const styles = {
     boxSizing: 'border-box' as const,
   },
   content: {
-    paddingTop: '8px',
+    display: 'grid',
+    gap: '18px',
+    marginTop: '18px',
+  },
+  section: {
+    display: 'grid',
+    gap: '10px',
+  },
+  sectionTitle: {
+    margin: 0,
+    fontSize: '1.45rem',
+    fontWeight: 900,
+    letterSpacing: '-0.02em',
+    color: '#ffffff',
+  },
+  sectionText: {
+    margin: 0,
+    fontSize: '0.92rem',
+    color: '#a3a3a3',
+    lineHeight: 1.7,
+    maxWidth: '62ch',
   },
   buttonList: {
     display: 'grid',
-    gap: '12px',
-    marginTop: '18px',
+    gap: '6px',
+    marginTop: '6px',
+  },
+  button: {
+    width: '100%',
+    padding: '14px 0',
+    borderRadius: '0',
+    border: 'none',
+    borderBottom: '1px solid rgba(255,255,255,0.12)',
+    background: 'transparent',
+    color: '#ffffff',
+    fontSize: '1rem',
+    fontWeight: 800,
+    textAlign: 'left' as const,
+    cursor: 'pointer',
+  },
+  buttonSubtext: {
+    margin: '6px 0 0',
+    fontSize: '0.86rem',
+    color: '#b3b3b3',
+    lineHeight: 1.6,
   },
 };
 
-const getButtonStyle = (label: string, mode: 'light' | 'dark') => {
-  const theme = HYBRID_THEME_TOKENS[mode];
-  const isDanger = label === 'Danger';
-
-  return {
-    width: '100%',
-    padding: '16px 18px',
-    borderRadius: '16px',
-    border: `1px solid ${isDanger ? theme.danger : theme.border}`,
-    background: isDanger ? theme.primarySoft : theme.surface,
-    color: isDanger ? theme.danger : theme.text,
-    fontSize: '1rem',
-    fontWeight: 700,
-    textAlign: 'left' as const,
-    cursor: 'pointer',
-  };
-};
+const getButtonStyle = () => styles.button;
 
 const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
 
@@ -64,10 +87,16 @@ const PortfolioPage = () => {
         <div style={styles.shell}>
           <AppHeader />
           <div style={styles.content}>
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}>Portfolio</h2>
+              <p style={styles.sectionText}>Select a section below. These are page actions for now, not navigation tabs.</p>
+            </section>
+
             <div style={styles.buttonList}>
               {pageButtons.map((label) => (
-                <button key={label} type="button" style={getButtonStyle(label, 'dark')} onClick={() => handleButtonClick(label)}>
+                <button key={label} type="button" style={getButtonStyle()} onClick={() => handleButtonClick(label)}>
                   {label}
+                  {label === 'Danger' ? <p style={styles.buttonSubtext}>Account recovery and irreversible actions.</p> : null}
                 </button>
               ))}
             </div>
