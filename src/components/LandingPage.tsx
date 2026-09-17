@@ -36,7 +36,7 @@ const features = [
 ];
 
 const steps = [
-  'Create your KingsHall profile in minutes.',
+  'Create your KingsHall portfolio in minutes.',
   'Fund your account with crypto or supported payment rails.',
   'Trade, invest, and track your growth in one elegant dashboard.',
 ];

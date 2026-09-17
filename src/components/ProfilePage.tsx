@@ -360,7 +360,7 @@ const ProfilePage = () => {
   return (
     <>
       <Helmet>
-        <title>KingsHall Exchange | Profile</title>
+        <title>KingsHall Exchange | Portfolio</title>
       </Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>

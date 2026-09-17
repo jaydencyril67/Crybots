@@ -46,7 +46,7 @@ const getRouteKey = () => {
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
   if (pathname === '/forgot-password' || hash === '#/forgot-password') return 'forgot-password';
   if (pathname === '/dashboard' || hash === '#/dashboard') return 'dashboard';
-  if (pathname === '/profile' || hash === '#/profile') return 'profile';
+  if (pathname === '/portfolio' || hash === '#/portfolio') return 'portfolio';
   if (pathname === '/staking' || hash === '#/staking') return 'staking';
   if (pathname === '/settings' || hash === '#/settings') return 'settings';
   if (pathname === '/withdrawals' || hash === '#/withdrawals') return 'withdrawals';
@@ -64,7 +64,7 @@ const routeToKey = (path: string) => {
   if (path === '/signin' || path === '#/signin') return 'signin';
   if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
   if (path === '/dashboard' || path === '#/dashboard') return 'dashboard';
-  if (path === '/profile' || path === '#/profile') return 'profile';
+  if (path === '/portfolio' || path === '#/portfolio') return 'portfolio';
   if (path === '/staking' || path === '#/staking') return 'staking';
   if (path === '/settings' || path === '#/settings') return 'settings';
   if (path === '/withdrawals' || path === '#/withdrawals') return 'withdrawals';
@@ -118,7 +118,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'signin') return <SigninPage />;
     if (displayedRouteKey === 'forgot-password') return <ForgotPasswordPage />;
     if (displayedRouteKey === 'dashboard') return <ProtectedRoute><DashboardPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
+    if (displayedRouteKey === 'portfolio') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
     if (displayedRouteKey === 'staking') return <ProtectedRoute><StakingPage /></ProtectedRoute>;
     if (displayedRouteKey === 'settings') return <ProtectedRoute><SettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'withdrawals') return <ProtectedRoute><WithdrawalsPage /></ProtectedRoute>;
@@ -129,7 +129,7 @@ const RouteTransition = () => {
     return <LandingPage />;
   }, [displayedRouteKey]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions';
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions';
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflowX: 'hidden' }}>

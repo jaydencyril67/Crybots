@@ -191,7 +191,7 @@ const getActivePath = () => window.location.pathname || window.location.hash.rep
 
 const getCurrentPageTitle = (path: string) => {
   if (path === '/dashboard') return 'DASHBOARD';
-  if (path === '/profile') return 'PROFILE';
+  if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/staking') return 'STAKING';
   if (path === '/settings') return 'SETTINGS';
   if (path === '/withdrawals') return 'WITHDRAW';
@@ -243,12 +243,12 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/transfer',
   },
   {
-    label: 'Profile',
+    label: 'Portfolio',
     icon: <CircleUserRound size={18} />,
     onClick: () => {
-      navigate('/profile');
+      navigate('/portfolio');
     },
-    active: getActivePath() === '/profile',
+    active: getActivePath() === '/portfolio',
   },
   {
     label: 'Transactions',

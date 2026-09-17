@@ -622,7 +622,7 @@ const SignupPage = () => {
                 </div>
 
                 <p style={styles.stepLabel}>{current.title}</p>
-                <h3 style={styles.stepTitle}>Let’s set up your profile</h3>
+                <h3 style={styles.stepTitle}>Let’s set up your portfolio</h3>
                 <p style={styles.stepDesc}>{current.description}</p>
 
                 <div style={styles.form}>{currentField}</div>

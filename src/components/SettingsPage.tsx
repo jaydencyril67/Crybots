@@ -584,7 +584,7 @@ const SettingsPage = () => {
       });
 
       setAvatarPreview(uploadedFile.secure_url);
-      showStatus('success', 'Profile picture updated.');
+      showStatus('success', 'Portfolio picture updated.');
     } catch (error) {
       console.error('[SettingsPage] avatar upload failed:', error);
       showStatus('error', error instanceof Error ? error.message : 'Unable to upload image.');
@@ -624,7 +624,7 @@ const SettingsPage = () => {
             ) : null}
 
             <section style={styles.card}>
-              <h2 style={styles.cardTitle}><UserCircle2 size={18} /> Profile picture</h2>
+              <h2 style={styles.cardTitle}><UserCircle2 size={18} /> Portfolio picture</h2>
               <p style={styles.cardText}>Choose a photo and upload it directly as-is.</p>
               <div style={{ display: 'grid', gap: '14px', marginTop: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
@@ -742,7 +742,7 @@ const SettingsPage = () => {
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><WalletCards size={18} /> Withdrawal wallet</h2>
-                <p style={styles.cardText}>Bind your TRC-20 wallet address now so withdrawals can be added later without changing your profile again.</p>
+                <p style={styles.cardText}>Bind your TRC-20 wallet address now so withdrawals can be added later without changing your portfolio again.</p>
                 <div style={styles.formGrid}>
                   <label style={styles.field}>
                     <span style={styles.label}>TRC-20 wallet address</span>
