@@ -275,6 +275,7 @@ type MeResponse = {
   user?: ProfileDetails;
 };
 
+
 const ProfilePage = () => {
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
@@ -337,6 +338,7 @@ const ProfilePage = () => {
   }, []);
 
   const profileDetails = liveProfile;
+  const avatarPicture = profileDetails?.profilePicture ?? null;
   const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
   const email = profileDetails?.email || 'Not available';
   const uid = profileDetails?.uid || 'Pending confirmation';
@@ -370,12 +372,10 @@ const ProfilePage = () => {
                   <div
                     style={{
                       ...styles.avatar,
-                      backgroundImage: liveProfile?.profilePicture
-                        ? `url(${liveProfile.profilePicture}${liveProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()})`
-                        : styles.avatar.background,
+                      backgroundImage: avatarPicture ? `url(${avatarPicture})` : styles.avatar.background,
                     }}
                   >
-                    {liveProfile?.profilePicture ? null : <CircleUserRound style={styles.avatarIcon} />}
+                    {avatarPicture ? null : <CircleUserRound style={styles.avatarIcon} />}
                   </div>
                  </div>
               </section>
