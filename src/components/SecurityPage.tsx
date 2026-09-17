@@ -142,10 +142,7 @@ const styles = {
     overflowWrap: 'anywhere' as const,
   },
   tableMeta: {
-    margin: '6px 0 0',
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
-    fontSize: '0.88rem',
-    lineHeight: 1.6,
+    display: 'none',
   },
   rowList: {
     display: 'grid',
@@ -494,7 +491,6 @@ const SecurityPage = () => {
                             <td style={styles.tableCell}>
                               <p style={styles.tableLabel}>Location</p>
                               <p style={styles.tableValue}>{session.location || 'Location unavailable'}</p>
-                              <p style={styles.tableMeta}>{[session.city, session.region].filter(Boolean).join(', ') || 'Precise area unavailable'}</p>
                             </td>
                             <td style={styles.tableCell}>
                               <p style={styles.tableLabel}>Country</p>
@@ -511,11 +507,10 @@ const SecurityPage = () => {
                             <td style={styles.tableCell}>
                               <p style={styles.tableLabel}>Status</p>
                               <p style={styles.tableValue}>{isCurrent ? 'Current device' : `Device ${index + 1}`}</p>
-                              <p style={styles.tableMeta}>{isCurrent ? 'Active now' : 'Stored session'}</p>
                             </td>
                             <td style={styles.tableCell}>
                               {isCurrent ? (
-                                <p style={styles.tableMeta}>This device cannot be removed from here.</p>
+                                <></>
                               ) : (
                                 <button
                                   type="button"
