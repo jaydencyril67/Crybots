@@ -629,7 +629,8 @@ const SettingsPage = () => {
       return;
     }
 
-    const nextSize = (dragState.startSize ?? dragState.startBox.size) + Math.max(deltaX, deltaY);
+    const delta = Math.max(deltaX, deltaY);
+    const nextSize = (dragState.startSize ?? dragState.startBox.size) + delta;
     setCropBox(clampCropBox({
       ...dragState.startBox,
       size: nextSize,
@@ -1007,13 +1008,13 @@ const SettingsPage = () => {
                 />
                 <div
                   role="presentation"
-                  onPointerMove={handleCropPointerMove}
-                  onPointerUp={handleCropPointerUp}
-                  onPointerLeave={handleCropPointerUp}
                   style={{ position: 'absolute', inset: '18px', pointerEvents: 'none' }}
                 >
                   <div
                     onPointerDown={(event) => handleCropPointerDown(event, 'move')}
+                    onPointerMove={handleCropPointerMove}
+                    onPointerUp={handleCropPointerUp}
+                    onPointerCancel={handleCropPointerUp}
                     style={{
                       position: 'absolute',
                       left: `${cropBox.x}px`,
@@ -1026,10 +1027,14 @@ const SettingsPage = () => {
                       background: 'transparent',
                       cursor: 'move',
                       pointerEvents: 'auto',
+                      touchAction: 'none',
                     }}
                   >
                     <div
                       onPointerDown={(event) => handleCropPointerDown(event, 'resize')}
+                      onPointerMove={handleCropPointerMove}
+                      onPointerUp={handleCropPointerUp}
+                      onPointerCancel={handleCropPointerUp}
                       style={{
                         position: 'absolute',
                         right: '-10px',
@@ -1041,6 +1046,7 @@ const SettingsPage = () => {
                         border: '2px solid #050816',
                         cursor: 'nwse-resize',
                         pointerEvents: 'auto',
+                        touchAction: 'none',
                       }}
                     />
                   </div>
