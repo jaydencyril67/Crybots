@@ -44,13 +44,12 @@ type AvatarEditorState = {
   source: string;
   fileName: string;
   file: File;
-  crop: AvatarCropState;
 };
 
-type AvatarCropState = {
+type CropBox = {
   x: number;
   y: number;
-  scale: number;
+  size: number;
 };
 
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
@@ -236,9 +235,11 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [cropBox, setCropBox] = useState<CropBox>({ x: 70, y: 70, size: 160 });
   const cropInputRef = useRef<HTMLInputElement | null>(null);
-  const cropContainerRef = useRef<HTMLDivElement | null>(null);
-  const cropEditorRef = useRef<any>(null);
+  const avatarImageRef = useRef<HTMLImageElement | null>(null);
+  const cropOverlayRef = useRef<HTMLDivElement | null>(null);
+  const cropDragStateRef = useRef<{ mode: 'move' | 'resize' | null; startX: number; startY: number; startBox: CropBox | null; startSize: number | null }>({ mode: null, startX: 0, startY: 0, startBox: null, startSize: null });
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -560,8 +561,8 @@ const SettingsPage = () => {
       source,
       fileName: file.name || `avatar-${Date.now()}.png`,
       file,
-      crop: { x: 0, y: 0, scale: 1 },
     });
+    setCropBox({ x: 70, y: 70, size: 160 });
   };
 
   const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -587,8 +588,63 @@ const SettingsPage = () => {
     if (cropInputRef.current) {
       cropInputRef.current.value = '';
     }
-    setCropReady(false);
-    setCropBoxSize(0);
+  };
+
+  const clampCropBox = (nextBox: CropBox) => {
+    const imageSize = avatarImageRef.current?.getBoundingClientRect();
+    const limit = imageSize ? Math.min(imageSize.width, imageSize.height) : 320;
+    const size = Math.max(80, Math.min(nextBox.size, limit));
+    const x = Math.max(0, Math.min(nextBox.x, limit - size));
+    const y = Math.max(0, Math.min(nextBox.y, limit - size));
+    return { x, y, size };
+  };
+
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>, mode: 'move' | 'resize') => {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    cropDragStateRef.current = {
+      mode,
+      startX: event.clientX,
+      startY: event.clientY,
+      startBox: cropBox,
+      startSize: cropBox.size,
+    };
+  };
+
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const dragState = cropDragStateRef.current;
+    if (!dragState.mode || !dragState.startBox) {
+      return;
+    }
+
+    const deltaX = event.clientX - dragState.startX;
+    const deltaY = event.clientY - dragState.startY;
+
+    if (dragState.mode === 'move') {
+      setCropBox(clampCropBox({
+        ...dragState.startBox,
+        x: dragState.startBox.x + deltaX,
+        y: dragState.startBox.y + deltaY,
+      }));
+      return;
+    }
+
+    const delta = Math.max(deltaX, deltaY);
+    const nextSize = (dragState.startSize ?? dragState.startBox.size) + delta;
+    setCropBox(clampCropBox({
+      ...dragState.startBox,
+      size: nextSize,
+    }));
+  };
+
+  const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const dragState = cropDragStateRef.current;
+    if (dragState.mode) {
+      dragState.mode = null;
+      dragState.startBox = null;
+      dragState.startSize = null;
+    }
+    event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
   const avatarDisplayStyle = {
@@ -603,24 +659,24 @@ const SettingsPage = () => {
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
   };
 
-  const handleCropDone = async () => {
-    const editor = cropEditorRef.current;
-    if (!editor?.getCroppedBlob) {
-      showStatus('error', 'Unable to prepare the cropped image.');
+  const handleAvatarUpload = async () => {
+    const file = avatarEditor?.file;
+    const image = avatarImageRef.current;
+
+    if (!file || !image) {
+      showStatus('error', 'Unable to load the selected image.');
       return;
     }
 
-    const croppedBlob = await editor.getCroppedBlob();
-    if (!croppedBlob) {
-      showStatus('error', 'Adjust your photo before saving.');
-      return;
-    }
+    const imageRect = image.getBoundingClientRect();
+    const displaySize = Math.min(imageRect.width, imageRect.height) || 320;
+    const scale = (image.naturalWidth && image.naturalHeight) ? Math.min(image.naturalWidth, image.naturalHeight) / displaySize : 1;
+    const cropSize = Math.round(cropBox.size * scale);
+    const cropX = Math.round(cropBox.x * scale);
+    const cropY = Math.round(cropBox.y * scale);
 
     setAvatarUploading(true);
     try {
-      const croppedFile = croppedBlob instanceof File
-        ? croppedBlob
-        : new File([croppedBlob], `avatar-${Date.now()}.png`, { type: croppedBlob.type || 'image/png' });
       const authResponse = await api.get('/api/imagekit/auth');
       const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
@@ -628,9 +684,26 @@ const SettingsPage = () => {
         throw new Error('Unable to prepare image upload.');
       }
 
+      const canvas = document.createElement('canvas');
+      canvas.width = cropSize;
+      canvas.height = cropSize;
+      const context = canvas.getContext('2d');
+
+      if (!context) {
+        throw new Error('Unable to prepare image crop.');
+      }
+
+      context.drawImage(image, cropX, cropY, cropSize, cropSize, 0, 0, cropSize, cropSize);
+
+      const croppedBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob((blob) => resolve(blob), file.type || 'image/png'));
+      if (!croppedBlob) {
+        throw new Error('Unable to prepare cropped image.');
+      }
+
+      const croppedFile = new File([croppedBlob], avatarEditor?.fileName || file.name, { type: croppedBlob.type || file.type || 'image/png' });
       const uploadFormData = new FormData();
       uploadFormData.append('file', croppedFile);
-      uploadFormData.append('fileName', avatarEditor?.fileName || croppedFile.name);
+      uploadFormData.append('fileName', croppedFile.name);
       uploadFormData.append('useUniqueFileName', 'true');
       uploadFormData.append('token', auth.token);
       uploadFormData.append('expire', String(auth.expire));
@@ -918,28 +991,69 @@ const SettingsPage = () => {
             <div style={{ width: '100%', height: '100%', maxWidth: '100%', borderRadius: 0, background: 'linear-gradient(180deg, rgba(9,13,25,0.98), rgba(4,8,16,0.98))', border: 'none', padding: '0', display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 0 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                 <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Cancel</button>
-                <span style={{ color: '#c6d3ea', fontSize: '0.95rem', fontWeight: 700 }}>Edit photo</span>
-                <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '10px 14px' }} onClick={() => void handleCropDone()} disabled={avatarUploading}>
-                  {avatarUploading ? 'Saving...' : 'Done'}
+                <span style={{ color: '#c6d3ea', fontSize: '0.95rem', fontWeight: 700 }}>Crop photo</span>
+                <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '10px 14px' }} onClick={() => void handleAvatarUpload()} disabled={avatarUploading}>
+                  {avatarUploading ? 'Saving...' : 'Crop & upload'}
                 </button>
               </div>
-              <div style={{ position: 'relative', minHeight: 0, overflow: 'hidden' }}>
-                <ImageCrop
-                  ref={cropEditorRef}
+              <div
+                ref={cropOverlayRef}
+                style={{ position: 'relative', minHeight: '320px', overflow: 'hidden', display: 'grid', placeItems: 'center', padding: '18px' }}
+              >
+                <img
+                  ref={avatarImageRef}
                   src={avatarEditor.source}
-                  width="100%"
-                  height="100%"
-                  aspectRatio={1}
-                  cropShape="round"
-                  showGrid
-                  showZoom
-                  showRotate
-                  backgroundColor="#050816"
-                  darkOverlayColor="rgba(3, 7, 20, 0.72)"
+                  alt="Selected avatar preview"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', filter: 'saturate(1.08) contrast(1.04)' }}
                 />
+                <div
+                  role="presentation"
+                  style={{ position: 'absolute', inset: '18px', pointerEvents: 'none' }}
+                >
+                  <div
+                    onPointerDown={(event) => handleCropPointerDown(event, 'move')}
+                    onPointerMove={handleCropPointerMove}
+                    onPointerUp={handleCropPointerUp}
+                    onPointerCancel={handleCropPointerUp}
+                    style={{
+                      position: 'absolute',
+                      left: `${cropBox.x}px`,
+                      top: `${cropBox.y}px`,
+                      width: `${cropBox.size}px`,
+                      height: `${cropBox.size}px`,
+                      border: '2px solid rgba(125, 211, 252, 0.95)',
+                      borderRadius: '18px',
+                      boxShadow: '0 0 0 9999px rgba(3, 7, 20, 0.45)',
+                      background: 'transparent',
+                      cursor: 'move',
+                      pointerEvents: 'auto',
+                      touchAction: 'none',
+                    }}
+                  >
+                    <div
+                      onPointerDown={(event) => handleCropPointerDown(event, 'resize')}
+                      onPointerMove={handleCropPointerMove}
+                      onPointerUp={handleCropPointerUp}
+                      onPointerCancel={handleCropPointerUp}
+                      style={{
+                        position: 'absolute',
+                        right: '-10px',
+                        bottom: '-10px',
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '999px',
+                        background: '#7dd3fc',
+                        border: '2px solid #050816',
+                        cursor: 'nwse-resize',
+                        pointerEvents: 'auto',
+                        touchAction: 'none',
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                <span style={{ color: '#8ea2c7', fontSize: '0.9rem' }}>Drag to reposition, pinch to zoom, and rotate if needed.</span>
+              <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <span style={{ color: '#8ea2c7', fontSize: '0.9rem', marginRight: 'auto' }}>Drag the crop box or resize it from the corner.</span>
                 <label style={{ ...styles.button, background: 'rgba(255,255,255,0.06)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                   <Upload size={16} />
                   <span>Choose another photo</span>
