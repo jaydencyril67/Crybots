@@ -5,7 +5,6 @@ export interface User {
     createdAt: Date;
     btcBalance: number;
     profilePicture?: string;
-    profilePictureFileId?: string;
 }
 
 export interface PortfolioItem {

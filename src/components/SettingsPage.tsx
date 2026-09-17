@@ -26,7 +26,6 @@ type MeResponse = {
     email?: string;
     walletAddress?: string;
     profilePicture?: string;
-    profilePictureFileId?: string;
   };
 };
 
@@ -693,10 +692,10 @@ const SettingsPage = () => {
 
     setAvatarUploading(true);
     try {
-      const authResponse = await api.get('/api/imagekit/upload');
-      const auth = authResponse.data as { publicKey?: string; uploadPreset?: string };
+      const authResponse = await api.get('/api/cloudinary/upload');
+      const auth = authResponse.data as { cloudName?: string; uploadPreset?: string };
 
-      if (!auth.publicKey || !auth.uploadPreset) {
+      if (!auth.cloudName || !auth.uploadPreset) {
         throw new Error('Unable to prepare image upload.');
       }
 
@@ -719,13 +718,9 @@ const SettingsPage = () => {
       const croppedFile = new File([croppedBlob], avatarEditor?.fileName || file.name, { type: croppedBlob.type || file.type || 'image/png' });
       const uploadFormData = new FormData();
       uploadFormData.append('file', croppedFile);
-      uploadFormData.append('fileName', croppedFile.name);
-      uploadFormData.append('useUniqueFileName', 'true');
-      uploadFormData.append('publicKey', auth.publicKey);
-      uploadFormData.append('uploadPreset', auth.uploadPreset);
-      uploadFormData.append('folder', 'kingshall/avatars');
+      uploadFormData.append('upload_preset', auth.uploadPreset);
 
-      const uploadResponse = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${auth.cloudName}/image/upload`, {
         method: 'POST',
         body: uploadFormData,
       });
@@ -734,14 +729,13 @@ const SettingsPage = () => {
         throw new Error('Unable to upload profile picture.');
       }
 
-      const uploadedFile = await uploadResponse.json() as { url?: string };
-      if (!uploadedFile.url) {
+      const uploadedFile = await uploadResponse.json() as { secure_url?: string };
+      if (!uploadedFile.secure_url) {
         throw new Error('Image upload did not return a usable URL.');
       }
 
       await api.patch('/api/settings/profile-picture', {
-        profilePicture: uploadedFile.url,
-        profilePictureFileId: undefined,
+        profilePicture: uploadedFile.secure_url,
       });
 
       const { data: refreshedAccount } = await api.get<MeResponse>('/api/auth/me');
