@@ -25,8 +25,14 @@ const styles = {
   content: {
     paddingTop: '8px',
     display: 'grid',
-    gap: '12px',
+    gap: '18px',
     marginTop: '18px',
+  },
+  card: {
+    borderRadius: '22px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.04)',
+    padding: '18px',
   },
   sectionTitle: {
     margin: 0,
@@ -222,7 +228,7 @@ const ProfilePage = () => {
             <AppHeader />
 
             <div style={styles.content}>
-              <section>
+              <section style={styles.card}>
                 <h1 style={styles.sectionTitle}>Details</h1>
                 <p style={styles.sectionSub}>Your account summary is shown here in a simple direct layout.</p>
               </section>

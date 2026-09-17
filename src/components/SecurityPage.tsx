@@ -55,8 +55,14 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '22px',
+    gap: '18px',
     marginTop: '18px',
+  },
+  card: {
+    borderRadius: '22px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.04)',
+    padding: '18px',
   },
   sectionTitle: {
     margin: 0,
@@ -83,10 +89,10 @@ const styles = {
   },
   row: {
     width: '100%',
-    background: 'transparent',
-    border: 'none',
-    borderBottom: '1px solid rgba(255,255,255,0.1)',
-    padding: '16px 0',
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '18px',
+    padding: '16px',
     display: 'grid',
     gap: '6px',
     textAlign: 'left' as const,
@@ -317,7 +323,7 @@ const SecurityPage = () => {
           </Helmet>
           <AppHeader />
           <div style={styles.content}>
-            <section style={styles.block}>
+            <section style={styles.card}>
               <h1 style={styles.sectionTitle}>Security</h1>
               <p style={styles.sectionText}>Manage identity, sign-in protection, device access, and future security tooling from one flat, direct page.</p>
             </section>
