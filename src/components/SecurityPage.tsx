@@ -184,7 +184,7 @@ const SecurityPage = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await api.get<SecurityMeResponse>('/api/security/me');
+        const { data } = await api.get<SecurityMeResponse>('/api/settings/me');
         setUid(data.user?.uid ?? '');
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
         setTwoFactorEnabled(Boolean(data.user?.twoFactorEnabled));
