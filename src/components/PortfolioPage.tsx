@@ -70,8 +70,6 @@ const styles = {
     textAlign: 'left' as const,
     boxSizing: 'border-box' as const,
     cursor: 'pointer',
-    appearance: 'none',
-    WebkitAppearance: 'none',
   },
   cardSubtext: {
     margin: 0,
