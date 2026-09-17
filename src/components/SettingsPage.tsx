@@ -628,11 +628,15 @@ const SettingsPage = () => {
     }
 
     const delta = Math.max(deltaX, deltaY);
-    const nextSize = (dragState.startSize ?? dragState.startBox.size) + delta;
+    const nextSize = Math.max(48, (dragState.startSize ?? dragState.startBox.size) + delta);
 
-    setCropBox({
-      ...dragState.startBox,
-      size: nextSize,
+    setCropBox((currentBox) => {
+      const nextBox = {
+        ...dragState.startBox,
+        size: nextSize,
+      };
+
+      return clampCropBox(nextBox);
     });
   };
 
@@ -1047,6 +1051,7 @@ const SettingsPage = () => {
                         pointerEvents: 'auto',
                         touchAction: 'none',
                         padding: 0,
+                        zIndex: 2,
                       }}
                     />
                   </div>
