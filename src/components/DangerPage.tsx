@@ -30,12 +30,12 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '28px',
-    marginTop: '18px',
+    gap: '18px',
+    marginTop: '10px',
   },
   section: {
     display: 'grid',
-    gap: '10px',
+    gap: '8px',
     paddingTop: '0',
   },
   sectionTitle: {
@@ -62,12 +62,12 @@ const styles = {
     margin: 0,
     fontSize: '0.88rem',
     color: '#b3b3b3',
-    lineHeight: 1.65,
+    lineHeight: 1.55,
     maxWidth: '64ch',
   },
   field: {
     display: 'grid',
-    gap: '8px',
+    gap: '6px',
     marginTop: '0',
   },
   label: {
@@ -90,7 +90,7 @@ const styles = {
   },
   actionButton: {
     borderRadius: '0',
-    padding: '16px 0',
+    padding: '12px 0',
     border: 'none',
     borderBottom: '1px solid rgba(255,255,255,0.12)',
     cursor: 'pointer',
@@ -100,7 +100,7 @@ const styles = {
     textAlign: 'left' as const,
   },
   status: {
-    marginTop: '4px',
+    marginTop: '2px',
     fontSize: '0.92rem',
     fontWeight: 700,
     color: '#ffffff',
