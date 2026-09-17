@@ -44,7 +44,7 @@ const styles = {
     padding: '16px',
     borderRadius: '18px',
     border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.03)',
+    background: 'rgba(255,255,255,0.04)',
     boxSizing: 'border-box' as const,
     display: 'grid',
     gap: '6px',
