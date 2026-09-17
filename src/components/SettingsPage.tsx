@@ -605,13 +605,6 @@ const SettingsPage = () => {
     background: 'rgba(255,255,255,0.04)',
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
   };
-    const image = avatarImageRef.current;
-
-    if (!file || !image) {
-      showStatus('error', 'Unable to load the selected image.');
-      return;
-    }
-
     setAvatarUploading(true);
     try {
       const authResponse = await api.get('/api/cloudinary/upload');
