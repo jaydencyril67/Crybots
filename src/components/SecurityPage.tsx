@@ -336,7 +336,7 @@ const SecurityPage = () => {
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>
                 <p style={styles.rowValue}>{uid || 'Not set yet'}</p>
                 <div style={styles.control}>
-                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="Edit UID" inputMode="numeric" />
+                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
                   <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? 'Saving...' : 'Save UID'}</button>
                 </div>
               </div>
