@@ -302,9 +302,12 @@ const ProfilePage = () => {
         }
 
         const serverProfile = meResponse.data.user ?? null;
+        const profilePicture = serverProfile?.profilePicture
+          ? `${serverProfile.profilePicture}${serverProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}`
+          : null;
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
         setBalance(nextBalance);
-        setLiveProfile(serverProfile);
+        setLiveProfile(serverProfile ? { ...serverProfile, profilePicture: profilePicture ?? undefined } : null);
         setBalanceError(null);
       } catch {
         if (!isMounted) {

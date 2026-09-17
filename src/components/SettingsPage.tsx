@@ -724,9 +724,10 @@ const SettingsPage = () => {
         profilePictureFileId: uploadedFile.fileId,
       });
       const nextProfile = data?.user ?? null;
-      setAvatarPreview(nextProfile?.profilePicture
+      const nextProfilePicture = nextProfile?.profilePicture
         ? `${nextProfile.profilePicture}${nextProfile.profilePicture.includes('?') ? '&' : '?'}v=${Date.now()}`
-        : null);
+        : null;
+      setAvatarPreview(nextProfilePicture);
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
