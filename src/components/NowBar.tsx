@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, ArrowUpDown, Banknote, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpDown, Banknote, BarChart3, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -194,6 +194,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/profile') return 'PROFILE';
   if (path === '/staking') return 'STAKING';
   if (path === '/settings') return 'SETTINGS';
+  if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/withdrawals') return 'WITHDRAW';
   if (path === '/transfer') return 'TRANSFER';
   if (path === '/deposit') return 'DEPOSIT';
@@ -217,6 +218,14 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/dashboard');
     },
     active: getActivePath() === '/dashboard',
+  },
+  {
+    label: 'Portfolio',
+    icon: <BarChart3 size={18} />,
+    onClick: () => {
+      navigate('/portfolio');
+    },
+    active: getActivePath() === '/portfolio',
   },
   {
     label: 'Staking',
