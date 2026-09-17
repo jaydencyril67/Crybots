@@ -693,10 +693,10 @@ const SettingsPage = () => {
 
     setAvatarUploading(true);
     try {
-      const authResponse = await api.get('/api/imagekit/auth');
-      const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
+      const authResponse = await api.get('/api/imagekit/upload');
+      const auth = authResponse.data as { publicKey?: string };
 
-      if (!auth.publicKey || !auth.token || !auth.expire || !auth.signature) {
+      if (!auth.publicKey) {
         throw new Error('Unable to prepare image upload.');
       }
 
@@ -721,9 +721,6 @@ const SettingsPage = () => {
       uploadFormData.append('file', croppedFile);
       uploadFormData.append('fileName', croppedFile.name);
       uploadFormData.append('useUniqueFileName', 'true');
-      uploadFormData.append('token', auth.token);
-      uploadFormData.append('expire', String(auth.expire));
-      uploadFormData.append('signature', auth.signature);
       uploadFormData.append('publicKey', auth.publicKey);
       uploadFormData.append('folder', 'kingshall/avatars');
 
@@ -736,14 +733,14 @@ const SettingsPage = () => {
         throw new Error('Unable to upload profile picture.');
       }
 
-      const uploadedFile = await uploadResponse.json() as { url?: string; fileId?: string };
+      const uploadedFile = await uploadResponse.json() as { url?: string };
       if (!uploadedFile.url) {
         throw new Error('Image upload did not return a usable URL.');
       }
 
       await api.patch('/api/settings/profile-picture', {
         profilePicture: uploadedFile.url,
-        profilePictureFileId: uploadedFile.fileId,
+        profilePictureFileId: undefined,
       });
 
       const { data: refreshedAccount } = await api.get<MeResponse>('/api/auth/me');
