@@ -599,7 +599,7 @@ const SettingsPage = () => {
     return { x, y, size };
   };
 
-  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>, mode: 'move' | 'resize') => {
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLElement>, mode: 'move' | 'resize') => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     cropDragStateRef.current = {
@@ -611,7 +611,7 @@ const SettingsPage = () => {
     };
   };
 
-  const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLElement>) => {
     const dragState = cropDragStateRef.current;
     if (!dragState.mode || !dragState.startBox) {
       return;
@@ -637,7 +637,7 @@ const SettingsPage = () => {
     }));
   };
 
-  const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handleCropPointerUp = (event: React.PointerEvent<HTMLElement>) => {
     const dragState = cropDragStateRef.current;
     if (dragState.mode) {
       dragState.mode = null;
