@@ -146,6 +146,35 @@ const RouteTransition = () => {
       void validateSession();
     }, 15000);
 
+    const connectForceLogoutStream = () => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        return null;
+      }
+
+      const stream = new EventSource(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/force-logout/stream`, {
+        withCredentials: true,
+      });
+
+      const handleForceLogout = () => {
+        forceLogout();
+        stream.close();
+      };
+
+      stream.addEventListener('force-logout', handleForceLogout);
+      stream.addEventListener('error', () => {
+        stream.close();
+        window.setTimeout(() => {
+          connectForceLogoutStream();
+        }, 5000);
+      });
+
+      return stream;
+    };
+
+    const forceLogoutStream = connectForceLogoutStream();
+
     window.addEventListener('storage', syncAuthState);
     window.addEventListener('ke:force-logout', syncAuthState);
 
@@ -155,6 +184,7 @@ const RouteTransition = () => {
       window.clearInterval(interval);
       window.removeEventListener('storage', syncAuthState);
       window.removeEventListener('ke:force-logout', syncAuthState);
+      forceLogoutStream?.close();
     };
   }, []);
 
