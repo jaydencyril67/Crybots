@@ -669,11 +669,12 @@ const SettingsPage = () => {
     }
 
     const imageRect = image.getBoundingClientRect();
-    const displaySize = Math.min(imageRect.width, imageRect.height) || 320;
-    const scale = (image.naturalWidth && image.naturalHeight) ? Math.min(image.naturalWidth, image.naturalHeight) / displaySize : 1;
-    const cropSize = Math.round(cropBox.size * scale);
-    const cropX = Math.round(cropBox.x * scale);
-    const cropY = Math.round(cropBox.y * scale);
+    const overlaySize = imageRect.width || imageRect.height || 320;
+    const scaleX = image.naturalWidth / overlaySize || 1;
+    const scaleY = image.naturalHeight / overlaySize || 1;
+    const cropX = Math.max(0, Math.round(cropBox.x * scaleX));
+    const cropY = Math.max(0, Math.round(cropBox.y * scaleY));
+    const cropSize = Math.max(1, Math.round(cropBox.size * Math.min(scaleX, scaleY)));
 
     setAvatarUploading(true);
     try {
