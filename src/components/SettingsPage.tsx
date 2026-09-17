@@ -590,10 +590,6 @@ const SettingsPage = () => {
   };
 
   /* Avatar positioning and cropping are provided by react-avatar-edit. */
-  const closeAvatarEditor = () => {
-    setAvatarEditor(null);
-  };
-
 
   const handleUploadAvatar = async () => {
     if (!avatarEditor?.preview) {
