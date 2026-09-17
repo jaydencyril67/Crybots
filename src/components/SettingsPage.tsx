@@ -540,16 +540,6 @@ const SettingsPage = () => {
     return 'Enter exactly 5 digits to check availability.';
   }, [uid, uidAvailable, uidChecking]);
 
-  const openAvatarEditor = (file: File) => {
-    const source = URL.createObjectURL(file);
-    setAvatarEditor({
-      source,
-      fileName: file.name || `avatar-${Date.now()}.png`,
-      file,
-    });
-    setCropBox({ x: 70, y: 70, size: 160 });
-  };
-
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -561,8 +551,6 @@ const SettingsPage = () => {
       return;
     }
 
-    const previewUrl = URL.createObjectURL(file);
-    setAvatarPreview(previewUrl);
     setAvatarUploading(true);
 
     try {
@@ -599,12 +587,8 @@ const SettingsPage = () => {
       showStatus('success', 'Profile picture updated.');
     } catch (error) {
       console.error('[SettingsPage] avatar upload failed:', error);
-      setAvatarPreview(null);
       showStatus('error', error instanceof Error ? error.message : 'Unable to upload image.');
     } finally {
-      if (previewUrl !== avatarPreview) {
-        URL.revokeObjectURL(previewUrl);
-      }
       setAvatarUploading(false);
       event.target.value = '';
     }
@@ -621,9 +605,6 @@ const SettingsPage = () => {
     background: 'rgba(255,255,255,0.04)',
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
   };
-
-  const handleAvatarUpload = async () => {
-    const file = avatarEditor?.file;
     const image = avatarImageRef.current;
 
     if (!file || !image) {
@@ -631,44 +612,17 @@ const SettingsPage = () => {
       return;
     }
 
-    const imageRect = image.getBoundingClientRect();
-    const renderedWidth = imageRect.width || 1;
-    const renderedHeight = imageRect.height || 1;
-    const scaleX = image.naturalWidth / renderedWidth || 1;
-    const scaleY = image.naturalHeight / renderedHeight || 1;
-    const cropX = Math.max(0, Math.round(cropBox.x * scaleX));
-    const cropY = Math.max(0, Math.round(cropBox.y * scaleY));
-    const cropSize = Math.max(1, Math.round(cropBox.size * Math.min(scaleX, scaleY)));
-
     setAvatarUploading(true);
     try {
       const authResponse = await api.get('/api/cloudinary/upload');
       const auth = authResponse.data as { cloudName?: string; uploadPreset?: string };
-      console.log('[SettingsPage] cloudinary config response:', JSON.stringify(auth));
 
       if (!auth.cloudName || !auth.uploadPreset) {
         throw new Error('Unable to prepare image upload.');
       }
 
-      const canvas = document.createElement('canvas');
-      canvas.width = cropSize;
-      canvas.height = cropSize;
-      const context = canvas.getContext('2d');
-
-      if (!context) {
-        throw new Error('Unable to prepare image crop.');
-      }
-
-      context.drawImage(image, cropX, cropY, cropSize, cropSize, 0, 0, cropSize, cropSize);
-
-      const croppedBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob((blob) => resolve(blob), file.type || 'image/png'));
-      if (!croppedBlob) {
-        throw new Error('Unable to prepare cropped image.');
-      }
-
-      const croppedFile = new File([croppedBlob], avatarEditor?.fileName || file.name, { type: croppedBlob.type || file.type || 'image/png' });
       const uploadFormData = new FormData();
-      uploadFormData.append('file', croppedFile);
+      uploadFormData.append('file', file);
       uploadFormData.append('upload_preset', auth.uploadPreset);
 
       const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${auth.cloudName}/image/upload`, {
@@ -681,7 +635,6 @@ const SettingsPage = () => {
       }
 
       const uploadedFile = await uploadResponse.json() as { secure_url?: string };
-      console.log('[SettingsPage] cloudinary upload response:', JSON.stringify(uploadedFile));
       if (!uploadedFile.secure_url) {
         throw new Error('Image upload did not return a usable URL.');
       }
