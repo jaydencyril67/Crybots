@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import * as ImageCrop from '@cloudimage/image-crop';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
