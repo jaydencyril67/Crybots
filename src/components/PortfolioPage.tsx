@@ -2,6 +2,7 @@ import React from 'react';
 import AppHeader from './AppHeader';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import { navigate } from '../utils/navigate';
 
 const styles = {
   page: {
