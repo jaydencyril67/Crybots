@@ -1,6 +1,7 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
 import { navigate } from '../utils/navigate';
+import api from '../api/axios';
 
 const styles = {
   header: {
@@ -61,7 +62,12 @@ const styles = {
 };
 
 const AppHeader = () => {
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await api.post('/api/auth/signout');
+    } catch {
+      // Even if signout API fails, clear local state
+    }
     window.localStorage.removeItem('token');
     window.localStorage.removeItem('user');
     window.localStorage.removeItem('kingshall_user');
