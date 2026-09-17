@@ -594,9 +594,7 @@ const SettingsPage = () => {
     const imageSize = avatarImageRef.current?.getBoundingClientRect();
     const limit = imageSize ? Math.min(imageSize.width, imageSize.height) : 320;
     const size = Math.max(80, Math.min(nextBox.size, limit));
-    const x = Math.max(0, Math.min(nextBox.x, limit - size));
-    const y = Math.max(0, Math.min(nextBox.y, limit - size));
-    return { x, y, size };
+    return { ...nextBox, size };
   };
 
   const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>, mode: 'move' | 'resize') => {
@@ -1054,11 +1052,7 @@ const SettingsPage = () => {
               </div>
               <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                 <span style={{ color: '#8ea2c7', fontSize: '0.9rem', marginRight: 'auto' }}>Drag the crop box or resize it from the corner.</span>
-                <label style={{ ...styles.button, background: 'rgba(255,255,255,0.06)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                  <Upload size={16} />
-                  <span>Choose another photo</span>
-                  <input ref={cropInputRef} type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} />
-                </label>
+                <input ref={cropInputRef} type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} />
               </div>
             </div>
           </div>
