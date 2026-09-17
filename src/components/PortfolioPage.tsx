@@ -25,18 +25,24 @@ const styles = {
     gap: '12px',
     marginTop: '18px',
   },
-  pageButton: {
+};
+
+const getButtonStyle = (label: string, mode: 'light' | 'dark') => {
+  const theme = HYBRID_THEME_TOKENS[mode];
+  const isDanger = label === 'Danger';
+
+  return {
     width: '100%',
     padding: '16px 18px',
     borderRadius: '16px',
-    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
-    background: HYBRID_THEME_TOKENS.dark.surface,
-    color: HYBRID_THEME_TOKENS.dark.text,
+    border: `1px solid ${isDanger ? theme.danger : theme.border}`,
+    background: isDanger ? theme.primarySoft : theme.surface,
+    color: isDanger ? theme.danger : theme.text,
     fontSize: '1rem',
     fontWeight: 700,
     textAlign: 'left' as const,
     cursor: 'pointer',
-  },
+  };
 };
 
 const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
@@ -50,7 +56,7 @@ const PortfolioPage = () => {
           <div style={styles.content}>
             <div style={styles.buttonList}>
               {pageButtons.map((label) => (
-                <button key={label} type="button" style={styles.pageButton}>
+                <button key={label} type="button" style={getButtonStyle(label, 'dark')}>
                   {label}
                 </button>
               ))}
