@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, Globe, LogOut } from 'lucide-react';
+import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -519,18 +519,6 @@ const SecurityPage = () => {
                       })}
                     </tbody>
                   </table>
-                </div>
-              </div>
-
-              <div style={styles.row}>
-                <p style={styles.rowLabel}><Globe size={16} /> Recent logins</p>
-                <div style={styles.control}>
-                  {logins.map((login, index) => (
-                    <div key={login.id ?? `${login.device ?? 'login'}-${index}`} style={styles.row}>
-                      <p style={styles.rowValue}>{login.device || 'Unknown device'} • {login.ip || 'IP not available'}</p>
-                      <p style={styles.note}>{login.location || 'Location unavailable'}{login.createdAt ? ` • ${new Date(login.createdAt).toLocaleString()}` : ''} • {login.success ? 'Success' : 'Review needed'}</p>
-                    </div>
-                  ))}
                 </div>
               </div>
 
