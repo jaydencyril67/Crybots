@@ -44,6 +44,7 @@ const styles = {
     fontWeight: 900,
     letterSpacing: '-0.02em',
     color: '#ffffff',
+    marginBottom: '12px',
   },
   sectionText: {
     margin: 0,
