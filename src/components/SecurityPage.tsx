@@ -203,11 +203,8 @@ const SecurityPage = () => {
 
   const showStatus = (kind: SaveState, text: string) => setStatus({ kind, text });
 
-  const handleConfirm = (message: string) => window.confirm(message);
-
   const handleUidSave = async () => {
     if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
-    if (!handleConfirm('Change your UID now? This affects how your account is identified.')) return;
     setSavingUid(true);
     try {
       await api.patch('/api/settings/uid', { uid: uid.trim() });
@@ -228,7 +225,6 @@ const SecurityPage = () => {
       return showStatus('error', 'New password and confirmation must match.');
     }
 
-    if (!handleConfirm('Change your password now? Make sure you can remember the new one.')) return;
     setSavingPassword(true);
     try {
       await api.patch('/api/settings/password', {
@@ -255,7 +251,6 @@ const SecurityPage = () => {
       return showStatus('error', 'Security code must be 6 digits and match confirmation.');
     }
 
-    if (!handleConfirm('Set or update your security code now?')) return;
     setSavingSecurityCode(true);
     try {
       await api.patch('/api/withdrawals/security-code', {
@@ -275,7 +270,6 @@ const SecurityPage = () => {
   };
 
   const handleToggle2fa = async () => {
-    if (!handleConfirm(twoFactorEnabled ? 'Disable 2FA now?' : 'Enable 2FA now?')) return;
     setSaving2fa(true);
     try {
       showStatus('success', '2FA setup will be added in the backend next.');
@@ -285,7 +279,6 @@ const SecurityPage = () => {
   };
 
   const handleToggleBiometric = async () => {
-    if (!handleConfirm(biometricEnabled ? 'Disable biometric login now?' : 'Enable biometric login now?')) return;
     setSavingBiometric(true);
     try {
       showStatus('success', 'Biometric security will be wired to the backend next.');
@@ -295,7 +288,6 @@ const SecurityPage = () => {
   };
 
   const handleToggleHardware = async () => {
-    if (!handleConfirm(hardwareKeyEnabled ? 'Disable hardware security now?' : 'Enable hardware security now?')) return;
     setSavingHardware(true);
     try {
       showStatus('success', 'Hardware security will be wired to the backend next.');
@@ -305,7 +297,6 @@ const SecurityPage = () => {
   };
 
   const handleSecurityQuestionSave = async () => {
-    if (!handleConfirm('Update your security question now?')) return;
     setSavingSecurityQuestion(true);
     try {
       await api.patch('/api/settings/security-question', {});
@@ -336,7 +327,7 @@ const SecurityPage = () => {
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>
                 <p style={styles.rowValue}>{uid || 'Not set yet'}</p>
                 <div style={styles.control}>
-                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 8))} placeholder="Edit UID" inputMode="numeric" />
+                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
                   <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? 'Saving...' : 'Save UID'}</button>
                 </div>
               </div>
