@@ -597,7 +597,7 @@ const SettingsPage = () => {
     return { ...nextBox, size };
   };
 
-  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>, mode: 'move' | 'resize') => {
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLElement>, mode: 'move' | 'resize') => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     cropDragStateRef.current = {
@@ -609,7 +609,7 @@ const SettingsPage = () => {
     };
   };
 
-  const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLElement>) => {
     const dragState = cropDragStateRef.current;
     if (!dragState.mode || !dragState.startBox) {
       return;
@@ -636,7 +636,7 @@ const SettingsPage = () => {
     });
   };
 
-  const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+  const handleCropPointerUp = (event: React.PointerEvent<HTMLElement>) => {
     const dragState = cropDragStateRef.current;
     if (dragState.mode) {
       dragState.mode = null;
@@ -668,11 +668,12 @@ const SettingsPage = () => {
     }
 
     const imageRect = image.getBoundingClientRect();
-    const displaySize = Math.min(imageRect.width, imageRect.height) || 320;
-    const scale = (image.naturalWidth && image.naturalHeight) ? Math.min(image.naturalWidth, image.naturalHeight) / displaySize : 1;
-    const cropSize = Math.round(cropBox.size * scale);
-    const cropX = Math.round(cropBox.x * scale);
-    const cropY = Math.round(cropBox.y * scale);
+    const overlaySize = imageRect.width || imageRect.height || 320;
+    const scaleX = image.naturalWidth / overlaySize || 1;
+    const scaleY = image.naturalHeight / overlaySize || 1;
+    const cropX = Math.max(0, Math.round(cropBox.x * scaleX));
+    const cropY = Math.max(0, Math.round(cropBox.y * scaleY));
+    const cropSize = Math.max(1, Math.round(cropBox.size * Math.min(scaleX, scaleY)));
 
     setAvatarUploading(true);
     try {
@@ -1029,11 +1030,10 @@ const SettingsPage = () => {
                       touchAction: 'none',
                     }}
                   >
-                    <div
+                    <button
+                      type="button"
+                      aria-label="Resize crop area"
                       onPointerDown={(event) => handleCropPointerDown(event, 'resize')}
-                      onPointerMove={handleCropPointerMove}
-                      onPointerUp={handleCropPointerUp}
-                      onPointerCancel={handleCropPointerUp}
                       style={{
                         position: 'absolute',
                         right: '-10px',
@@ -1046,6 +1046,7 @@ const SettingsPage = () => {
                         cursor: 'nwse-resize',
                         pointerEvents: 'auto',
                         touchAction: 'none',
+                        padding: 0,
                       }}
                     />
                   </div>
