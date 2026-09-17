@@ -40,18 +40,6 @@ type WalletValidationState = {
   message: string;
 };
 
-type AvatarEditorState = {
-  source: string;
-  fileName: string;
-  file: File;
-};
-
-type CropBox = {
-  x: number;
-  y: number;
-  size: number;
-};
-
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
 const trc20WalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
 
@@ -233,13 +221,7 @@ const SettingsPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
   const [deactivating, setDeactivating] = useState(false);
-  const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [cropBox, setCropBox] = useState<CropBox>({ x: 70, y: 70, size: 160 });
-  const cropInputRef = useRef<HTMLInputElement | null>(null);
-  const avatarImageRef = useRef<HTMLImageElement | null>(null);
-  const cropOverlayRef = useRef<HTMLDivElement | null>(null);
-  const cropDragStateRef = useRef<{ mode: 'move' | 'resize' | null; startX: number; startY: number; startBox: CropBox | null; startSize: number | null; offsetX: number; offsetY: number }>({ mode: null, startX: 0, startY: 0, startBox: null, startSize: null, offsetX: 0, offsetY: 0 });
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -568,7 +550,7 @@ const SettingsPage = () => {
     setCropBox({ x: 70, y: 70, size: 160 });
   };
 
-  const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
@@ -579,79 +561,53 @@ const SettingsPage = () => {
       return;
     }
 
-    openAvatarEditor(file);
-    event.target.value = '';
-  };
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+    setAvatarUploading(true);
 
-  const closeAvatarEditor = () => {
-    if (avatarEditor?.source) {
-      URL.revokeObjectURL(avatarEditor.source);
-    }
-    setAvatarEditor(null);
-    if (cropInputRef.current) {
-      cropInputRef.current.value = '';
-    }
-  };
+    try {
+      const authResponse = await api.get('/api/cloudinary/upload');
+      const auth = authResponse.data as { cloudName?: string; uploadPreset?: string };
 
-  const clampCropBox = (nextBox: CropBox) => {
-    const imageSize = avatarImageRef.current?.getBoundingClientRect();
-    const limit = imageSize ? Math.min(imageSize.width, imageSize.height) : 320;
-    const size = Math.max(80, Math.min(nextBox.size, limit));
-    return { ...nextBox, size };
-  };
+      if (!auth.cloudName || !auth.uploadPreset) {
+        throw new Error('Unable to prepare image upload.');
+      }
 
-  const handleCropPointerDown = (event: React.PointerEvent<HTMLElement>, mode: 'move' | 'resize') => {
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    cropDragStateRef.current = {
-      mode,
-      startX: event.clientX,
-      startY: event.clientY,
-      startBox: cropBox,
-      startSize: cropBox.size,
-      offsetX: event.clientX - cropBox.x,
-      offsetY: event.clientY - cropBox.y,
-    };
-  };
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('upload_preset', auth.uploadPreset);
 
-  const handleCropPointerMove = (event: React.PointerEvent<HTMLElement>) => {
-    const dragState = cropDragStateRef.current;
-    if (!dragState.mode || !dragState.startBox) {
-      return;
-    }
-
-    const deltaX = event.clientX - dragState.startX;
-    const deltaY = event.clientY - dragState.startY;
-
-    if (dragState.mode === 'move') {
-      setCropBox({
-        ...dragState.startBox,
-        x: event.clientX - dragState.offsetX,
-        y: event.clientY - dragState.offsetY,
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${auth.cloudName}/image/upload`, {
+        method: 'POST',
+        body: uploadFormData,
       });
-      return;
+
+      if (!uploadResponse.ok) {
+        throw new Error('Unable to upload profile picture.');
+      }
+
+      const uploadedFile = await uploadResponse.json() as { secure_url?: string };
+      if (!uploadedFile.secure_url) {
+        throw new Error('Image upload did not return a usable URL.');
+      }
+
+      await api.patch('/api/settings/profile-picture', {
+        profilePicture: uploadedFile.secure_url,
+      });
+
+      setAvatarPreview(uploadedFile.secure_url);
+      showStatus('success', 'Profile picture updated.');
+    } catch (error) {
+      console.error('[SettingsPage] avatar upload failed:', error);
+      setAvatarPreview(null);
+      showStatus('error', error instanceof Error ? error.message : 'Unable to upload image.');
+    } finally {
+      if (previewUrl !== avatarPreview) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setAvatarUploading(false);
+      event.target.value = '';
     }
-
-    const delta = Math.max(deltaX, deltaY);
-    const nextSize = Math.max(48, (dragState.startSize ?? dragState.startBox.size) + delta);
-
-    setCropBox(clampCropBox({
-      ...dragState.startBox,
-      size: nextSize,
-    }));
-  };
-
-  const handleCropPointerUp = (event: React.PointerEvent<HTMLElement>) => {
-    const dragState = cropDragStateRef.current;
-    if (dragState.mode) {
-      dragState.mode = null;
-      dragState.startBox = null;
-      dragState.startSize = null;
-    }
-    dragState.offsetX = 0;
-    dragState.offsetY = 0;
-    event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
   const avatarDisplayStyle = {
@@ -768,7 +724,7 @@ const SettingsPage = () => {
 
             <section style={styles.card}>
               <h2 style={styles.cardTitle}><UserCircle2 size={18} /> Profile picture</h2>
-              <p style={styles.cardText}>Choose a photo, adjust it in the modal, and save a clean cropped avatar.</p>
+              <p style={styles.cardText}>Choose a photo and upload it directly as-is.</p>
               <div style={{ display: 'grid', gap: '14px', marginTop: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                   <div style={{ ...avatarDisplayStyle, width: '96px', height: '96px', flex: '0 0 auto' }}>
@@ -782,7 +738,7 @@ const SettingsPage = () => {
                   </div>
                   <label style={{ ...styles.button, ...styles.primaryButton, display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                     <Upload size={16} />
-                    <span>Choose photo</span>
+                    <span>{avatarUploading ? 'Uploading...' : 'Choose photo'}</span>
                     <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} />
                   </label>
                 </div>
@@ -993,82 +949,6 @@ const SettingsPage = () => {
 
           </div>
         </div>
-        {avatarEditor ? (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(3, 7, 20, 0.82)', backdropFilter: 'blur(18px)', display: 'grid', placeItems: 'center', padding: '0' }}>
-            <div style={{ width: '100%', height: '100%', maxWidth: '100%', borderRadius: 0, background: 'linear-gradient(180deg, rgba(9,13,25,0.98), rgba(4,8,16,0.98))', border: 'none', padding: '0', display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 0 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Cancel</button>
-                <span style={{ color: '#c6d3ea', fontSize: '0.95rem', fontWeight: 700 }}>Crop photo</span>
-                <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '10px 14px' }} onClick={() => void handleAvatarUpload()} disabled={avatarUploading}>
-                  {avatarUploading ? 'Saving...' : 'Crop & upload'}
-                </button>
-              </div>
-              <div
-                ref={cropOverlayRef}
-                style={{ position: 'relative', minHeight: '320px', overflow: 'hidden', display: 'grid', placeItems: 'center', padding: '18px' }}
-              >
-                <div style={{ width: 'min(100%, 520px)', maxHeight: 'min(72vh, 520px)', position: 'relative' }}>
-                  <img
-                    ref={avatarImageRef}
-                    src={avatarEditor.source}
-                    alt="Selected avatar preview"
-                    style={{ width: '100%', height: 'auto', maxHeight: 'min(72vh, 520px)', objectFit: 'contain', objectPosition: 'center', borderRadius: '16px', filter: 'saturate(1.08) contrast(1.04)' }}
-                  />
-                </div>
-                <div
-                  role="presentation"
-                  style={{ position: 'absolute', inset: '18px', pointerEvents: 'none' }}
-                >
-                  <div
-                    onPointerDown={(event) => handleCropPointerDown(event, 'move')}
-                    onPointerMove={handleCropPointerMove}
-                    onPointerUp={handleCropPointerUp}
-                    onPointerCancel={handleCropPointerUp}
-                    style={{
-                      position: 'absolute',
-                      left: `${cropBox.x}px`,
-                      top: `${cropBox.y}px`,
-                      width: `${cropBox.size}px`,
-                      height: `${cropBox.size}px`,
-                      border: '2px solid rgba(125, 211, 252, 0.95)',
-                      borderRadius: '18px',
-                      boxShadow: '0 0 0 9999px rgba(3, 7, 20, 0.45)',
-                      background: 'transparent',
-                      cursor: 'move',
-                      pointerEvents: 'auto',
-                      touchAction: 'none',
-                    }}
-                  >
-                    <button
-                      type="button"
-                      aria-label="Resize crop area"
-                      onPointerDown={(event) => handleCropPointerDown(event, 'resize')}
-                      style={{
-                        position: 'absolute',
-                        right: '-10px',
-                        bottom: '-10px',
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '999px',
-                        background: '#7dd3fc',
-                        border: '2px solid #050816',
-                        cursor: 'nwse-resize',
-                        pointerEvents: 'auto',
-                        touchAction: 'none',
-                        padding: 0,
-                        zIndex: 2,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                <span style={{ color: '#8ea2c7', fontSize: '0.9rem', marginRight: 'auto' }}>Drag the crop box or resize it from the corner.</span>
-                <input ref={cropInputRef} type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} />
-              </div>
-            </div>
-          </div>
-        ) : null}
         <NowBar />
       </div>
     </div>
