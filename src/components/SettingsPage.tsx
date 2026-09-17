@@ -599,6 +599,7 @@ const SettingsPage = () => {
 
   const handleCropPointerDown = (event: React.PointerEvent<HTMLElement>, mode: 'move' | 'resize') => {
     event.preventDefault();
+    event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
     cropDragStateRef.current = {
       mode,
