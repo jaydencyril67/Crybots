@@ -6,6 +6,14 @@ import NowBar from './NowBar';
 
 type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
 
+type DangerActionState = {
+  password: string;
+  confirmation: string;
+  reason: string;
+  status: string;
+  loading: DangerActionKey | null;
+};
+
 const styles = {
   page: {
     minHeight: '100vh',
@@ -100,40 +108,40 @@ const styles = {
 };
 
 const DangerPage = () => {
-  const [password, setPassword] = useState('');
-  const [confirmation, setConfirmation] = useState('');
-  const [reason, setReason] = useState('');
-  const [status, setStatus] = useState('');
-  const [loading, setLoading] = useState<DangerActionKey | null>(null);
+  const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
+  const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
+  const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
 
-  const submitAction = async (action: DangerActionKey) => {
-    setLoading(action);
-    setStatus('');
+  const submitAction = async (
+    action: DangerActionKey,
+    state: DangerActionState,
+    setState: React.Dispatch<React.SetStateAction<DangerActionState>>,
+  ) => {
+    setState((current) => ({ ...current, loading: action, status: '' }));
 
     try {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
+      const payload = { password: state.password, confirmation: state.confirmation, reason: state.reason };
 
       if (action === 'delete') {
         await api.delete('/api/settings/danger/delete', {
           headers,
-          data: { password, confirmation },
+          data: { password: state.password, confirmation: state.confirmation },
         });
       } else if (action === 'disable') {
-        await api.patch('/api/settings/danger/disable', { password, confirmation, reason }, { headers });
+        await api.patch('/api/settings/danger/disable', payload, { headers });
       } else {
-        await api.patch('/api/settings/danger/self-exclude', { password, confirmation, reason }, { headers });
+        await api.patch('/api/settings/danger/self-exclude', payload, { headers });
       }
 
-      setStatus('Success: account action completed.');
+      setState((current) => ({ ...current, status: 'Success: account action completed.' }));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to complete the action.';
-      setStatus(message);
+      setState((current) => ({ ...current, status: message }));
     } finally {
-      setLoading(null);
+      setState((current) => ({ ...current, loading: null }));
     }
   };
-
-
   return (
     <HybridTheme mode="dark">
       <div style={styles.page}>
@@ -148,34 +156,55 @@ const DangerPage = () => {
             <section style={styles.section}>
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-disable-password">Password</label>
+                <input id="danger-disable-password" style={styles.input} type="password" value={disable.password} onChange={(event) => setDisable((current) => ({ ...current, password: event.target.value }))} />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-disable-confirmation">Confirmation</label>
+                <input id="danger-disable-confirmation" style={styles.input} value={disable.confirmation} onChange={(event) => setDisable((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DISABLE" />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-disable-reason">Reason</label>
+                <input id="danger-disable-reason" style={styles.input} value={disable.reason} onChange={(event) => setDisable((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for disabling" />
+              </div>
+              <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>Confirm Disable</button>
+              {disable.status ? <div style={styles.status}>{disable.status}</div> : null}
             </section>
+
             <section style={styles.section}>
               <h3 style={styles.actionTitle}>Self Exclude</h3>
               <p style={styles.actionText}>This places your account into a self-exclusion state to prevent further use according to your request.</p>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-self-exclude-password">Password</label>
+                <input id="danger-self-exclude-password" style={styles.input} type="password" value={selfExclude.password} onChange={(event) => setSelfExclude((current) => ({ ...current, password: event.target.value }))} />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-self-exclude-confirmation">Confirmation</label>
+                <input id="danger-self-exclude-confirmation" style={styles.input} value={selfExclude.confirmation} onChange={(event) => setSelfExclude((current) => ({ ...current, confirmation: event.target.value }))} placeholder="SELF EXCLUDE" />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-self-exclude-reason">Reason</label>
+                <input id="danger-self-exclude-reason" style={styles.input} value={selfExclude.reason} onChange={(event) => setSelfExclude((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for self exclusion" />
+              </div>
+              <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null}>Confirm Self Exclude</button>
+              {selfExclude.status ? <div style={styles.status}>{selfExclude.status}</div> : null}
             </section>
+
             <section style={styles.section}>
               <h3 style={styles.actionTitle}>Delete Account</h3>
               <p style={styles.actionText}>This permanently removes your account after the confirmation step. This action cannot be undone.</p>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-delete-password">Password</label>
+                <input id="danger-delete-password" style={styles.input} type="password" value={remove.password} onChange={(event) => setRemove((current) => ({ ...current, password: event.target.value }))} />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
+                <input id="danger-delete-confirmation" style={styles.input} value={remove.confirmation} onChange={(event) => setRemove((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DELETE" />
+              </div>
+              <button type="button" style={styles.actionButton} onClick={() => submitAction('delete', remove, setRemove)} disabled={remove.loading !== null}>Confirm Delete</button>
+              {remove.status ? <div style={styles.status}>{remove.status}</div> : null}
             </section>
-
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="danger-password">Password</label>
-              <input id="danger-password" style={styles.input} type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="danger-confirmation">Confirmation</label>
-              <input id="danger-confirmation" style={styles.input} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder="DISABLE, SELF EXCLUDE, or DELETE" />
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="danger-reason">Reason</label>
-              <input id="danger-reason" style={styles.input} value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Optional reason for the action" />
-            </div>
-
-            <button type="button" style={styles.actionButton} onClick={() => submitAction('disable')} disabled={loading !== null}>Confirm Disable</button>
-            <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude')} disabled={loading !== null}>Confirm Self Exclude</button>
-            <button type="button" style={styles.actionButton} onClick={() => submitAction('delete')} disabled={loading !== null}>Confirm Delete</button>
-
-            {status ? <div style={styles.status}>{status}</div> : null}
           </div>
         </div>
         <NowBar />
