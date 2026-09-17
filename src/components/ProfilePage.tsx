@@ -56,12 +56,11 @@ const styles = {
     page: { paddingBottom: '156px' },
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
-    card: { padding: '16px', borderRadius: '18px' },
+    card: HYBRID_CARD_STYLES.cardMobile,
     sectionTitle: { fontSize: '1.15rem' },
     sectionSub: { maxWidth: '100%' },
     infoList: { gap: '10px', gridTemplateColumns: 'minmax(0, 1fr)' },
     infoRow: { padding: '14px', borderRadius: '16px' },
-    card: HYBRID_CARD_STYLES.cardMobile,
     helper: { padding: '14px 16px', borderRadius: '18px' },
   },
   sectionTitle: {
