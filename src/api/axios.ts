@@ -18,6 +18,7 @@ const clearAuthData = () => {
 
 export const forceLogout = () => {
   clearAuthData();
+  window.dispatchEvent(new Event('ke:force-logout'));
   window.location.href = '/';
 };
 
