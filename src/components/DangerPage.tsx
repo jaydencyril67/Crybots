@@ -30,13 +30,14 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '0',
-    marginTop: '0',
+    gap: '18px',
+    marginTop: '18px',
   },
-  section: {
-    display: 'grid',
-    gap: '0',
-    paddingTop: '0',
+  card: {
+    borderRadius: '22px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.04)',
+    padding: '18px',
   },
   sectionTitle: {
     margin: 0,
@@ -46,7 +47,7 @@ const styles = {
     color: '#ffffff',
   },
   sectionText: {
-    margin: 0,
+    margin: '8px 0 0',
     fontSize: '0.92rem',
     color: '#a3a3a3',
     lineHeight: 1.7,
@@ -59,7 +60,7 @@ const styles = {
     color: '#ffffff',
   },
   actionText: {
-    margin: 0,
+    margin: '8px 0 0',
     fontSize: '0.88rem',
     color: '#b3b3b3',
     lineHeight: 1.55,
@@ -68,7 +69,7 @@ const styles = {
   field: {
     display: 'grid',
     gap: '6px',
-    marginTop: '0',
+    marginTop: '14px',
   },
   label: {
     fontSize: '0.82rem',
@@ -80,32 +81,30 @@ const styles = {
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '0',
-    border: 'none',
-    borderBottom: '1px solid rgba(255,255,255,0.14)',
-    background: 'transparent',
+    borderRadius: '18px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.03)',
     color: '#ffffff',
-    padding: '12px 0',
+    padding: '12px 14px',
     outline: 'none',
   },
   buttonRow: {
     display: 'flex',
     justifyContent: 'center',
-    marginBottom: '18px',
+    marginTop: '18px',
   },
   actionButton: {
-    borderRadius: '0',
-    padding: '12px 0',
-    border: 'none',
-    borderBottom: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: '18px',
+    padding: '12px 18px',
+    border: '1px solid rgba(255,255,255,0.08)',
     cursor: 'pointer',
     fontWeight: 800,
     color: '#ffffff',
-    background: 'transparent',
+    background: 'rgba(255,255,255,0.05)',
     textAlign: 'center' as const,
   },
   status: {
-    marginTop: '0',
+    marginTop: '14px',
     fontSize: '0.92rem',
     fontWeight: 700,
     color: '#ffffff',
@@ -153,12 +152,12 @@ const DangerPage = () => {
         <div style={styles.shell}>
           <AppHeader />
           <div style={styles.content}>
-            <section style={styles.section}>
+            <section style={styles.card}>
               <h2 style={styles.sectionTitle}>Danger Zone</h2>
               <p style={styles.sectionText}>These actions are irreversible or highly restrictive. Read each warning carefully before continuing.</p>
             </section>
 
-            <section style={styles.section}>
+            <section style={styles.card}>
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
               <div style={styles.field}>
@@ -179,7 +178,7 @@ const DangerPage = () => {
               {disable.status ? <div style={styles.status}>{disable.status}</div> : null}
             </section>
 
-            <section style={styles.section}>
+            <section style={styles.card}>
               <h3 style={styles.actionTitle}>Self Exclude</h3>
               <p style={styles.actionText}>This places your account into a self-exclusion state to prevent further use according to your request.</p>
               <div style={styles.field}>
@@ -200,7 +199,7 @@ const DangerPage = () => {
               {selfExclude.status ? <div style={styles.status}>{selfExclude.status}</div> : null}
             </section>
 
-            <section style={styles.section}>
+            <section style={styles.card}>
               <h3 style={styles.actionTitle}>Delete Account</h3>
               <p style={styles.actionText}>This permanently removes your account after the confirmation step. This action cannot be undone.</p>
               <div style={styles.field}>
