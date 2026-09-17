@@ -281,12 +281,15 @@ const SettingsPage = () => {
       try {
         const { data } = await api.get<MeResponse>('/api/auth/me');
         const user = data.user;
+        console.log('[SettingsPage] /api/auth/me response user:', JSON.stringify(user));
+        console.log('[SettingsPage] profilePicture from response:', JSON.stringify(user?.profilePicture));
         const loadedUid = (user?.uid ?? '').replace(/\D/g, '').slice(0, 5);
         setUid(loadedUid);
         setInitialUid(loadedUid);
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
+        console.log('[SettingsPage] setting avatarPreview to:', JSON.stringify(user?.profilePicture ?? null));
         setAvatarPreview(user?.profilePicture ?? null);
 
       } catch {
@@ -694,6 +697,7 @@ const SettingsPage = () => {
     try {
       const authResponse = await api.get('/api/cloudinary/upload');
       const auth = authResponse.data as { cloudName?: string; uploadPreset?: string };
+      console.log('[SettingsPage] cloudinary config response:', JSON.stringify(auth));
 
       if (!auth.cloudName || !auth.uploadPreset) {
         throw new Error('Unable to prepare image upload.');
@@ -730,6 +734,7 @@ const SettingsPage = () => {
       }
 
       const uploadedFile = await uploadResponse.json() as { secure_url?: string };
+      console.log('[SettingsPage] cloudinary upload response:', JSON.stringify(uploadedFile));
       if (!uploadedFile.secure_url) {
         throw new Error('Image upload did not return a usable URL.');
       }
@@ -737,12 +742,16 @@ const SettingsPage = () => {
       await api.patch('/api/settings/profile-picture', {
         profilePicture: uploadedFile.secure_url,
       });
+      console.log('[SettingsPage] patch /api/settings/profile-picture succeeded, URL saved');
 
       const { data: refreshedAccount } = await api.get<MeResponse>('/api/auth/me');
+      console.log('[SettingsPage] refreshed account after upload:', JSON.stringify(refreshedAccount));
+      console.log('[SettingsPage] refreshed profilePicture:', JSON.stringify(refreshedAccount?.user?.profilePicture));
       setAvatarPreview(refreshedAccount?.user?.profilePicture ?? null);
       closeAvatarEditor();
       showStatus('success', 'Profile picture updated successfully.');
     } catch (error: any) {
+      console.log('[SettingsPage] handleAvatarUpload error:', error?.response?.data || error?.message || error);
       showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update profile picture.');
     } finally {
       setAvatarUploading(false);

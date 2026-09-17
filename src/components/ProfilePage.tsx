@@ -303,6 +303,9 @@ const ProfilePage = () => {
         }
 
         const serverProfile = meResponse.data.user ?? null;
+        console.log('[ProfilePage] /api/auth/me response:', JSON.stringify(serverProfile));
+        console.log('[ProfilePage] profilePicture value:', JSON.stringify(serverProfile?.profilePicture));
+
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
         setBalance(nextBalance);
         setLiveProfile(serverProfile);
