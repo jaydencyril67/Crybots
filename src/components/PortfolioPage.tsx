@@ -1,12 +1,11 @@
 import React from 'react';
 import AppHeader from './AppHeader';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 
 const styles = {
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
@@ -26,39 +25,47 @@ const styles = {
     gap: '12px',
     marginTop: '18px',
   },
-  pageButton: {
+};
+
+const getButtonStyle = (label: string, mode: 'light' | 'dark') => {
+  const theme = HYBRID_THEME_TOKENS[mode];
+  const isDanger = label === 'Danger';
+
+  return {
     width: '100%',
     padding: '16px 18px',
     borderRadius: '16px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
-    color: '#ffffff',
+    border: `1px solid ${isDanger ? theme.danger : theme.border}`,
+    background: isDanger ? theme.primarySoft : theme.surface,
+    color: isDanger ? theme.danger : theme.text,
     fontSize: '1rem',
     fontWeight: 700,
     textAlign: 'left' as const,
     cursor: 'pointer',
-  },
+  };
 };
 
 const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
 
 const PortfolioPage = () => {
   return (
-    <div style={styles.page}>
-      <div style={styles.shell}>
-        <AppHeader />
-        <div style={styles.content}>
-          <div style={styles.buttonList}>
-            {pageButtons.map((label) => (
-              <button key={label} type="button" style={styles.pageButton}>
-                {label}
-              </button>
-            ))}
+    <HybridTheme mode="dark">
+      <div style={styles.page}>
+        <div style={styles.shell}>
+          <AppHeader />
+          <div style={styles.content}>
+            <div style={styles.buttonList}>
+              {pageButtons.map((label) => (
+                <button key={label} type="button" style={getButtonStyle(label, 'dark')}>
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
+        <NowBar />
       </div>
-      <NowBar />
-    </div>
+    </HybridTheme>
   );
 };
 
