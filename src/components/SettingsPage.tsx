@@ -238,7 +238,6 @@ const SettingsPage = () => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const cropInputRef = useRef<HTMLInputElement | null>(null);
   const cropContainerRef = useRef<HTMLDivElement | null>(null);
-  const cropEditorRef = useRef<any>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -587,8 +586,6 @@ const SettingsPage = () => {
     if (cropInputRef.current) {
       cropInputRef.current.value = '';
     }
-    setCropReady(false);
-    setCropBoxSize(0);
   };
 
   const avatarDisplayStyle = {
@@ -603,24 +600,16 @@ const SettingsPage = () => {
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
   };
 
-  const handleCropDone = async () => {
-    const editor = cropEditorRef.current;
-    if (!editor?.getCroppedBlob) {
-      showStatus('error', 'Unable to prepare the cropped image.');
-      return;
-    }
+  const handleAvatarUpload = async () => {
+    const file = avatarEditor?.file;
 
-    const croppedBlob = await editor.getCroppedBlob();
-    if (!croppedBlob) {
-      showStatus('error', 'Adjust your photo before saving.');
+    if (!file) {
+      showStatus('error', 'Please choose an image file.');
       return;
     }
 
     setAvatarUploading(true);
     try {
-      const croppedFile = croppedBlob instanceof File
-        ? croppedBlob
-        : new File([croppedBlob], `avatar-${Date.now()}.png`, { type: croppedBlob.type || 'image/png' });
       const authResponse = await api.get('/api/imagekit/auth');
       const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
@@ -629,8 +618,8 @@ const SettingsPage = () => {
       }
 
       const uploadFormData = new FormData();
-      uploadFormData.append('file', croppedFile);
-      uploadFormData.append('fileName', avatarEditor?.fileName || croppedFile.name);
+      uploadFormData.append('file', file);
+      uploadFormData.append('fileName', avatarEditor?.fileName || file.name);
       uploadFormData.append('useUniqueFileName', 'true');
       uploadFormData.append('token', auth.token);
       uploadFormData.append('expire', String(auth.expire));
@@ -919,27 +908,18 @@ const SettingsPage = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                 <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Cancel</button>
                 <span style={{ color: '#c6d3ea', fontSize: '0.95rem', fontWeight: 700 }}>Edit photo</span>
-                <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '10px 14px' }} onClick={() => void handleCropDone()} disabled={avatarUploading}>
-                  {avatarUploading ? 'Saving...' : 'Done'}
+                <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '10px 14px' }} onClick={() => void handleAvatarUpload()} disabled={avatarUploading}>
+                  {avatarUploading ? 'Uploading...' : 'Done'}
                 </button>
               </div>
-              <div style={{ position: 'relative', minHeight: 0, overflow: 'hidden' }}>
-                <ImageCrop
-                  ref={cropEditorRef}
+              <div style={{ position: 'relative', minHeight: '320px', overflow: 'hidden', display: 'grid', placeItems: 'center', padding: '18px' }}>
+                <img
                   src={avatarEditor.source}
-                  width="100%"
-                  height="100%"
-                  aspectRatio={1}
-                  cropShape="round"
-                  showGrid
-                  showZoom
-                  showRotate
-                  backgroundColor="#050816"
-                  darkOverlayColor="rgba(3, 7, 20, 0.72)"
+                  alt="Selected avatar preview"
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '16px' }}
                 />
               </div>
-              <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                <span style={{ color: '#8ea2c7', fontSize: '0.9rem' }}>Drag to reposition, pinch to zoom, and rotate if needed.</span>
+              <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                 <label style={{ ...styles.button, background: 'rgba(255,255,255,0.06)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                   <Upload size={16} />
                   <span>Choose another photo</span>
