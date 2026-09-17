@@ -195,6 +195,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/staking') return 'STAKING';
   if (path === '/settings') return 'SETTINGS';
   if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/danger') return 'DANGER';
   if (path === '/withdrawals') return 'WITHDRAW';
   if (path === '/transfer') return 'TRANSFER';
   if (path === '/deposit') return 'DEPOSIT';

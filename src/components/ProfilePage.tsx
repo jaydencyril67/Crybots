@@ -47,13 +47,12 @@ const styles = {
   },
   infoRow: {
     width: '100%',
-    padding: '16px 18px',
-    borderRadius: '16px',
-    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
-    background: HYBRID_THEME_TOKENS.dark.surface,
+    padding: '10px 0',
+    border: 'none',
+    background: 'transparent',
     boxSizing: 'border-box' as const,
     display: 'grid',
-    gap: '8px',
+    gap: '6px',
     textAlign: 'left' as const,
   },
   infoLabel: {
@@ -80,8 +79,8 @@ const styles = {
     marginTop: '8px',
     padding: '16px 18px',
     borderRadius: '16px',
-    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
-    background: HYBRID_THEME_TOKENS.dark.surfaceElevated,
+    border: 'none',
+    background: 'transparent',
     flexWrap: 'wrap' as const,
   },
   helperText: {
@@ -90,8 +89,8 @@ const styles = {
     lineHeight: 1.5,
   },
   helperAction: {
-    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
-    background: HYBRID_THEME_TOKENS.dark.surface,
+    border: 'none',
+    background: 'transparent',
     color: HYBRID_THEME_TOKENS.dark.text,
     borderRadius: '999px',
     padding: '12px 16px',
@@ -107,8 +106,8 @@ const styles = {
     width: '36px',
     height: '36px',
     borderRadius: '999px',
-    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
-    background: HYBRID_THEME_TOKENS.dark.surface,
+    border: 'none',
+    background: 'transparent',
     color: HYBRID_THEME_TOKENS.dark.text,
     cursor: 'pointer',
     flexShrink: 0,
@@ -229,26 +228,26 @@ const ProfilePage = () => {
               </section>
 
               <div style={styles.infoList}>
-                <button type="button" style={styles.infoRow}>
+                <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><UserRound size={16} /> Display name</p>
                   <p style={styles.infoValue}>{fullName}</p>
-                </button>
-                <button type="button" style={styles.infoRow}>
+                </div>
+                <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><Mail size={16} /> Email</p>
                   <p style={styles.infoValue}>{email}</p>
-                </button>
-                <button type="button" style={styles.infoRow}>
+                </div>
+                <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> Account status</p>
                   <p style={styles.infoValue}>Protected</p>
-                </button>
-                <button type="button" style={styles.infoRow}>
+                </div>
+                <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> UID</p>
                   <p style={styles.infoValue}>{uid}</p>
-                </button>
-                <button type="button" style={styles.infoRow}>
+                </div>
+                <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><Coins size={16} /> USDT Balance</p>
                   <p style={styles.infoValue}>{usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</p>
-                </button>
+                </div>
               </div>
 
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
