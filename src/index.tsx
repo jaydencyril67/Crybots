@@ -15,6 +15,7 @@ import SettingsPage from './components/SettingsPage';
 import DepositPage from './components/DepositPage';
 import PortfolioPage from './components/PortfolioPage';
 import DangerPage from './components/DangerPage';
+import SecurityPage from './components/SecurityPage';
 import WithdrawalsPage from './components/WithdrawalsPage';
 import TransferPage from './components/TransferPage';
 import TransactionHistoryPage from './components/TransactionHistoryPage';
@@ -53,6 +54,7 @@ const getRouteKey = () => {
   if (pathname === '/settings' || hash === '#/settings') return 'settings';
   if (pathname === '/portfolio' || hash === '#/portfolio') return 'portfolio';
   if (pathname === '/danger' || hash === '#/danger') return 'danger';
+  if (pathname === '/security' || hash === '#/security') return 'security';
   if (pathname === '/withdrawals' || hash === '#/withdrawals') return 'withdrawals';
   if (pathname === '/transfer' || hash === '#/transfer') return 'transfer';
   if (pathname === '/deposit' || hash === '#/deposit') return 'deposit';
@@ -73,6 +75,7 @@ const routeToKey = (path: string) => {
   if (path === '/settings' || path === '#/settings') return 'settings';
   if (path === '/portfolio' || path === '#/portfolio') return 'portfolio';
   if (path === '/danger' || path === '#/danger') return 'danger';
+  if (path === '/security' || path === '#/security') return 'security';
   if (path === '/withdrawals' || path === '#/withdrawals') return 'withdrawals';
   if (path === '/transfer' || path === '#/transfer') return 'transfer';
   if (path === '/deposit' || path === '#/deposit') return 'deposit';
