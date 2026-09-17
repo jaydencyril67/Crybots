@@ -80,6 +80,7 @@ const styles = {
   rowList: {
     display: 'grid',
     gap: '12px',
+    gridTemplateColumns: 'minmax(0, 1fr)',
   },
   row: {
     width: '100%',
@@ -135,7 +136,7 @@ const styles = {
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
     card: { padding: '16px', borderRadius: '18px' },
-    rowList: { gap: '10px' },
+    rowList: { gap: '10px', gridTemplateColumns: 'minmax(0, 1fr)' },
     row: { padding: '14px', borderRadius: '16px' },
     control: { gridTemplateColumns: 'minmax(0, 1fr)', gap: '8px' },
     button: { width: '100%' },
