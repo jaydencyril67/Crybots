@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound, Wallet } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { navigate } from '../utils/navigate';
 import NowBar from './NowBar';
 
@@ -51,17 +51,12 @@ const styles = {
     textAlign: 'left' as const,
     minWidth: 0,
   },
-  card: {
-    borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-    padding: '18px',
-  },
+  card: HYBRID_CARD_STYLES.card,
   '@media (max-width: 640px)': {
     page: { paddingBottom: '156px' },
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
-    card: { padding: '16px', borderRadius: '18px' },
+    card: HYBRID_CARD_STYLES.cardMobile,
     sectionTitle: { fontSize: '1.15rem' },
     sectionSub: { maxWidth: '100%' },
     infoList: { gap: '10px', gridTemplateColumns: 'minmax(0, 1fr)' },
