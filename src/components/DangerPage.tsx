@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme from './HybridTheme';
 import NowBar from './NowBar';
 
 type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
@@ -22,63 +22,79 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '12px',
+    gap: '18px',
     marginTop: '18px',
   },
-  rowButton: {
-    width: '100%',
-    padding: '16px 18px',
-    borderRadius: '16px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-    color: '#ffffff',
-    cursor: 'pointer',
-    textAlign: 'left' as const,
+  section: {
     display: 'grid',
-    gap: '6px',
+    gap: '10px',
+    paddingTop: '10px',
   },
-  warning: {
+  sectionTitle: {
     margin: 0,
-    fontSize: '0.82rem',
-    color: '#cbd5e1',
-    lineHeight: 1.5,
-  },
-  title: {
-    margin: '0 0 4px',
-    fontSize: '1.05rem',
-    fontWeight: 800,
-  },
-  status: {
-    marginTop: '12px',
-    fontSize: '0.92rem',
-    fontWeight: 700,
-  },
-  input: {
-    width: '100%',
-    boxSizing: 'border-box' as const,
-    borderRadius: '14px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(0,0,0,0.35)',
+    fontSize: '1.45rem',
+    fontWeight: 900,
+    letterSpacing: '-0.02em',
     color: '#ffffff',
-    padding: '13px 14px',
-    outline: 'none',
+  },
+  sectionText: {
+    margin: 0,
+    fontSize: '0.92rem',
+    color: '#a3a3a3',
+    lineHeight: 1.7,
+    maxWidth: '62ch',
+  },
+  actionTitle: {
+    margin: 0,
+    fontSize: '1.1rem',
+    fontWeight: 800,
+    color: '#ffffff',
+  },
+  actionText: {
+    margin: 0,
+    fontSize: '0.88rem',
+    color: '#b3b3b3',
+    lineHeight: 1.65,
+    maxWidth: '64ch',
   },
   field: {
     display: 'grid',
     gap: '8px',
-    marginTop: '14px',
+    marginTop: '8px',
   },
   label: {
-    fontSize: '0.9rem',
-    fontWeight: 700,
-    color: '#e5e7eb',
+    fontSize: '0.82rem',
+    fontWeight: 800,
+    color: '#8f8f8f',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase' as const,
+  },
+  input: {
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    borderRadius: '0',
+    border: 'none',
+    borderBottom: '1px solid rgba(255,255,255,0.14)',
+    background: 'transparent',
+    color: '#ffffff',
+    padding: '12px 0',
+    outline: 'none',
   },
   actionButton: {
-    borderRadius: '14px',
-    padding: '13px 16px',
+    borderRadius: '0',
+    padding: '14px 0',
     border: 'none',
+    borderBottom: '1px solid rgba(255,255,255,0.12)',
     cursor: 'pointer',
     fontWeight: 800,
+    color: '#ffffff',
+    background: 'transparent',
+    textAlign: 'left' as const,
+  },
+  status: {
+    marginTop: '8px',
+    fontSize: '0.92rem',
+    fontWeight: 700,
     color: '#ffffff',
   },
 };
@@ -117,7 +133,6 @@ const DangerPage = () => {
     }
   };
 
-  const theme = HYBRID_THEME_TOKENS.dark;
 
   return (
     <HybridTheme mode="dark">
@@ -125,18 +140,23 @@ const DangerPage = () => {
         <div style={styles.shell}>
           <AppHeader />
           <div style={styles.content}>
-            <button type="button" style={styles.rowButton} onClick={() => submitAction('disable')}>
-              <div style={{ ...styles.title, color: theme.warning }}>Disable Account</div>
-              <p style={styles.warning}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
-            </button>
-            <button type="button" style={styles.rowButton} onClick={() => submitAction('self-exclude')}>
-              <div style={{ ...styles.title, color: theme.danger }}>Self Exclude</div>
-              <p style={styles.warning}>This places your account into a self-exclusion state to prevent further use according to your request.</p>
-            </button>
-            <button type="button" style={styles.rowButton} onClick={() => submitAction('delete')}>
-              <div style={{ ...styles.title, color: theme.danger }}>Delete Account</div>
-              <p style={styles.warning}>This permanently removes your account after the confirmation step. This action cannot be undone.</p>
-            </button>
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}>Danger Zone</h2>
+              <p style={styles.sectionText}>These actions are irreversible or highly restrictive. Read each warning carefully before continuing.</p>
+            </section>
+
+            <section style={styles.section}>
+              <h3 style={styles.actionTitle}>Disable Account</h3>
+              <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
+            </section>
+            <section style={styles.section}>
+              <h3 style={styles.actionTitle}>Self Exclude</h3>
+              <p style={styles.actionText}>This places your account into a self-exclusion state to prevent further use according to your request.</p>
+            </section>
+            <section style={styles.section}>
+              <h3 style={styles.actionTitle}>Delete Account</h3>
+              <p style={styles.actionText}>This permanently removes your account after the confirmation step. This action cannot be undone.</p>
+            </section>
 
             <div style={styles.field}>
               <label style={styles.label} htmlFor="danger-password">Password</label>
@@ -150,11 +170,11 @@ const DangerPage = () => {
               <label style={styles.label} htmlFor="danger-reason">Reason</label>
               <input id="danger-reason" style={styles.input} value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Optional reason for the action" />
             </div>
-            <div style={{ display: 'grid', gap: '10px' }}>
-              <button type="button" style={{ ...styles.actionButton, background: 'linear-gradient(135deg, #f59e0b, #ef4444)' }} onClick={() => submitAction('disable')} disabled={loading !== null}>Confirm Disable</button>
-              <button type="button" style={{ ...styles.actionButton, background: 'linear-gradient(135deg, #dc2626, #7f1d1d)' }} onClick={() => submitAction('self-exclude')} disabled={loading !== null}>Confirm Self Exclude</button>
-              <button type="button" style={{ ...styles.actionButton, background: 'linear-gradient(135deg, #991b1b, #450a0a)' }} onClick={() => submitAction('delete')} disabled={loading !== null}>Confirm Delete</button>
-            </div>
+
+            <button type="button" style={styles.actionButton} onClick={() => submitAction('disable')} disabled={loading !== null}>Confirm Disable</button>
+            <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude')} disabled={loading !== null}>Confirm Self Exclude</button>
+            <button type="button" style={styles.actionButton} onClick={() => submitAction('delete')} disabled={loading !== null}>Confirm Delete</button>
+
             {status ? <div style={styles.status}>{status}</div> : null}
           </div>
         </div>
