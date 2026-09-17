@@ -58,6 +58,21 @@ const styles = {
     textAlign: 'left' as const,
     boxSizing: 'border-box' as const,
   },
+  cardButton: {
+    display: 'grid',
+    gap: '6px',
+    width: '100%',
+    padding: '16px 18px',
+    borderRadius: '18px',
+    border: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.04)',
+    color: '#ffffff',
+    textAlign: 'left' as const,
+    boxSizing: 'border-box' as const,
+    cursor: 'pointer',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+  },
   cardSubtext: {
     margin: 0,
     fontSize: '0.86rem',
@@ -66,7 +81,7 @@ const styles = {
   },
 };
 
-const getCardStyle = () => styles.card;
+const getCardStyle = () => styles.cardButton;
 
 const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
 
@@ -96,10 +111,10 @@ const PortfolioPage = () => {
 
             <div style={styles.buttonList}>
               {pageButtons.map((label) => (
-                <section key={label} style={getCardStyle()}>
+                <button key={label} type="button" style={getCardStyle()} onClick={() => handleButtonClick(label)}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>{label}</h3>
                   {label === 'Danger' ? <p style={styles.cardSubtext}>Account recovery and irreversible actions.</p> : null}
-                </section>
+                </button>
               ))}
             </div>
           </div>
