@@ -239,7 +239,7 @@ const SettingsPage = () => {
   const cropInputRef = useRef<HTMLInputElement | null>(null);
   const avatarImageRef = useRef<HTMLImageElement | null>(null);
   const cropOverlayRef = useRef<HTMLDivElement | null>(null);
-  const cropDragStateRef = useRef<{ mode: 'move' | 'resize' | null; startX: number; startY: number; startBox: CropBox | null; startSize: number | null }>({ mode: null, startX: 0, startY: 0, startBox: null, startSize: null });
+  const cropDragStateRef = useRef<{ mode: 'move' | 'resize' | null; startX: number; startY: number; startBox: CropBox | null; startSize: number | null; offsetX: number; offsetY: number }>({ mode: null, startX: 0, startY: 0, startBox: null, startSize: null, offsetX: 0, offsetY: 0 });
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -606,6 +606,8 @@ const SettingsPage = () => {
       startY: event.clientY,
       startBox: cropBox,
       startSize: cropBox.size,
+      offsetX: event.clientX - cropBox.x,
+      offsetY: event.clientY - cropBox.y,
     };
   };
 
@@ -621,19 +623,19 @@ const SettingsPage = () => {
     if (dragState.mode === 'move') {
       setCropBox({
         ...dragState.startBox,
-        x: dragState.startBox.x + deltaX,
-        y: dragState.startBox.y + deltaY,
+        x: event.clientX - dragState.offsetX,
+        y: event.clientY - dragState.offsetY,
       });
       return;
     }
 
     const delta = Math.max(deltaX, deltaY);
-    const nextSize = (dragState.startSize ?? dragState.startBox.size) + delta;
+    const nextSize = Math.max(48, (dragState.startSize ?? dragState.startBox.size) + delta);
 
-    setCropBox({
+    setCropBox(clampCropBox({
       ...dragState.startBox,
       size: nextSize,
-    });
+    }));
   };
 
   const handleCropPointerUp = (event: React.PointerEvent<HTMLElement>) => {
@@ -643,6 +645,8 @@ const SettingsPage = () => {
       dragState.startBox = null;
       dragState.startSize = null;
     }
+    dragState.offsetX = 0;
+    dragState.offsetY = 0;
     event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
@@ -668,11 +672,21 @@ const SettingsPage = () => {
     }
 
     const imageRect = image.getBoundingClientRect();
-    const overlaySize = imageRect.width || imageRect.height || 320;
-    const scaleX = image.naturalWidth / overlaySize || 1;
-    const scaleY = image.naturalHeight / overlaySize || 1;
-    const cropX = Math.max(0, Math.round(cropBox.x * scaleX));
-    const cropY = Math.max(0, Math.round(cropBox.y * scaleY));
+    const overlayRect = cropOverlayRef.current?.getBoundingClientRect();
+    const visibleImageRect = overlayRect
+      ? {
+          left: Math.max(imageRect.left, overlayRect.left),
+          top: Math.max(imageRect.top, overlayRect.top),
+          right: Math.min(imageRect.right, overlayRect.right),
+          bottom: Math.min(imageRect.bottom, overlayRect.bottom),
+        }
+      : imageRect;
+    const visibleWidth = Math.max(1, visibleImageRect.right - visibleImageRect.left);
+    const visibleHeight = Math.max(1, visibleImageRect.bottom - visibleImageRect.top);
+    const scaleX = image.naturalWidth / visibleWidth || 1;
+    const scaleY = image.naturalHeight / visibleHeight || 1;
+    const cropX = Math.max(0, Math.round((cropBox.x - (visibleImageRect.left - imageRect.left)) * scaleX));
+    const cropY = Math.max(0, Math.round((cropBox.y - (visibleImageRect.top - imageRect.top)) * scaleY));
     const cropSize = Math.max(1, Math.round(cropBox.size * Math.min(scaleX, scaleY)));
 
     setAvatarUploading(true);
@@ -1047,6 +1061,7 @@ const SettingsPage = () => {
                         pointerEvents: 'auto',
                         touchAction: 'none',
                         padding: 0,
+                        zIndex: 2,
                       }}
                     />
                   </div>
