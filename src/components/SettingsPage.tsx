@@ -592,9 +592,12 @@ const SettingsPage = () => {
 
   const clampCropBox = (nextBox: CropBox) => {
     const imageSize = avatarImageRef.current?.getBoundingClientRect();
-    const limit = imageSize ? Math.min(imageSize.width, imageSize.height) : 320;
-    const size = Math.max(80, Math.min(nextBox.size, limit));
-    return { ...nextBox, size };
+    const maxWidth = imageSize?.width ?? 320;
+    const maxHeight = imageSize?.height ?? 320;
+    const size = Math.max(80, Math.min(nextBox.size, Math.min(maxWidth, maxHeight)));
+    const x = Math.max(0, Math.min(nextBox.x, Math.max(0, maxWidth - size)));
+    const y = Math.max(0, Math.min(nextBox.y, Math.max(0, maxHeight - size)));
+    return { x, y, size };
   };
 
   const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>, mode: 'move' | 'resize') => {
@@ -619,21 +622,21 @@ const SettingsPage = () => {
     const deltaY = event.clientY - dragState.startY;
 
     if (dragState.mode === 'move') {
-      setCropBox({
+      setCropBox(clampCropBox({
         ...dragState.startBox,
         x: dragState.startBox.x + deltaX,
         y: dragState.startBox.y + deltaY,
-      });
+      }));
       return;
     }
 
     const delta = Math.max(deltaX, deltaY);
-    const nextSize = (dragState.startSize ?? dragState.startBox.size) + delta;
+    const nextSize = Math.max(80, (dragState.startSize ?? dragState.startBox.size) + delta);
 
-    setCropBox({
+    setCropBox(clampCropBox({
       ...dragState.startBox,
       size: nextSize,
-    });
+    }));
   };
 
   const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -1046,6 +1049,7 @@ const SettingsPage = () => {
                         cursor: 'nwse-resize',
                         pointerEvents: 'auto',
                         touchAction: 'none',
+                        zIndex: 2,
                       }}
                     />
                   </div>
