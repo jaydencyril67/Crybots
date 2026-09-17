@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Avatar from 'react-avatar-edit';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import ImageCrop from '@cloudimage/image-crop';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
@@ -43,7 +43,8 @@ type WalletValidationState = {
 
 type AvatarEditorState = {
   source: string;
-  preview: string | null;
+  fileName: string;
+  file: File;
 };
 
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
@@ -229,6 +230,8 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const cropInputRef = useRef<HTMLInputElement | null>(null);
+  const cropEditorRef = useRef<any>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -545,17 +548,8 @@ const SettingsPage = () => {
   }, [uid, uidAvailable, uidChecking]);
 
   const openAvatarEditor = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const source = typeof reader.result === 'string' ? reader.result : '';
-      if (!source) {
-        showStatus('error', 'Unable to read that image.');
-        return;
-      }
-
-      setAvatarEditor({ source, preview: null });
-    };
-    reader.readAsDataURL(file);
+    const source = URL.createObjectURL(file);
+    setAvatarEditor({ source, fileName: file.name || `avatar-${Date.now()}.png`, file });
   };
 
   const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -574,7 +568,13 @@ const SettingsPage = () => {
   };
 
   const closeAvatarEditor = () => {
+    if (avatarEditor?.source) {
+      URL.revokeObjectURL(avatarEditor.source);
+    }
     setAvatarEditor(null);
+    if (cropInputRef.current) {
+      cropInputRef.current.value = '';
+    }
   };
 
   const avatarDisplayStyle = {
@@ -589,17 +589,24 @@ const SettingsPage = () => {
     boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
   };
 
-  /* Avatar positioning and cropping are provided by react-avatar-edit. */
+  const handleCropDone = async () => {
+    const editor = cropEditorRef.current;
+    if (!editor?.getCroppedBlob) {
+      showStatus('error', 'Unable to prepare the cropped image.');
+      return;
+    }
 
-  const handleUploadAvatar = async () => {
-    if (!avatarEditor?.preview) {
+    const croppedBlob = await editor.getCroppedBlob();
+    if (!croppedBlob) {
       showStatus('error', 'Adjust your photo before saving.');
       return;
     }
 
     setAvatarUploading(true);
     try {
-      const avatarDataUrl = avatarEditor.preview;
+      const croppedFile = croppedBlob instanceof File
+        ? croppedBlob
+        : new File([croppedBlob], `avatar-${Date.now()}.png`, { type: croppedBlob.type || 'image/png' });
       const authResponse = await api.get('/api/imagekit/auth');
       const auth = authResponse.data as { publicKey?: string; token?: string; expire?: number; signature?: string };
 
@@ -608,8 +615,8 @@ const SettingsPage = () => {
       }
 
       const uploadFormData = new FormData();
-      uploadFormData.append('file', avatarDataUrl);
-      uploadFormData.append('fileName', `avatar-${Date.now()}.png`);
+      uploadFormData.append('file', croppedFile);
+      uploadFormData.append('fileName', avatarEditor?.fileName || croppedFile.name);
       uploadFormData.append('useUniqueFileName', 'true');
       uploadFormData.append('token', auth.token);
       uploadFormData.append('expire', String(auth.expire));
@@ -893,30 +900,38 @@ const SettingsPage = () => {
           </div>
         </div>
         {avatarEditor ? (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(3, 7, 20, 0.82)', backdropFilter: 'blur(18px)', display: 'grid', placeItems: 'center', padding: '18px' }}>
-            <div style={{ width: 'min(460px, 100%)', borderRadius: '24px', background: 'linear-gradient(180deg, rgba(13,18,32,0.98), rgba(8,12,23,0.98))', border: '1px solid rgba(255,255,255,0.08)', padding: '18px', display: 'grid', gap: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#c6d3ea', fontSize: '0.92rem', fontWeight: 600 }}>Adjust profile photo</span>
-                <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Close</button>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: 'rgba(3, 7, 20, 0.82)', backdropFilter: 'blur(18px)', display: 'grid', placeItems: 'center', padding: '0' }}>
+            <div style={{ width: '100%', height: '100%', maxWidth: '100%', borderRadius: 0, background: 'linear-gradient(180deg, rgba(9,13,25,0.98), rgba(4,8,16,0.98))', border: 'none', padding: '0', display: 'grid', gridTemplateRows: 'auto 1fr auto', gap: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 18px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Cancel</button>
+                <span style={{ color: '#c6d3ea', fontSize: '0.95rem', fontWeight: 700 }}>Edit photo</span>
+                <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '10px 14px' }} onClick={() => void handleCropDone()} disabled={avatarUploading}>
+                  {avatarUploading ? 'Saving...' : 'Done'}
+                </button>
               </div>
-              <Avatar
-                width={360}
-                height={360}
-                cropRadius={180}
-                exportAsSquare
-                exportSize={512}
-                exportMimeType="image/png"
-                src={avatarEditor.source}
-                onCrop={(preview) => setAvatarEditor((current) => (current ? { ...current, preview } : current))}
-                onClose={closeAvatarEditor}
-                closeIconColor="#ffffff"
-                shadingColor="#050816"
-                shadingOpacity={0.65}
-                label="Choose profile photo"
-              />
-              <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '12px 18px' }} onClick={() => void handleUploadAvatar()} disabled={avatarUploading || !avatarEditor.preview}>
-                {avatarUploading ? 'Saving...' : 'Save cropped photo'}
-              </button>
+              <div style={{ position: 'relative', minHeight: 0, overflow: 'hidden' }}>
+                <ImageCrop
+                  ref={cropEditorRef}
+                  src={avatarEditor.source}
+                  width="100%"
+                  height="100%"
+                  aspectRatio={1}
+                  cropShape="round"
+                  showGrid
+                  showZoom
+                  showRotate
+                  backgroundColor="#050816"
+                  darkOverlayColor="rgba(3, 7, 20, 0.72)"
+                />
+              </div>
+              <div style={{ padding: '14px 18px calc(18px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <span style={{ color: '#8ea2c7', fontSize: '0.9rem' }}>Drag to reposition, pinch to zoom, and rotate if needed.</span>
+                <label style={{ ...styles.button, background: 'rgba(255,255,255,0.06)', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                  <Upload size={16} />
+                  <span>Choose another photo</span>
+                  <input ref={cropInputRef} type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} />
+                </label>
+              </div>
             </div>
           </div>
         ) : null}
