@@ -170,9 +170,9 @@ const SecurityPage = () => {
   const [devices, setDevices] = useState<SecurityDevice[]>([]);
   const [logins, setLogins] = useState<SecurityLogin[]>([]);
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
-  const [twoFactorEnabled] = useState(false);
-  const [biometricEnabled] = useState(false);
-  const [hardwareKeyEnabled] = useState(false);
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
   const [savingUid, setSavingUid] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [savingSecurityCode, setSavingSecurityCode] = useState(false);
