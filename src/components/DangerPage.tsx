@@ -30,13 +30,13 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '24px',
+    gap: '28px',
     marginTop: '18px',
   },
   section: {
     display: 'grid',
-    gap: '12px',
-    paddingTop: '10px',
+    gap: '10px',
+    paddingTop: '0',
   },
   sectionTitle: {
     margin: 0,
@@ -68,7 +68,7 @@ const styles = {
   field: {
     display: 'grid',
     gap: '8px',
-    marginTop: '10px',
+    marginTop: '0',
   },
   label: {
     fontSize: '0.82rem',
@@ -100,7 +100,7 @@ const styles = {
     textAlign: 'left' as const,
   },
   status: {
-    marginTop: '12px',
+    marginTop: '4px',
     fontSize: '0.92rem',
     fontWeight: 700,
     color: '#ffffff',
