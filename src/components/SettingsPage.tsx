@@ -1015,12 +1015,14 @@ const SettingsPage = () => {
                 ref={cropOverlayRef}
                 style={{ position: 'relative', minHeight: '320px', overflow: 'hidden', display: 'grid', placeItems: 'center', padding: '18px' }}
               >
-                <img
-                  ref={avatarImageRef}
-                  src={avatarEditor.source}
-                  alt="Selected avatar preview"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', filter: 'saturate(1.08) contrast(1.04)' }}
-                />
+                <div style={{ width: 'min(100%, 520px)', aspectRatio: '1 / 1', maxHeight: 'min(72vh, 520px)', position: 'relative' }}>
+                  <img
+                    ref={avatarImageRef}
+                    src={avatarEditor.source}
+                    alt="Selected avatar preview"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px', filter: 'saturate(1.08) contrast(1.04)' }}
+                  />
+                </div>
                 <div
                   role="presentation"
                   style={{ position: 'absolute', inset: '18px', pointerEvents: 'none' }}
