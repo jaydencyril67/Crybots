@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, Globe, LogOut } from 'lucide-react';
+import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -19,6 +19,8 @@ type SecurityDevice = {
 type SessionData = {
   tokenHash: string;
   ip: string;
+  deviceType: string;
+  location: string;
   createdAt: string;
 };
 
@@ -88,6 +90,60 @@ const styles = {
     gap: '12px',
     paddingTop: '8px',
   },
+  tableWrap: {
+    width: '100%',
+    overflowX: 'auto' as const,
+    WebkitOverflowScrolling: 'touch' as const,
+  },
+  table: {
+    width: '100%',
+    minWidth: '920px',
+    borderCollapse: 'separate' as const,
+    borderSpacing: 0,
+  },
+  tableHeadCell: {
+    textAlign: 'left' as const,
+    padding: '12px 14px',
+    fontSize: '0.8rem',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.08em',
+    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    whiteSpace: 'nowrap' as const,
+  },
+  tableCell: {
+    padding: '14px',
+    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    verticalAlign: 'top' as const,
+  },
+  tableRow: {
+    background: 'rgba(255,255,255,0.02)',
+  },
+  tableRowCurrent: {
+    background: 'rgba(34,197,94,0.08)',
+  },
+  tableLabel: {
+    margin: 0,
+    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    fontSize: '0.78rem',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.08em',
+  },
+  tableValue: {
+    margin: '6px 0 0',
+    color: HYBRID_THEME_TOKENS.dark.text,
+    fontSize: '0.95rem',
+    fontWeight: 800,
+    lineHeight: 1.5,
+    wordBreak: 'break-word' as const,
+    overflowWrap: 'anywhere' as const,
+  },
+  tableMeta: {
+    margin: '6px 0 0',
+    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    fontSize: '0.88rem',
+    lineHeight: 1.6,
+  },
   rowList: {
     display: 'grid',
     gap: '12px',
@@ -150,6 +206,7 @@ const styles = {
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
     card: { ...HYBRID_CARD_STYLES.card, ...HYBRID_CARD_STYLES.cardMobile },
+    table: { minWidth: '820px' },
     rowList: { gap: '10px', gridTemplateColumns: '1fr', width: '100%', minWidth: 0 },
     row: { padding: '14px', borderRadius: '16px', maxWidth: '100%' },
     control: { gridTemplateColumns: '1fr', gap: '8px', width: '100%', minWidth: 0 },
@@ -397,58 +454,71 @@ const SecurityPage = () => {
 
               <div style={styles.row}>
                 <p style={styles.rowLabel}><Smartphone size={16} /> Devices logged in</p>
-                <p style={styles.rowValue}>{currentLoginCount} active device{currentLoginCount === 1 ? '' : 's'} &bull; max 3 per account</p>
-                <div style={styles.control}>
-                  {sessions.length === 0 && (
-                    <p style={styles.note}>No active sessions found.</p>
-                  )}
-                  {sessions.map((session, index) => {
-                    const isCurrent = session.tokenHash === currentTokenHash;
-                    return (
-                      <div key={session.tokenHash ?? `session-${index}`} style={{ ...styles.row, borderColor: isCurrent ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.08)' }}>
-                        <p style={styles.rowLabel}>
-                          <Laptop2 size={14} />
-                          {isCurrent ? 'Current device' : `Device ${index + 1}`}
-                          {isCurrent && <span style={{ color: '#22c55e', fontSize: '0.75rem', marginLeft: '6px', fontWeight: 600 }}>● Active now</span>}
-                        </p>
-                        <p style={styles.rowValue}>{session.ip || 'IP not available'}</p>
-                        <p style={styles.note}>
-                          Logged in {new Date(session.createdAt).toLocaleString(undefined, {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                        {!isCurrent && (
-                          <div style={{ marginTop: '8px' }}>
-                            <button
-                              type="button"
-                              style={{ ...styles.button, color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
-                              onClick={() => void handleRemoveSession(session.tokenHash)}
-                              disabled={removingSession === session.tokenHash}
-                            >
-                              <LogOut size={14} />
-                              {removingSession === session.tokenHash ? 'Removing...' : 'Force logout device'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div style={styles.row}>
-                <p style={styles.rowLabel}><Globe size={16} /> Recent logins</p>
-                <div style={styles.control}>
-                  {logins.map((login, index) => (
-                    <div key={login.id ?? `${login.device ?? 'login'}-${index}`} style={styles.row}>
-                      <p style={styles.rowValue}>{login.device || 'Unknown device'} • {login.ip || 'IP not available'}</p>
-                      <p style={styles.note}>{login.location || 'Location unavailable'}{login.createdAt ? ` • ${login.createdAt}` : ''} • {login.success ? 'Success' : 'Review needed'}</p>
-                    </div>
-                  ))}
+                <p style={styles.rowValue}>{currentLoginCount} active device{currentLoginCount === 1 ? '' : 's'} &bull; max 2 per account</p>
+                <div style={styles.tableWrap}>
+                  <table style={styles.table}>
+                    <thead>
+                      <tr>
+                        <th style={styles.tableHeadCell}>Device</th>
+                        <th style={styles.tableHeadCell}>IP address</th>
+                        <th style={styles.tableHeadCell}>Location</th>
+                        <th style={styles.tableHeadCell}>Login time</th>
+                        <th style={styles.tableHeadCell}>Status</th>
+                        <th style={styles.tableHeadCell}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sessions.length === 0 ? (
+                        <tr>
+                          <td style={styles.tableCell} colSpan={6}>
+                            <p style={styles.note}>No active sessions found.</p>
+                          </td>
+                        </tr>
+                      ) : sessions.map((session, index) => {
+                        const isCurrent = session.tokenHash === currentTokenHash;
+                        return (
+                          <tr key={session.tokenHash ?? `session-${index}`} style={isCurrent ? styles.tableRowCurrent : styles.tableRow}>
+                            <td style={styles.tableCell}>
+                              <p style={styles.tableLabel}><Laptop2 size={14} /> Device</p>
+                              <p style={styles.tableValue}>{session.deviceType || 'Unknown device'}</p>
+                            </td>
+                            <td style={styles.tableCell}>
+                              <p style={styles.tableLabel}>IP address</p>
+                              <p style={styles.tableValue}>{session.ip || 'IP not available'}</p>
+                            </td>
+                            <td style={styles.tableCell}>
+                              <p style={styles.tableLabel}>Location</p>
+                              <p style={styles.tableValue}>{session.location || 'Location unavailable'}</p>
+                            </td>
+                            <td style={styles.tableCell}>
+                              <p style={styles.tableLabel}>Login time</p>
+                              <p style={styles.tableValue}>{new Date(session.createdAt).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                            </td>
+                            <td style={styles.tableCell}>
+                              <p style={styles.tableLabel}>Status</p>
+                              <p style={styles.tableValue}>{isCurrent ? 'Current device' : `Device ${index + 1}`}</p>
+                              <p style={styles.tableMeta}>{isCurrent ? 'Active now' : 'Stored session'}</p>
+                            </td>
+                            <td style={styles.tableCell}>
+                              {isCurrent ? (
+                                <p style={styles.tableMeta}>This device cannot be removed from here.</p>
+                              ) : (
+                                <button
+                                  type="button"
+                                  style={{ ...styles.button, color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                                  onClick={() => void handleRemoveSession(session.tokenHash)}
+                                  disabled={removingSession === session.tokenHash}
+                                >
+                                  <LogOut size={14} />
+                                  {removingSession === session.tokenHash ? 'Removing...' : 'Force logout device'}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
