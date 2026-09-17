@@ -8,6 +8,19 @@ export const authHeaders = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+const clearAuthData = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('kingshall_user');
+  localStorage.removeItem('firstName');
+  localStorage.removeItem('kingshall_first_name');
+};
+
+export const forceLogout = () => {
+  clearAuthData();
+  window.location.href = '/';
+};
+
 // Create axios instance with base URL
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -26,5 +39,16 @@ api.interceptors.request.use((config) => {
 }, (error) => {
   return Promise.reject(error);
 });
+
+// Add a response interceptor to handle force logout
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.data?.forceLogout) {
+      forceLogout();
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default api;

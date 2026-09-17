@@ -223,7 +223,12 @@ const ProfilePage = () => {
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : 0;
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await api.post('/api/auth/signout');
+    } catch {
+      // Even if signout API fails, clear local state
+    }
     window.localStorage.removeItem('token');
     window.localStorage.removeItem('user');
     window.localStorage.removeItem('kingshall_user');
