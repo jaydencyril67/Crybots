@@ -22,12 +22,12 @@ const styles = {
   },
   content: {
     display: 'grid',
-    gap: '18px',
+    gap: '24px',
     marginTop: '18px',
   },
   section: {
     display: 'grid',
-    gap: '10px',
+    gap: '12px',
     paddingTop: '10px',
   },
   sectionTitle: {
@@ -60,7 +60,7 @@ const styles = {
   field: {
     display: 'grid',
     gap: '8px',
-    marginTop: '8px',
+    marginTop: '10px',
   },
   label: {
     fontSize: '0.82rem',
@@ -82,7 +82,7 @@ const styles = {
   },
   actionButton: {
     borderRadius: '0',
-    padding: '14px 0',
+    padding: '16px 0',
     border: 'none',
     borderBottom: '1px solid rgba(255,255,255,0.12)',
     cursor: 'pointer',
@@ -92,7 +92,7 @@ const styles = {
     textAlign: 'left' as const,
   },
   status: {
-    marginTop: '8px',
+    marginTop: '12px',
     fontSize: '0.92rem',
     fontWeight: 700,
     color: '#ffffff',
