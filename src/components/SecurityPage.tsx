@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, Globe } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
@@ -132,16 +132,13 @@ const styles = {
     minWidth: 0,
   },
   card: {
-    borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-    padding: '18px',
+    ...HYBRID_CARD_STYLES.card,
   },
   '@media (max-width: 640px)': {
     page: { paddingBottom: '156px' },
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
-    card: { padding: '16px', borderRadius: '18px' },
+    card: { ...HYBRID_CARD_STYLES.card, ...HYBRID_CARD_STYLES.cardMobile },
     rowList: { gap: '10px', gridTemplateColumns: '1fr', width: '100%', minWidth: 0 },
     row: { padding: '14px', borderRadius: '16px', maxWidth: '100%' },
     control: { gridTemplateColumns: '1fr', gap: '8px', width: '100%', minWidth: 0 },
