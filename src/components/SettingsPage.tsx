@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ImageCrop from '@cloudimage/image-crop';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
@@ -45,6 +44,13 @@ type AvatarEditorState = {
   source: string;
   fileName: string;
   file: File;
+  crop: AvatarCropState;
+};
+
+type AvatarCropState = {
+  x: number;
+  y: number;
+  scale: number;
 };
 
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
@@ -231,6 +237,7 @@ const SettingsPage = () => {
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const cropInputRef = useRef<HTMLInputElement | null>(null);
+  const cropContainerRef = useRef<HTMLDivElement | null>(null);
   const cropEditorRef = useRef<any>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
@@ -549,7 +556,12 @@ const SettingsPage = () => {
 
   const openAvatarEditor = (file: File) => {
     const source = URL.createObjectURL(file);
-    setAvatarEditor({ source, fileName: file.name || `avatar-${Date.now()}.png`, file });
+    setAvatarEditor({
+      source,
+      fileName: file.name || `avatar-${Date.now()}.png`,
+      file,
+      crop: { x: 0, y: 0, scale: 1 },
+    });
   };
 
   const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -575,6 +587,8 @@ const SettingsPage = () => {
     if (cropInputRef.current) {
       cropInputRef.current.value = '';
     }
+    setCropReady(false);
+    setCropBoxSize(0);
   };
 
   const avatarDisplayStyle = {
