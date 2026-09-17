@@ -44,13 +44,6 @@ type AvatarEditorState = {
   source: string;
   fileName: string;
   file: File;
-  crop: AvatarCropState;
-};
-
-type AvatarCropState = {
-  x: number;
-  y: number;
-  scale: number;
 };
 
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
@@ -237,7 +230,6 @@ const SettingsPage = () => {
   const [avatarEditor, setAvatarEditor] = useState<AvatarEditorState | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const cropInputRef = useRef<HTMLInputElement | null>(null);
-  const cropContainerRef = useRef<HTMLDivElement | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
@@ -559,7 +551,6 @@ const SettingsPage = () => {
       source,
       fileName: file.name || `avatar-${Date.now()}.png`,
       file,
-      crop: { x: 0, y: 0, scale: 1 },
     });
   };
 
@@ -909,7 +900,7 @@ const SettingsPage = () => {
                 <button type="button" style={{ ...styles.button, padding: '10px 14px', background: 'rgba(255,255,255,0.06)' }} onClick={closeAvatarEditor} disabled={avatarUploading}>Cancel</button>
                 <span style={{ color: '#c6d3ea', fontSize: '0.95rem', fontWeight: 700 }}>Edit photo</span>
                 <button type="button" style={{ ...styles.button, ...styles.primaryButton, padding: '10px 14px' }} onClick={() => void handleAvatarUpload()} disabled={avatarUploading}>
-                  {avatarUploading ? 'Uploading...' : 'Done'}
+                  {avatarUploading ? 'Saving...' : 'Crop & upload'}
                 </button>
               </div>
               <div style={{ position: 'relative', minHeight: '320px', overflow: 'hidden', display: 'grid', placeItems: 'center', padding: '18px' }}>
