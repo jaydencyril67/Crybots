@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, Globe } from 'lucide-react';
+import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, Globe, LogOut } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -14,6 +14,12 @@ type SecurityDevice = {
   location?: string;
   lastActiveAt?: string;
   status?: string;
+};
+
+type SessionData = {
+  tokenHash: string;
+  ip: string;
+  createdAt: string;
 };
 
 type SecurityLogin = {
@@ -35,6 +41,11 @@ type SecurityMeResponse = {
   };
   devices?: SecurityDevice[];
   logins?: SecurityLogin[];
+};
+
+type SessionsApiResponse = {
+  sessions: SessionData[];
+  currentTokenHash: string;
 };
 
 type SaveState = 'idle' | 'saving' | 'success' | 'error';
@@ -193,7 +204,6 @@ const SecurityPage = () => {
   const [securityCode, setSecurityCode] = useState('');
   const [confirmSecurityCode, setConfirmSecurityCode] = useState('');
   const [status, setStatus] = useState<{ kind: SaveState; text: string }>({ kind: 'idle', text: '' });
-  const [devices, setDevices] = useState<SecurityDevice[]>([]);
   const [logins, setLogins] = useState<SecurityLogin[]>([]);
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -206,6 +216,9 @@ const SecurityPage = () => {
   const [savingSecurityQuestion, setSavingSecurityQuestion] = useState(false);
   const [savingBiometric, setSavingBiometric] = useState(false);
   const [savingHardware, setSavingHardware] = useState(false);
+  const [sessions, setSessions] = useState<SessionData[]>([]);
+  const [currentTokenHash, setCurrentTokenHash] = useState('');
+  const [removingSession, setRemovingSession] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -216,16 +229,40 @@ const SecurityPage = () => {
         setTwoFactorEnabled(Boolean(data.user?.twoFactorEnabled));
         setBiometricEnabled(Boolean(data.user?.biometricEnabled));
         setHardwareKeyEnabled(Boolean(data.user?.hardwareKeyEnabled));
-        setDevices(data.devices ?? []);
+
         setLogins(data.logins ?? []);
       } catch {
         setStatus({ kind: 'error', text: 'Unable to load security details right now.' });
+      }
+
+      try {
+        const { data } = await api.get<SessionsApiResponse>('/api/auth/sessions');
+        setSessions(data.sessions ?? []);
+        setCurrentTokenHash(data.currentTokenHash ?? '');
+      } catch {
+        // sessions fetch is non-critical
       }
     };
     void load();
   }, []);
 
-  const currentLoginCount = useMemo(() => devices.length, [devices.length]);
+  const currentLoginCount = useMemo(() => sessions.length, [sessions.length]);
+
+  const handleRemoveSession = async (tokenHash: string) => {
+    setRemovingSession(tokenHash);
+    try {
+      await api.delete(`/api/auth/sessions/${tokenHash}`);
+      setSessions((prev) => prev.filter((s) => s.tokenHash !== tokenHash));
+      setStatus({ kind: 'success', text: 'Device session removed successfully.' });
+    } catch (error: any) {
+      setStatus({
+        kind: 'error',
+        text: error?.response?.data?.message || 'Unable to remove device session.',
+      });
+    } finally {
+      setRemovingSession(null);
+    }
+  };
 
   const showStatus = (kind: SaveState, text: string) => setStatus({ kind, text });
 
@@ -360,15 +397,46 @@ const SecurityPage = () => {
 
               <div style={styles.row}>
                 <p style={styles.rowLabel}><Smartphone size={16} /> Devices logged in</p>
-                <p style={styles.rowValue}>{currentLoginCount} active device{currentLoginCount === 1 ? '' : 's'}</p>
+                <p style={styles.rowValue}>{currentLoginCount} active device{currentLoginCount === 1 ? '' : 's'} &bull; max 3 per account</p>
                 <div style={styles.control}>
-                  {devices.map((device, index) => (
-                    <div key={device.id ?? `${device.name ?? 'device'}-${index}`} style={styles.row}>
-                      <p style={styles.rowLabel}><Laptop2 size={14} /> {device.name || 'Device'}</p>
-                      <p style={styles.rowValue}>{device.ip || 'IP not available'} {device.location ? `• ${device.location}` : ''}</p>
-                      <p style={styles.note}>{device.lastActiveAt ? `Last active ${device.lastActiveAt}` : 'Last activity unavailable'}{device.status ? ` • ${device.status}` : ''}</p>
-                    </div>
-                  ))}
+                  {sessions.length === 0 && (
+                    <p style={styles.note}>No active sessions found.</p>
+                  )}
+                  {sessions.map((session, index) => {
+                    const isCurrent = session.tokenHash === currentTokenHash;
+                    return (
+                      <div key={session.tokenHash ?? `session-${index}`} style={{ ...styles.row, borderColor: isCurrent ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.08)' }}>
+                        <p style={styles.rowLabel}>
+                          <Laptop2 size={14} />
+                          {isCurrent ? 'Current device' : `Device ${index + 1}`}
+                          {isCurrent && <span style={{ color: '#22c55e', fontSize: '0.75rem', marginLeft: '6px', fontWeight: 600 }}>● Active now</span>}
+                        </p>
+                        <p style={styles.rowValue}>{session.ip || 'IP not available'}</p>
+                        <p style={styles.note}>
+                          Logged in {new Date(session.createdAt).toLocaleString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                        {!isCurrent && (
+                          <div style={{ marginTop: '8px' }}>
+                            <button
+                              type="button"
+                              style={{ ...styles.button, color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                              onClick={() => void handleRemoveSession(session.tokenHash)}
+                              disabled={removingSession === session.tokenHash}
+                            >
+                              <LogOut size={14} />
+                              {removingSession === session.tokenHash ? 'Removing...' : 'Force logout device'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
