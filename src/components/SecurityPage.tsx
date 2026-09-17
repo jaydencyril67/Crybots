@@ -79,7 +79,7 @@ const styles = {
   },
   rowList: {
     display: 'grid',
-    gap: '10px',
+    gap: '12px',
   },
   row: {
     width: '100%',
@@ -90,6 +90,7 @@ const styles = {
     display: 'grid',
     gap: '6px',
     textAlign: 'left' as const,
+    minWidth: 0,
   },
   rowLabel: {
     margin: 0,
@@ -134,7 +135,7 @@ const styles = {
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
     card: { padding: '16px', borderRadius: '18px' },
-    rowList: { gap: '12px' },
+    rowList: { gap: '10px' },
     row: { padding: '14px', borderRadius: '16px' },
     control: { gridTemplateColumns: 'minmax(0, 1fr)', gap: '8px' },
     button: { width: '100%' },
