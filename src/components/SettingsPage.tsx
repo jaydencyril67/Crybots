@@ -629,8 +629,12 @@ const SettingsPage = () => {
 
     const delta = Math.max(deltaX, deltaY);
     const nextSize = (dragState.startSize ?? dragState.startBox.size) + delta;
+    const nextX = dragState.startBox.x;
+    const nextY = dragState.startBox.y;
+
     setCropBox(clampCropBox({
-      ...dragState.startBox,
+      x: nextX,
+      y: nextY,
       size: nextSize,
     }));
   };
