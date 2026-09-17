@@ -1031,11 +1031,10 @@ const SettingsPage = () => {
                       touchAction: 'none',
                     }}
                   >
-                    <div
+                    <button
+                      type="button"
+                      aria-label="Resize crop area"
                       onPointerDown={(event) => handleCropPointerDown(event, 'resize')}
-                      onPointerMove={handleCropPointerMove}
-                      onPointerUp={handleCropPointerUp}
-                      onPointerCancel={handleCropPointerUp}
                       style={{
                         position: 'absolute',
                         right: '-10px',
@@ -1048,6 +1047,7 @@ const SettingsPage = () => {
                         cursor: 'nwse-resize',
                         pointerEvents: 'auto',
                         touchAction: 'none',
+                        padding: 0,
                       }}
                     />
                   </div>
