@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
+import { navigate } from '../utils/navigate';
 import AppHeader from './AppHeader';
 import HybridTheme from './HybridTheme';
 import NowBar from './NowBar';
@@ -132,6 +133,7 @@ const DangerPage = () => {
           headers,
           data: { password: state.password, confirmation: state.confirmation },
         });
+        navigate('/pending-deletion');
       } else if (action === 'disable') {
         await api.patch('/api/settings/danger/disable', payload, { headers });
       } else {
