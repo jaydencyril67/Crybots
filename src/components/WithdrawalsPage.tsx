@@ -5,6 +5,7 @@ import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
+import ReusableDatePage from './ReusableDatePage';
 import { navigate } from '../utils/navigate';
 
 type WithdrawalDetailsResponse = {
@@ -102,6 +103,7 @@ const WithdrawPage = () => {
   const [currency, setCurrency] = useState('USDT');
   const [destinationValue, setDestinationValue] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
+  const [showSchedulePage, setShowSchedulePage] = useState(false);
   const [securityCode, setSecurityCode] = useState('');
   const [currentWallet, setCurrentWallet] = useState('');
   const [balances, setBalances] = useState({ usdtBalance: 0 });
@@ -150,7 +152,11 @@ const WithdrawPage = () => {
     setDestinationValue(currentWallet);
   }, [currentWallet]);
 
-
+  useEffect(() => {
+    if (method !== 'scheduled') {
+      setShowSchedulePage(false);
+    }
+  }, [method]);
 
   const handleSaveSecurityCode = async () => {
     setSavingSecurityCode(true);
@@ -263,7 +269,7 @@ const WithdrawPage = () => {
                   <input style={styles.input} value={availableDestination} readOnly />
                   <span style={styles.helper}>Use your bound TRC-20 wallet.</span>
                 </div>
-                {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><input style={styles.input} type="datetime-local" value={scheduledFor} onChange={(event) => setScheduledFor(event.target.value)} /></div> : null}
+                {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
                   <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
@@ -290,6 +296,22 @@ const WithdrawPage = () => {
         </div>
         <NowBar />
       </div>
+      {showSchedulePage ? (
+        <ReusableDatePage
+          title="Schedule withdrawal"
+          description="Choose the date and time you want this withdrawal to be processed."
+          label="Schedule date and time"
+          mode="auto"
+          value={scheduledFor}
+          onCancel={() => setShowSchedulePage(false)}
+          onConfirm={(value) => {
+            setScheduledFor(value);
+            setShowSchedulePage(false);
+          }}
+          confirmLabel="Confirm schedule"
+          cancelLabel="Back"
+        />
+      ) : null}
     </div>
   );
 };
