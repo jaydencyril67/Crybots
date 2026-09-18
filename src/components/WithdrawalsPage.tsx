@@ -31,23 +31,24 @@ const baseStyles = {
     width: '100%',
     maxWidth: '1320px',
     margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(14px, 3vw, 28px) clamp(12px, 2.5vw, 24px) 40px',
     boxSizing: 'border-box' as const,
   },
   content: {
     display: 'grid',
-    gap: '30px',
-    padding: 'clamp(24px, 5vw, 48px) 0',
+    gap: '16px',
+    padding: 'clamp(14px, 3.5vw, 24px)',
   },
   section: {
     display: 'grid',
     gap: '18px',
-    padding: '0 0 30px',
-    borderBottom: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
-  },
-  sectionLast: {
-    paddingBottom: 0,
-    borderBottom: 'none',
+    padding: 'clamp(14px, 3.5vw, 24px)',
+    borderRadius: '28px',
+    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
+    background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
+    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
   },
   sectionTitle: {
     margin: 0,
@@ -90,7 +91,7 @@ const WithdrawPage = () => {
       background: theme.background,
       color: theme.text,
     },
-    section: { ...baseStyles.section, borderBottom: `1px solid ${theme.border}` },
+    section: { ...baseStyles.section, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, boxShadow: `inset 0 1px 0 ${theme.highlight}, 0 18px 34px rgba(0, 0, 0, 0.10)` },
     sectionText: { ...baseStyles.sectionText, color: theme.textMuted },
     label: { ...baseStyles.label, color: theme.textMuted },
     input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
@@ -213,88 +214,71 @@ const WithdrawPage = () => {
 
   return (
     <div data-shadow-free-page="withdrawals" style={styles.page}>
-      <style>{'[data-shadow-free-page="withdrawals"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
       <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />
         <div style={styles.content}>
           {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
           <section style={styles.section}>
-                <h2 style={styles.sectionTitle}><Coins size={18} /> Withdraw USDT</h2>
-                <p style={styles.sectionText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
-                <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Asset type</span>
-                  <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
-                    <span>Crypto</span>
-                    <span style={{ transform: isAssetMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
-                  </button>
-                  {isAssetMenuOpen ? (
-                    <div style={styles.selectMenu}>
-                      {(['crypto'] as const).map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          style={styles.selectOption}
-                          onClick={() => {
-                            setAssetType(option);
-                            setIsAssetMenuOpen(false);
-                          }}
-                        >
-                          Crypto
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
+            <h2 style={styles.sectionTitle}><Coins size={18} /> Withdraw USDT</h2>
+            <p style={styles.sectionText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
+            <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Asset type</span>
+              <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
+                <span>Crypto</span>
+                <span style={{ transform: isAssetMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
+              </button>
+              {isAssetMenuOpen ? (
+                <div style={styles.selectMenu}>
+                  {(['crypto'] as const).map((option) => (
+                    <button key={option} type="button" style={styles.selectOption} onClick={() => { setAssetType(option); setIsAssetMenuOpen(false); }}>
+                      Crypto
+                    </button>
+                  ))}
                 </div>
-                <div ref={methodMenuRef} style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Withdrawal method</span>
-                  <button type="button" style={styles.selectTrigger} onClick={() => setIsMethodMenuOpen((current) => !current)}>
-                    <span>{method === 'instant' ? 'Instant' : 'Scheduled'}</span>
-                    <span style={{ transform: isMethodMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
-                  </button>
-                  {isMethodMenuOpen ? (
-                    <div style={styles.selectMenu}>
-                      {(['instant', 'scheduled'] as const).map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          style={styles.selectOption}
-                          onClick={() => {
-                            setMethod(option);
-                            setIsMethodMenuOpen(false);
-                          }}
-                        >
-                          {option === 'instant' ? 'Instant' : 'Scheduled'}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
+              ) : null}
+            </div>
+            <div ref={methodMenuRef} style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Withdrawal method</span>
+              <button type="button" style={styles.selectTrigger} onClick={() => setIsMethodMenuOpen((current) => !current)}>
+                <span>{method === 'instant' ? 'Instant' : 'Scheduled'}</span>
+                <span style={{ transform: isMethodMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
+              </button>
+              {isMethodMenuOpen ? (
+                <div style={styles.selectMenu}>
+                  {(['instant', 'scheduled'] as const).map((option) => (
+                    <button key={option} type="button" style={styles.selectOption} onClick={() => { setMethod(option); setIsMethodMenuOpen(false); }}>
+                      {option === 'instant' ? 'Instant' : 'Scheduled'}
+                    </button>
+                  ))}
                 </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Amount</span>
-                  <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder={assetType === 'crypto' ? '0.00 USDT' : '0.00'} />
-                </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Currency</span>
-                  <input style={styles.input} value={currency} onChange={(event) => setCurrency(event.target.value.toUpperCase())} placeholder='USDT' />
-                </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Bound wallet</span>
-                  <input style={styles.input} value={availableDestination} readOnly />
-                  <span style={styles.helper}>Use your bound TRC-20 wallet.</span>
-                </div>
-                {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Security code</span>
-                  <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
-                </div>
-                <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || !securityCodeSet || !securityCode}>
-                    {withdrawing ? 'Submitting...' : 'Submit withdrawal'}
-                  </button>
-                </div>
-                <p style={styles.sectionText}>Crypto balance: {balances.usdtBalance.toFixed(2)} USDT</p>
-              </section>
+              ) : null}
+            </div>
+            <div style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Amount</span>
+              <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder={assetType === 'crypto' ? '0.00 USDT' : '0.00'} />
+            </div>
+            <div style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Currency</span>
+              <input style={styles.input} value={currency} onChange={(event) => setCurrency(event.target.value.toUpperCase())} placeholder="USDT" />
+            </div>
+            <div style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Bound wallet</span>
+              <input style={styles.input} value={availableDestination} readOnly />
+              <span style={styles.helper}>Use your bound TRC-20 wallet.</span>
+            </div>
+            {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
+            <div style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Security code</span>
+              <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
+            </div>
+            <div style={styles.buttonRow}>
+              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || !securityCodeSet || !securityCode}>
+                {withdrawing ? 'Submitting...' : 'Submit withdrawal'}
+              </button>
+            </div>
+            <p style={styles.sectionText}>Crypto balance: {balances.usdtBalance.toFixed(2)} USDT</p>
+          </section>
 
           <section style={styles.section}>
             <h2 style={styles.sectionTitle}><ShieldCheck size={18} /> Security code</h2>
@@ -302,7 +286,7 @@ const WithdrawPage = () => {
             <p style={styles.sectionText}>If you have not set a security code yet, go to Settings and bind one first before submitting a withdrawal.</p>
           </section>
 
-          <section style={{ ...styles.section, ...styles.sectionLast }}>
+          <section style={styles.section}>
             <h2 style={styles.sectionTitle}><TimerReset size={18} /> Withdrawal method guide</h2>
             <p style={styles.sectionText}>Instant withdrawals submit immediately. Scheduled withdrawals are queued for the date and time you choose, giving you more control over when the transfer is processed.</p>
           </section>
