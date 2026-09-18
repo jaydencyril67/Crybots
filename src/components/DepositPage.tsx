@@ -8,6 +8,7 @@ import { useAppTheme } from './AppTheme';
 const DepositPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+
   const styles = useMemo(() => ({
     page: {
       minHeight: '100vh',
@@ -62,16 +63,6 @@ const DepositPage = () => {
       </p>
     </div>
   ), [styles.mutedCard]);
-
-const DepositPage = () => {
-  const cryptoContent = useMemo(() => (
-    <div style={styles.mutedCard}>
-      <strong>USDT deposits only</strong>
-      <p style={{ margin: '10px 0 0' }}>
-        This app is now USDT-only. Add your wallet address and use the crypto deposit flow to move funds in.
-      </p>
-    </div>
-  ), []);
 
   return (
     <div style={styles.page}>
