@@ -65,7 +65,8 @@ const DepositPage = () => {
   ), [styles.mutedCard]);
 
   return (
-    <div style={styles.page}>
+    <div data-shadow-free-page="deposit" style={styles.page}>
+      <style>{'[data-shadow-free-page="deposit"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
       <div style={styles.shell}>
         <AppHeader />
         <div style={styles.card}>
