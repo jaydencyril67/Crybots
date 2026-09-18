@@ -6,7 +6,7 @@ import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
-import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -34,28 +34,31 @@ const baseStyles = {
     padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
     boxSizing: 'border-box' as const,
   },
-  panel: HYBRID_CARD_STYLES.panel,
-  body: {
-    padding: 'clamp(18px, 4vw, 30px)',
+  content: {
+    display: 'grid',
+    gap: '30px',
+    padding: 'clamp(24px, 5vw, 48px) 0',
+  },
+  section: {
     display: 'grid',
     gap: '18px',
+    padding: '0 0 30px',
+    borderBottom: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
   },
-  grid: {
-    display: 'grid',
-    gap: '18px',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' as const,
+  sectionLast: {
+    paddingBottom: 0,
+    borderBottom: 'none',
   },
-  card: HYBRID_CARD_STYLES.card,
-  cardTitle: {
+  sectionTitle: {
     margin: 0,
-    fontSize: '1.05rem',
+    fontSize: '1.1rem',
     fontWeight: 800,
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
   },
-  cardText: {
-    margin: '10px 0 0',
+  sectionText: {
+    margin: 0,
     color: HYBRID_THEME_TOKENS.dark.textMuted,
     lineHeight: 1.6,
     fontSize: '0.92rem',
@@ -87,21 +90,8 @@ const WithdrawPage = () => {
       background: theme.background,
       color: theme.text,
     },
-    panel: {
-      ...baseStyles.panel,
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
-      backdropFilter: 'blur(18px) saturate(1.08)',
-      WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
-    },
-    card: {
-      ...baseStyles.card,
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
-      backdropFilter: 'blur(18px) saturate(1.08)',
-      WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
-    },
-    cardText: { ...baseStyles.cardText, color: theme.textMuted },
+    section: { ...baseStyles.section, borderBottom: `1px solid ${theme.border}` },
+    sectionText: { ...baseStyles.sectionText, color: theme.textMuted },
     label: { ...baseStyles.label, color: theme.textMuted },
     input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
     selectTrigger: { ...baseStyles.selectTrigger, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
@@ -227,13 +217,11 @@ const WithdrawPage = () => {
       <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />
-        <div style={styles.panel}>
-          <div style={styles.body}>
-            {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
-            <div style={styles.grid}>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><Coins size={18} /> Withdraw USDT</h2>
-                <p style={styles.cardText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
+        <div style={styles.content}>
+          {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
+          <section style={styles.section}>
+                <h2 style={styles.sectionTitle}><Coins size={18} /> Withdraw USDT</h2>
+                <p style={styles.sectionText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
                 <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Asset type</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
@@ -305,20 +293,19 @@ const WithdrawPage = () => {
                     {withdrawing ? 'Submitting...' : 'Submit withdrawal'}
                   </button>
                 </div>
-                <p style={styles.cardText}>Crypto balance: {balances.usdtBalance.toFixed(2)} USDT</p>
+                <p style={styles.sectionText}>Crypto balance: {balances.usdtBalance.toFixed(2)} USDT</p>
               </section>
 
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security code</h2>
-                <p style={styles.cardText}>Use the settings page to bind or change your security code. Withdrawals only work after it has been set.</p>
-                <p style={styles.cardText}>If you have not set a security code yet, go to Settings and bind one first before submitting a withdrawal.</p>
-              </section>
-            </div>
-            <section style={styles.card}>
-              <h2 style={styles.cardTitle}><TimerReset size={18} /> Withdrawal method guide</h2>
-              <p style={styles.cardText}>Instant withdrawals submit immediately. Scheduled withdrawals are queued for the date and time you choose, giving you more control over when the transfer is processed.</p>
-            </section>
-          </div>
+          <section style={styles.section}>
+            <h2 style={styles.sectionTitle}><ShieldCheck size={18} /> Security code</h2>
+            <p style={styles.sectionText}>Use the settings page to bind or change your security code. Withdrawals only work after it has been set.</p>
+            <p style={styles.sectionText}>If you have not set a security code yet, go to Settings and bind one first before submitting a withdrawal.</p>
+          </section>
+
+          <section style={{ ...styles.section, ...styles.sectionLast }}>
+            <h2 style={styles.sectionTitle}><TimerReset size={18} /> Withdrawal method guide</h2>
+            <p style={styles.sectionText}>Instant withdrawals submit immediately. Scheduled withdrawals are queued for the date and time you choose, giving you more control over when the transfer is processed.</p>
+          </section>
         </div>
         <NowBar />
       </div>
