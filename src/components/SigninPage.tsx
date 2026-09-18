@@ -239,7 +239,6 @@ const styles = {
     border: '1px solid transparent',
   },
   buttonPrimary: {
-    boxShadow: 'none',
   },
   footerNote: {
     margin: '18px 0 0',
@@ -254,7 +253,6 @@ const styles = {
     fontSize: '13px',
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: 'none',
   },
   icon: {
     width: '20px',
@@ -279,11 +277,11 @@ const SigninPage = () => {
     },
     glow: {
       ...styles.glow,
-      background: `radial-gradient(circle at top left, ${theme.primarySoft}, transparent 34%), radial-gradient(circle at 85% 20%, ${theme.highlightSoft}, transparent 28%), linear-gradient(180deg, ${theme.surfaceElevated} 0%, ${theme.background} 100%)`,
+      background: theme.background,
     },
     topLine: {
       ...styles.topLine,
-      background: `linear-gradient(to right, transparent, ${theme.primarySoft}, transparent)`,
+      background: theme.border,
     },
     brandKicker: {
       ...styles.brandKicker,
@@ -304,11 +302,14 @@ const SigninPage = () => {
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
       color: theme.text,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px ${theme.border}`, 
+
     },
     titleAccent: {
       ...styles.titleAccent,
-      background: `linear-gradient(90deg, ${theme.text} 0%, ${theme.textMuted} 45%, ${theme.text} 100%)`,
+      background: 'none',
+      WebkitBackgroundClip: 'unset',
+      backgroundClip: 'unset',
+      color: theme.primary,
     },
     lead: {
       ...styles.lead,
@@ -319,7 +320,6 @@ const SigninPage = () => {
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
       color: theme.text,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px ${theme.border}`, 
     },
     progressBar: {
       ...styles.progressBar,
@@ -327,7 +327,7 @@ const SigninPage = () => {
     },
     progressFill: {
       ...styles.progressFill,
-      background: `linear-gradient(90deg, ${theme.primarySoft}, ${theme.highlightSoft})`,
+      background: theme.primary,
     },
     stepLabel: {
       ...styles.stepLabel,
@@ -346,20 +346,18 @@ const SigninPage = () => {
       borderColor: theme.borderGlass,
       background: theme.surfaceElevated,
       color: theme.text,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}`,
+
     },
     optionCard: {
       ...styles.optionCard,
       borderColor: theme.borderGlass,
       background: theme.surfaceGlass,
       color: theme.text,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}`,
     },
     optionCardActive: {
       ...styles.optionCardActive,
       borderColor: theme.primarySoft,
       background: theme.primarySoft,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}`,
     },
     switchText: {
       ...styles.switchText,
@@ -374,7 +372,6 @@ const SigninPage = () => {
       borderColor: theme.borderGlass,
       background: theme.surfaceGlass,
       color: theme.text,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}`,
     },
     buttonPrimary: {
       ...styles.buttonPrimary,
@@ -436,7 +433,7 @@ const SigninPage = () => {
       ? {
           ...hybridStyles.input,
           borderColor: theme.danger,
-          boxShadow: `0 0 0 1px ${theme.danger}`, 
+
           background: theme.surfaceMuted,
         }
       : hybridStyles.input;
@@ -757,7 +754,7 @@ const SigninPage = () => {
                     color: theme.primary,
                     textDecoration: 'none',
                     fontWeight: 700,
-                    boxShadow: `0 8px 24px ${theme.primarySoft}`,
+
                   }}
                 >
                   Forgot password?
