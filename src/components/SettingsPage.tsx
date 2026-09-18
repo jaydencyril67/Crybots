@@ -63,9 +63,9 @@ const styles = {
   },
   panel: {
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
-    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+    boxShadow: 'none',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
     overflow: 'hidden',

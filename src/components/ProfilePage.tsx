@@ -177,7 +177,7 @@ const ProfilePage = () => {
       ...baseStyles.infoRow,
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
-      boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 12px 22px ${theme.primarySoft}`,
+      boxShadow: 'none',
       backdropFilter: 'blur(18px) saturate(1.08)',
       WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
     },
