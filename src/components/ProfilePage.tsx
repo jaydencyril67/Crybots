@@ -238,7 +238,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <HybridTheme mode="dark">
+    <HybridTheme>
       <>
         <Helmet>
           <title>KingsHall Exchange | Details</title>

@@ -96,11 +96,13 @@ const styles = {
   actionButton: {
     borderRadius: '18px',
     padding: '12px 18px',
-    border: '1px solid rgba(255,255,255,0.08)',
     cursor: 'pointer',
     fontWeight: 800,
     background: '#ffffff',
     color: '#000000',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   secondaryButton: {
     borderRadius: '18px',
@@ -139,7 +141,7 @@ const ReusableDatePage = ({
   const parsedMax = useMemo(() => max, [max]);
 
   return (
-    <HybridTheme mode="dark">
+    <HybridTheme>
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />
