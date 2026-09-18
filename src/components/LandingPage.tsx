@@ -442,6 +442,10 @@ const LandingPage = () => {
     navigate(token && isTokenValid(token) ? '/dashboard' : '/signin');
   };
 
+  const handleGetStartedClick = () => {
+    navigate('/signup');
+  };
+
   return (
     <HybridTheme>
       <>
@@ -477,7 +481,7 @@ const LandingPage = () => {
               </p>
 
               <div style={styles.buttonRow}>
-                <button type="button" onClick={handleDashboardClick} style={{ ...styles.buttonPrimary, cursor: 'pointer' }}>
+                <button type="button" onClick={handleGetStartedClick} style={{ ...styles.buttonPrimary, cursor: 'pointer' }}>
                   Get started
                 </button>
                 <button type="button" onClick={handleDashboardClick} style={{ ...styles.buttonSecondary, cursor: 'pointer' }}>
