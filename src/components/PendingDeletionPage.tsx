@@ -9,6 +9,10 @@ type DeletionStatus = {
   daysLeft?: number;
   codeSentAt?: string;
   codeExpiresAt?: string;
+  accountStatus?: string;
+  accountStatusReason?: string;
+  accountStatusUpdatedAt?: string;
+  reactivationAtIso?: string;
 };
 
 const formatDaysLeft = (daysLeft?: number) => {
@@ -64,10 +68,12 @@ const PendingDeletionPage = () => {
     setMessage('Verifying cancellation code…');
 
     try {
-      await api.post('/api/settings/danger/deletion-cancel', { code }, {
+      const response = await api.post('/api/settings/danger/deletion-cancel', { code }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMessage('Deletion cancelled successfully. Redirecting…');
+      const reactivationAtIso = (response.data as { reactivationAtIso?: string })?.reactivationAtIso || new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
+      window.localStorage.setItem('pendingDeletionRecoveryUntil', reactivationAtIso);
+      setMessage('Deletion cancelled successfully. Full access will return after 24 hours. Redirecting…');
       navigate('/dashboard');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unable to cancel deletion.';
@@ -81,14 +87,14 @@ const PendingDeletionPage = () => {
     <ReusableConfirmationPage
       eyebrow="Pending deletion"
       title="Your account is scheduled for deletion"
-      description="Sign-in is paused until you cancel the deletion request. You can request a code by email and confirm cancellation here."
+      description="Sign-in is paused while your account is marked for deletion. You can request a code by email and confirm cancellation here, then wait 24 hours for normal access to return."
       statusLabel={status?.scheduled ? `Deletion in ${formatDaysLeft(status.daysLeft)} · code expires ${status.codeExpiresAt ? new Date(status.codeExpiresAt).toLocaleString() : 'soon'}` : 'No active deletion request'}
       statusTone="warning"
       primaryActionLabel={loading ? 'Confirming…' : 'Cancel deletion'}
       secondaryActionLabel={codeRequestLoading ? 'Sending code…' : 'Send cancellation code'}
       onPrimaryAction={submitCancel}
       onSecondaryAction={requestCode}
-      footerNote={message}
+      footerNote={message || 'After cancellation, your account stays in a recovery state for 24 hours before returning to normal access.'}
     >
       <div style={{ display: 'grid', gap: '10px', marginTop: '18px' }}>
         <div style={{ display: 'grid', gap: '6px' }}>

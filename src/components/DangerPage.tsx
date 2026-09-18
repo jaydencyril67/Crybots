@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import api from '../api/axios';
-import { navigate } from '../utils/navigate';
 import AppHeader from './AppHeader';
 import HybridTheme from './HybridTheme';
 import NowBar from './NowBar';
+import ReusableConfirmationPage from './ReusableConfirmationPage';
+import api from '../api/axios';
+import { navigate } from '../utils/navigate';
 
-type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
+type DangerActionKey = 'disable' | 'self-exclude';
 
 type DangerActionState = {
   password: string;
@@ -116,6 +117,7 @@ const DangerPage = () => {
   const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
   const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
   const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   const submitAction = async (
     action: DangerActionKey,
@@ -128,13 +130,83 @@ const DangerPage = () => {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
       const payload = { password: state.password, confirmation: state.confirmation, reason: state.reason };
 
-      if (action === 'delete') {
-        await api.delete('/api/settings/danger/delete', {
-          headers,
-          data: { password: state.password, confirmation: state.confirmation },
-        });
+      if (action === 'disable') {
+        await api.patch('/api/settings/danger/disable', payload, { headers });
+      } else {
+        await api.patch('/api/settings/danger/self-exclude', payload, { headers });
+      }
+
+      setState((current) => ({ ...current, status: 'Success: account action completed.' }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to complete the action.';
+      setState((current) => ({ ...current, status: message }));
+    } finally {
+      setState((current) => ({ ...current, loading: null }));
+    }
+  };
+
+  const confirmDeleteAccount = async () => {
+    setRemove((current) => ({ ...current, loading: 'delete', status: '' }));
+
+    try {
+      const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
+      const response = await api.delete('/api/settings/danger/delete', {
+        headers,
+        data: { password: remove.password, confirmation: remove.confirmation },
+      });
+      const forceLogout = Boolean((response.data as { forceLogout?: boolean })?.forceLogout);
+      const reactivationAtIso = (response.data as { reactivationAtIso?: string })?.reactivationAtIso;
+
+      if (reactivationAtIso) {
+        window.localStorage.setItem('pendingDeletionRecoveryUntil', reactivationAtIso);
+      }
+
+      window.localStorage.removeItem('token');
+      window.localStorage.removeItem('user');
+      window.localStorage.removeItem('kingshall_user');
+      window.localStorage.removeItem('firstName');
+      window.localStorage.removeItem('kingshall_first_name');
+      if (forceLogout) {
         navigate('/pending-deletion');
-      } else if (action === 'disable') {
+        return;
+      }
+      navigate('/pending-deletion');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to complete the action.';
+      setRemove((current) => ({ ...current, status: message }));
+    } finally {
+      setRemove((current) => ({ ...current, loading: null }));
+    }
+  };
+
+  if (showDeleteConfirmation) {
+    return (
+      <ReusableConfirmationPage
+        eyebrow="Delete account"
+        title="Confirm account deletion"
+        description="Review the warnings carefully. Your account will be marked for deletion, sign-in will be blocked, and you can only cancel it with an email code after the cooldown window begins."
+        statusLabel="This starts a 30-day deletion countdown."
+        statusTone="danger"
+        primaryActionLabel={remove.loading === 'delete' ? 'Confirming…' : 'Confirm delete'}
+        secondaryActionLabel="Go back"
+        onPrimaryAction={confirmDeleteAccount}
+        onSecondaryAction={() => setShowDeleteConfirmation(false)}
+        footerNote={remove.status || 'Deleting your account immediately logs you out and prevents normal use until cancellation is approved.'}
+      >
+        <div style={styles.field}>
+          <label style={styles.label} htmlFor="danger-delete-password">Password</label>
+          <input id="danger-delete-password" style={styles.input} type="password" value={remove.password} onChange={(event) => setRemove((current) => ({ ...current, password: event.target.value }))} />
+        </div>
+        <div style={styles.field}>
+          <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
+          <input id="danger-delete-confirmation" style={styles.input} value={remove.confirmation} onChange={(event) => setRemove((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DELETE" />
+        </div>
+      </ReusableConfirmationPage>
+    );
+  }
+
+  return (
+    <HybridTheme mode="dark">
         await api.patch('/api/settings/danger/disable', payload, { headers });
       } else {
         await api.patch('/api/settings/danger/self-exclude', payload, { headers });
@@ -203,19 +275,10 @@ const DangerPage = () => {
 
             <section style={styles.card}>
               <h3 style={styles.actionTitle}>Delete Account</h3>
-              <p style={styles.actionText}>This permanently removes your account after the confirmation step. This action cannot be undone.</p>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-delete-password">Password</label>
-                <input id="danger-delete-password" style={styles.input} type="password" value={remove.password} onChange={(event) => setRemove((current) => ({ ...current, password: event.target.value }))} />
-              </div>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
-                <input id="danger-delete-confirmation" style={styles.input} value={remove.confirmation} onChange={(event) => setRemove((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DELETE" />
-              </div>
+              <p style={styles.actionText}>This starts the hybrid deletion flow. You will first see a dedicated confirmation page before the deletion request is submitted.</p>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => submitAction('delete', remove, setRemove)} disabled={remove.loading !== null}>Delete Account</button>
+                <button type="button" style={styles.actionButton} onClick={() => setShowDeleteConfirmation(true)} disabled={remove.loading !== null}>Open Delete Confirmation</button>
               </div>
-              {remove.status ? <div style={styles.status}>{remove.status}</div> : null}
             </section>
           </div>
         </div>
