@@ -7,6 +7,8 @@ import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 import ReusableDatePage from './ReusableDatePage';
 import { navigate } from '../utils/navigate';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 const steps = [
   { title: 'First name', description: 'Tell us how to address you.', field: 'firstName', placeholder: 'Enter your first name' },
@@ -30,11 +32,11 @@ const initialState: FormState = {
   password: '',
 };
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
+    background: theme.background,
+    color: theme.text,
     overflow: 'hidden',
   },
   shell: {
@@ -47,7 +49,7 @@ const styles = {
     position: 'absolute' as const,
     inset: 0,
     background:
-      'radial-gradient(circle at top left, rgba(34,211,238,0.18), transparent 34%), radial-gradient(circle at 85% 20%, rgba(168,85,247,0.2), transparent 28%), linear-gradient(180deg, #09111f 0%, #050816 100%)',
+      `radial-gradient(circle at top left, ${theme.primarySoft}, transparent 34%), radial-gradient(circle at 85% 20%, ${theme.highlightSoft}, transparent 28%), linear-gradient(180deg, ${theme.surfaceMuted} 0%, ${theme.background} 100%)`,
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -55,7 +57,7 @@ const styles = {
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: 'linear-gradient(to right, transparent, rgba(34,211,238,0.7), transparent)',
+    background: `linear-gradient(to right, transparent, ${theme.primary}, transparent)`,
   },
   header: {
     display: 'flex',
@@ -77,17 +79,17 @@ const styles = {
     fontWeight: 800,
     letterSpacing: '0.22em',
     textTransform: 'uppercase' as const,
-    color: '#67e8f9',
+    color: theme.primary,
   },
   brandSub: {
     margin: '6px 0 0',
     fontSize: 'clamp(13px, 1.5vw, 15px)',
-    color: 'rgba(255,255,255,0.62)',
+    color: theme.textMuted,
   },
   backButton: {
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
-    color: '#ffffff',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
+    color: theme.text,
     borderRadius: '999px',
     width: '44px',
     height: '44px',
@@ -107,8 +109,8 @@ const styles = {
   },
   heroCard: {
     borderRadius: '24px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
     padding: '18px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -121,16 +123,16 @@ const styles = {
   },
   titleAccent: {
     display: 'block',
-    background: 'linear-gradient(90deg, #67e8f9 0%, #ffffff 45%, #c4b5fd 100%)',
+    background: `linear-gradient(90deg, ${theme.primary} 0%, ${theme.text} 45%, ${theme.highlight} 100%)`,
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
-    color: 'transparent',
+    color: theme.textInverse,
   },
   lead: {
     margin: '10px 0 0',
     fontSize: '14px',
     lineHeight: 1.6,
-    color: 'rgba(255,255,255,0.68)',
+    color: theme.textMuted,
   },
   summaryBox: {
     display: 'grid',
@@ -138,8 +140,8 @@ const styles = {
     marginTop: '16px',
     padding: '12px',
     borderRadius: '16px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(255,255,255,0.04)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceShine,
   },
   summaryRow: {
     display: 'flex',
@@ -148,11 +150,11 @@ const styles = {
     alignItems: 'center',
   },
   summaryKey: {
-    color: 'rgba(255,255,255,0.6)',
+    color: theme.textMuted,
     fontSize: '12px',
   },
   summaryValue: {
-    color: '#ffffff',
+    color: theme.text,
     fontWeight: 700,
     textAlign: 'right' as const,
     overflowWrap: 'anywhere' as const,
@@ -160,13 +162,13 @@ const styles = {
   },
   inlineError: {
     margin: '10px 0 0',
-    color: '#f87171',
+    color: theme.danger,
     fontSize: '12px',
     fontWeight: 600,
   },
   inlineNote: {
     margin: '8px 0 0',
-    color: 'rgba(255,255,255,0.62)',
+    color: theme.textMuted,
     fontSize: '11px',
     lineHeight: 1.5,
   },
@@ -183,7 +185,7 @@ const styles = {
     gap: '8px',
     fontSize: '11px',
     lineHeight: 1.5,
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
   },
   passwordChecklistIcon: {
     width: '16px',
@@ -192,8 +194,8 @@ const styles = {
   },
   panel: {
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
     padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
@@ -210,17 +212,17 @@ const styles = {
     flex: '1 1 220px',
     height: '10px',
     borderRadius: '999px',
-    background: 'rgba(255,255,255,0.08)',
+    background: theme.surfaceMuted,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: '999px',
-    background: 'linear-gradient(90deg, #67e8f9, #c4b5fd)',
+    background: `linear-gradient(90deg, ${theme.primary}, ${theme.highlight})`,
   },
   stepLabel: {
     margin: 0,
-    color: '#67e8f9',
+    color: theme.primary,
     fontSize: '12px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.25em',
@@ -233,7 +235,7 @@ const styles = {
   },
   stepDesc: {
     margin: '10px 0 0',
-    color: 'rgba(255,255,255,0.7)',
+    color: theme.textMuted,
     lineHeight: 1.7,
     fontSize: '15px',
   },
@@ -248,16 +250,16 @@ const styles = {
   },
   label: {
     fontSize: '14px',
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
     fontWeight: 600,
   },
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(6,10,20,0.9)',
-    color: '#ffffff',
+    border: `1px solid ${theme.border}`,
+    background: theme.surface,
+    color: theme.text,
     padding: '13px 14px',
     fontSize: '16px',
     outline: 'none',
@@ -269,15 +271,15 @@ const styles = {
   },
   radioCard: {
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(10,16,32,0.72)',
-    color: '#ffffff',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceElevated,
+    color: theme.text,
     padding: '14px 16px',
     cursor: 'pointer',
   },
   radioCardActive: {
-    border: '1px solid rgba(34,211,238,0.45)',
-    background: 'rgba(34,211,238,0.08)',
+    border: `1px solid ${theme.primary}`,
+    background: theme.primarySoft,
   },
   navRow: {
     display: 'flex',
@@ -300,7 +302,7 @@ const styles = {
   switchLink: {
     border: 'none',
     background: 'transparent',
-    color: '#67e8f9',
+    color: theme.primary,
     fontSize: '14px',
     fontWeight: 700,
     padding: 0,
@@ -315,34 +317,34 @@ const styles = {
     minWidth: '108px',
   },
   buttonGhost: {
-    background: 'rgba(255,255,255,0.06)',
-    color: '#ffffff',
-    border: '1px solid rgba(255,255,255,0.12)',
+    background: theme.surfaceGlass,
+    color: theme.text,
+    border: `1px solid ${theme.border}`,
   },
   buttonPrimary: {
-    background: '#ffffff',
-    color: '#050816',
+    background: theme.primary,
+    color: theme.textInverse,
     boxShadow: 'none',
   },
   footerNote: {
     margin: '18px 0 0',
-    color: 'rgba(255,255,255,0.55)',
+    color: theme.textMuted,
     fontSize: '13px',
     lineHeight: 1.6,
   },
   icon: {
     width: '20px',
     height: '20px',
-    color: '#67e8f9',
+    color: theme.primary,
     flexShrink: 0,
   },
   iconLarge: {
     width: '24px',
     height: '24px',
-    color: '#67e8f9',
+    color: theme.primary,
     flexShrink: 0,
   },
-};
+});
 
 const SignupPage = () => {
   const [stepIndex, setStepIndex] = useState(0);
@@ -352,6 +354,9 @@ const SignupPage = () => {
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDobPage, setShowDobPage] = useState(false);
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -381,7 +386,7 @@ const SignupPage = () => {
 
   const emailInputStyle =
     form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
-      ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+      ? { ...styles.input, borderColor: theme.danger, boxShadow: `0 0 0 1px ${theme.danger}`, background: theme.surfaceMuted }
       : styles.input;
 
   const passwordHasLetter = /[A-Za-z]/.test(form.password);
@@ -545,10 +550,10 @@ const SignupPage = () => {
                     <CheckCircle2
                       style={{
                         ...styles.passwordChecklistIcon,
-                        color: item.met ? '#4ade80' : 'rgba(255,255,255,0.32)',
+                        color: item.met ? theme.success : theme.textMuted,
                       }}
                     />
-                    <span style={{ color: item.met ? '#4ade80' : 'rgba(255,255,255,0.72)' }}>{item.label}</span>
+                    <span style={{ color: item.met ? theme.success : theme.textMuted }}>{item.label}</span>
                   </li>
                 ))}
               </ul>
@@ -595,7 +600,7 @@ const SignupPage = () => {
                 textAlign: 'left',
                 cursor: 'pointer',
                 ...(form.dob && !dobMeetsRequirement
-                  ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+                  ? { borderColor: theme.danger, boxShadow: `0 0 0 1px ${theme.danger}`, background: theme.surfaceMuted }
                   : null),
               }}
             >
@@ -724,7 +729,7 @@ const SignupPage = () => {
                 </div>
 
                 {isSubmitting ? (
-                  <div style={{ marginTop: '18px', color: 'rgba(255,255,255,0.7)' }}>
+                  <div style={{ marginTop: '18px', color: theme.textMuted }}>
                     <InlineLoadingDots />
                   </div>
                 ) : null}
