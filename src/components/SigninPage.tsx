@@ -304,7 +304,7 @@ const SigninPage = () => {
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
       color: theme.text,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, ${theme.shadowSoft}`,
+      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px ${theme.border}`, 
     },
     titleAccent: {
       ...styles.titleAccent,
@@ -319,7 +319,7 @@ const SigninPage = () => {
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
       color: theme.text,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, ${theme.shadowSoft}`,
+      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px ${theme.border}`, 
     },
     progressBar: {
       ...styles.progressBar,
@@ -436,8 +436,8 @@ const SigninPage = () => {
       ? {
           ...hybridStyles.input,
           borderColor: theme.danger,
-          boxShadow: `0 0 0 1px ${theme.dangerSoft}`,
-          background: theme.dangerSoft,
+          boxShadow: `0 0 0 1px ${theme.danger}`, 
+          background: theme.surfaceMuted,
         }
       : hybridStyles.input;
 
