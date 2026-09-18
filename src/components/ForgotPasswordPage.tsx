@@ -407,7 +407,7 @@ const ForgotPasswordPage = () => {
       background: theme.primary,
     },
     card: {
-      ...styles.card,
+      ...styles.panel,
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
       color: theme.text,
