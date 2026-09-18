@@ -59,8 +59,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   glow: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      `radial-gradient(circle at top, ${theme.primarySoft}, transparent 35%), radial-gradient(circle at 80% 20%, ${theme.primarySoft}, transparent 30%), linear-gradient(180deg, ${theme.surface} 0%, ${theme.background} 100%)`,
+    background: theme.background,
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -68,7 +67,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: `linear-gradient(to right, transparent, ${theme.borderStrong}, transparent)`,
+    background: theme.borderStrong,
   },
   header: {
     display: 'flex',
