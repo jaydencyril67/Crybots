@@ -105,7 +105,7 @@ export const createHybridCardStyles = (theme: HybridThemeToken) => ({
     backdropFilter: 'blur(24px) saturate(1.15)',
     WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
   },
-});
+} satisfies Record<'card' | 'cardMobile' | 'panel', React.CSSProperties>);
 
 export const HYBRID_CARD_STYLES = createHybridCardStyles(HYBRID_THEME_TOKENS.dark);
 
