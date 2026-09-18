@@ -116,7 +116,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     textDecoration: 'none',
   },
   buttonSecondary: {
-    border: `1px solid ${theme.borderGlass}`,
+    border: `1px solid ${theme.border}`, 
     borderRadius: '999px',
     background: theme.surfaceGlass,
     boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 12px 26px rgba(0, 0, 0, 0.10)`,
@@ -144,7 +144,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     alignItems: 'center',
     gap: '10px',
     borderRadius: '999px',
-    border: `1px solid ${theme.borderGlass}`,
+    border: `1px solid ${theme.border}`,
     background: theme.surfaceGlass,
     boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px rgba(0, 0, 0, 0.10)`,
     color: theme.text,
