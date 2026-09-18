@@ -13,7 +13,6 @@ type HybridThemeToken = {
   surfaceShine: string;
   border: string;
   borderStrong: string;
-  borderGlass: string;
   text: string;
   textMuted: string;
   textInverse: string;
@@ -38,7 +37,6 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
     surfaceShine: 'rgba(255,255,255,0.04)',
     border: 'rgba(28, 28, 28, 0.08)',
     borderStrong: 'rgba(28, 28, 28, 0.12)',
-    borderGlass: 'rgba(255,255,255,0.06)',
     text: '#151515',
     textMuted: '#626262',
     textInverse: '#ffffff',
@@ -61,7 +59,6 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
     surfaceShine: 'rgba(255,255,255,0.02)',
     border: 'rgba(255,255,255,0.10)',
     borderStrong: 'rgba(255,255,255,0.18)',
-    borderGlass: 'rgba(255,255,255,0.10)',
     text: '#ffffff',
     textMuted: '#b3b3b3',
     textInverse: '#000000',
@@ -83,7 +80,7 @@ type HybridThemeProps = {
 export const createHybridCardStyles = (theme: HybridThemeToken) => ({
   card: {
     borderRadius: '22px',
-    border: `1px solid ${theme.borderGlass}`,
+    border: `1px solid ${theme.border}`,
     background: theme.surfaceGlass,
     padding: '18px',
     boxSizing: 'border-box' as const,
