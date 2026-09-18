@@ -107,7 +107,32 @@ export const createHybridCardStyles = (theme: HybridThemeToken) => ({
   },
 });
 
-export const HYBRID_CARD_STYLES = createHybridCardStyles(HYBRID_THEME_TOKENS.dark);
+export const HYBRID_CARD_STYLES = {
+  card: {
+    borderRadius: '22px',
+    border: `1px solid ${HYBRID_THEME_TOKENS.dark.borderGlass}`,
+    background: HYBRID_THEME_TOKENS.dark.surfaceGlass,
+    padding: '18px',
+    boxSizing: 'border-box' as const,
+    boxShadow: 'none',
+    backdropFilter: 'blur(24px) saturate(1.15)',
+    WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
+  },
+  cardMobile: {
+    padding: '16px',
+    borderRadius: '18px',
+  },
+  panel: {
+    borderRadius: '18px',
+    border: `1px solid ${HYBRID_THEME_TOKENS.dark.borderGlass}`,
+    background: HYBRID_THEME_TOKENS.dark.surfaceGlass,
+    padding: '16px 18px',
+    boxSizing: 'border-box' as const,
+    boxShadow: 'none',
+    backdropFilter: 'blur(24px) saturate(1.15)',
+    WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
+  },
+};
 
 const styles = {
   root: {
