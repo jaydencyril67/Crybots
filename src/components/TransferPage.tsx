@@ -93,7 +93,7 @@ const styles = {
   selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   helper: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
-  button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
+  button: { borderRadius: '999px', border: 'none', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
   primaryButton: { background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)', border: 'none' },
   narrowCard: { minWidth: 0 },
   summaryRow: { display: 'grid', gap: '12px' },
