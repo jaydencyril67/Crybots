@@ -177,9 +177,9 @@ const ProfilePage = () => {
       ...baseStyles.infoRow,
       border: `1px solid ${theme.borderGlass}`,
       background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
-      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px rgba(0, 0, 0, 0.10)`,
-      backdropFilter: 'blur(24px) saturate(1.15)',
-      WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
+      boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 12px 22px ${theme.primarySoft}`,
+      backdropFilter: 'blur(18px) saturate(1.08)',
+      WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
     },
   }), [theme]);
 
