@@ -48,8 +48,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   glow: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      `radial-gradient(circle at top left, ${theme.primarySoft}, transparent 34%), radial-gradient(circle at 85% 20%, ${theme.highlightSoft}, transparent 28%), linear-gradient(180deg, ${theme.surfaceMuted} 0%, ${theme.background} 100%)`,
+    background: theme.surfaceMuted,
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -57,7 +56,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: `linear-gradient(to right, transparent, ${theme.primary}, transparent)`,
+    background: theme.primary,
   },
   header: {
     display: 'flex',
@@ -123,10 +122,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   titleAccent: {
     display: 'block',
-    background: `linear-gradient(90deg, ${theme.primary} 0%, ${theme.text} 45%, ${theme.highlight} 100%)`,
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: theme.textInverse,
+    color: theme.primary,
+    WebkitBackgroundClip: 'initial',
+    backgroundClip: 'initial',
+    color: theme.primary,
   },
   lead: {
     margin: '10px 0 0',
@@ -218,7 +217,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   progressFill: {
     height: '100%',
     borderRadius: '999px',
-    background: `linear-gradient(90deg, ${theme.primary}, ${theme.highlight})`,
+    background: theme.primary,
   },
   stepLabel: {
     margin: 0,
