@@ -37,10 +37,14 @@ const baseStyles = {
   content: {
     display: 'grid',
     gap: '16px',
-    padding: 'clamp(18px, 4vw, 30px)',
+    padding: 'clamp(0px, 2vw, 30px) 0 0',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   section: {
     display: 'grid',
+    width: '100%',
+    boxSizing: 'border-box' as const,
     gap: '20px',
     padding: 'clamp(18px, 4vw, 28px)',
     borderRadius: '28px',
