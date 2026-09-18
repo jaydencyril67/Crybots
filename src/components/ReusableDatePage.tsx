@@ -100,7 +100,9 @@ const styles = {
     fontWeight: 800,
     background: '#ffffff',
     color: '#000000',
-    border: '1px solid rgba(255,255,255,0.08)',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'rgba(255,255,255,0.08)',
   },
   secondaryButton: {
     borderRadius: '18px',
