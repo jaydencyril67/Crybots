@@ -126,9 +126,10 @@ const ReusableDatePage = ({
   label,
   mode = 'auto',
 }: ReusableDatePageProps) => {
-  const resolvedMode = mode === 'auto' ? (value.includes('T') ? 'datetime-local' : 'date') : mode;
+  const resolvedMode: 'date' | 'datetime-local' | 'time' =
+    mode === 'auto' ? (value.includes('T') ? 'datetime-local' : 'date') : mode;
   const resolvedLabel = label ?? (resolvedMode === 'time' ? 'Time' : resolvedMode === 'datetime-local' ? 'Date and time' : 'Date');
-  const inputType = resolvedMode === 'auto' ? 'date' : resolvedMode;
+  const inputType = resolvedMode;
   const [date, setDate] = useState(value);
 
   useEffect(() => {
