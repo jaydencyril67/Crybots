@@ -102,7 +102,6 @@ const styles = {
     color: '#b3b3b3',
   },
   buttonPrimary: {
-    border: 'none',
     borderRadius: '999px',
     background: 'rgba(255,255,255,0.08)',
     color: '#ffffff',
