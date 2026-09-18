@@ -3,8 +3,10 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 import AppHeader from './AppHeader';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
+import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
 const signInMethods = [
@@ -302,6 +304,8 @@ const styles = {
 };
 
 const SigninPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
   const [form, setForm] = useState<FormState>(initialState);
   const [method, setMethod] = useState<SignInMethod | null>(null);
   const [step, setStep] = useState<'email' | 'method' | 'password' | 'code'>('email');
@@ -516,7 +520,7 @@ const SigninPage = () => {
         <meta name="description" content="Sign in to your KingsHall Exchange account using email and your preferred secure method." />
       </Helmet>
 
-      <main style={styles.page}>
+      <main style={{ ...styles.page, background: theme.background, color: theme.text }}>
         <section style={{ position: 'relative', overflow: 'hidden' }}>
           <div style={styles.glow} />
           <div style={styles.topLine} />
@@ -667,6 +671,7 @@ const SigninPage = () => {
         </section>
       </main>
     </>
+      </HybridTheme>
   );
 };
 
