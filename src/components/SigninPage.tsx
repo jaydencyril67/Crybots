@@ -3,8 +3,10 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 import AppHeader from './AppHeader';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
+import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
 const signInMethods = [
@@ -30,8 +32,6 @@ const initialState: FormState = {
 const styles = {
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
     overflow: 'hidden',
   },
   shell: {
@@ -43,8 +43,6 @@ const styles = {
   glow: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      'radial-gradient(circle at top left, rgba(34,211,238,0.18), transparent 34%), radial-gradient(circle at 85% 20%, rgba(168,85,247,0.2), transparent 28%), linear-gradient(180deg, #09111f 0%, #050816 100%)',
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -52,7 +50,6 @@ const styles = {
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: 'linear-gradient(to right, transparent, rgba(34,211,238,0.7), transparent)',
   },
   header: {
     display: 'flex',
@@ -74,17 +71,13 @@ const styles = {
     fontWeight: 800,
     letterSpacing: '0.22em',
     textTransform: 'uppercase' as const,
-    color: '#67e8f9',
   },
   brandSub: {
     margin: '6px 0 0',
     fontSize: 'clamp(13px, 1.5vw, 15px)',
-    color: 'rgba(255,255,255,0.62)',
   },
   backButton: {
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
-    color: '#ffffff',
+    border: '1px solid transparent',
     borderRadius: '999px',
     width: '44px',
     height: '44px',
@@ -104,8 +97,6 @@ const styles = {
   },
   heroCard: {
     borderRadius: '24px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
     padding: '18px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -118,7 +109,6 @@ const styles = {
   },
   titleAccent: {
     display: 'block',
-    background: 'linear-gradient(90deg, #67e8f9 0%, #ffffff 45%, #c4b5fd 100%)',
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
     color: 'transparent',
@@ -127,12 +117,9 @@ const styles = {
     margin: '10px 0 0',
     fontSize: '14px',
     lineHeight: 1.6,
-    color: 'rgba(255,255,255,0.68)',
   },
   panel: {
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
     padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
@@ -153,17 +140,14 @@ const styles = {
     flex: '1 1 220px',
     height: '10px',
     borderRadius: '999px',
-    background: 'rgba(255,255,255,0.08)',
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     borderRadius: '999px',
-    background: 'linear-gradient(90deg, #67e8f9, #c4b5fd)',
   },
   stepLabel: {
     margin: 0,
-    color: '#67e8f9',
     fontSize: '12px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.25em',
@@ -176,7 +160,6 @@ const styles = {
   },
   stepDesc: {
     margin: '10px 0 0',
-    color: 'rgba(255,255,255,0.7)',
     lineHeight: 1.7,
     fontSize: '15px',
   },
@@ -191,16 +174,13 @@ const styles = {
   },
   label: {
     fontSize: '14px',
-    color: 'rgba(255,255,255,0.72)',
     fontWeight: 600,
   },
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(6,10,20,0.9)',
-    color: '#ffffff',
+    border: '1px solid transparent',
     padding: '13px 14px',
     fontSize: '16px',
     outline: 'none',
@@ -211,19 +191,16 @@ const styles = {
   },
   optionCard: {
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(10,16,32,0.72)',
+    border: '1px solid transparent',
     padding: '14px 16px',
     cursor: 'pointer',
     display: 'flex',
     gap: '12px',
     alignItems: 'center',
     textAlign: 'left' as const,
-    color: '#ffffff',
   },
   optionCardActive: {
-    border: '1px solid rgba(34,211,238,0.45)',
-    background: 'rgba(34,211,238,0.08)',
+    border: '1px solid transparent',
   },
   navRow: {
     display: 'flex',
@@ -240,13 +217,11 @@ const styles = {
     marginTop: '18px',
   },
   switchText: {
-    color: 'rgba(255,255,255,0.72)',
     fontSize: '14px',
   },
   switchLink: {
     border: 'none',
     background: 'transparent',
-    color: '#67e8f9',
     fontSize: '14px',
     fontWeight: 700,
     padding: 0,
@@ -261,18 +236,12 @@ const styles = {
     minWidth: '108px',
   },
   buttonGhost: {
-    background: 'rgba(255,255,255,0.06)',
-    color: '#ffffff',
-    border: '1px solid rgba(255,255,255,0.12)',
+    border: '1px solid transparent',
   },
   buttonPrimary: {
-    background: '#ffffff',
-    color: '#050816',
-    boxShadow: 'none',
   },
   footerNote: {
     margin: '18px 0 0',
-    color: 'rgba(255,255,255,0.55)',
     fontSize: '13px',
     lineHeight: 1.6,
   },
@@ -281,27 +250,151 @@ const styles = {
     padding: 0,
     border: 'none',
     background: 'transparent',
-    color: '#67e8f9',
     fontSize: '13px',
     fontWeight: 700,
     cursor: 'pointer',
-    boxShadow: 'none',
   },
   icon: {
     width: '20px',
     height: '20px',
-    color: '#67e8f9',
     flexShrink: 0,
   },
   iconLarge: {
     width: '24px',
     height: '24px',
-    color: '#67e8f9',
     flexShrink: 0,
   },
 };
 
 const SigninPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const hybridStyles = {
+    page: {
+      ...styles.page,
+      background: theme.background,
+      color: theme.text,
+    },
+    glow: {
+      ...styles.glow,
+      background: theme.background,
+    },
+    topLine: {
+      ...styles.topLine,
+      background: theme.border,
+    },
+    brandKicker: {
+      ...styles.brandKicker,
+      color: theme.text,
+    },
+    brandSub: {
+      ...styles.brandSub,
+      color: theme.textMuted,
+    },
+    backButton: {
+      ...styles.backButton,
+      borderColor: theme.borderGlass,
+      background: theme.surfaceGlass,
+      color: theme.text,
+    },
+    heroCard: {
+      ...styles.heroCard,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      color: theme.text,
+
+    },
+    titleAccent: {
+      ...styles.titleAccent,
+      background: 'none',
+      WebkitBackgroundClip: 'unset',
+      backgroundClip: 'unset',
+      color: theme.primary,
+    },
+    lead: {
+      ...styles.lead,
+      color: theme.textMuted,
+    },
+    panel: {
+      ...styles.panel,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      color: theme.text,
+    },
+    progressBar: {
+      ...styles.progressBar,
+      background: theme.borderGlass,
+    },
+    progressFill: {
+      ...styles.progressFill,
+      background: theme.primary,
+    },
+    stepLabel: {
+      ...styles.stepLabel,
+      color: theme.primary,
+    },
+    stepDesc: {
+      ...styles.stepDesc,
+      color: theme.textMuted,
+    },
+    label: {
+      ...styles.label,
+      color: theme.textMuted,
+    },
+    input: {
+      ...styles.input,
+      borderColor: theme.borderGlass,
+      background: theme.surfaceElevated,
+      color: theme.text,
+
+    },
+    optionCard: {
+      ...styles.optionCard,
+      borderColor: theme.borderGlass,
+      background: theme.surfaceGlass,
+      color: theme.text,
+    },
+    optionCardActive: {
+      ...styles.optionCardActive,
+      borderColor: theme.primarySoft,
+      background: theme.primarySoft,
+    },
+    switchText: {
+      ...styles.switchText,
+      color: theme.textMuted,
+    },
+    switchLink: {
+      ...styles.switchLink,
+      color: theme.primary,
+    },
+    buttonGhost: {
+      ...styles.buttonGhost,
+      borderColor: theme.borderGlass,
+      background: theme.surfaceGlass,
+      color: theme.text,
+    },
+    buttonPrimary: {
+      ...styles.buttonPrimary,
+      background: theme.primary,
+      color: theme.textInverse,
+    },
+    footerNote: {
+      ...styles.footerNote,
+      color: theme.textMuted,
+    },
+    linkButton: {
+      ...styles.linkButton,
+      color: theme.primary,
+    },
+    icon: {
+      ...styles.icon,
+      color: theme.primary,
+    },
+    iconLarge: {
+      ...styles.iconLarge,
+      color: theme.primary,
+    },
+  };
   const [form, setForm] = useState<FormState>(initialState);
   const [method, setMethod] = useState<SignInMethod | null>(null);
   const [step, setStep] = useState<'email' | 'method' | 'password' | 'code'>('email');
@@ -337,8 +430,13 @@ const SigninPage = () => {
 
   const emailInputStyle =
     form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
-      ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
-      : styles.input;
+      ? {
+          ...hybridStyles.input,
+          borderColor: theme.danger,
+
+          background: theme.surfaceMuted,
+        }
+      : hybridStyles.input;
 
   const signInDisabled = isSubmitting || !canContinue || (step === 'code' && !form.code.trim()) || (step === 'password' && !form.password.trim());
 
@@ -516,55 +614,55 @@ const SigninPage = () => {
         <meta name="description" content="Sign in to your KingsHall Exchange account using email and your preferred secure method." />
       </Helmet>
 
-      <main style={styles.page}>
+      <main style={hybridStyles.page}>
         <section style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={styles.glow} />
-          <div style={styles.topLine} />
+          <div style={hybridStyles.glow} />
+          <div style={hybridStyles.topLine} />
 
           <div style={styles.shell}>
             <AppHeader />
 
             <div style={styles.grid}>
-              <article style={styles.heroCard}>
-                <h2 style={styles.title}>
+              <article style={hybridStyles.heroCard}>
+                <h2 style={{ ...styles.title, color: theme.text }}>
                   Welcome back.
-                  <span style={styles.titleAccent}>Sign in fast.</span>
+                  <span style={hybridStyles.titleAccent}>Sign in fast.</span>
                 </h2>
-                <p style={styles.lead}>Enter your email once, then choose password or email code to continue. Email-code sign in is protected with a 5-attempt lockout.</p>
+                <p style={hybridStyles.lead}>Enter your email once, then choose password or email code to continue. Email-code sign in is protected with a 5-attempt lockout.</p>
               </article>
 
-              <article style={styles.panel}>
+              <article style={hybridStyles.panel}>
                 <div style={styles.progressWrap}>
-                  <div style={styles.progressBar}>
-                    <div style={{ ...styles.progressFill, width: `${progress}%` }} />
+                  <div style={hybridStyles.progressBar}>
+                    <div style={{ ...hybridStyles.progressFill, width: `${progress}%` }} />
                   </div>
-                  <div>{step === 'email' ? 'Step 1 of 3' : step === 'method' ? 'Step 2 of 3' : step === 'password' || step === 'code' ? 'Step 3 of 3' : 'Step 4 of 4'}</div>
+                  <div style={{ color: theme.textMuted }}>{step === 'email' ? 'Step 1 of 3' : step === 'method' ? 'Step 2 of 3' : step === 'password' || step === 'code' ? 'Step 3 of 3' : 'Step 4 of 4'}</div>
                 </div>
 
                 <div style={styles.headerCopy}>
                   {step === 'email' ? (
                     <>
-                      <p style={styles.stepLabel}>Email</p>
-                      <h3 style={styles.stepTitle}>Start with your account email</h3>
-                      <p style={styles.stepDesc}>We’ll use this to show your sign-in choices and keep the flow secure.</p>
+                      <p style={hybridStyles.stepLabel}>Email</p>
+                      <h3 style={{ ...styles.stepTitle, color: theme.text }}>Start with your account email</h3>
+                      <p style={hybridStyles.stepDesc}>We’ll use this to show your sign-in choices and keep the flow secure.</p>
                     </>
                   ) : step === 'method' ? (
                     <>
-                      <p style={styles.stepLabel}>Choose method</p>
-                      <h2 style={styles.stepTitle}>Pick how you want to sign in</h2>
-                      <p style={styles.stepDesc}>Password is instant if you remember it. Code sign-in sends a 3-digit email code through Resend.</p>
+                      <p style={hybridStyles.stepLabel}>Choose method</p>
+                      <h2 style={{ ...styles.stepTitle, color: theme.text }}>Pick how you want to sign in</h2>
+                      <p style={hybridStyles.stepDesc}>Password is instant if you remember it. Code sign-in sends a 3-digit email code through Resend.</p>
                     </>
                   ) : step === 'password' ? (
                     <>
-                      <p style={styles.stepLabel}>Password</p>
-                      <h2 style={styles.stepTitle}>Enter your password</h2>
-                      <p style={styles.stepDesc}>This is your standard sign-in route.</p>
+                      <p style={hybridStyles.stepLabel}>Password</p>
+                      <h2 style={{ ...styles.stepTitle, color: theme.text }}>Enter your password</h2>
+                      <p style={hybridStyles.stepDesc}>This is your standard sign-in route.</p>
                     </>
                   ) : (
                     <>
-                      <p style={styles.stepLabel}>Code</p>
-                      <h2 style={styles.stepTitle}>Enter your email code</h2>
-                      <p style={styles.stepDesc}>We sent a sign-in code to your email address.</p>
+                      <p style={hybridStyles.stepLabel}>Code</p>
+                      <h2 style={{ ...styles.stepTitle, color: theme.text }}>Enter your email code</h2>
+                      <p style={hybridStyles.stepDesc}>We sent a sign-in code to your email address.</p>
                     </>
                   )}
                 </div>
@@ -572,7 +670,7 @@ const SigninPage = () => {
                 <div style={styles.form}>
                   {step === 'email' ? (
                     <div style={styles.field}>
-                      <label style={styles.label} htmlFor="signin-email">Email</label>
+                      <label style={hybridStyles.label} htmlFor="signin-email">Email</label>
                       <input id="signin-email" style={emailInputStyle} type="email" value={form.email} onChange={(event) => updateField('email', event.target.value)} placeholder="Enter your email" autoComplete="email" />
                     </div>
                   ) : null}
@@ -580,11 +678,11 @@ const SigninPage = () => {
                   {step === 'method' ? (
                     <div style={styles.optionGrid}>
                       {signInMethods.map((option) => (
-                        <button key={option.value} type="button" style={{ ...styles.optionCard, ...(method === option.value ? styles.optionCardActive : {}) }} onClick={() => handleStartSignin(option.value)} disabled={isSubmitting}>
+                        <button key={option.value} type="button" style={{ ...hybridStyles.optionCard, ...(method === option.value ? hybridStyles.optionCardActive : {}) }} onClick={() => handleStartSignin(option.value)} disabled={isSubmitting}>
                           <KeyRound size={20} />
                           <div>
-                            <div style={{ fontWeight: 700 }}>{option.title}</div>
-                            <div style={{ color: 'rgba(255,255,255,0.68)', fontSize: '13px', lineHeight: 1.5 }}>{option.description}</div>
+                            <div style={{ fontWeight: 700, color: theme.text }}>{option.title}</div>
+                            <div style={{ color: theme.textMuted, fontSize: '13px', lineHeight: 1.5 }}>{option.description}</div>
                           </div>
                         </button>
                       ))}
@@ -593,15 +691,15 @@ const SigninPage = () => {
 
                   {step === 'password' ? (
                     <div style={styles.field}>
-                      <label style={styles.label} htmlFor="signin-password">Password</label>
-                      <input id="signin-password" style={styles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
+                      <label style={hybridStyles.label} htmlFor="signin-password">Password</label>
+                      <input id="signin-password" style={hybridStyles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
                     </div>
                   ) : null}
                   {step === 'code' ? (
                     <div style={styles.field}>
-                      <label style={styles.label} htmlFor="signin-code">Sign-in code</label>
-                      <input id="signin-code" style={styles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
-                      <div style={styles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
+                      <label style={hybridStyles.label} htmlFor="signin-code">Sign-in code</label>
+                      <input id="signin-code" style={hybridStyles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
+                      <div style={hybridStyles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
                     </div>
                   ) : null}
 
@@ -610,7 +708,7 @@ const SigninPage = () => {
                       {submitError ? <NotificationBanner tone="warning" title="Action required" message={submitError} /> : null}
                       {resendStatus ? <NotificationBanner tone="success" title="Update received" message={resendStatus} /> : null}
                       {showResendConfirmationLink ? (
-                        <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={styles.linkButton}>
+                        <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={hybridStyles.linkButton}>
                           {isResendingCode ? 'Resending code…' : 'Resend confirmation code'}
                         </button>
                       ) : null}
@@ -619,28 +717,28 @@ const SigninPage = () => {
                 </div>
 
                 <div style={styles.navRow}>
-                  <button type="button" onClick={handleBack} style={{ ...styles.button, ...styles.buttonGhost }}>Back</button>
+                  <button type="button" onClick={handleBack} style={{ ...styles.button, ...hybridStyles.buttonGhost }}>Back</button>
                   {step === 'email' ? (
-                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={!canContinue}>Continue</button>
+                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={!canContinue}>Continue</button>
                   ) : step === 'password' ? (
-                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Sign in</button>
+                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>Sign in</button>
                   ) : step === 'code' ? (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   ) : (
                     <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
                   )}
                 </div>
                 <div style={styles.switchRow}>
-                  <span style={styles.switchText}>New to KingsHall?</span>
-                  <button type="button" onClick={() => { navigate('/signup'); }} style={styles.switchLink}>
+                  <span style={hybridStyles.switchText}>New to KingsHall?</span>
+                  <button type="button" onClick={() => { navigate('/signup'); }} style={hybridStyles.switchLink}>
                     Signup here
                   </button>
                 </div>
               </article>
-              <article style={styles.heroCard}>
-                <p style={styles.stepLabel}>Need help?</p>
-                <h2 style={styles.stepTitle}>Forgot your password?</h2>
-                <p style={styles.stepDesc}>Use your email code to verify your account and reset access securely.</p>
+              <article style={hybridStyles.heroCard}>
+                <p style={hybridStyles.stepLabel}>Need help?</p>
+                <h2 style={{ ...styles.stepTitle, color: theme.text }}>Forgot your password?</h2>
+                <p style={hybridStyles.stepDesc}>Use your email code to verify your account and reset access securely.</p>
                 <a
                   href="/forgot-password"
                   style={{
@@ -651,12 +749,12 @@ const SigninPage = () => {
                     minHeight: '42px',
                     padding: '0 16px',
                     borderRadius: '14px',
-                    border: '1px solid rgba(103,232,249,0.35)',
-                    background: 'rgba(103,232,249,0.08)',
-                    color: '#67e8f9',
+                    border: `1px solid ${theme.primarySoft}`,
+                    background: theme.primarySoft,
+                    color: theme.primary,
                     textDecoration: 'none',
                     fontWeight: 700,
-                    boxShadow: '0 8px 24px rgba(103,232,249,0.14)',
+
                   }}
                 >
                   Forgot password?

@@ -91,7 +91,6 @@ const WithdrawPage = () => {
       ...baseStyles.panel,
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
-      boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 12px 22px ${theme.primarySoft}`,
       backdropFilter: 'blur(18px) saturate(1.08)',
       WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
     },
@@ -99,7 +98,6 @@ const WithdrawPage = () => {
       ...baseStyles.card,
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
-      boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 10px 18px ${theme.primarySoft}`,
       backdropFilter: 'blur(18px) saturate(1.08)',
       WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
     },
@@ -224,7 +222,8 @@ const WithdrawPage = () => {
   if (loading) return null;
 
   return (
-    <div style={styles.page}>
+    <div data-shadow-free-page="withdrawals" style={styles.page}>
+      <style>{'[data-shadow-free-page="withdrawals"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
       <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />

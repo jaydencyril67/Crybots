@@ -61,7 +61,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     textAlign: 'left' as const,
     boxSizing: 'border-box' as const,
     cursor: 'pointer',
-    boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px ${theme.primarySoft}`,
     backdropFilter: 'blur(24px) saturate(1.15)',
     WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
   },

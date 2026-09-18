@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound, Wallet } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NowBar from './NowBar';
@@ -51,12 +51,12 @@ const baseStyles = {
     minWidth: 0,
     gridColumn: '1 / -1',
   },
-  card: HYBRID_CARD_STYLES.card,
+  card: {},
   '@media (max-width: 640px)': {
     page: { paddingBottom: '156px' },
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
-    card: HYBRID_CARD_STYLES.cardMobile,
+    card: {},
     sectionTitle: { fontSize: '1.15rem' },
     sectionSub: { maxWidth: '100%' },
     infoList: { gap: '10px', gridTemplateColumns: 'minmax(0, 1fr)' },
@@ -173,11 +173,11 @@ const ProfilePage = () => {
       ...baseStyles.logoutButton,
       color: theme.text,
     },
+    card: createHybridCardStyles(theme).card,
     infoRow: {
       ...baseStyles.infoRow,
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
-      boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 12px 22px ${theme.primarySoft}`,
       backdropFilter: 'blur(18px) saturate(1.08)',
       WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
     },
@@ -267,7 +267,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <HybridTheme>
+    <HybridTheme mode={themeMode}>
       <>
         <Helmet>
           <title>KingsHall Exchange | Details</title>
