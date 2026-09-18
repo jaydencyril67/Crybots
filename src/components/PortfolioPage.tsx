@@ -55,14 +55,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
     padding: '16px 18px',
     borderRadius: '18px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
+    border: `1px solid ${theme.borderGlass}`,
+    background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
     color: theme.text,
     textAlign: 'left' as const,
     boxSizing: 'border-box' as const,
     cursor: 'pointer',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px ${theme.primarySoft}`,
+    backdropFilter: 'blur(24px) saturate(1.15)',
+    WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
   },
   cardSubtext: {
     margin: 0,
@@ -70,10 +71,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.textMuted,
     lineHeight: 1.6,
   },
-});
-
-const getCardStyle = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  ...getStyles(theme).cardButton,
 });
 
 const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
@@ -108,7 +105,7 @@ const PortfolioPage = () => {
 
             <div style={styles.buttonList}>
               {pageButtons.map((label) => (
-                <button key={label} type="button" style={getCardStyle(theme)} onClick={() => handleButtonClick(label)}>
+                <button key={label} type="button" style={styles.cardButton} onClick={() => handleButtonClick(label)}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>{label}</h3>
                   {label === 'Danger' ? <p style={styles.cardSubtext}>Account recovery and irreversible actions.</p> : null}
                 </button>
