@@ -90,7 +90,7 @@ const WithdrawPage = () => {
     panel: {
       ...baseStyles.panel,
       border: `1px solid ${theme.borderGlass}`,
-      background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+      background: theme.surfaceGlass,
       boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 12px 22px ${theme.primarySoft}`,
       backdropFilter: 'blur(18px) saturate(1.08)',
       WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
@@ -98,7 +98,7 @@ const WithdrawPage = () => {
     card: {
       ...baseStyles.card,
       border: `1px solid ${theme.borderGlass}`,
-      background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+      background: theme.surfaceGlass,
       boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 10px 18px ${theme.primarySoft}`,
       backdropFilter: 'blur(18px) saturate(1.08)',
       WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
