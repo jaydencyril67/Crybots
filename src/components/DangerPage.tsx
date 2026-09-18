@@ -207,21 +207,6 @@ const DangerPage = () => {
 
   return (
     <HybridTheme mode="dark">
-        await api.patch('/api/settings/danger/disable', payload, { headers });
-      } else {
-        await api.patch('/api/settings/danger/self-exclude', payload, { headers });
-      }
-
-      setState((current) => ({ ...current, status: 'Success: account action completed.' }));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to complete the action.';
-      setState((current) => ({ ...current, status: message }));
-    } finally {
-      setState((current) => ({ ...current, loading: null }));
-    }
-  };
-  return (
-    <HybridTheme mode="dark">
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />
