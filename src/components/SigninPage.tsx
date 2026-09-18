@@ -767,8 +767,7 @@ const SigninPage = () => {
           </div>
         </section>
       </main>
-    </>
-      </HybridTheme>
+    </HybridTheme>
   );
 };
 
