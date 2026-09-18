@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
+import AppThemeProvider from './components/AppTheme';
 import LandingPage from './components/LandingPage';
 import SignupPage from './components/SignupPage';
 import SignupConfirmationSentPage from './components/SignupConfirmationSentPage';
@@ -237,8 +238,10 @@ const RouteTransition = () => {
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      <AppSplashOverlay />
-      <RouteTransition />
+      <AppThemeProvider>
+        <AppSplashOverlay />
+        <RouteTransition />
+      </AppThemeProvider>
     </HelmetProvider>
   </React.StrictMode>
 );

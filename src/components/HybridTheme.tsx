@@ -1,6 +1,6 @@
 import React from 'react';
 
-type HybridThemeMode = 'light' | 'dark';
+export type HybridThemeMode = 'light' | 'dark';
 
 type HybridThemeToken = {
   mode: HybridThemeMode;
