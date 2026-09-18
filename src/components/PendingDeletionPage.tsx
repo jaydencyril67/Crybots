@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from '../utils/navigation';
 import api from '../api/axios';
+import { navigate } from '../utils/navigate';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
 
 type DeletionStatus = {
@@ -17,7 +17,6 @@ const formatDaysLeft = (daysLeft?: number) => {
 };
 
 const PendingDeletionPage = () => {
-  const navigate = useNavigate();
   const [status, setStatus] = useState<DeletionStatus | null>(null);
   const [code, setCode] = useState('');
   const [message, setMessage] = useState('Loading deletion status…');
