@@ -146,7 +146,7 @@ const DangerPage = () => {
   };
 
   const confirmDeleteAccount = async () => {
-    setRemove((current) => ({ ...current, loading: 'delete', status: '' }));
+    setRemove((current) => ({ ...current, loading: 'self-exclude', status: '' }));
 
     try {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
