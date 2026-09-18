@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'luc
 import AppHeader from './AppHeader';
 import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
+import ReusableDatePage from './ReusableDatePage';
 import { navigate } from '../utils/navigate';
 
 const steps = [
@@ -350,6 +351,7 @@ const SignupPage = () => {
   const [passwordError, setPasswordError] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDobPage, setShowDobPage] = useState(false);
 
   const current = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -490,6 +492,31 @@ const SignupPage = () => {
     { label: 'One symbol', met: passwordHasSymbol },
   ];
 
+  const maxDob = useMemo(() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 18);
+    return date.toISOString().split('T')[0];
+  }, []);
+
+  if (showDobPage) {
+    return (
+      <ReusableDatePage
+        title="Date of birth"
+        description="You must be at least 18 years old to create an account. Enter your birthday and confirm to continue."
+        value={form.dob}
+        min="1900-01-01"
+        max={maxDob}
+        confirmLabel="Confirm date"
+        cancelLabel="Back"
+        onConfirm={(value) => {
+          updateField('dob', value);
+          setShowDobPage(false);
+        }}
+        onCancel={() => setShowDobPage(false)}
+      />
+    );
+  }
+
   const currentField = (() => {
     switch (current.field) {
       case 'firstName':
@@ -559,23 +586,21 @@ const SignupPage = () => {
             <label style={styles.label} htmlFor={current.field}>
               Date of birth
             </label>
-            <input
+            <button
               id={current.field}
+              type="button"
+              onClick={() => setShowDobPage(true)}
               style={{
                 ...styles.input,
+                textAlign: 'left',
+                cursor: 'pointer',
                 ...(form.dob && !dobMeetsRequirement
                   ? { borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
                   : null),
               }}
-              type="date"
-              value={form.dob}
-              onChange={(event) => updateField('dob', event.target.value)}
-              max={(() => {
-                const date = new Date();
-                date.setFullYear(date.getFullYear() - 18);
-                return date.toISOString().split('T')[0];
-              })()}
-            />
+            >
+              {form.dob || 'Select your date of birth'}
+            </button>
             {dobError ? <NotificationBanner tone="error" title="Check your details" message={dobError} /> : null}
           </div>
         );
