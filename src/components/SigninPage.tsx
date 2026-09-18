@@ -3,7 +3,7 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
@@ -767,7 +767,7 @@ const SigninPage = () => {
           </div>
         </section>
       </main>
-    </HybridTheme>
+    </>
   );
 };
 
