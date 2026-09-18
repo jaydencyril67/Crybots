@@ -1,63 +1,60 @@
 import React, { useMemo } from 'react';
-import { ShieldCheck, Wallet } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
-
-const authToken = window.localStorage.getItem('token') ?? '';
-
-const styles = {
-  page: {
-    minHeight: '100vh',
-    padding: 'clamp(16px, 4vw, 24px) clamp(12px, 4vw, 16px) 104px',
-    background: 'radial-gradient(circle at top, rgba(37,99,235,0.18), transparent 35%), linear-gradient(180deg, #07111f 0%, #050b14 100%)',
-    color: '#eef4ff',
-  },
-  shell: {
-    width: 'min(920px, 100%)',
-    margin: '0 auto',
-  },
-  card: {
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '28px',
-    background: 'rgba(8,14,26,0.82)',
-    boxShadow: '0 24px 60px rgba(0,0,0,0.36)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-    padding: 'clamp(16px, 4vw, 22px)',
-  },
-  headerRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    marginBottom: '18px',
-    flexWrap: 'wrap' as const,
-  },
-  title: {
-    margin: '18px 0 0',
-    fontSize: 'clamp(1.3rem, 4vw, 1.45rem)',
-    fontWeight: 800,
-    letterSpacing: '-0.03em',
-    lineHeight: 1.2,
-  },
-  subtitle: {
-    margin: '8px 0 0',
-    color: '#9aaac9',
-    lineHeight: 1.6,
-    fontSize: '0.92rem',
-    maxWidth: '58ch',
-  },
-  mutedCard: {
-    marginTop: '16px',
-    borderRadius: '22px',
-    padding: '18px',
-    border: '1px dashed rgba(255,255,255,0.12)',
-    color: 'rgba(238,244,255,0.72)',
-    background: 'rgba(255,255,255,0.03)',
-  },
-};
+import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 const DepositPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+
+  const styles = useMemo(() => ({
+    page: {
+      minHeight: '100vh',
+      padding: 'clamp(16px, 4vw, 24px) clamp(12px, 4vw, 16px) 104px',
+      background: theme.background,
+      color: theme.text,
+    },
+    shell: {
+      width: 'min(920px, 100%)',
+      margin: '0 auto',
+    },
+    card: {
+      ...HYBRID_CARD_STYLES.card,
+      borderRadius: '28px',
+      padding: 'clamp(16px, 4vw, 22px)',
+    },
+    headerRow: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: '12px',
+      marginBottom: '18px',
+      flexWrap: 'wrap' as const,
+    },
+    title: {
+      margin: '18px 0 0',
+      fontSize: 'clamp(1.3rem, 4vw, 1.45rem)',
+      fontWeight: 800,
+      letterSpacing: '-0.03em',
+      lineHeight: 1.2,
+    },
+    subtitle: {
+      margin: '8px 0 0',
+      color: theme.textMuted,
+      lineHeight: 1.6,
+      fontSize: '0.92rem',
+      maxWidth: '58ch',
+    },
+    mutedCard: {
+      ...HYBRID_CARD_STYLES.panel,
+      marginTop: '16px',
+      borderRadius: '22px',
+      color: theme.textMuted,
+    },
+  }), [theme]);
+
   const cryptoContent = useMemo(() => (
     <div style={styles.mutedCard}>
       <strong>USDT deposits only</strong>
@@ -65,7 +62,7 @@ const DepositPage = () => {
         This app is now USDT-only. Add your wallet address and use the crypto deposit flow to move funds in.
       </p>
     </div>
-  ), []);
+  ), [styles.mutedCard]);
 
   return (
     <div style={styles.page}>
@@ -73,7 +70,7 @@ const DepositPage = () => {
         <AppHeader />
         <div style={styles.card}>
           <div style={styles.headerRow}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '0.92rem', color: '#9aaac9' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '0.92rem', color: theme.textMuted }}>
               <ShieldCheck size={18} />
               <span>Secure deposits</span>
             </div>

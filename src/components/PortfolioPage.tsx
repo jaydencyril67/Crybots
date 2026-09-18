@@ -56,7 +56,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     padding: '16px 18px',
     borderRadius: '18px',
     border: `1px solid ${theme.borderGlass}`,
-    background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+    background: theme.surfaceGlass,
     color: theme.text,
     textAlign: 'left' as const,
     boxSizing: 'border-box' as const,

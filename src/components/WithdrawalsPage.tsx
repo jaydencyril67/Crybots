@@ -6,6 +6,8 @@ import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
+import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
 type WithdrawalDetailsResponse = {
@@ -18,11 +20,9 @@ type WithdrawalDetailsResponse = {
   };
 };
 
-const styles = {
+const baseStyles = {
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#fff',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
@@ -34,15 +34,7 @@ const styles = {
     padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
     boxSizing: 'border-box' as const,
   },
-  panel: {
-    borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
-    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-    overflow: 'hidden',
-  },
+  panel: HYBRID_CARD_STYLES.panel,
   body: {
     padding: 'clamp(18px, 4vw, 30px)',
     display: 'grid',
@@ -53,12 +45,7 @@ const styles = {
     gap: '18px',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' as const,
   },
-  card: {
-    borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-    padding: '18px',
-  },
+  card: HYBRID_CARD_STYLES.card,
   cardTitle: {
     margin: 0,
     fontSize: '1.05rem',
@@ -69,28 +56,68 @@ const styles = {
   },
   cardText: {
     margin: '10px 0 0',
-    color: '#9db0d1',
+    color: HYBRID_THEME_TOKENS.dark.textMuted,
     lineHeight: 1.6,
     fontSize: '0.92rem',
   },
   field: { display: 'grid', gap: '8px' },
-  label: { fontSize: '0.82rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
-  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
-  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
-  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)', transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
-  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
-  helper: { fontSize: '0.85rem', color: '#95a8ca', lineHeight: 1.5 },
+  label: { fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceMuted, color: HYBRID_THEME_TOKENS.dark.text, padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
+  selectTrigger: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceMuted, color: HYBRID_THEME_TOKENS.dark.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: HYBRID_THEME_TOKENS.dark.surfaceMuted, border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
+  selectOption: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, color: HYBRID_THEME_TOKENS.dark.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
+  helper: { fontSize: '0.85rem', color: HYBRID_THEME_TOKENS.dark.textMuted, lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
-  button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%' },
-  primaryButton: { background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)', border: 'none' },
+  button: { borderRadius: '999px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, padding: '12px 16px', fontWeight: 700, color: HYBRID_THEME_TOKENS.dark.text, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, cursor: 'pointer', width: '100%', maxWidth: '100%' },
+  primaryButton: { background: `linear-gradient(135deg, ${HYBRID_THEME_TOKENS.dark.primarySoft}, ${HYBRID_THEME_TOKENS.dark.surfaceGlass})`, border: 'none' },
   customPickerRow: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px' },
-  customPickerButton: { borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', fontSize: '0.92rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const },
-  customPickerButtonActive: { border: '1px solid rgba(125,211,252,0.55)', background: 'rgba(125,211,252,0.12)' },
-  customPickerDisplay: { borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', padding: '13px 14px', color: '#eef4ff', fontSize: '0.92rem', lineHeight: 1.5 },
+  customPickerButton: { borderRadius: '16px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceMuted, color: HYBRID_THEME_TOKENS.dark.text, padding: '12px 14px', fontSize: '0.92rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const },
+  customPickerButtonActive: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.borderGlass}`, background: HYBRID_THEME_TOKENS.dark.surfaceGlass },
+  customPickerDisplay: { borderRadius: '16px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, padding: '13px 14px', color: HYBRID_THEME_TOKENS.dark.text, fontSize: '0.92rem', lineHeight: 1.5 },
   customPickerHint: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
 };
 
 const WithdrawPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = useMemo(() => ({
+    ...baseStyles,
+    page: {
+      ...baseStyles.page,
+      background: theme.background,
+      color: theme.text,
+    },
+    panel: {
+      ...baseStyles.panel,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 12px 22px ${theme.primarySoft}`,
+      backdropFilter: 'blur(18px) saturate(1.08)',
+      WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
+    },
+    card: {
+      ...baseStyles.card,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      boxShadow: `inset 0 1px 0 ${theme.highlightSoft}, 0 10px 18px ${theme.primarySoft}`,
+      backdropFilter: 'blur(18px) saturate(1.08)',
+      WebkitBackdropFilter: 'blur(18px) saturate(1.08)',
+    },
+    cardText: { ...baseStyles.cardText, color: theme.textMuted },
+    label: { ...baseStyles.label, color: theme.textMuted },
+    input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
+    selectTrigger: { ...baseStyles.selectTrigger, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
+    selectMenu: { ...baseStyles.selectMenu, border: `1px solid ${theme.border}`, background: theme.surfaceMuted },
+    selectOption: { ...baseStyles.selectOption, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
+    helper: { ...baseStyles.helper, color: theme.textMuted },
+    button: { ...baseStyles.button, border: `1px solid ${theme.border}`, color: theme.text, background: theme.surfaceGlass },
+    primaryButton: { ...baseStyles.primaryButton, color: theme.textInverse },
+    customPickerButton: { ...baseStyles.customPickerButton, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
+    customPickerButtonActive: { ...baseStyles.customPickerButtonActive, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+    customPickerDisplay: { ...baseStyles.customPickerDisplay, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
+    customPickerHint: { ...baseStyles.customPickerHint, color: theme.textMuted },
+  }), [theme]);
+
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [assetType, setAssetType] = useState<'crypto'>('crypto');
