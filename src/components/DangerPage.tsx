@@ -6,7 +6,7 @@ import ReusableConfirmationPage from './ReusableConfirmationPage';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 
-type DangerActionKey = 'disable' | 'self-exclude';
+type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
 
 type DangerActionState = {
   password: string;
