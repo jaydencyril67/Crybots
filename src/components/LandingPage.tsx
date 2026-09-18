@@ -59,8 +59,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   glow: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      `radial-gradient(circle at top, ${theme.primarySoft}, transparent 35%), radial-gradient(circle at 80% 20%, ${theme.primarySoft}, transparent 30%), linear-gradient(180deg, ${theme.surface} 0%, ${theme.background} 100%)`,
+    background: theme.background,
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -68,7 +67,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: `linear-gradient(to right, transparent, ${theme.borderStrong}, transparent)`,
+    background: theme.borderStrong,
   },
   header: {
     display: 'flex',
@@ -104,7 +103,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   buttonPrimary: {
     borderRadius: '999px',
-    background: theme.surfaceShine,
+    background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
     color: theme.text,
     border: `1px solid ${theme.border}`,
     padding: '12px 20px',
@@ -117,9 +116,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     textDecoration: 'none',
   },
   buttonSecondary: {
-    border: `1px solid ${theme.border}`,
+    border: `1px solid ${theme.borderGlass}`,
     borderRadius: '999px',
-    background: theme.surfaceShine,
+    background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+    boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 12px 26px rgba(0, 0, 0, 0.10)`,
     color: theme.text,
     padding: '12px 20px',
     fontWeight: 700,
@@ -144,8 +144,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     alignItems: 'center',
     gap: '10px',
     borderRadius: '999px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceShine,
+    border: `1px solid ${theme.borderGlass}`,
+    background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+    boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px rgba(0, 0, 0, 0.10)`,
     color: theme.text,
     padding: '10px 16px',
     fontSize: '14px',
@@ -209,8 +210,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   statCard: {
     borderRadius: '28px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceShine,
+    border: `1px solid ${theme.borderGlass}`,
+    background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+    boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px rgba(0, 0, 0, 0.10)`,
     padding: '16px',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
@@ -240,10 +242,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   panel: {
     position: 'relative' as const,
     borderRadius: '32px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceShine,
+    border: `1px solid ${theme.borderGlass}`,
+    background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+    boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 25px 80px ${theme.primarySoft}`,
     padding: '24px',
-    boxShadow: `0 25px 80px ${theme.primarySoft}`,
     backdropFilter: 'blur(24px)',
     WebkitBackdropFilter: 'blur(24px)',
   },
