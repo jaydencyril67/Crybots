@@ -21,6 +21,7 @@ const formatDaysLeft = (daysLeft?: number) => {
 };
 
 const PendingDeletionPage = () => {
+  const recoveryUntil = useMemo(() => window.localStorage.getItem('pendingDeletionRecoveryUntil') || '', []);
   const [status, setStatus] = useState<DeletionStatus | null>(null);
   const [code, setCode] = useState('');
   const [message, setMessage] = useState('Loading deletion status…');
@@ -94,7 +95,7 @@ const PendingDeletionPage = () => {
       secondaryActionLabel={codeRequestLoading ? 'Sending code…' : 'Send cancellation code'}
       onPrimaryAction={submitCancel}
       onSecondaryAction={requestCode}
-      footerNote={message || 'After cancellation, your account stays in a recovery state for 24 hours before returning to normal access.'}
+      footerNote={`${message || 'After cancellation, your account stays in a recovery state for 24 hours before returning to normal access.'}${recoveryUntil ? ` Recovery ends at ${new Date(recoveryUntil).toLocaleString()}.` : ''}`}
     >
       <div style={{ display: 'grid', gap: '10px', marginTop: '18px' }}>
         <div style={{ display: 'grid', gap: '6px' }}>

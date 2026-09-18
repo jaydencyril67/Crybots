@@ -204,14 +204,14 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'settings') return <ProtectedRoute><SettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'portfolio') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
     if (displayedRouteKey === 'danger') return <ProtectedRoute><DangerPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'pending-deletion') return <ProtectedRoute><PendingDeletionPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'pending-deletion') return <PendingDeletionPage />;
     if (displayedRouteKey === 'security') return <ProtectedRoute><SecurityPage /></ProtectedRoute>;
     if (displayedRouteKey === 'withdrawals') return <ProtectedRoute><WithdrawalsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'transfer') return <ProtectedRoute><TransferPage /></ProtectedRoute>;
     if (displayedRouteKey === 'deposit') return <ProtectedRoute><DepositPage /></ProtectedRoute>;
     if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
