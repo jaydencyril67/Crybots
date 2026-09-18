@@ -128,7 +128,7 @@ const ReusableConfirmationPage = ({
   const statusStyle = toneStyles[statusTone];
 
   return (
-    <HybridTheme mode="dark">
+    <HybridTheme>
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />

@@ -139,7 +139,7 @@ const ReusableDatePage = ({
   const parsedMax = useMemo(() => max, [max]);
 
   return (
-    <HybridTheme mode="dark">
+    <HybridTheme>
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />

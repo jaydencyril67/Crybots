@@ -1,5 +1,5 @@
 import React from 'react';
-import HybridTheme from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 import AppHeader from './AppHeader';
@@ -46,6 +46,8 @@ const styles = {
   page: {
     minHeight: '100vh',
     overflow: 'hidden',
+    background: HYBRID_THEME_TOKENS.dark.background,
+    color: HYBRID_THEME_TOKENS.dark.text,
   },
   shell: {
     position: 'relative' as const,
@@ -57,7 +59,7 @@ const styles = {
     position: 'absolute' as const,
     inset: 0,
     background:
-      'radial-gradient(circle at top, rgba(34,211,238,0.18), transparent 35%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.22), transparent 30%), linear-gradient(180deg, #09111f 0%, #050816 100%)',
+      'radial-gradient(circle at top, rgba(34,211,238,0.12), transparent 35%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.14), transparent 30%), linear-gradient(180deg, #050816 0%, #000000 100%)',
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -65,15 +67,15 @@ const styles = {
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: 'linear-gradient(to right, transparent, rgba(34,211,238,0.7), transparent)',
+    background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.16), transparent)',
   },
   header: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: '16px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.10)',
+    background: 'rgba(255,255,255,0.04)',
     padding: '14px 20px',
     borderRadius: '999px',
     backdropFilter: 'blur(20px)',
@@ -90,20 +92,21 @@ const styles = {
     fontSize: 'clamp(14px, 1.6vw, 16px)',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.22em',
-    color: '#67e8f9',
+    color: '#d4d4d4',
     margin: 0,
     fontWeight: 800,
   },
   brandSub: {
     margin: '6px 0 0',
     fontSize: 'clamp(13px, 1.5vw, 15px)',
-    color: 'rgba(255,255,255,0.62)',
+    color: '#b3b3b3',
   },
   buttonPrimary: {
     border: 'none',
     borderRadius: '999px',
-    background: 'linear-gradient(135deg, #67e8f9 0%, #c4b5fd 100%)',
-    color: '#050816',
+    background: 'rgba(255,255,255,0.08)',
+    color: '#ffffff',
+    border: '1px solid rgba(255,255,255,0.12)',
     padding: '12px 20px',
     fontWeight: 800,
     width: 'clamp(104px, 36vw, 160px)',
@@ -114,9 +117,9 @@ const styles = {
     textDecoration: 'none',
   },
   buttonSecondary: {
-    border: '1px solid rgba(255,255,255,0.14)',
+    border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: '999px',
-    background: 'rgba(255,255,255,0.05)',
+    background: 'rgba(255,255,255,0.04)',
     color: '#ffffff',
     padding: '12px 20px',
     fontWeight: 700,
@@ -142,8 +145,8 @@ const styles = {
     gap: '10px',
     borderRadius: '999px',
     border: '1px solid rgba(34,211,238,0.2)',
-    background: 'rgba(34,211,238,0.1)',
-    color: '#cffafe',
+    background: 'rgba(255,255,255,0.04)',
+    color: '#ffffff',
     padding: '10px 16px',
     fontSize: '14px',
     marginBottom: '24px',
@@ -159,7 +162,7 @@ const styles = {
   },
   gradientText: {
     display: 'block',
-    background: 'linear-gradient(90deg, #67e8f9 0%, #ffffff 45%, #c4b5fd 100%)',
+    background: 'linear-gradient(90deg, #ffffff 0%, #d4d4d4 45%, #ffffff 100%)',
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
     color: 'transparent',
@@ -169,7 +172,7 @@ const styles = {
     maxWidth: '680px',
     fontSize: 'clamp(16px, 2vw, 18px)',
     lineHeight: 1.8,
-    color: 'rgba(255,255,255,0.72)',
+    color: '#b3b3b3',
   },
   buttonRow: {
     display: 'flex',
@@ -206,8 +209,8 @@ const styles = {
   },
   statCard: {
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.10)',
+    background: 'rgba(255,255,255,0.04)',
     padding: '16px',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
@@ -222,7 +225,7 @@ const styles = {
   statLabel: {
     margin: '10px 0 0',
     fontSize: '14px',
-    color: 'rgba(255,255,255,0.62)',
+    color: '#b3b3b3',
   },
   panelWrap: {
     position: 'relative' as const,
@@ -237,8 +240,8 @@ const styles = {
   panel: {
     position: 'relative' as const,
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.10)',
+    background: 'rgba(255,255,255,0.04)',
     padding: '24px',
     boxShadow: '0 25px 80px rgba(34, 211, 238, 0.08)',
     backdropFilter: 'blur(24px)',
@@ -276,8 +279,8 @@ const styles = {
   },
   badge: {
     borderRadius: '999px',
-    background: 'rgba(52,211,153,0.14)',
-    color: '#86efac',
+    background: 'rgba(255,255,255,0.06)',
+    color: '#d4d4d4',
     padding: '8px 14px',
     fontSize: '14px',
     fontWeight: 600,
@@ -339,7 +342,7 @@ const styles = {
   featureCard: {
     borderRadius: '28px',
     border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
+    background: 'rgba(255,255,255,0.04)',
     padding: '24px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -388,7 +391,7 @@ const styles = {
     alignItems: 'flex-start',
     borderRadius: '22px',
     border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(10,16,32,0.72)',
+    background: 'rgba(24,24,24,0.86)',
     padding: '18px',
     minWidth: 0,
     flexWrap: 'wrap' as const,
@@ -400,8 +403,8 @@ const styles = {
     display: 'grid',
     placeItems: 'center',
     borderRadius: '999px',
-    background: 'rgba(34,211,238,0.12)',
-    color: '#67e8f9',
+    background: 'rgba(255,255,255,0.08)',
+    color: '#ffffff',
     fontWeight: 700,
     fontSize: '14px',
   },
@@ -413,7 +416,7 @@ const styles = {
     color: 'rgba(255,255,255,0.75)',
   },
   icon: {
-    color: '#67e8f9',
+    color: '#d4d4d4',
     width: '24px',
     height: '24px',
     flexShrink: 0,
@@ -433,20 +436,20 @@ const LandingPage = () => {
   };
 
   return (
-    <HybridTheme mode="dark">
+    <HybridTheme>
       <>
         <Helmet>
-      <title>KingsHall Exchange | Modern Crypto Trading & Investing</title>
-      <meta
-        name="description"
-        content="KingsHall Exchange is a sleek crypto exchange and investment app with secure trading, fast transfers, and premium portfolio tools. "
-      />
-    </Helmet>
+          <title>KingsHall Exchange | Modern Crypto Trading & Investing</title>
+          <meta
+            name="description"
+            content="KingsHall Exchange is a sleek crypto exchange and investment app with secure trading, fast transfers, and premium portfolio tools. "
+          />
+        </Helmet>
 
-    <main style={styles.page}>
-      <section style={{ position: 'relative', overflow: 'hidden' }}>
-        <div style={styles.glow} />
-        <div style={styles.topLine} />
+        <main style={styles.page}>
+          <section style={{ position: 'relative', overflow: 'hidden' }}>
+            <div style={styles.glow} />
+            <div style={styles.topLine} />
 
         <div style={styles.shell}>
           <AppHeader />
@@ -517,7 +520,7 @@ const LandingPage = () => {
                     {['Bitcoin', 'Ethereum', 'Solana'].map((asset, index) => (
                       <div key={asset} style={styles.assetItem}>
                         <span style={{ fontSize: '14px', fontWeight: 600 }}>{asset}</span>
-                        <span style={{ fontSize: '14px', color: '#86efac' }}>{['+12.2%', '+8.5%', '+15.1%'][index]}</span>
+                        <span style={{ fontSize: '14px', color: 'inherit' }}>{['+12.2%', '+8.5%', '+15.1%'][index]}</span>
                       </div>
                     ))}
                   </div>
@@ -542,7 +545,7 @@ const LandingPage = () => {
           <section style={styles.howSection}>
             <div style={styles.howGrid}>
               <div>
-                <p style={{ ...styles.smallText, textTransform: 'uppercase', letterSpacing: '0.3em', color: '#67e8f9' }}>
+                <p style={{ ...styles.smallText, textTransform: 'uppercase', letterSpacing: '0.3em', color: 'inherit' }}>
                   How it works
                 </p>
                 <h2 style={styles.howHeading}>A smooth path from signup to growth.</h2>

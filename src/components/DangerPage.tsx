@@ -206,7 +206,7 @@ const DangerPage = () => {
   }
 
   return (
-    <HybridTheme mode="dark">
+    <HybridTheme>
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />
