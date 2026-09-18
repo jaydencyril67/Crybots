@@ -5,10 +5,11 @@ import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound, Wallet } 
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import AppHeader from './AppHeader';
 import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NowBar from './NowBar';
 
-const styles = {
+const baseStyles = {
   page: {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
@@ -43,8 +44,6 @@ const styles = {
     width: '100%',
     padding: '16px',
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
     boxSizing: 'border-box' as const,
     display: 'grid',
     gap: '6px',
@@ -74,11 +73,9 @@ const styles = {
     margin: '8px 0 0',
     lineHeight: 1.6,
     maxWidth: '58ch',
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
   },
   infoLabel: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
     fontSize: '0.82rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
@@ -87,7 +84,6 @@ const styles = {
     margin: 0,
     fontSize: '1rem',
     fontWeight: 700,
-    color: HYBRID_THEME_TOKENS.dark.text,
     lineHeight: 1.5,
     wordBreak: 'break-word' as const,
     overflowWrap: 'anywhere' as const,
@@ -106,13 +102,11 @@ const styles = {
   },
   helperText: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
     lineHeight: 1.5,
   },
   helperAction: {
     border: 'none',
     background: 'transparent',
-    color: HYBRID_THEME_TOKENS.dark.text,
     borderRadius: '999px',
     padding: '12px 16px',
     fontWeight: 700,
@@ -129,7 +123,6 @@ const styles = {
     borderRadius: '999px',
     border: 'none',
     background: 'transparent',
-    color: HYBRID_THEME_TOKENS.dark.text,
     cursor: 'pointer',
     flexShrink: 0,
   },
@@ -152,6 +145,44 @@ type MeResponse = {
 
 
 const ProfilePage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = useMemo(() => ({
+    ...baseStyles,
+    sectionSub: {
+      ...baseStyles.sectionSub,
+      color: theme.textMuted,
+    },
+    infoLabel: {
+      ...baseStyles.infoLabel,
+      color: theme.textMuted,
+    },
+    infoValue: {
+      ...baseStyles.infoValue,
+      color: theme.text,
+    },
+    helperText: {
+      ...baseStyles.helperText,
+      color: theme.textMuted,
+    },
+    helperAction: {
+      ...baseStyles.helperAction,
+      color: theme.text,
+    },
+    logoutButton: {
+      ...baseStyles.logoutButton,
+      color: theme.text,
+    },
+    infoRow: {
+      ...baseStyles.infoRow,
+      border: `1px solid ${theme.borderGlass}`,
+      background: `linear-gradient(180deg, ${theme.surfaceShine} 0%, ${theme.surfaceGlass} 100%)`,
+      boxShadow: `inset 0 1px 0 ${theme.highlight}, inset 0 -1px 0 ${theme.border}, 0 18px 34px rgba(0, 0, 0, 0.10)`,
+      backdropFilter: 'blur(24px) saturate(1.15)',
+      WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
+    },
+  }), [theme]);
+
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
@@ -178,8 +209,6 @@ const ProfilePage = () => {
         }
 
         const serverProfile = meResponse.data.user ?? null;
-        console.log('[ProfilePage] /api/auth/me response:', JSON.stringify(serverProfile));
-        console.log('[ProfilePage] profilePicture value:', JSON.stringify(serverProfile?.profilePicture));
 
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
         setBalance(nextBalance);
