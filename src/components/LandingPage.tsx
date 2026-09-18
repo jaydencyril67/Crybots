@@ -1,5 +1,6 @@
 import React from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 import AppHeader from './AppHeader';
@@ -42,7 +43,7 @@ const steps = [
   'Trade, invest, and track your growth in one elegant dashboard.',
 ];
 
-const getStyles = (theme = HYBRID_THEME_TOKENS.dark) => ({
+const getStyles = (theme) => ({
   page: {
     minHeight: '100vh',
     overflow: 'hidden',
@@ -430,13 +431,14 @@ const getStyles = (theme = HYBRID_THEME_TOKENS.dark) => ({
 
 
 const LandingPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
+
   const handleDashboardClick = () => {
     const token = window.localStorage.getItem('token') || '';
     navigate(token && isTokenValid(token) ? '/dashboard' : '/signin');
   };
-
-  const theme = HYBRID_THEME_TOKENS.dark;
-  const styles = getStyles(theme);
 
   return (
     <HybridTheme>
