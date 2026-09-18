@@ -141,7 +141,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.primary,
     WebkitBackgroundClip: 'initial',
     backgroundClip: 'initial',
-    color: theme.primary,
   },
   lead: {
     margin: '10px 0 0',
@@ -408,7 +407,7 @@ const ForgotPasswordPage = () => {
       background: theme.primary,
     },
     card: {
-      ...styles.card,
+      ...styles.panel,
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
       color: theme.text,
@@ -424,25 +423,25 @@ const ForgotPasswordPage = () => {
       color: theme.text,
     },
     hint: {
-      ...styles.hint,
+      ...styles.inlineNote,
       color: theme.textMuted,
     },
     helper: {
-      ...styles.helper,
+      ...styles.footerNote,
       color: theme.textMuted,
     },
     listItem: {
-      ...styles.listItem,
+      ...styles.passwordChecklistItem,
       color: theme.textMuted,
     },
     actionButton: {
-      ...styles.actionButton,
+      ...styles.buttonGhost,
       borderColor: theme.borderGlass,
       background: theme.surfaceGlass,
       color: theme.text,
     },
     actionButtonPrimary: {
-      ...styles.actionButtonPrimary,
+      ...styles.buttonPrimary,
       background: theme.primary,
       color: theme.surfaceElevated,
     },
