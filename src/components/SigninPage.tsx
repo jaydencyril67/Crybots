@@ -739,8 +739,9 @@ const SigninPage = () => {
                 <p style={hybridStyles.stepLabel}>Need help?</p>
                 <h2 style={{ ...styles.stepTitle, color: theme.text }}>Forgot your password?</h2>
                 <p style={hybridStyles.stepDesc}>Use your email code to verify your account and reset access securely.</p>
-                <a
-                  href="/forgot-password"
+                <button
+                  type="button"
+                  onClick={() => navigate('/forgot-password')}
                   style={{
                     ...styles.button,
                     display: 'inline-flex',
@@ -752,13 +753,12 @@ const SigninPage = () => {
                     border: `1px solid ${theme.primarySoft}`,
                     background: theme.primarySoft,
                     color: theme.primary,
-                    textDecoration: 'none',
                     fontWeight: 700,
 
                   }}
                 >
                   Forgot password?
-                </a>
+                </button>
               </article>
             </div>
           </div>
