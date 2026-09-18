@@ -64,8 +64,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   glow: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      `radial-gradient(circle at top left, ${theme.primarySoft}, transparent 34%), radial-gradient(circle at 85% 20%, ${theme.highlightSoft}, transparent 28%), linear-gradient(180deg, ${theme.surfaceMuted} 0%, ${theme.background} 100%)`,
+    background: theme.surfaceMuted,
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -73,7 +72,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: `linear-gradient(to right, transparent, ${theme.primary}, transparent)`,
+    background: theme.primary,
   },
   header: {
     display: 'flex',
@@ -139,10 +138,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   titleAccent: {
     display: 'block',
-    background: `linear-gradient(90deg, ${theme.primary} 0%, ${theme.text} 45%, ${theme.highlight} 100%)`,
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: theme.textInverse,
+    color: theme.primary,
+    WebkitBackgroundClip: 'initial',
+    backgroundClip: 'initial',
+    color: theme.primary,
   },
   lead: {
     margin: '10px 0 0',
@@ -234,7 +233,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   progressFill: {
     height: '100%',
     borderRadius: '999px',
-    background: `linear-gradient(90deg, ${theme.primary}, ${theme.highlight})`,
+    background: theme.primary,
   },
   stepLabel: {
     margin: 0,
@@ -368,6 +367,86 @@ const ForgotPasswordPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
+  const hybridStyles = {
+    page: {
+      ...styles.page,
+      background: theme.background,
+      color: theme.text,
+    },
+    glow: {
+      ...styles.glow,
+      background: theme.background,
+    },
+    topLine: {
+      ...styles.topLine,
+      background: theme.border,
+    },
+    brandKicker: {
+      ...styles.brandKicker,
+      color: theme.primary,
+    },
+    brandSub: {
+      ...styles.brandSub,
+      color: theme.textMuted,
+    },
+    backButton: {
+      ...styles.backButton,
+      borderColor: theme.borderGlass,
+      background: theme.surfaceGlass,
+      color: theme.text,
+    },
+    stepLabel: {
+      ...styles.stepLabel,
+      color: theme.primary,
+    },
+    progressBar: {
+      ...styles.progressBar,
+      background: theme.borderGlass,
+    },
+    progressFill: {
+      ...styles.progressFill,
+      background: theme.primary,
+    },
+    card: {
+      ...styles.card,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      color: theme.text,
+    },
+    label: {
+      ...styles.label,
+      color: theme.textMuted,
+    },
+    input: {
+      ...styles.input,
+      borderColor: theme.borderGlass,
+      background: theme.surfaceElevated,
+      color: theme.text,
+    },
+    hint: {
+      ...styles.hint,
+      color: theme.textMuted,
+    },
+    helper: {
+      ...styles.helper,
+      color: theme.textMuted,
+    },
+    listItem: {
+      ...styles.listItem,
+      color: theme.textMuted,
+    },
+    actionButton: {
+      ...styles.actionButton,
+      borderColor: theme.borderGlass,
+      background: theme.surfaceGlass,
+      color: theme.text,
+    },
+    actionButtonPrimary: {
+      ...styles.actionButtonPrimary,
+      background: theme.primary,
+      color: theme.surfaceElevated,
+    },
+  };
 
   const currentStep = steps[step];
   const progress = ((step + 1) / steps.length) * 100;
@@ -509,23 +588,23 @@ const ForgotPasswordPage = () => {
           content="Reset your account password by verifying your email, full name, and a 3-digit recovery code."
         />
       </Helmet>
-      <div style={styles.page}>
+      <div style={hybridStyles.page}>
         <div style={styles.shell}>
-          <div style={styles.glow} />
-          <div style={styles.topLine} />
+          <div style={hybridStyles.glow} />
+          <div style={hybridStyles.topLine} />
           <header style={styles.header}>
-            <button type="button" style={styles.backButton} onClick={goBack} aria-label="Go back">
+            <button type="button" style={hybridStyles.backButton} onClick={goBack} aria-label="Go back">
               <ArrowLeft style={styles.icon} />
             </button>
             <div style={styles.brandBlock}>
-              <p style={styles.brandKicker}>Kingshall</p>
-              <p style={styles.brandSub}>Secure recovery flow</p>
+              <p style={hybridStyles.brandKicker}>Kingshall</p>
+              <p style={hybridStyles.brandSub}>Secure recovery flow</p>
             </div>
           </header>
 
           <div style={styles.grid}>
-            <section style={styles.heroCard}>
-              <p style={styles.stepLabel}>Password recovery</p>
+            <section style={hybridStyles.card}>
+              <p style={hybridStyles.stepLabel}>Password recovery</p>
               <h2 style={styles.title}>
                 <span style={styles.titleAccent}>Reset your password safely.</span>
                 Confirm your identity, receive a 3-digit code, and set a new password.
@@ -547,10 +626,10 @@ const ForgotPasswordPage = () => {
 
             <section style={styles.panel}>
               <div style={styles.progressWrap}>
-                <div style={styles.progressBar}>
-                  <div style={{ ...styles.progressFill, width: `${progress}%` }} />
+                <div style={hybridStyles.progressBar}>
+                  <div style={{ ...hybridStyles.progressFill, width: `${progress}%` }} />
                 </div>
-                <p style={styles.stepLabel}>Step {step + 1} of {steps.length}</p>
+                <p style={hybridStyles.stepLabel}>Step {step + 1} of {steps.length}</p>
               </div>
 
               <h2 style={styles.stepTitle}>{currentStep.title}</h2>
@@ -565,7 +644,7 @@ const ForgotPasswordPage = () => {
                     placeholder={currentStep.placeholder}
                     value={form[currentStep.field]}
                     onChange={(event) => updateField(currentStep.field, event.target.value)}
-                    style={styles.input}
+                    style={hybridStyles.input}
                     autoComplete={currentStep.field === 'email' ? 'email' : currentStep.field === 'password' ? 'new-password' : 'off'}
                   />
                 </label>
@@ -590,14 +669,14 @@ const ForgotPasswordPage = () => {
                               : validateField('password', form.password),
                         }));
                       }}
-                      style={styles.input}
+                      style={hybridStyles.input}
                       autoComplete="new-password"
                     />
                   </label>
                 ) : null}
 
                 {currentStep.field === 'password' ? (
-                  <p style={styles.inlineNote}>Live validation checks password length, uppercase, lowercase, number, symbol, and confirmation match.</p>
+                  <p style={hybridStyles.hint}>Live validation checks password length, uppercase, lowercase, number, symbol, and confirmation match.</p>
                 ) : null}
                 {currentStep.field === 'password' ? (
                   <ul style={styles.passwordChecklist}>
@@ -621,14 +700,14 @@ const ForgotPasswordPage = () => {
                 <div style={styles.navRow}>
                   <button
                     type="button"
-                    style={{ ...styles.button, ...styles.buttonGhost }}
+                    style={hybridStyles.actionButton}
                     onClick={goBack}
                   >
                     {step === 0 ? 'Back to sign in' : 'Previous'}
                   </button>
                   <button
                     type="button"
-                    style={{ ...styles.button, ...styles.buttonPrimary }}
+                    style={hybridStyles.actionButtonPrimary}
                     onClick={goNext}
                     disabled={loading}
                   >
@@ -637,7 +716,7 @@ const ForgotPasswordPage = () => {
                 </div>
               </div>
 
-              <p style={styles.footerNote}>
+              <p style={hybridStyles.helper}>
                 {!completed
                   ? 'We only send the recovery code after your email and account name match.'
                   : 'Please return to sign in and use your updated password.'}
