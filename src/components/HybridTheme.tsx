@@ -2,7 +2,7 @@ import React from 'react';
 
 export type HybridThemeMode = 'light' | 'dark';
 
-type HybridThemeToken = {
+export type HybridThemeToken = {
   mode: HybridThemeMode;
   name: string;
   background: string;
