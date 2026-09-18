@@ -30,10 +30,10 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
   light: {
     mode: 'light',
     name: 'Light',
-    background: '#eeece7',
-    surface: '#fcfbf8',
+    background: '#e7e4de',
+    surface: '#faf8f4',
     surfaceElevated: '#ffffff',
-    surfaceMuted: '#f3eee5',
+    surfaceMuted: '#efe8dd',
     surfaceGlass: 'rgba(255,255,255,0.60)',
     surfaceShine: 'rgba(255,255,255,0.06)',
     border: 'rgba(28, 28, 28, 0.08)',

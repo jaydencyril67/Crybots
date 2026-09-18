@@ -37,12 +37,12 @@ const baseStyles = {
   content: {
     display: 'grid',
     gap: '16px',
-    padding: 'clamp(14px, 3.5vw, 24px)',
+    padding: 'clamp(18px, 4vw, 30px)',
   },
   section: {
     display: 'grid',
-    gap: '18px',
-    padding: 'clamp(14px, 3.5vw, 24px)',
+    gap: '20px',
+    padding: 'clamp(18px, 4vw, 28px)',
     borderRadius: '28px',
     border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
     background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
