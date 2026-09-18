@@ -68,7 +68,6 @@ const PendingDeletionPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessage('Deletion cancelled successfully. Redirecting…');
-      window.localStorage.setItem('ke:navigation-redirect', '/dashboard');
       navigate('/dashboard');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unable to cancel deletion.';
