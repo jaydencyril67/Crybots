@@ -435,6 +435,9 @@ const LandingPage = () => {
     navigate(token && isTokenValid(token) ? '/dashboard' : '/signin');
   };
 
+  const theme = HYBRID_THEME_TOKENS.dark;
+  const styles = getStyles(theme);
+
   return (
     <HybridTheme>
       <>
