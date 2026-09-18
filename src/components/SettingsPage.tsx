@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import HybridTheme, { HYBRID_THEME_TOKENS, type HybridThemeMode } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
@@ -223,6 +225,7 @@ const SettingsPage = () => {
   const [deactivating, setDeactivating] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const { themeMode, setThemeMode } = useAppTheme();
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
   const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
@@ -233,6 +236,7 @@ const SettingsPage = () => {
     if (typeof window === 'undefined') {
       return;
     }
+
 
     try {
       const raw = window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY);
@@ -440,6 +444,10 @@ const SettingsPage = () => {
 
 
 
+  const persistTheme = (nextMode: HybridThemeMode) => {
+    setThemeMode(nextMode);
+  };
+
   const persistEdgeLight = (enabled: boolean, color: EdgeLightColorKey) => {
     window.localStorage.setItem(
       EDGE_LIGHT_STORAGE_KEY,
@@ -502,6 +510,11 @@ const SettingsPage = () => {
     } finally {
       setSecurityCodeCardSaving(false);
     }
+  };
+
+  const handleToggleTheme = () => {
+    persistTheme(themeMode === 'dark' ? 'light' : 'dark');
+    showStatus('success', `Theme switched to ${themeMode === 'dark' ? 'Light' : 'Dark'} mode.`);
   };
 
   const handleDeactivate = async () => {
@@ -691,6 +704,32 @@ const SettingsPage = () => {
                 ) : null}
               </section>
 
+
+              <section style={styles.card}>
+                <h2 style={styles.cardTitle}>🎨 Theme</h2>
+                <p style={styles.cardText}>Switch the app theme instantly. The choice is saved across reloads.</p>
+                <div style={styles.toggleRow}>
+                  <button
+                    type="button"
+                    style={{ ...styles.togglePill, ...(themeMode === 'dark' ? styles.togglePillActive : {}) }}
+                    onClick={() => persistTheme('dark')}
+                  >
+                    Dark
+                  </button>
+                  <button
+                    type="button"
+                    style={{ ...styles.togglePill, ...(themeMode === 'light' ? styles.togglePillActive : {}) }}
+                    onClick={() => persistTheme('light')}
+                  >
+                    Light
+                  </button>
+                </div>
+                <div style={styles.buttonRow}>
+                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={handleToggleTheme}>
+                    Toggle theme
+                  </button>
+                </div>
+              </section>
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}>⚡ NowBar edge lighting</h2>

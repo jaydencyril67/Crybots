@@ -1,4 +1,5 @@
 import React from 'react';
+import HybridTheme from './HybridTheme';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 import AppHeader from './AppHeader';
@@ -44,8 +45,6 @@ const steps = [
 const styles = {
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
     overflow: 'hidden',
   },
   shell: {
@@ -434,8 +433,9 @@ const LandingPage = () => {
   };
 
   return (
-  <>
-    <Helmet>
+    <HybridTheme mode="dark">
+      <>
+        <Helmet>
       <title>KingsHall Exchange | Modern Crypto Trading & Investing</title>
       <meta
         name="description"
@@ -560,7 +560,8 @@ const LandingPage = () => {
         </div>
       </section>
     </main>
-  </>
+      </>
+    </HybridTheme>
   );
 };
 
