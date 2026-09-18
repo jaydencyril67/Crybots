@@ -1,5 +1,5 @@
 import React from 'react';
-import HybridTheme, { HYBRID_THEME_TOKENS, type HybridThemeToken } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
@@ -43,7 +43,7 @@ const steps = [
   'Trade, invest, and track your growth in one elegant dashboard.',
 ];
 
-const getStyles = (theme: HybridThemeToken) => ({
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflow: 'hidden',
