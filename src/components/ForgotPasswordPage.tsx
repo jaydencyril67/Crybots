@@ -141,7 +141,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.primary,
     WebkitBackgroundClip: 'initial',
     backgroundClip: 'initial',
-    color: theme.primary,
   },
   lead: {
     margin: '10px 0 0',
