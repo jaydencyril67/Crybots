@@ -8,11 +8,19 @@ type HybridThemeToken = {
   background: string;
   surface: string;
   surfaceElevated: string;
+  surfaceMuted: string;
+  surfaceGlass: string;
+  surfaceShine: string;
   border: string;
+  borderStrong: string;
+  borderGlass: string;
   text: string;
   textMuted: string;
+  textInverse: string;
   primary: string;
   primarySoft: string;
+  highlight: string;
+  highlightSoft: string;
   success: string;
   warning: string;
   danger: string;
@@ -25,14 +33,22 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
     background: '#ffffff',
     surface: '#f7f7f7',
     surfaceElevated: '#ffffff',
+    surfaceMuted: '#f2f2f2',
+    surfaceGlass: 'rgba(255,255,255,0.72)',
+    surfaceShine: 'rgba(255,255,255,0.92)',
     border: 'rgba(0, 0, 0, 0.10)',
+    borderStrong: 'rgba(0, 0, 0, 0.16)',
+    borderGlass: 'rgba(255,255,255,0.85)',
     text: '#111111',
     textMuted: '#5f5f5f',
+    textInverse: '#ffffff',
     primary: '#111111',
     primarySoft: 'rgba(17, 17, 17, 0.08)',
-    success: '#111111',
+    highlight: 'rgba(255,255,255,0.65)',
+    highlightSoft: 'rgba(255,255,255,0.34)',
+    success: '#166534',
     warning: '#4b5563',
-    danger: '#111111',
+    danger: '#b91c1c',
   },
   dark: {
     mode: 'dark',
@@ -40,14 +56,22 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
     background: '#000000',
     surface: '#111111',
     surfaceElevated: '#181818',
+    surfaceMuted: '#111111',
+    surfaceGlass: 'rgba(255,255,255,0.06)',
+    surfaceShine: 'rgba(255,255,255,0.14)',
     border: 'rgba(255,255,255,0.10)',
+    borderStrong: 'rgba(255,255,255,0.16)',
+    borderGlass: 'rgba(255,255,255,0.18)',
     text: '#ffffff',
     textMuted: '#b3b3b3',
+    textInverse: '#000000',
     primary: '#ffffff',
     primarySoft: 'rgba(255, 255, 255, 0.08)',
-    success: '#ffffff',
+    highlight: 'rgba(255,255,255,0.28)',
+    highlightSoft: 'rgba(255,255,255,0.12)',
+    success: '#4ade80',
     warning: '#d4d4d4',
-    danger: '#ffffff',
+    danger: '#fb7185',
   },
 };
 
@@ -56,11 +80,11 @@ type HybridThemeProps = {
   children?: React.ReactNode;
 };
 
-export const HYBRID_CARD_STYLES = {
+export const createHybridCardStyles = (theme: HybridThemeToken) => ({
   card: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surface,
     padding: '18px',
     boxSizing: 'border-box' as const,
   },
@@ -68,7 +92,16 @@ export const HYBRID_CARD_STYLES = {
     padding: '16px',
     borderRadius: '18px',
   },
-};
+  panel: {
+    borderRadius: '18px',
+    border: `1px solid ${theme.borderStrong}`,
+    background: theme.surfaceElevated,
+    padding: '16px 18px',
+    boxSizing: 'border-box' as const,
+  },
+});
+
+export const HYBRID_CARD_STYLES = createHybridCardStyles(HYBRID_THEME_TOKENS.dark);
 
 const styles = {
   root: {
