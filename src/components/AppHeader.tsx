@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { navigate } from '../utils/navigate';
-import api from '../api/axios';
+import api, { API_BASE_URL } from '../api/axios';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import KHLogo from './KHLogo';
@@ -152,11 +152,27 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     } else {
       void loadUnreadCount();
     }
-    const interval = window.setInterval(() => { void loadUnreadCount(); }, 15000);
+    let eventSource: EventSource | undefined;
+    if (!isPublicPage && localStorage.getItem('token')) {
+      eventSource = new EventSource(`${API_BASE_URL}/api/notifications/stream?token=${encodeURIComponent(localStorage.getItem('token') || '')}`);
+      eventSource.addEventListener('notification', (event) => {
+        try {
+          const payload = JSON.parse((event as MessageEvent).data) as { unreadCount?: number };
+          const nextCount = Number(payload.unreadCount || 0);
+          if (nextCount > previousCount.current) activateAlert();
+          previousCount.current = nextCount;
+          hasLoadedCount.current = true;
+          setUnreadCount(nextCount);
+        } catch {
+          // Ignore malformed stream events and keep the header available.
+        }
+      });
+      eventSource.onerror = () => {
+        // EventSource automatically reconnects when the network is restored.
+      };
+    }
     window.addEventListener('ke:force-logout', clearNotificationState);
     const handleNotificationsChanged = () => {
-      // This event also fires when a notification is marked as read. The polling
-      // comparison below is the source of truth for newly arrived notifications.
       void loadUnreadCount();
     };
     const handleAuthChanged = () => { void loadUnreadCount(); };
@@ -164,7 +180,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
     return () => {
       mounted = false;
-      window.clearInterval(interval);
+      eventSource?.close();
       window.clearTimeout(alertTimeout.current);
       alertTimeout.current = undefined;
       window.removeEventListener('ke:force-logout', clearNotificationState);
