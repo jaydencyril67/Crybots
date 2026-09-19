@@ -101,13 +101,18 @@ const RouteTransition = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem('token')));
 
   useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+
     const syncRoute = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       const nextRouteKey = getRouteKey();
       setRouteKey(nextRouteKey);
       setDisplayedRouteKey(nextRouteKey);
     };
 
     const handleNavigationStart = (event: Event) => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       const customEvent = event as CustomEvent<{ path?: string }>;
       const nextRouteKey = routeToKey(customEvent.detail?.path ?? window.location.pathname);
       setRouteKey(nextRouteKey);
@@ -118,6 +123,7 @@ const RouteTransition = () => {
     window.addEventListener('popstate', syncRoute);
     window.addEventListener('hashchange', syncRoute);
     return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
       window.removeEventListener('ke:navigation-start', handleNavigationStart as EventListener);
       window.removeEventListener('popstate', syncRoute);
       window.removeEventListener('hashchange', syncRoute);
