@@ -49,7 +49,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const AppSplashOverlay = () => {
   const { themeMode } = useAppTheme();
-  const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(false);
 
