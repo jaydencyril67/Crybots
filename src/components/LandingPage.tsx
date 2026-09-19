@@ -443,7 +443,7 @@ const LandingPage = () => {
   };
 
   const handleGetStartedClick = () => {
-    navigate('/signup', { replace: false });
+    navigate('/signup');
   };
 
   return (
