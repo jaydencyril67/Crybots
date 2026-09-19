@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
-import AppHeader from './AppHeader';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
@@ -620,7 +619,7 @@ const SigninPage = () => {
           <div style={hybridStyles.topLine} />
 
           <div style={styles.shell}>
-            <AppHeader />
+            
 
             <div style={styles.grid}>
               <article style={hybridStyles.heroCard}>

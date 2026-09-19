@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
-import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
@@ -218,7 +217,7 @@ const WithdrawPage = () => {
       <div data-shadow-free-page="withdrawals" style={styles.page}>
       <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
-        <AppHeader />
+        
         {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0 0' }}><LoadingDots /></div> : null}
         <div style={styles.content}>
           {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}

@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
-import AppHeader from './AppHeader';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
@@ -356,7 +355,7 @@ const TransactionHistoryPage = () => {
       <div data-shadow-free-page="transaction-history" style={styles.page}>
       <Helmet><title>Transaction History | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
-        <AppHeader />
+        
         <div style={styles.panel}>
           <div style={styles.body}>
             <section style={styles.topGrid}>

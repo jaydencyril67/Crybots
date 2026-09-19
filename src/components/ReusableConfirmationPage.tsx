@@ -1,5 +1,4 @@
 import React from 'react';
-import AppHeader from './AppHeader';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
@@ -131,7 +130,7 @@ const ReusableConfirmationPage = ({
     <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <div style={styles.shell}>
-          <AppHeader />
+          
           <div style={styles.content}>
             <section style={styles.card}>
               <p style={styles.eyebrow}>{eyebrow}</p>

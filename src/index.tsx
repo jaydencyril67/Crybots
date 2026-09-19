@@ -23,6 +23,7 @@ import TransferPage from './components/TransferPage';
 import TransactionHistoryPage from './components/TransactionHistoryPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
+import AppHeader from './components/AppHeader';
 import AppSplashOverlay from './components/AppSplashOverlay';
 import api, { forceLogout } from './api/axios';
 
@@ -226,8 +227,10 @@ const RouteTransition = () => {
       <div
         style={{
           minHeight: '100vh',
+          paddingTop: '66px',
         }}
       >
+        <AppHeader />
         {appContent}
       </div>
       {showNowBar ? <NowBar /> : null}

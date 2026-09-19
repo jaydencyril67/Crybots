@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut } from 'lucide-react';
 import api from '../api/axios';
-import AppHeader from './AppHeader';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
@@ -442,7 +441,7 @@ const SecurityPage = () => {
           <Helmet>
             <title>KingsHall Exchange | Security</title>
           </Helmet>
-          <AppHeader />
+          
           <div style={styles.content}>
             <section style={styles.card}>
               <h1 style={styles.sectionTitle}>Security</h1>

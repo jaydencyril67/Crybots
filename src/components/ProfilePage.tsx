@@ -3,7 +3,6 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound, Wallet } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
-import AppHeader from './AppHeader';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
@@ -274,7 +273,7 @@ const ProfilePage = () => {
         </Helmet>
         <main style={styles.page}>
           <div style={styles.shell}>
-            <AppHeader />
+            
 
             <div style={styles.content}>
               <section style={styles.card}>

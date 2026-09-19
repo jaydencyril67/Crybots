@@ -1,5 +1,4 @@
 import React from 'react';
-import AppHeader from './AppHeader';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
@@ -95,7 +94,7 @@ const PortfolioPage = () => {
     <HybridTheme>
       <div style={styles.page}>
         <div style={styles.shell}>
-          <AppHeader />
+          
           <div style={styles.content}>
             <section style={styles.section}>
               <h2 style={styles.sectionTitle}>Portfolio</h2>

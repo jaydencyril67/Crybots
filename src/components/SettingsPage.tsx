@@ -17,7 +17,6 @@ const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
-import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
@@ -58,21 +57,20 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
     maxWidth: '1320px',
     margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(14px, 3vw, 28px) clamp(8px, 1.5vw, 16px) 40px',
     boxSizing: 'border-box' as const,
   },
   panel: {
-    borderRadius: '28px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-    overflow: 'hidden',
+    display: 'grid',
+    gap: '16px',
+    width: '100%',
   },
   body: {
-    padding: 'clamp(18px, 4vw, 30px)',
+    padding: 'clamp(0px, 2vw, 30px) 0 0',
     display: 'grid',
-    gap: '18px',
+    gap: '16px',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   grid: {
     display: 'grid',
@@ -618,7 +616,7 @@ const SettingsPage = () => {
         <title>Settings | KingsHall Exchange</title>
       </Helmet>
       <div style={styles.shell}>
-        <AppHeader />
+        
         <div style={styles.panel}>
           <div style={styles.body}>
             {status.kind !== 'idle' ? (

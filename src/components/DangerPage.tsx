@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import AppHeader from './AppHeader';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
@@ -213,7 +212,7 @@ const DangerPage = () => {
     <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <div style={styles.shell}>
-          <AppHeader />
+          
           <div style={styles.content}>
             <section style={styles.card}>
               <h2 style={styles.sectionTitle}>Danger Zone</h2>
