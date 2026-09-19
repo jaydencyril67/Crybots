@@ -1,5 +1,5 @@
-const CACHE_NAME = 'kingshall-pwa-v3';
-const APP_SHELL = ['/', '/index.html', '/manifest.json'];
+const CACHE_NAME = 'kingshall-pwa-v4-gold-crown';
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/ke-icon.svg'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
 self.addEventListener('install', (event) => {

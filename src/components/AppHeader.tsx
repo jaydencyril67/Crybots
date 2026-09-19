@@ -11,7 +11,7 @@ const styles = {
     gridTemplateColumns: 'auto 1fr auto',
     alignItems: 'center',
     gap: '10px',
-    padding: '8px 16px',
+    padding: '7px 16px',
     borderRadius: '28px',
     border: '1.5px solid rgba(255,255,255,0.16)',
     background: 'linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(8,14,26,0.92) 100%)',
@@ -39,6 +39,12 @@ const styles = {
     minWidth: 0,
     display: 'flex',
     justifyContent: 'center',
+  },
+  rightArtwork: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexShrink: 0,
   },
   brandCopy: {
     minWidth: 0,
@@ -138,7 +144,7 @@ const AppHeader = () => {
   };
   const renderArtwork = () => unreadCount > 0
     ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span>
-    : <KHLogo theme={theme} size={30} label="KingsHall" />;
+    : <KHLogo size={30} label="KingsHall" />;
 
   return (
     <>
@@ -157,6 +163,10 @@ const AppHeader = () => {
         <div style={styles.brandCopy}>
           <p style={styles.brandTitle}>{headerTitle}</p>
         </div>
+      </div>
+
+      <div style={styles.rightArtwork}>
+        <KHLogo size={30} label="KingsHall" />
       </div>
 
       </header>
