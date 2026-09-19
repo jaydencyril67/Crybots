@@ -37,7 +37,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   card: {
     borderRadius: '22px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
     padding: '18px',
   },
@@ -84,7 +84,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
     boxSizing: 'border-box' as const,
     borderRadius: '18px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
     color: theme.text,
     padding: '12px 14px',
@@ -98,7 +98,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   actionButton: {
     borderRadius: '18px',
     padding: '12px 18px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.borderGlass}`,
     cursor: 'pointer',
     fontWeight: 800,
     color: theme.text,
