@@ -27,7 +27,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   description: { margin: '8px 0 24px', color: theme.textMuted, lineHeight: 1.65 },
   calendarHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '18px' },
   pickerGroup: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flex: 1 },
-  picker: { borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', font: 'inherit', fontWeight: 800, cursor: 'pointer', outline: 'none' },
+  pickerWrapper: { position: 'relative' as const },
+  picker: { borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', font: 'inherit', fontWeight: 800, cursor: 'pointer', outline: 'none', minWidth: '116px', textAlign: 'left' as const },
+  pickerMenu: { position: 'absolute' as const, zIndex: 10, top: 'calc(100% + 6px)', left: 0, right: 0, maxHeight: '240px', overflowY: 'auto' as const, padding: '6px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surface, boxShadow: `0 16px 36px ${theme.borderGlass}` },
+  pickerOption: { display: 'block', width: '100%', border: 0, borderRadius: '9px', background: 'transparent', color: theme.text, padding: '9px 10px', font: 'inherit', fontWeight: 700, textAlign: 'left' as const, cursor: 'pointer' },
+  selectedPickerOption: { background: theme.primary, color: theme.textInverse },
   navButton: { width: '38px', height: '38px', borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontSize: '1.35rem', lineHeight: 1 },
   weekdays: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', marginBottom: '6px' },
   weekday: { color: theme.textMuted, fontSize: '0.7rem', fontWeight: 800, textAlign: 'center' as const, textTransform: 'uppercase' as const },
@@ -67,6 +71,7 @@ const ReusableDatePage = ({
     const parsed = new Date(`${initialDate}T12:00:00`);
     return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
   });
+  const [openPicker, setOpenPicker] = useState<'month' | 'year' | null>(null);
 
   useEffect(() => {
     const nextDate = value.split('T')[0] || toDateKey(new Date());
@@ -105,12 +110,22 @@ const ReusableDatePage = ({
                 <div style={styles.calendarHeader}>
                   <button type="button" aria-label="Previous month" style={styles.navButton} onClick={() => changeMonth(-1)}>‹</button>
                   <div style={styles.pickerGroup}>
-                    <select aria-label="Choose month" style={styles.picker} value={month.getMonth()} onChange={(event) => changePickerMonth(Number(event.target.value))}>
-                      {monthOptions.map((monthName, index) => <option key={monthName} value={index}>{monthName}</option>)}
-                    </select>
-                    <select aria-label="Choose year" style={styles.picker} value={month.getFullYear()} onChange={(event) => changePickerMonth(month.getMonth(), Number(event.target.value))}>
-                      {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
-                    </select>
+                    <div style={styles.pickerWrapper}>
+                      <button type="button" aria-haspopup="listbox" aria-expanded={openPicker === 'month'} aria-label="Choose month" style={styles.picker} onClick={() => setOpenPicker(openPicker === 'month' ? null : 'month')}>
+                        {monthOptions[month.getMonth()]} <span aria-hidden="true">⌄</span>
+                      </button>
+                      {openPicker === 'month' ? <div role="listbox" aria-label="Months" style={styles.pickerMenu}>
+                        {monthOptions.map((monthName, index) => <button key={monthName} type="button" role="option" aria-selected={month.getMonth() === index} style={{ ...styles.pickerOption, ...(month.getMonth() === index ? styles.selectedPickerOption : {}) }} onClick={() => { changePickerMonth(index); setOpenPicker(null); }}>{monthName}</button>)}
+                      </div> : null}
+                    </div>
+                    <div style={styles.pickerWrapper}>
+                      <button type="button" aria-haspopup="listbox" aria-expanded={openPicker === 'year'} aria-label="Choose year" style={styles.picker} onClick={() => setOpenPicker(openPicker === 'year' ? null : 'year')}>
+                        {month.getFullYear()} <span aria-hidden="true">⌄</span>
+                      </button>
+                      {openPicker === 'year' ? <div role="listbox" aria-label="Years" style={styles.pickerMenu}>
+                        {yearOptions.map((year) => <button key={year} type="button" role="option" aria-selected={month.getFullYear() === year} style={{ ...styles.pickerOption, ...(month.getFullYear() === year ? styles.selectedPickerOption : {}) }} onClick={() => { changePickerMonth(month.getMonth(), year); setOpenPicker(null); }}>{year}</button>)}
+                      </div> : null}
+                    </div>
                   </div>
                   <button type="button" aria-label="Next month" style={styles.navButton} onClick={() => changeMonth(1)}>›</button>
                 </div>
