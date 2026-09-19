@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2 } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2, Copy } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -266,6 +266,32 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     lineHeight: 1.6,
     color: theme.textMuted,
   },
+  inlineError: {
+    margin: '6px 0 0',
+    color: theme.danger,
+    fontSize: '0.82rem',
+    lineHeight: 1.4,
+  },
+  passwordChecklist: {
+    margin: '10px 0 0',
+    padding: 0,
+    listStyle: 'none',
+    display: 'grid',
+    gap: '6px',
+  },
+  passwordChecklistItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '11px',
+    lineHeight: 1.5,
+    color: theme.textMuted,
+  },
+  passwordChecklistIcon: {
+    width: '16px',
+    height: '16px',
+    flexShrink: 0,
+  },
 });
 
 const SecurityPage = () => {
@@ -274,6 +300,8 @@ const SecurityPage = () => {
   const styles = getStyles(theme);
 
   const [uid, setUid] = useState('');
+  const [uidCode, setUidCode] = useState('');
+  const [uidCodeRequested, setUidCodeRequested] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -291,10 +319,12 @@ const SecurityPage = () => {
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
   const [twoFactorUri, setTwoFactorUri] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [twoFactorKeyCopied, setTwoFactorKeyCopied] = useState(false);
   const [showDelete2faConfirmation, setShowDelete2faConfirmation] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
   const [savingUid, setSavingUid] = useState(false);
+  const [requestingUidCode, setRequestingUidCode] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [savingSecurityCode, setSavingSecurityCode] = useState(false);
   const [saving2fa, setSaving2fa] = useState(false);
@@ -359,11 +389,29 @@ const SecurityPage = () => {
 
   const showStatus = (kind: SaveState, text: string) => setStatus({ kind, text });
 
+  const handleUidCodeRequest = async () => {
+    if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
+    setRequestingUidCode(true);
+    try {
+      await api.post('/api/settings/uid-code');
+      setUidCodeRequested(true);
+      setUidCode('');
+      showStatus('success', 'A confirmation code was sent to your email.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to send UID confirmation code.');
+    } finally {
+      setRequestingUidCode(false);
+    }
+  };
+
   const handleUidSave = async () => {
     if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
+    if (!uidCode.trim()) return showStatus('error', 'Enter the confirmation code sent to your email.');
     setSavingUid(true);
     try {
-      await api.patch('/api/settings/uid', { uid: uid.trim() });
+      await api.patch('/api/settings/uid', { uid: uid.trim(), code: uidCode.trim() });
+      setUidCode('');
+      setUidCodeRequested(false);
       showStatus('success', 'UID updated successfully.');
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update UID.');
@@ -372,9 +420,32 @@ const SecurityPage = () => {
     }
   };
 
+  const passwordHasMinLength = newPassword.length >= 8;
+  const passwordHasUppercase = /[A-Z]/.test(newPassword);
+  const passwordHasLowercase = /[a-z]/.test(newPassword);
+  const passwordHasNumber = /\d/.test(newPassword);
+  const passwordHasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+  const passwordMeetsRequirement = passwordHasMinLength && passwordHasUppercase && passwordHasLowercase && passwordHasNumber && passwordHasSymbol;
+  const passwordNotice = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.';
+  const passwordChecklist = [
+    { label: 'At least 8 characters', met: passwordHasMinLength },
+    { label: 'One uppercase letter', met: passwordHasUppercase },
+    { label: 'One lowercase letter', met: passwordHasLowercase },
+    { label: 'One number', met: passwordHasNumber },
+    { label: 'One symbol', met: passwordHasSymbol },
+  ];
+  const passwordErrorMessage = newPassword && !passwordMeetsRequirement ? passwordNotice : '';
+  const passwordInputStyle = passwordErrorMessage ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input;
+  const confirmPasswordMismatch = confirmPassword && newPassword !== confirmPassword;
+  const confirmPasswordInputStyle = confirmPasswordMismatch ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input;
+
   const handlePasswordSave = async () => {
     if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
       return showStatus('error', 'Enter your current password, new password, and confirmation.');
+    }
+
+    if (!passwordMeetsRequirement) {
+      return showStatus('error', passwordNotice);
     }
 
     if (newPassword !== confirmPassword) {
@@ -439,6 +510,19 @@ const SecurityPage = () => {
       showStatus('error', error?.response?.data?.message || 'Unable to start 2FA setup.');
     } finally {
       setSaving2fa(false);
+    }
+  };
+
+  const handleCopyTwoFactorKey = async () => {
+    if (!twoFactorSecret) return;
+
+    try {
+      await navigator.clipboard.writeText(twoFactorSecret);
+      setTwoFactorKeyCopied(true);
+      showStatus('success', 'Manual key copied to clipboard.');
+      window.setTimeout(() => setTwoFactorKeyCopied(false), 2000);
+    } catch {
+      showStatus('error', 'Unable to copy the manual key.');
     }
   };
 
@@ -572,7 +656,9 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
-                  <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
+                  {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Email confirmation code" inputMode="numeric" maxLength={6} /> : null}
+                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
                 </div>
               </div>
 
@@ -662,8 +748,18 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>Change your account password</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" />
-                  <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
-                  <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
+                  <input style={passwordInputStyle} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
+                  <ul style={styles.passwordChecklist}>
+                    {passwordChecklist.map((item) => (
+                      <li key={item.label} style={styles.passwordChecklistItem}>
+                        <CheckCircle2 style={{ ...styles.passwordChecklistIcon, color: item.met ? theme.success : theme.textMuted }} />
+                        <span style={{ color: item.met ? theme.success : theme.textMuted }}>{item.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {passwordErrorMessage ? <p style={styles.inlineError}>{passwordErrorMessage}</p> : null}
+                  <input style={confirmPasswordInputStyle} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
+                  {confirmPasswordMismatch ? <p style={styles.inlineError}>Passwords do not match.</p> : null}
                   <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change'}</button>
                 </div>
               </div>
@@ -692,7 +788,12 @@ const SecurityPage = () => {
                       <div style={{ display: 'grid', gap: '8px', justifyItems: 'start' }}>
                         <QRCodeCanvas value={twoFactorUri} size={180} includeMargin />
                         <p style={styles.note}>Scan this QR code in Google Authenticator, Authy, or another TOTP app.</p>
-                        <p style={{ ...styles.note, wordBreak: 'break-all' as const }}>Manual key: {twoFactorSecret}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' as const }}>
+                          <p style={{ ...styles.note, wordBreak: 'break-all' as const, margin: 0 }}>Manual key: {twoFactorSecret}</p>
+                          <button type="button" style={{ ...styles.button, padding: '8px 12px', minWidth: 'auto' }} onClick={() => void handleCopyTwoFactorKey()} disabled={!twoFactorSecret} aria-label="Copy manual key">
+                            <Copy size={14} /> {twoFactorKeyCopied ? 'Copied' : 'Copy'}
+                          </button>
+                        </div>
                       </div>
                     ) : null}
                     <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
@@ -704,8 +805,8 @@ const SecurityPage = () => {
                   <div style={styles.control}>
                     <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : 'Disable 2FA'}</button>
-                      <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button>
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
+                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button> : null}
                     </div>
                   </div>
                 )}
