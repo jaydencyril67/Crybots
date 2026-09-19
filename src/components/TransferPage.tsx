@@ -3,8 +3,10 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
+import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
+import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
 type TransferRecipientCheckResponse = {
@@ -29,11 +31,9 @@ type TransferDetailsResponse = {
   };
 };
 
-const styles = {
+const baseStyles = {
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#fff',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
@@ -46,60 +46,104 @@ const styles = {
     boxSizing: 'border-box' as const,
   },
   panel: {
+    ...HYBRID_CARD_STYLES.card,
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
-    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    padding: 'clamp(14px, 3.5vw, 24px)',
     overflow: 'hidden',
   },
   body: {
-    padding: 'clamp(14px, 3.5vw, 24px)',
     display: 'grid',
     gap: '16px',
   },
-  grid: {
+  content: {
     display: 'grid',
     gap: '16px',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' as const,
   },
-  card: {
-    borderRadius: '20px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-    padding: '16px',
+  section: {
+    display: 'grid',
+    gap: '14px',
   },
-  cardTitle: {
-    margin: 0,
-    fontSize: '1rem',
-    fontWeight: 800,
+  headerRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
-    lineHeight: 1.3,
+    justifyContent: 'space-between',
+    gap: '12px',
+    flexWrap: 'wrap' as const,
   },
-  cardText: {
-    margin: '10px 0 0',
-    color: '#9db0d1',
+  titleBlock: {
+    display: 'grid',
+    gap: '8px',
+  },
+  title: {
+    margin: 0,
+    fontSize: 'clamp(1.3rem, 3vw, 1.45rem)',
+    fontWeight: 800,
+    letterSpacing: '-0.03em',
+    lineHeight: 1.2,
+  },
+  subtitle: {
+    margin: 0,
+    color: HYBRID_THEME_TOKENS.dark.textMuted,
     lineHeight: 1.6,
-    fontSize: '0.9rem',
+    fontSize: '0.92rem',
+    maxWidth: '62ch',
+  },
+  contentShell: {
+    display: 'grid',
+    gap: '16px',
+  },
+  introRow: {
+    display: 'grid',
+    gap: '12px',
+  },
+  twoColumn: {
+    display: 'grid',
+    gap: '16px',
+    gridTemplateColumns: 'minmax(0, 1.35fr) minmax(280px, 0.65fr)',
+    alignItems: 'start',
+  },
+  stack: {
+    display: 'grid',
+    gap: '16px',
+  },
+  compactCard: {
+    ...HYBRID_CARD_STYLES.panel,
+    borderRadius: '22px',
+    padding: '16px',
+    minWidth: 0,
   },
   field: { display: 'grid', gap: '8px' },
-  label: { fontSize: '0.78rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
-  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
-  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
-  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)', transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
-  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
-  helper: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
+  label: { fontSize: '0.82rem', fontWeight: 700, color: HYBRID_THEME_TOKENS.dark.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceMuted, color: HYBRID_THEME_TOKENS.dark.text, padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
+  selectTrigger: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceMuted, color: HYBRID_THEME_TOKENS.dark.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: HYBRID_THEME_TOKENS.dark.surfaceMuted, border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
+  selectOption: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, color: HYBRID_THEME_TOKENS.dark.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
+  helper: { fontSize: '0.85rem', color: HYBRID_THEME_TOKENS.dark.textMuted, lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
-  button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
-  primaryButton: { background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)', border: 'none' },
-  narrowCard: { minWidth: 0 },
+  button: { borderRadius: '999px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, padding: '12px 16px', fontWeight: 700, color: HYBRID_THEME_TOKENS.dark.text, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
+  primaryButton: { background: `linear-gradient(135deg, ${HYBRID_THEME_TOKENS.dark.primarySoft}, ${HYBRID_THEME_TOKENS.dark.surfaceGlass})`, border: 'none', color: HYBRID_THEME_TOKENS.dark.text },
   summaryRow: { display: 'grid', gap: '12px' },
 };
 
 const TransferPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = useMemo(() => ({
+    ...baseStyles,
+    page: { ...baseStyles.page, background: theme.background, color: theme.text },
+    panel: { ...baseStyles.panel, border: `1px solid ${theme.border}`, background: theme.surfaceGlass },
+    compactCard: { ...baseStyles.compactCard, border: `1px solid ${theme.border}`, background: theme.surfaceGlass },
+    subtitle: { ...baseStyles.subtitle, color: theme.textMuted },
+    label: { ...baseStyles.label, color: theme.textMuted },
+    input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
+    selectTrigger: { ...baseStyles.selectTrigger, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
+    selectMenu: { ...baseStyles.selectMenu, border: `1px solid ${theme.border}`, background: theme.surfaceMuted },
+    selectOption: { ...baseStyles.selectOption, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
+    helper: { ...baseStyles.helper, color: theme.textMuted },
+    button: { ...baseStyles.button, border: `1px solid ${theme.border}`, color: theme.text, background: theme.surfaceGlass },
+    primaryButton: { ...baseStyles.primaryButton, color: theme.textInverse },
+  }), [theme]);
+
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [recipientMethod, setRecipientMethod] = useState<'uid' | 'email'>('uid');
@@ -202,88 +246,109 @@ const TransferPage = () => {
   if (loading) return null;
 
   return (
-    <div style={styles.page}>
-      <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
-      <div style={styles.shell}>
-        <AppHeader />
-        <div style={styles.panel}>
-          <div style={styles.body}>
-            {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
-            <div style={styles.grid}>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><ArrowRightLeft size={18} /> Send USDT to another user</h2>
-                <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
-                <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Recipient type</span>
-                  <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
-                    <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
-                    <span style={{ transform: isRecipientMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
-                  </button>
-                  {isRecipientMenuOpen ? (
-                    <div style={styles.selectMenu}>
-                      {(['uid', 'email'] as const).map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          style={styles.selectOption}
-                          onClick={() => {
-                            setRecipientMethod(option);
-                            setIsRecipientMenuOpen(false);
-                          }}
-                        >
-                          {option === 'uid' ? 'UID' : 'Email'}
+    <HybridTheme mode={themeMode}>
+      <div style={styles.page}>
+        <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
+        <div style={styles.shell}>
+          <AppHeader />
+          <div style={styles.panel}>
+            <div style={styles.body}>
+              {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
+              <div style={styles.contentShell}>
+                <div style={styles.headerRow}>
+                  <div style={styles.titleBlock}>
+                    <h1 style={styles.title}>Transfer USDT</h1>
+                    <p style={styles.subtitle}>Send USDT to another user using their UID or email. Recipient validation runs automatically as you type.</p>
+                  </div>
+                  <div style={{ color: theme.textMuted, fontSize: '0.92rem' }}>Balance: {usdtBalance.toFixed(2)} USDT</div>
+                </div>
+
+                <div style={styles.twoColumn}>
+                  <section style={styles.compactCard}>
+                    <div style={styles.stack}>
+                      <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
+                        <span style={styles.label}>Recipient type</span>
+                        <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
+                          <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
+                          <span style={{ transform: isRecipientMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                         </button>
-                      ))}
+                        {isRecipientMenuOpen ? (
+                          <div style={styles.selectMenu}>
+                            {(['uid', 'email'] as const).map((option) => (
+                              <button
+                                key={option}
+                                type="button"
+                                style={styles.selectOption}
+                                onClick={() => {
+                                  setRecipientMethod(option);
+                                  setIsRecipientMenuOpen(false);
+                                }}
+                              >
+                                {option === 'uid' ? 'UID' : 'Email'}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div style={styles.field as React.CSSProperties}>
+                        <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>
+                        <input
+                          style={styles.input}
+                          value={recipientValue}
+                          onChange={(event) => setRecipientValue(recipientMethod === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)}
+                          placeholder={recipientMethod === 'email' ? 'recipient@email.com' : '12345'}
+                        />
+                      </div>
+
+                      <div style={styles.helper}>
+                        {recipientChecking ? 'Checking recipient...' : recipientValid ? `Recipient found: ${recipientDisplay}` : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a UID or email to validate.'}
+                      </div>
+
+                      <div style={styles.field as React.CSSProperties}>
+                        <span style={styles.label}>Amount</span>
+                        <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
+                      </div>
+
+                      <div style={styles.field as React.CSSProperties}>
+                        <span style={styles.label}>Security code</span>
+                        <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit code' : 'Set security code to continue'} disabled={!securityCodeBound} />
+                      </div>
+
+                      <div style={styles.buttonRow}>
+                        <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>
+                          {transferring ? 'Sending...' : 'Send USDT'}
+                        </button>
+                      </div>
                     </div>
-                  ) : null}
+                  </section>
+
+                  <div style={styles.stack}>
+                    <section style={styles.compactCard}>
+                      <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}><BadgeCheck size={18} /> Transfer rules</h2>
+                      <p style={styles.helper}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
+                    </section>
+
+                    <section style={styles.compactCard}>
+                      <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}><UserRound size={18} /> Recipient validation</h2>
+                      <p style={styles.helper}>UID entries are restricted to 5 digits. Email validation checks the exact email that exists in the database.</p>
+                      <p style={styles.helper}>Validation runs live after a short pause so the interface stays responsive on mobile and desktop.</p>
+                    </section>
+
+                    <section style={styles.compactCard}>
+                      <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}><Hash size={18} /> Security verification</h2>
+                      <p style={styles.helper}>Bind a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
+                      <p style={styles.helper}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
+                    </section>
+                  </div>
                 </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>
-                  <input
-                    style={styles.input}
-                    value={recipientValue}
-                    onChange={(event) => setRecipientValue(recipientMethod === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)}
-                    placeholder={recipientMethod === 'email' ? 'recipient@email.com' : '12345'}
-                  />
-                </div>
-                <div style={styles.helper}>
-                  {recipientChecking ? 'Checking recipient...' : recipientValid ? `Recipient found: ${recipientDisplay}` : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a UID or email to validate.'}
-                </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Amount</span>
-                  <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
-                </div>
-                <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>Security code</span>
-                  <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit code' : 'Set security code to continue'} disabled={!securityCodeBound} />
-                </div>
-                <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>
-                    {transferring ? 'Sending...' : 'Send USDT'}
-                  </button>
-                </div>
-                <p style={styles.cardText}>Available balance: {usdtBalance.toFixed(2)} USDT</p>
-              </section>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><BadgeCheck size={18} /> Transfer rules</h2>
-                <p style={styles.cardText}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
-              </section>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><UserRound size={18} /> Recipient validation</h2>
-                <p style={styles.cardText}>UID entries are restricted to 5 digits. Email validation checks the exact email that exists in the database.</p>
-                <p style={styles.cardText}>Validation runs live after a short pause so the interface stays responsive on mobile and desktop.</p>
-              </section>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><Hash size={18} /> Security verification</h2>
-                <p style={styles.cardText}>Bind a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
-                <p style={styles.cardText}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
-              </section>
+              </div>
             </div>
           </div>
+          <NowBar />
         </div>
-        <NowBar />
       </div>
-    </div>
+    </HybridTheme>
   );
 };
 
