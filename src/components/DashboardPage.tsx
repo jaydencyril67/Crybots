@@ -394,7 +394,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.highlight,
     flexShrink: 0,
   },
-};
+});
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-US', {

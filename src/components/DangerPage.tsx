@@ -111,7 +111,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     fontWeight: 700,
     color: theme.text,
   },
-};
+});
 
 const DangerPage = () => {
   const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
