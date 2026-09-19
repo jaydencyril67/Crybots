@@ -158,7 +158,12 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   };
 
   const headerStyle = isAlertActive
-    ? { ...styles.header, borderColor: theme.danger, animation: 'ke-header-alert 1.2s ease-in-out infinite' }
+    ? {
+      ...styles.header,
+      borderColor: '#ef4444',
+      boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 22px rgba(239, 68, 68, 0.85), 0 14px 30px rgba(0,0,0,0.24)',
+      animation: 'ke-header-alert 1.2s ease-in-out infinite',
+    }
     : styles.header;
   const headerTitle = unreadCount > 0
     ? `${unreadCount} New Notification${unreadCount === 1 ? '' : 's'}`
@@ -175,7 +180,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
 
   return (
     <>
-      <style>{`@keyframes ke-header-alert { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }`}</style>
+      <style>{`@keyframes ke-header-alert {
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 22px rgba(239, 68, 68, 0.85), 0 14px 30px rgba(0,0,0,0.24); }
+        50% { opacity: 0.72; box-shadow: 0 0 0 3px rgba(239, 68, 68, 1), 0 0 34px rgba(239, 68, 68, 1), 0 14px 30px rgba(0,0,0,0.24); }
+      }`}</style>
       <header
         style={headerStyle}
         onClick={handleHeaderClick}
