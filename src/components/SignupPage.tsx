@@ -509,6 +509,7 @@ const SignupPage = () => {
         max={maxDob}
         confirmLabel="Confirm date"
         cancelLabel="Back"
+        showNowBar={false}
         onConfirm={(value) => {
           updateField('dob', value);
           setShowDobPage(false);
