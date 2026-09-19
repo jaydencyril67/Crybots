@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2, Copy } from 'lucide-react';
+import { CheckCircle2, ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2, Copy } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -266,6 +266,26 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     lineHeight: 1.6,
     color: theme.textMuted,
   },
+  passwordChecklist: {
+    margin: '10px 0 0',
+    padding: 0,
+    listStyle: 'none',
+    display: 'grid',
+    gap: '6px',
+  },
+  passwordChecklistItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '11px',
+    lineHeight: 1.5,
+    color: theme.textMuted,
+  },
+  passwordChecklistIcon: {
+    width: '16px',
+    height: '16px',
+    flexShrink: 0,
+  },
 });
 
 const SecurityPage = () => {
@@ -394,9 +414,32 @@ const SecurityPage = () => {
     }
   };
 
+  const passwordHasMinLength = newPassword.length >= 8;
+  const passwordHasUppercase = /[A-Z]/.test(newPassword);
+  const passwordHasLowercase = /[a-z]/.test(newPassword);
+  const passwordHasNumber = /\d/.test(newPassword);
+  const passwordHasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+  const passwordMeetsRequirement = passwordHasMinLength && passwordHasUppercase && passwordHasLowercase && passwordHasNumber && passwordHasSymbol;
+  const passwordNotice = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.';
+  const passwordChecklist = [
+    { label: 'At least 8 characters', met: passwordHasMinLength },
+    { label: 'One uppercase letter', met: passwordHasUppercase },
+    { label: 'One lowercase letter', met: passwordHasLowercase },
+    { label: 'One number', met: passwordHasNumber },
+    { label: 'One symbol', met: passwordHasSymbol },
+  ];
+  const passwordErrorMessage = newPassword && !passwordMeetsRequirement ? passwordNotice : '';
+  const passwordInputStyle = passwordErrorMessage ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input;
+  const confirmPasswordMismatch = confirmPassword && newPassword !== confirmPassword;
+  const confirmPasswordInputStyle = confirmPasswordMismatch ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input;
+
   const handlePasswordSave = async () => {
     if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
       return showStatus('error', 'Enter your current password, new password, and confirmation.');
+    }
+
+    if (!passwordMeetsRequirement) {
+      return showStatus('error', passwordNotice);
     }
 
     if (newPassword !== confirmPassword) {
@@ -699,8 +742,18 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>Change your account password</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" />
-                  <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
-                  <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
+                  <input style={passwordInputStyle} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
+                  <ul style={styles.passwordChecklist}>
+                    {passwordChecklist.map((item) => (
+                      <li key={item.label} style={styles.passwordChecklistItem}>
+                        <CheckCircle2 style={{ ...styles.passwordChecklistIcon, color: item.met ? theme.success : theme.textMuted }} />
+                        <span style={{ color: item.met ? theme.success : theme.textMuted }}>{item.label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {passwordErrorMessage ? <p style={styles.inlineError}>{passwordErrorMessage}</p> : null}
+                  <input style={confirmPasswordInputStyle} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
+                  {confirmPasswordMismatch ? <p style={styles.inlineError}>Passwords do not match.</p> : null}
                   <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change'}</button>
                 </div>
               </div>
