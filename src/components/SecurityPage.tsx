@@ -394,7 +394,7 @@ const SecurityPage = () => {
     if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
     setRequestingUidCode(true);
     try {
-      await api.post('/api/settings/uid-code');
+      await api.post('/api/settings/uid-code', { uid: uid.trim() });
       setUidCodeRequested(true);
       setUidCode('');
       showStatus('success', 'A confirmation code was sent to your email.');
