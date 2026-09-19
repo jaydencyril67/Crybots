@@ -340,7 +340,7 @@ const SettingsPage = () => {
   };
 
   const handleSaveSecurityCode = async () => {
-    if (!currentPassword) {
+    if (!currentSecurityPassword) {
       showStatus('error', 'Enter your current password to update your security code.');
       return;
     }
@@ -353,7 +353,7 @@ const SettingsPage = () => {
     setSecurityCodeCardSaving(true);
     try {
       await api.patch('/api/withdrawals/security-code', {
-        currentPassword,
+        currentPassword: currentSecurityPassword,
         securityCode,
       });
       showStatus('success', 'Security code updated successfully.');
