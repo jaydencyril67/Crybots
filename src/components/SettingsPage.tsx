@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS, type HybridThemeMode } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
@@ -15,7 +15,7 @@ type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
+import { RotateCcw, ShieldCheck, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
@@ -43,7 +43,6 @@ type WalletValidationState = {
   message: string;
 };
 
-const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
 const trc20WalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -195,37 +194,17 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
 });
 
-const passwordMeetsRule = (value: string) => {
-  const hasMinLength = value.length >= 8;
-  const hasUppercase = /[A-Z]/.test(value);
-  const hasLowercase = /[a-z]/.test(value);
-  const hasNumber = /\d/.test(value);
-  const hasSymbol = /[^A-Za-z0-9]/.test(value);
-  return hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSymbol;
-};
-
 const SettingsPage = () => {
-  const [uid, setUid] = useState('');
   const [accountLoading, setAccountLoading] = useState(true);
-  const [uidAvailable, setUidAvailable] = useState<boolean | null>(null);
-  const [uidEditorActive, setUidEditorActive] = useState(false as boolean);
-  const [uidChecking, setUidChecking] = useState(false);
-  const [uidCardSaving, setUidCardSaving] = useState(false);
-  const [passwordCardSaving, setPasswordCardSaving] = useState(false);
   const [walletCardSaving, setWalletCardSaving] = useState(false);
   const [securityCodeCardSaving, setSecurityCodeCardSaving] = useState(false);
-  const [activeCard, setActiveCard] = useState<'password' | 'wallet' | 'uid' | 'securityCode' | null>(null);
-  const [initialUid, setInitialUid] = useState('');
+  const [activeCard, setActiveCard] = useState<'wallet' | 'securityCode' | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
   const [securityCode, setSecurityCode] = useState('');
   const [securityCodeConfirm, setSecurityCodeConfirm] = useState('');
   const [currentSecurityPassword, setCurrentSecurityPassword] = useState('');
   const [walletValidation, setWalletValidation] = useState<WalletValidationState>({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
-  const [deactivating, setDeactivating] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const { themeMode, setThemeMode } = useAppTheme();
@@ -263,10 +242,6 @@ const SettingsPage = () => {
     }
   }, []);
 
-  const uidDigits = uid.replace(/\D/g, '').slice(0, 5);
-  const uidReadyToSave = Boolean(uidEditorActive && uidDigits.length === 5 && uidAvailable !== false && uidDigits !== initialUid);
-  const showUidSaveButton = Boolean(activeCard === 'uid' && uidReadyToSave) || uidCardSaving;
-
   useEffect(() => {
     const loadAccount = async () => {
       try {
@@ -274,9 +249,6 @@ const SettingsPage = () => {
         const user = data.user;
         console.log('[SettingsPage] /api/auth/me response user:', JSON.stringify(user));
         console.log('[SettingsPage] profilePicture from response:', JSON.stringify(user?.profilePicture));
-        const loadedUid = (user?.uid ?? '').replace(/\D/g, '').slice(0, 5);
-        setUid(loadedUid);
-        setInitialUid(loadedUid);
         setActiveCard(null);
         setWalletAddress(user?.walletAddress ?? '');
         setWalletValidation({ valid: Boolean(user?.walletAddress && trc20WalletPattern.test(user.walletAddress)), message: user?.walletAddress && trc20WalletPattern.test(user.walletAddress) ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 wallet address.' });
@@ -293,135 +265,12 @@ const SettingsPage = () => {
     void loadAccount();
   }, []);
 
-  useEffect(() => {
-    const trimmedUid = uid.trim();
-
-    if (trimmedUid.length !== 5) {
-      setUidAvailable(null);
-      return;
-    }
-
-    setUidEditorActive(true);
-
-    if (trimmedUid === initialUid) {
-      setUidAvailable(true);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeout = window.setTimeout(async () => {
-      setUidChecking(true);
-      try {
-        const { data } = await api.get<{ available?: boolean }>('/api/settings/uid-check', {
-          params: { uid: trimmedUid },
-        });
-        setUidAvailable(Boolean(data.available));
-      } catch {
-        if (!controller.signal.aborted) {
-          setUidAvailable(null);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setUidChecking(false);
-        }
-      }
-    }, 450);
-
-    return () => {
-      controller.abort();
-      window.clearTimeout(timeout);
-    };
-  }, [uid]);
-
-  const passwordValid = useMemo(() => passwordMeetsRule(newPassword), [newPassword]);
-  const passwordMismatch = newPassword.length > 0 && confirmPassword.length > 0 && newPassword !== confirmPassword;
-  const passwordCanSave = currentPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0 && passwordValid && !passwordMismatch;
-  const passwordFieldStyle = newPassword.length > 0 && !passwordValid
-    ? { ...styles.input, borderColor: theme.danger }
-    : styles.input;
-  const confirmPasswordFieldStyle = confirmPassword.length > 0 && passwordMismatch
-    ? { ...styles.input, borderColor: theme.danger }
-    : styles.input;
-  const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
 
   const securityCodeValid = securityCode.trim().replace(/\D/g, '').length === 6 && securityCode === securityCodeConfirm;
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
-  };
-
-  const clearActiveIfMatches = (card: typeof activeCard) => {
-    setActiveCard((current) => (current === card ? null : current));
-  };
-
-  const handleSavePassword = async () => {
-    if (!currentPassword) {
-      showStatus('error', 'Enter your current password to update your password.');
-      return;
-    }
-
-    if (!newPassword || !confirmPassword) {
-      showStatus('error', 'Enter and confirm your new password.');
-      return;
-    }
-
-    if (!passwordValid) {
-      showStatus('error', passwordRuleMessage);
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      showStatus('error', 'New password and confirmation must match.');
-      return;
-    }
-
-    setPasswordCardSaving(true);
-    try {
-      await api.patch('/api/settings/password', {
-        currentPassword,
-        newPassword,
-      });
-      showStatus('success', 'Password updated successfully.');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      setActiveCard(null);
-    } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update your password.');
-    } finally {
-      setPasswordCardSaving(false);
-    }
-  };
-
-  const handleSaveUid = async () => {
-    const nextUid = uid.replace(/\D/g, '').slice(0, 5);
-
-    if (nextUid.length !== 5) {
-      showStatus('error', 'UID must be exactly 5 digits.');
-      return;
-    }
-
-    if (uidAvailable === false) {
-      showStatus('error', 'That UID is already taken.');
-      return;
-    }
-
-    setUidCardSaving(true);
-    try {
-      await api.patch('/api/settings/uid', {
-        uid: nextUid,
-      });
-      showStatus('success', 'UID updated successfully.');
-      setUidAvailable(null);
-      setInitialUid(nextUid);
-      setUidEditorActive(false);
-      setActiveCard(null);
-    } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update your UID.');
-    } finally {
-      setUidCardSaving(false);
-    }
   };
 
   const handleSaveWallet = async () => {
@@ -524,43 +373,6 @@ const SettingsPage = () => {
     showStatus('success', `Theme switched to ${themeMode === 'dark' ? 'Light' : 'Dark'} mode.`);
   };
 
-  const handleDeactivate = async () => {
-    const confirmed = window.confirm('Deactivate your account? This can be restored only by support.');
-    if (!confirmed) {
-      return;
-    }
-
-    setDeactivating(true);
-    try {
-      await api.post('/api/settings/deactivate');
-      window.localStorage.removeItem('token');
-      window.localStorage.removeItem('user');
-      window.localStorage.removeItem('kingshall_user');
-      window.dispatchEvent(new Event('ke:force-logout'));
-      navigate('/');
-    } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to deactivate your account.');
-    } finally {
-      setDeactivating(false);
-    }
-  };
-
-  const uidStatus = useMemo(() => {
-    if (uid.replace(/\D/g, '').slice(0, 5).length !== 5) {
-      return 'UID must be exactly 5 digits.';
-    }
-    if (uidChecking) {
-      return 'Checking UID availability...';
-    }
-    if (uidAvailable === true) {
-      return 'UID is available.';
-    }
-    if (uidAvailable === false) {
-      return 'UID is already in use.';
-    }
-    return 'Enter exactly 5 digits to check availability.';
-  }, [uid, uidAvailable, uidChecking]);
-
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -659,61 +471,6 @@ const SettingsPage = () => {
             </section>
 
             <div style={styles.grid}>
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><LockKeyhole size={18} /> Change password</h2>
-                <p style={styles.cardText}>{passwordRuleMessage}</p>
-                <div style={styles.formGrid}>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Current password</span>
-                    <input
-                      style={currentPasswordFieldStyle}
-                      type="password"
-                      value={currentPassword}
-                      onChange={(event) => {
-                        setCurrentPassword(event.target.value);
-                        setActiveCard('password');
-                      }}
-                      onFocus={() => setActiveCard('password')}
-                    />
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>New password</span>
-                    <input
-                      style={styles.input}
-                      type="password"
-                      value={newPassword}
-                      onChange={(event) => {
-                        setNewPassword(event.target.value);
-                        setActiveCard('password');
-                      }}
-                      onFocus={() => setActiveCard('password')}
-                    />
-                    <span style={styles.helper}>{passwordRuleMessage}</span>
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Confirm new password</span>
-                    <input
-                      style={confirmPasswordFieldStyle}
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(event) => {
-                        setConfirmPassword(event.target.value);
-                        setActiveCard('password');
-                      }}
-                      onFocus={() => setActiveCard('password')}
-                    />
-                    {passwordMismatch ? <span style={{ ...styles.helper, color: theme.danger }}>Passwords do not match.</span> : null}
-                  </label>
-                </div>
-                {((activeCard === 'password' && passwordCanSave) || passwordCardSaving) ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving || !passwordCanSave}>
-                      {passwordCardSaving ? <InlineLoadingDots /> : 'Save password'}
-                    </button>
-                  </div>
-                ) : null}
-              </section>
-
 
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}>🎨 Theme</h2>
@@ -843,48 +600,7 @@ const SettingsPage = () => {
                 ) : null}
               </section>
 
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><CheckCircle2 size={18} /> UID settings</h2>
-                <p style={styles.cardText}>Choose a unique 5-digit account UID. Digits only; validation runs live as you type so you can see availability right away.</p>
-                <div style={styles.formGrid}>
-                  <label style={styles.field}>
-                    <span style={styles.label}>UID</span>
-                    <input
-                      style={styles.input}
-                      value={uid}
-                      onChange={(event) => {
-                        setUid(event.target.value.replace(/\D/g, '').slice(0, 5));
-                        setUidAvailable(null);
-                        setUidEditorActive(true);
-                        setActiveCard('uid');
-                      }}
-                      onFocus={() => { setUidEditorActive(true); setActiveCard('uid'); }}
-                      inputMode="numeric"
-                      maxLength={5}
-                      placeholder="Enter 5 digits"
-                    />
-                    <span style={styles.helper}>{uidStatus}</span>
-                  </label>
-                </div>
-                {showUidSaveButton ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || !uidReadyToSave}>
-                      {uidCardSaving ? <InlineLoadingDots /> : 'Save UID'}
-                    </button>
-                  </div>
-                ) : null}
-              </section>
             </div>
-
-            <section style={styles.card}>
-              <h2 style={styles.cardTitle}><Trash2 size={18} /> Account deactivation</h2>
-              <p style={styles.cardText}>Deactivate your account if you no longer want to use KingsHall Exchange. This action can remove access immediately.</p>
-              <div style={styles.buttonRow}>
-                <button style={{ ...styles.button, ...styles.dangerButton }} type="button" onClick={() => void handleDeactivate()} disabled={deactivating}>
-                  {deactivating ? 'Deactivating...' : 'Deactivate account'}
-                </button>
-              </div>
-            </section>
 
           </div>
         </div>
