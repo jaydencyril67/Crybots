@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
-import AppThemeProvider from './components/AppTheme';
+import AppThemeProvider, { useAppTheme } from './components/AppTheme';
 import LandingPage from './components/LandingPage';
 import SignupPage from './components/SignupPage';
 import SignupConfirmationSentPage from './components/SignupConfirmationSentPage';
@@ -25,6 +25,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppHeader from './components/AppHeader';
 import AppSplashOverlay from './components/AppSplashOverlay';
+import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { forceLogout } from './api/axios';
 
 if ('serviceWorker' in navigator) {
@@ -90,6 +91,8 @@ const routeToKey = (path: string) => {
 };
 
 const RouteTransition = () => {
+  const { themeMode: mode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[mode];
   const [routeKey, setRouteKey] = useState(getRouteKey);
   const [displayedRouteKey, setDisplayedRouteKey] = useState(routeKey);
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem('token')));
@@ -223,11 +226,19 @@ const RouteTransition = () => {
   const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions';
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', overflowX: 'hidden' }}>
+    <div
+      style={{
+        position: 'relative',
+        minHeight: '100vh',
+        overflowX: 'hidden',
+        background: theme.background,
+        color: theme.text,
+      }}
+    >
       <div
         style={{
           minHeight: '100vh',
-          paddingTop: '66px',
+          paddingTop: '80px',
         }}
       >
         <AppHeader />
