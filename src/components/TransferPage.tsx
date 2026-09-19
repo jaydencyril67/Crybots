@@ -283,7 +283,8 @@ const TransferPage = () => {
             </div>
           </div>
         </div>
-          <NowBar />
+        </div>
+        <NowBar />
       </div>
     </HybridTheme>
   );
