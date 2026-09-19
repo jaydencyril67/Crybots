@@ -21,12 +21,14 @@ type FormState = {
   email: string;
   password: string;
   code: string;
+  twoFactorCode: string;
   };
 
 const initialState: FormState = {
   email: '',
   password: '',
   code: '',
+  twoFactorCode: '',
   };
 
 const styles = {
@@ -510,6 +512,7 @@ const SigninPage = () => {
       const response = await api.post('/api/auth/signin', {
         email: form.email,
         password: form.password,
+        twoFactorCode: form.twoFactorCode,
       });
 
       
@@ -545,6 +548,7 @@ const SigninPage = () => {
       const response = await api.post('/api/auth/signin/verify-code', {
         email: form.email,
         code: form.code,
+        twoFactorCode: form.twoFactorCode,
       });
 
       if (response.data?.token) {
@@ -695,12 +699,16 @@ const SigninPage = () => {
                     <div style={styles.field}>
                       <label style={hybridStyles.label} htmlFor="signin-password">Password</label>
                       <input id="signin-password" style={hybridStyles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
+                      <label style={hybridStyles.label} htmlFor="signin-2fa-password">Authenticator code (if enabled)</label>
+                      <input id="signin-2fa-password" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
                     </div>
                   ) : null}
                   {step === 'code' ? (
                     <div style={styles.field}>
                       <label style={hybridStyles.label} htmlFor="signin-code">Sign-in code</label>
                       <input id="signin-code" style={hybridStyles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
+                      <label style={hybridStyles.label} htmlFor="signin-2fa-code">Authenticator code (if enabled)</label>
+                      <input id="signin-2fa-code" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
                       <div style={hybridStyles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
                     </div>
                   ) : null}
