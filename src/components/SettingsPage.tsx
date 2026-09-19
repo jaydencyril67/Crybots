@@ -389,14 +389,25 @@ const SettingsPage = () => {
     setAvatarUploading(true);
 
     try {
+      const configResponse = await api.get('/api/cloudinary/upload');
+      const cloudinaryConfig = configResponse.data as { cloudName?: string; uploadPreset?: string };
+      if (!cloudinaryConfig.cloudName || !cloudinaryConfig.uploadPreset) {
+        throw new Error('Image upload is not configured.');
+      }
+
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
+      uploadFormData.append('upload_preset', cloudinaryConfig.uploadPreset);
 
-      const uploadResponse = await api.post('/api/cloudinary/upload', uploadFormData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, {
+        method: 'POST',
+        body: uploadFormData,
       });
+      if (!uploadResponse.ok) {
+        throw new Error('Unable to upload image.');
+      }
 
-      const uploadedFile = uploadResponse.data as { secure_url?: string };
+      const uploadedFile = await uploadResponse.json() as { secure_url?: string };
       if (!uploadedFile.secure_url) {
         throw new Error('Image upload did not return a usable URL.');
       }
