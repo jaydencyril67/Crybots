@@ -473,7 +473,7 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
                 <div style={styles.control}>
                   <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
-                  <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Save UID'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button>
                 </div>
               </div>
 
@@ -565,7 +565,7 @@ const SecurityPage = () => {
                   <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
                   <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
-                  <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change password'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change'}</button>
                 </div>
               </div>
 
@@ -576,7 +576,7 @@ const SecurityPage = () => {
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
                   <CodeInput length={6} value={securityCode} onChange={setSecurityCode} type="password" color={theme.text} borderColor={theme.borderStrong} background={theme.surfaceMuted} />
                   <CodeInput length={6} value={confirmSecurityCode} onChange={setConfirmSecurityCode} type="password" color={theme.text} borderColor={theme.borderStrong} background={theme.surfaceMuted} />
-                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save security code'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
                 </div>
               </div>
 
