@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
-import AppHeader from './AppHeader';
 import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 import ReusableDatePage from './ReusableDatePage';
@@ -627,7 +626,7 @@ const SignupPage = () => {
           <div style={styles.topLine} />
 
           <div style={styles.shell}>
-            <AppHeader />
+            
 
             <div style={styles.grid}>
               <article style={styles.heroCard}>

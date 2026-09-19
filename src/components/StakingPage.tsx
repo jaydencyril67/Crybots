@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowRight } from 'lucide-react';
 import api from '../api/axios';
 import { setCachedBalance } from '../utils/balance';
-import AppHeader from './AppHeader';
 import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
@@ -287,7 +286,7 @@ const StakingPage = () => {
       <HybridTheme mode={themeMode}>
         <main style={styles.page}>
         <div style={styles.shell}>
-          <AppHeader />
+          
           {packagesError ? <NotificationBanner tone="error" title="Package load issue" message={packagesError} /> : null}
           <section style={styles.packageGrid}>
             {stakingPackages.map((stakingPackage) => (

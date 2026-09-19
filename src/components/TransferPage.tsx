@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
-import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
@@ -216,7 +215,7 @@ const TransferPage = () => {
       <div style={styles.page}>
       <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
-        <AppHeader />
+        
         {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0 0' }}><LoadingDots /></div> : null}
         <div style={styles.panel}>
           <div style={styles.body}>

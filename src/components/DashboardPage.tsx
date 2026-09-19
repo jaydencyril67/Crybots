@@ -15,7 +15,6 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react';
-import AppHeader from './AppHeader';
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -548,7 +547,7 @@ const DashboardPage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
 
-          <AppHeader />
+          
 
           {!(isAuthNameLoaded && isCoinsLoaded) ? (
             <div style={{ padding: '18px 0 10px', display: 'flex', justifyContent: 'center' }}>

@@ -3,7 +3,6 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
-import AppHeader from './AppHeader';
 import InstallAppButton from './InstallAppButton';
 import { isTokenValid } from '../utils/auth';
 import { navigate } from '../utils/navigate';
@@ -459,7 +458,7 @@ const LandingPage = () => {
             <div style={styles.topLine} />
 
         <div style={styles.shell}>
-          <AppHeader />
+          
 
           <div style={styles.heroGrid}>
             <div>

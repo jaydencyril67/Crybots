@@ -17,7 +17,6 @@ const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
-import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
@@ -618,7 +617,7 @@ const SettingsPage = () => {
         <title>Settings | KingsHall Exchange</title>
       </Helmet>
       <div style={styles.shell}>
-        <AppHeader />
+        
         <div style={styles.panel}>
           <div style={styles.body}>
             {status.kind !== 'idle' ? (

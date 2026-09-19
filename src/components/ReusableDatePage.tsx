@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import AppHeader from './AppHeader';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
@@ -148,7 +147,7 @@ const ReusableDatePage = ({
     <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <div style={styles.shell}>
-          <AppHeader />
+          
           <div style={styles.content}>
             <section style={styles.card}>
               <p style={styles.eyebrow}>Hybrid picker</p>
