@@ -227,7 +227,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   panelSub: {
     margin: '8px 0 0',
-    color: 'rgba(255,255,255,0.66)',
+    color: theme.textMuted,
     lineHeight: 1.6,
     fontSize: '14px',
   },
@@ -245,8 +245,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '8px',
     padding: '10px 14px',
     borderRadius: '999px',
-    border: '1px solid rgba(34,211,238,0.16)',
-    background: 'rgba(34,211,238,0.08)',
+    border: `1px solid ${theme.borderSubtle}`,
+    background: theme.surfaceGlass,
     color: theme.highlight,
     fontSize: '13px',
     fontWeight: 700,
@@ -262,8 +262,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '14px',
     padding: '12px 14px',
     borderRadius: '20px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(9,14,28,0.72)',
+    border: `1px solid ${theme.borderSubtle}`,
+    background: theme.surfaceGlass,
   },
   coinBadge: {
     width: '44px',
@@ -282,7 +282,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   coinSymbol: {
     margin: '4px 0 0',
-    color: 'rgba(255,255,255,0.6)',
+    color: theme.textMuted,
     fontSize: '13px',
   },
   coinPrice: {
@@ -303,8 +303,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   adviceCard: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(8,12,24,0.74)',
+    border: `1px solid ${theme.borderSubtle}`,
+    background: theme.surfaceGlass,
     padding: '16px',
     display: 'grid',
     gap: '12px',
@@ -329,7 +329,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   adviceText: {
     margin: 0,
-    color: 'rgba(255,255,255,0.7)',
+    color: theme.textMuted,
     lineHeight: 1.7,
     fontSize: '14px',
   },
@@ -352,14 +352,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     alignItems: 'flex-start',
     padding: '14px 16px',
     borderRadius: '18px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: theme.surfaceGlass,
+    border: `1px solid ${theme.borderSubtle}`,
   },
   featureText: {
     margin: 0,
     fontSize: '14px',
     lineHeight: 1.65,
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
   },
   badgeRow: {
     display: 'flex',
@@ -378,7 +378,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   footerNote: {
     margin: '18px 0 0',
-    color: 'rgba(255,255,255,0.55)',
+    color: theme.textMuted,
     fontSize: '13px',
     lineHeight: 1.6,
   },
@@ -617,7 +617,7 @@ const DashboardPage = () => {
               <div style={styles.coinGrid}>
                 {liveCoins.map((coin) => (
                   <article key={coin.symbol} style={styles.coinCard}>
-                    <div style={{ ...styles.coinBadge, background: `linear-gradient(135deg, ${coin.color}, rgba(255,255,255,0.15))` }}>
+                    <div style={{ ...styles.coinBadge, background: coin.color }}>
                       {coin.symbol.slice(0, 1)}
                     </div>
                     <div>

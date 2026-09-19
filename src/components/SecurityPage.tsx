@@ -111,19 +111,19 @@ const styles = {
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
     color: theme.textMuted,
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    borderBottom: `1px solid ${theme.borderSubtle}`,
     whiteSpace: 'nowrap' as const,
   },
   tableCell: {
     padding: '14px',
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    borderBottom: `1px solid ${theme.borderSubtle}`,
     verticalAlign: 'top' as const,
   },
   tableRow: {
-    background: 'rgba(255,255,255,0.02)',
+    background: theme.surfaceGlass,
   },
   tableRowCurrent: {
-    background: 'rgba(34,197,94,0.08)',
+    background: theme.surfaceGlass,
   },
   tableLabel: {
     margin: 0,
@@ -154,8 +154,8 @@ const styles = {
   row: {
     width: '100%',
     maxWidth: '100%',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: theme.surfaceGlass,
+    border: `1px solid ${theme.borderSubtle}`,
     borderRadius: '18px',
     padding: '16px',
     display: 'grid',
@@ -218,7 +218,7 @@ const styles = {
   input: {
     width: '100%',
     border: 'none',
-    borderBottom: '1px solid rgba(255,255,255,0.14)',
+    borderBottom: `1px solid ${theme.borderSubtle}`,
     background: 'transparent',
     color: theme.text,
     padding: '12px 0',
