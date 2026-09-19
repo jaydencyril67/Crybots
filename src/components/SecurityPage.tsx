@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2 } from 'lucide-react';
+import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2, Copy } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -293,6 +293,7 @@ const SecurityPage = () => {
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
   const [twoFactorUri, setTwoFactorUri] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [twoFactorKeyCopied, setTwoFactorKeyCopied] = useState(false);
   const [showDelete2faConfirmation, setShowDelete2faConfirmation] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
@@ -460,6 +461,19 @@ const SecurityPage = () => {
       showStatus('error', error?.response?.data?.message || 'Unable to start 2FA setup.');
     } finally {
       setSaving2fa(false);
+    }
+  };
+
+  const handleCopyTwoFactorKey = async () => {
+    if (!twoFactorSecret) return;
+
+    try {
+      await navigator.clipboard.writeText(twoFactorSecret);
+      setTwoFactorKeyCopied(true);
+      showStatus('success', 'Manual key copied to clipboard.');
+      window.setTimeout(() => setTwoFactorKeyCopied(false), 2000);
+    } catch {
+      showStatus('error', 'Unable to copy the manual key.');
     }
   };
 
@@ -715,7 +729,12 @@ const SecurityPage = () => {
                       <div style={{ display: 'grid', gap: '8px', justifyItems: 'start' }}>
                         <QRCodeCanvas value={twoFactorUri} size={180} includeMargin />
                         <p style={styles.note}>Scan this QR code in Google Authenticator, Authy, or another TOTP app.</p>
-                        <p style={{ ...styles.note, wordBreak: 'break-all' as const }}>Manual key: {twoFactorSecret}</p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' as const }}>
+                          <p style={{ ...styles.note, wordBreak: 'break-all' as const, margin: 0 }}>Manual key: {twoFactorSecret}</p>
+                          <button type="button" style={{ ...styles.button, padding: '8px 12px', minWidth: 'auto' }} onClick={() => void handleCopyTwoFactorKey()} disabled={!twoFactorSecret} aria-label="Copy manual key">
+                            <Copy size={14} /> {twoFactorKeyCopied ? 'Copied' : 'Copy'}
+                          </button>
+                        </div>
                       </div>
                     ) : null}
                     <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
@@ -727,8 +746,8 @@ const SecurityPage = () => {
                   <div style={styles.control}>
                     <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : 'Disable 2FA'}</button>
-                      <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button>
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
+                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button> : null}
                     </div>
                   </div>
                 )}
