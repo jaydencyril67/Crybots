@@ -15,164 +15,111 @@ type ReusableDatePageProps = {
   cancelLabel?: string;
   label?: string;
   mode?: 'auto' | 'date' | 'datetime-local' | 'time';
+  showNowBar?: boolean;
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: {
-    minHeight: '100vh',
-    overflowX: 'hidden' as const,
-    overflowY: 'auto' as const,
-    paddingBottom: '132px',
-  },
-  shell: {
-    width: '100%',
-    maxWidth: '1320px',
-    margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
-    boxSizing: 'border-box' as const,
-  },
-  content: {
-    display: 'grid',
-    gap: '18px',
-    marginTop: '18px',
-  },
-  card: {
-    borderRadius: '22px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
-    padding: '18px',
-  },
-  eyebrow: {
-    margin: 0,
-    fontSize: '0.82rem',
-    fontWeight: 800,
-    color: theme.textMuted,
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase' as const,
-  },
-  title: {
-    margin: '8px 0 0',
-    fontSize: '1.45rem',
-    fontWeight: 900,
-    letterSpacing: '-0.02em',
-    color: theme.text,
-  },
-  description: {
-    margin: '8px 0 0',
-    fontSize: '0.92rem',
-    color: theme.textMuted,
-    lineHeight: 1.7,
-    maxWidth: '62ch',
-  },
-  field: {
-    display: 'grid',
-    gap: '6px',
-    marginTop: '14px',
-  },
-  label: {
-    fontSize: '0.82rem',
-    fontWeight: 800,
-    color: theme.textMuted,
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase' as const,
-  },
-  input: {
-    width: '100%',
-    boxSizing: 'border-box' as const,
-    borderRadius: '18px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
-    color: theme.text,
-    padding: '12px 14px',
-    outline: 'none',
-  },
-  buttonRow: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '12px',
-    flexWrap: 'wrap' as const,
-    marginTop: '18px',
-  },
-  actionButton: {
-    borderRadius: '18px',
-    padding: '12px 18px',
-    cursor: 'pointer',
-    fontWeight: 800,
-    background: theme.primary,
-    color: theme.textInverse,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: theme.borderGlass,
-  },
-  secondaryButton: {
-    borderRadius: '18px',
-    padding: '12px 18px',
-    border: `1px solid ${theme.borderGlass}`,
-    cursor: 'pointer',
-    fontWeight: 800,
-    background: theme.surfaceMuted,
-    color: theme.text,
-  },
+  page: { minHeight: '100vh', paddingBottom: '132px', color: theme.text },
+  shell: { width: '100%', maxWidth: '760px', margin: '0 auto', padding: 'clamp(16px, 4vw, 34px) 16px 40px', boxSizing: 'border-box' as const },
+  card: { borderRadius: '26px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, padding: 'clamp(18px, 4vw, 30px)', boxShadow: `0 20px 60px ${theme.borderGlass}` },
+  eyebrow: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' as const },
+  title: { margin: '8px 0 0', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 900, letterSpacing: '-0.03em' },
+  description: { margin: '8px 0 24px', color: theme.textMuted, lineHeight: 1.65 },
+  calendarHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '18px' },
+  month: { margin: 0, fontSize: '1.12rem', fontWeight: 900 },
+  navButton: { width: '38px', height: '38px', borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontSize: '1.35rem', lineHeight: 1 },
+  weekdays: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', marginBottom: '6px' },
+  weekday: { color: theme.textMuted, fontSize: '0.7rem', fontWeight: 800, textAlign: 'center' as const, textTransform: 'uppercase' as const },
+  days: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' },
+  day: { aspectRatio: '1', minHeight: '38px', borderRadius: '13px', border: '1px solid transparent', background: 'transparent', color: theme.text, cursor: 'pointer', fontWeight: 800 },
+  selectedDay: { background: theme.primary, color: theme.textInverse, borderColor: theme.primary },
+  disabledDay: { color: theme.textMuted, opacity: 0.35, cursor: 'not-allowed' },
+  emptyDay: { aspectRatio: '1' },
+  field: { display: 'grid', gap: '7px', marginTop: '22px' },
+  label: { color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '12px 14px', outline: 'none', font: 'inherit' },
+  actions: { display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap' as const, marginTop: '24px' },
+  primary: { borderRadius: '14px', border: `1px solid ${theme.primary}`, padding: '12px 18px', cursor: 'pointer', fontWeight: 800, background: theme.primary, color: theme.textInverse },
+  secondary: { borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, padding: '12px 18px', cursor: 'pointer', fontWeight: 800, background: theme.surfaceMuted, color: theme.text },
 });
 
+const toDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const ReusableDatePage = ({
-  title,
-  description,
-  value = '',
-  onConfirm,
-  onCancel,
-  min,
-  max,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
-  label,
-  mode = 'auto',
+  title, description, value = '', onConfirm, onCancel, min, max,
+  confirmLabel = 'Confirm', cancelLabel = 'Cancel', label, mode = 'auto', showNowBar = true,
 }: ReusableDatePageProps) => {
-  const resolvedMode: 'date' | 'datetime-local' | 'time' =
-    mode === 'auto' ? (value.includes('T') ? 'datetime-local' : 'date') : mode;
+  const resolvedMode: 'date' | 'datetime-local' | 'time' = mode === 'auto' ? (value.includes('T') ? 'datetime-local' : 'date') : mode;
   const resolvedLabel = label ?? (resolvedMode === 'time' ? 'Time' : resolvedMode === 'datetime-local' ? 'Date and time' : 'Date');
-  const inputType = resolvedMode;
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
-  const [date, setDate] = useState(value);
+  const initialDate = value.split('T')[0] || toDateKey(new Date());
+  const [selectedDate, setSelectedDate] = useState(initialDate);
+  const [time, setTime] = useState(value.split('T')[1]?.slice(0, 5) || '12:00');
+  const [month, setMonth] = useState(() => {
+    const parsed = new Date(`${initialDate}T12:00:00`);
+    return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+  });
 
   useEffect(() => {
-    setDate(value);
+    const nextDate = value.split('T')[0] || toDateKey(new Date());
+    setSelectedDate(nextDate);
+    if (value.includes('T')) setTime(value.split('T')[1]?.slice(0, 5) || '12:00');
+    const parsed = new Date(`${nextDate}T12:00:00`);
+    if (!Number.isNaN(parsed.getTime())) setMonth(parsed);
   }, [value]);
 
-  const parsedMax = useMemo(() => max, [max]);
+  const calendarDays = useMemo(() => {
+    const first = new Date(month.getFullYear(), month.getMonth(), 1);
+    const count = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+    return { leading: first.getDay(), days: Array.from({ length: count }, (_, index) => index + 1) };
+  }, [month]);
+
+  const isAllowed = (dateKey: string) => (!min || dateKey >= min.split('T')[0]) && (!max || dateKey <= max.split('T')[0]);
+  const outputValue = resolvedMode === 'datetime-local' ? `${selectedDate}T${time}` : resolvedMode === 'time' ? time : selectedDate;
+  const monthLabel = month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  const changeMonth = (offset: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + offset, 1));
 
   return (
     <HybridTheme mode={themeMode}>
       <div style={styles.page}>
-        <div style={styles.shell}>
-          
-          <div style={styles.content}>
-            <section style={styles.card}>
-              <p style={styles.eyebrow}>Hybrid picker</p>
-              <h1 style={styles.title}>{title}</h1>
-              <p style={styles.description}>{description}</p>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="reusable-date-input">{resolvedLabel}</label>
-                <input
-                  id="reusable-date-input"
-                  style={styles.input}
-                  type={inputType}
-                  value={date}
-                  min={min}
-                  max={parsedMax}
-                  onChange={(event) => setDate(event.target.value)}
-                />
-              </div>
-              <div style={styles.buttonRow}>
-                <button type="button" style={styles.secondaryButton} onClick={onCancel}>{cancelLabel}</button>
-                <button type="button" style={styles.actionButton} onClick={() => onConfirm(date)}>{confirmLabel}</button>
-              </div>
-            </section>
-          </div>
-        </div>
-        <NowBar />
+        <main style={styles.shell}>
+          <section style={styles.card}>
+            <p style={styles.eyebrow}>Calendar picker</p>
+            <h1 style={styles.title}>{title}</h1>
+            <p style={styles.description}>{description}</p>
+            {resolvedMode !== 'time' ? (
+              <>
+                <div style={styles.calendarHeader}>
+                  <button type="button" aria-label="Previous month" style={styles.navButton} onClick={() => changeMonth(-1)}>‹</button>
+                  <h2 style={styles.month}>{monthLabel}</h2>
+                  <button type="button" aria-label="Next month" style={styles.navButton} onClick={() => changeMonth(1)}>›</button>
+                </div>
+                <div style={styles.weekdays}>{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => <span key={day} style={styles.weekday}>{day}</span>)}</div>
+                <div style={styles.days}>
+                  {Array.from({ length: calendarDays.leading }, (_, index) => <span key={`empty-${index}`} style={styles.emptyDay} />)}
+                  {calendarDays.days.map((day) => {
+                    const dateKey = toDateKey(new Date(month.getFullYear(), month.getMonth(), day));
+                    const allowed = isAllowed(dateKey);
+                    return <button key={dateKey} type="button" disabled={!allowed} style={{ ...styles.day, ...(selectedDate === dateKey ? styles.selectedDay : {}), ...(!allowed ? styles.disabledDay : {}) }} onClick={() => setSelectedDate(dateKey)}>{day}</button>;
+                  })}
+                </div>
+              </>
+            ) : null}
+            {resolvedMode === 'datetime-local' || resolvedMode === 'time' ? <div style={styles.field}><label style={styles.label} htmlFor="reusable-time-input">{resolvedMode === 'time' ? resolvedLabel : 'Time'}</label><input id="reusable-time-input" style={styles.input} type="time" value={time} onChange={(event) => setTime(event.target.value)} /></div> : null}
+            <div style={styles.actions}>
+              <button type="button" style={styles.secondary} onClick={onCancel}>{cancelLabel}</button>
+              <button type="button" style={styles.primary} onClick={() => onConfirm(outputValue)} disabled={!selectedDate}>{confirmLabel}</button>
+            </div>
+          </section>
+        </main>
+        {showNowBar ? <NowBar /> : null}
       </div>
     </HybridTheme>
   );
