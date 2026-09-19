@@ -175,10 +175,7 @@ const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never :
   },
   titleAccent: {
     display: 'block',
-    background: theme.gradientText,
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: 'transparent',
+    color: theme.primary,
   },
   lead: {
     margin: '14px 0 0',

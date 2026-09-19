@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
@@ -45,25 +45,19 @@ const baseStyles = {
     padding: 'clamp(14px, 3vw, 28px) clamp(12px, 2.5vw, 24px) 40px',
     boxSizing: 'border-box' as const,
   },
-  panel: {
-    ...HYBRID_CARD_STYLES.card,
-    borderRadius: '28px',
-    padding: 'clamp(14px, 3.5vw, 24px)',
-    overflow: 'hidden',
-  },
-  body: {
-    display: 'grid',
-    gap: '16px',
-  },
   content: {
     display: 'grid',
     gap: '16px',
   },
-  section: {
+  hero: {
     display: 'grid',
-    gap: '14px',
+    gap: '10px',
+    padding: 'clamp(16px, 4vw, 24px)',
+    borderRadius: '24px',
+    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
+    background: HYBRID_THEME_TOKENS.dark.surfaceGlass,
   },
-  headerRow: {
+  heroRow: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -88,29 +82,32 @@ const baseStyles = {
     fontSize: '0.92rem',
     maxWidth: '62ch',
   },
-  contentShell: {
-    display: 'grid',
-    gap: '16px',
+  balance: {
+    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    fontSize: '0.92rem',
+    whiteSpace: 'nowrap' as const,
   },
-  introRow: {
+  section: {
     display: 'grid',
-    gap: '12px',
-  },
-  twoColumn: {
-    display: 'grid',
-    gap: '16px',
-    gridTemplateColumns: 'minmax(0, 1.35fr) minmax(280px, 0.65fr)',
-    alignItems: 'start',
-  },
-  stack: {
-    display: 'grid',
-    gap: '16px',
-  },
-  compactCard: {
-    ...HYBRID_CARD_STYLES.panel,
-    borderRadius: '22px',
+    gap: '14px',
     padding: '16px',
-    minWidth: 0,
+    borderRadius: '22px',
+    border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`,
+    background: HYBRID_THEME_TOKENS.dark.surfaceGlass,
+  },
+  sectionTitle: {
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '1rem',
+    fontWeight: 800,
+  },
+  sectionText: {
+    margin: 0,
+    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    lineHeight: 1.6,
+    fontSize: '0.92rem',
   },
   field: { display: 'grid', gap: '8px' },
   label: { fontSize: '0.82rem', fontWeight: 700, color: HYBRID_THEME_TOKENS.dark.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
@@ -121,8 +118,10 @@ const baseStyles = {
   helper: { fontSize: '0.85rem', color: HYBRID_THEME_TOKENS.dark.textMuted, lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, padding: '12px 16px', fontWeight: 700, color: HYBRID_THEME_TOKENS.dark.text, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
-  primaryButton: { background: `linear-gradient(135deg, ${HYBRID_THEME_TOKENS.dark.primarySoft}, ${HYBRID_THEME_TOKENS.dark.surfaceGlass})`, border: 'none', color: HYBRID_THEME_TOKENS.dark.text },
-  summaryRow: { display: 'grid', gap: '12px' },
+  primaryButton: { background: HYBRID_THEME_TOKENS.dark.surfaceMuted, border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}` },
+  stack: { display: 'grid', gap: '14px' },
+  summary: { display: 'grid', gap: '12px' },
+  note: { display: 'grid', gap: '8px' },
 };
 
 const TransferPage = () => {
@@ -131,9 +130,12 @@ const TransferPage = () => {
   const styles = useMemo(() => ({
     ...baseStyles,
     page: { ...baseStyles.page, background: theme.background, color: theme.text },
-    panel: { ...baseStyles.panel, border: `1px solid ${theme.border}`, background: theme.surfaceGlass },
-    compactCard: { ...baseStyles.compactCard, border: `1px solid ${theme.border}`, background: theme.surfaceGlass },
+    hero: { ...baseStyles.hero, border: `1px solid ${theme.border}`, background: theme.surfaceGlass },
+    title: { ...baseStyles.title, color: theme.text },
     subtitle: { ...baseStyles.subtitle, color: theme.textMuted },
+    balance: { ...baseStyles.balance, color: theme.textMuted },
+    section: { ...baseStyles.section, border: `1px solid ${theme.border}`, background: theme.surfaceGlass },
+    sectionText: { ...baseStyles.sectionText, color: theme.textMuted },
     label: { ...baseStyles.label, color: theme.textMuted },
     input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
     selectTrigger: { ...baseStyles.selectTrigger, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
@@ -141,7 +143,8 @@ const TransferPage = () => {
     selectOption: { ...baseStyles.selectOption, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
     helper: { ...baseStyles.helper, color: theme.textMuted },
     button: { ...baseStyles.button, border: `1px solid ${theme.border}`, color: theme.text, background: theme.surfaceGlass },
-    primaryButton: { ...baseStyles.primaryButton, color: theme.textInverse },
+    primaryButton: { ...baseStyles.primaryButton, color: theme.text },
+    stack: baseStyles.stack,
   }), [theme]);
 
   const [loading, setLoading] = useState(true);
@@ -251,99 +254,94 @@ const TransferPage = () => {
         <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
         <div style={styles.shell}>
           <AppHeader />
-          <div style={styles.panel}>
-            <div style={styles.body}>
-              {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
-              <div style={styles.contentShell}>
-                <div style={styles.headerRow}>
-                  <div style={styles.titleBlock}>
-                    <h1 style={styles.title}>Transfer USDT</h1>
-                    <p style={styles.subtitle}>Send USDT to another user using their UID or email. Recipient validation runs automatically as you type.</p>
-                  </div>
-                  <div style={{ color: theme.textMuted, fontSize: '0.92rem' }}>Balance: {usdtBalance.toFixed(2)} USDT</div>
+          <div style={styles.content}>
+            {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
+            <div style={styles.hero}>
+              <div style={styles.heroRow}>
+                <div style={styles.titleBlock}>
+                  <h1 style={styles.title}>Transfer USDT</h1>
+                  <p style={styles.subtitle}>Send USDT to another user using their UID or email. Recipient validation runs automatically as you type.</p>
                 </div>
-
-                <div style={styles.twoColumn}>
-                  <section style={styles.compactCard}>
-                    <div style={styles.stack}>
-                      <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
-                        <span style={styles.label}>Recipient type</span>
-                        <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
-                          <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
-                          <span style={{ transform: isRecipientMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
-                        </button>
-                        {isRecipientMenuOpen ? (
-                          <div style={styles.selectMenu}>
-                            {(['uid', 'email'] as const).map((option) => (
-                              <button
-                                key={option}
-                                type="button"
-                                style={styles.selectOption}
-                                onClick={() => {
-                                  setRecipientMethod(option);
-                                  setIsRecipientMenuOpen(false);
-                                }}
-                              >
-                                {option === 'uid' ? 'UID' : 'Email'}
-                              </button>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div style={styles.field as React.CSSProperties}>
-                        <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>
-                        <input
-                          style={styles.input}
-                          value={recipientValue}
-                          onChange={(event) => setRecipientValue(recipientMethod === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)}
-                          placeholder={recipientMethod === 'email' ? 'recipient@email.com' : '12345'}
-                        />
-                      </div>
-
-                      <div style={styles.helper}>
-                        {recipientChecking ? 'Checking recipient...' : recipientValid ? `Recipient found: ${recipientDisplay}` : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a UID or email to validate.'}
-                      </div>
-
-                      <div style={styles.field as React.CSSProperties}>
-                        <span style={styles.label}>Amount</span>
-                        <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
-                      </div>
-
-                      <div style={styles.field as React.CSSProperties}>
-                        <span style={styles.label}>Security code</span>
-                        <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit code' : 'Set security code to continue'} disabled={!securityCodeBound} />
-                      </div>
-
-                      <div style={styles.buttonRow}>
-                        <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>
-                          {transferring ? 'Sending...' : 'Send USDT'}
-                        </button>
-                      </div>
-                    </div>
-                  </section>
-
-                  <div style={styles.stack}>
-                    <section style={styles.compactCard}>
-                      <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}><BadgeCheck size={18} /> Transfer rules</h2>
-                      <p style={styles.helper}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
-                    </section>
-
-                    <section style={styles.compactCard}>
-                      <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}><UserRound size={18} /> Recipient validation</h2>
-                      <p style={styles.helper}>UID entries are restricted to 5 digits. Email validation checks the exact email that exists in the database.</p>
-                      <p style={styles.helper}>Validation runs live after a short pause so the interface stays responsive on mobile and desktop.</p>
-                    </section>
-
-                    <section style={styles.compactCard}>
-                      <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}><Hash size={18} /> Security verification</h2>
-                      <p style={styles.helper}>Bind a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
-                      <p style={styles.helper}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
-                    </section>
-                  </div>
-                </div>
+                <div style={styles.balance}>Balance: {usdtBalance.toFixed(2)} USDT</div>
               </div>
             </div>
+
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}><ArrowRightLeft size={18} /> Transfer details</h2>
+              <div style={styles.stack}>
+                <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
+                  <span style={styles.label}>Recipient type</span>
+                  <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
+                    <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
+                    <span style={{ transform: isRecipientMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
+                  </button>
+                  {isRecipientMenuOpen ? (
+                    <div style={styles.selectMenu}>
+                      {(['uid', 'email'] as const).map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          style={styles.selectOption}
+                          onClick={() => {
+                            setRecipientMethod(option);
+                            setIsRecipientMenuOpen(false);
+                          }}
+                        >
+                          {option === 'uid' ? 'UID' : 'Email'}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+
+                <div style={styles.field as React.CSSProperties}>
+                  <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>
+                  <input
+                    style={styles.input}
+                    value={recipientValue}
+                    onChange={(event) => setRecipientValue(recipientMethod === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)}
+                    placeholder={recipientMethod === 'email' ? 'recipient@email.com' : '12345'}
+                  />
+                </div>
+
+                <div style={styles.helper}>
+                  {recipientChecking ? 'Checking recipient...' : recipientValid ? `Recipient found: ${recipientDisplay}` : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a UID or email to validate.'}
+                </div>
+
+                <div style={styles.field as React.CSSProperties}>
+                  <span style={styles.label}>Amount</span>
+                  <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
+                </div>
+
+                <div style={styles.field as React.CSSProperties}>
+                  <span style={styles.label}>Security code</span>
+                  <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit code' : 'Set security code to continue'} disabled={!securityCodeBound} />
+                </div>
+
+                <div style={styles.buttonRow}>
+                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>
+                    {transferring ? 'Sending...' : 'Send USDT'}
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}><BadgeCheck size={18} /> Transfer rules</h2>
+              <p style={styles.sectionText}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
+            </section>
+
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}><UserRound size={18} /> Recipient validation</h2>
+              <p style={styles.sectionText}>UID entries are restricted to 5 digits. Email validation checks the exact email that exists in the database.</p>
+              <p style={styles.sectionText}>Validation runs live after a short pause so the interface stays responsive on mobile and desktop.</p>
+            </section>
+
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}><Hash size={18} /> Security verification</h2>
+              <p style={styles.sectionText}>Bind a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
+              <p style={styles.sectionText}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
+            </section>
           </div>
           <NowBar />
         </div>
