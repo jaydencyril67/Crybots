@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Create an axios instance with the base URL set to production API server
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://kingshalls.onrender.com';
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://kingshalls.onrender.com';
 
 export const authHeaders = () => {
   const token = localStorage.getItem('token');
