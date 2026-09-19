@@ -475,8 +475,8 @@ const SecurityPage = () => {
       return showStatus('error', 'Enter your current password to update the security code.');
     }
 
-    if (securityCode.length !== 4 || securityCode !== confirmSecurityCode) {
-      return showStatus('error', 'Security code must be 4 digits and match confirmation.');
+    if (securityCode.length !== 6 || securityCode !== confirmSecurityCode) {
+      return showStatus('error', 'Security code must be 6 digits and match confirmation.');
     }
 
     setSavingSecurityCode(true);
@@ -528,7 +528,7 @@ const SecurityPage = () => {
   };
 
   const handleToggle2fa = async () => {
-    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the 4-digit code from your authenticator app.');
+    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the 6-digit code from your authenticator app.');
     setSaving2fa(true);
     try {
       const endpoint = twoFactorEnabled ? '/api/settings/2fa/disable' : '/api/settings/2fa/enable';
@@ -546,7 +546,7 @@ const SecurityPage = () => {
   };
 
   const handleDelete2fa = async () => {
-    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the current 4-digit authenticator code to delete 2FA.');
+    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the current 6-digit authenticator code to delete 2FA.');
     setShowDelete2faConfirmation(true);
   };
 
@@ -770,8 +770,8 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
-                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit security code" />
-                  <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="Confirm security code" />
+                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
+                  <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
                   <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
                 </div>
               </div>
@@ -797,17 +797,17 @@ const SecurityPage = () => {
                         </div>
                       </div>
                     ) : null}
-                    <input style={styles.input} inputMode="numeric" maxLength={4} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit authenticator code" autoComplete="one-time-code" />
+                    <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 4}>{saving2fa ? 'Enabling...' : 'Enable 2FA'}</button>
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Enabling...' : 'Enable 2FA'}</button>
                     </div>
                   </div>
                 ) : (
                   <div style={styles.control}>
-                    <input style={styles.input} inputMode="numeric" maxLength={4} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit authenticator code" autoComplete="one-time-code" />
+                    <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 4}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
-                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 4}><Trash2 size={16} /> Delete 2FA</button> : null}
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
+                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button> : null}
                     </div>
                   </div>
                 )}

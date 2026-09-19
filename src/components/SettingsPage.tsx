@@ -584,11 +584,11 @@ const SettingsPage = () => {
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>Security code</span>
-                    <input style={styles.input} type="password" value={securityCode} onChange={(event) => { setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 4)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="4 digits" />
+                    <input style={styles.input} type="password" value={securityCode} onChange={(event) => { setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="6 digits" />
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>Confirm security code</span>
-                    <input style={styles.input} type="password" value={securityCodeConfirm} onChange={(event) => { setSecurityCodeConfirm(event.target.value.replace(/\D/g, '').slice(0, 4)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="Repeat 4 digits" />
+                    <input style={styles.input} type="password" value={securityCodeConfirm} onChange={(event) => { setSecurityCodeConfirm(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="Repeat 6 digits" />
                   </label>
                 </div>
                 {((activeCard === 'securityCode' && securityCodeValid) || securityCodeCardSaving) ? (
