@@ -27,7 +27,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     textAlign: 'center' as const,
   },
   logo: {
-    width: '180px',
+    width: '130px',
     height: 'auto',
     display: 'block',
   },
@@ -78,9 +78,9 @@ const AppSplashOverlay = () => {
   return (
     <div style={{ ...styles.overlay, ...(ready ? styles.hidden : {}) }} aria-hidden={ready}>
       <div style={styles.card}>
-        <img src="/icons/ke-icon.svg" alt="KHE" style={{ ...styles.logo, color: theme.primary }} />
+        <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.logo} />
         <div>
-          <p style={styles.subtitle}>KHE · KINGSHALL EXCHANGE</p>
+          <p style={styles.subtitle}>KingsHall Exchange</p>
         </div>
         <div style={styles.shimmer} />
       </div>

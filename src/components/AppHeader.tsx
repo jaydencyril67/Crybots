@@ -9,7 +9,7 @@ const styles = {
     gridTemplateColumns: 'auto 1fr auto',
     alignItems: 'center',
     gap: '10px',
-    padding: '10px 16px',
+    padding: '8px 16px',
     borderRadius: '28px',
     border: '1.5px solid rgba(255,255,255,0.16)',
     background: 'linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(8,14,26,0.92) 100%)',
@@ -82,15 +82,15 @@ const AppHeader = () => {
 
   return (
     <header style={styles.header}>
-      <img src="/icons/ke-icon.svg" alt="KHE" style={styles.headerIcon} />
+      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
 
       <div style={styles.brand}>
         <div style={styles.brandCopy}>
-          <p style={styles.brandTitle}>KHE</p>
+          <p style={styles.brandTitle}>KingsHall Exchange</p>
         </div>
       </div>
 
-      <img src="/icons/ke-icon.svg" alt="KHE" style={styles.headerIcon} />
+      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
     </header>
   );
 };
