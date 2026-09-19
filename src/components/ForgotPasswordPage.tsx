@@ -111,7 +111,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    cursor: 'default',
+    cursor: 'pointer',
     flexShrink: 0,
   },
   grid: {
@@ -290,7 +290,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     borderRadius: '999px',
     padding: '11px 16px',
     fontWeight: 700,
-    cursor: 'default',
+    cursor: 'pointer',
     minWidth: '108px',
   },
   buttonGhost: {
@@ -435,15 +435,17 @@ const ForgotPasswordPage = () => {
       color: theme.textMuted,
     },
     actionButton: {
+      ...styles.button,
       ...styles.buttonGhost,
       borderColor: theme.borderGlass,
       background: theme.surfaceGlass,
       color: theme.text,
     },
     actionButtonPrimary: {
+      ...styles.button,
       ...styles.buttonPrimary,
       background: theme.primary,
-      color: theme.surfaceElevated,
+      color: theme.textInverse,
     },
   };
 
