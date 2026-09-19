@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut } from 'lucide-react';
+import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2 } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
@@ -284,6 +285,10 @@ const SecurityPage = () => {
   const [logins, setLogins] = useState<SecurityLogin[]>([]);
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [twoFactorConfigured, setTwoFactorConfigured] = useState(false);
+  const [twoFactorSecret, setTwoFactorSecret] = useState('');
+  const [twoFactorUri, setTwoFactorUri] = useState('');
+  const [twoFactorCode, setTwoFactorCode] = useState('');
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
   const [savingUid, setSavingUid] = useState(false);
@@ -305,6 +310,10 @@ const SecurityPage = () => {
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
         setTwoFactorEnabled(Boolean(data.user?.twoFactorEnabled));
         setBiometricEnabled(Boolean(data.user?.biometricEnabled));
+
+        const { data: twoFactorStatus } = await api.get<{ configured?: boolean; enabled?: boolean }>('/api/settings/2fa');
+        setTwoFactorConfigured(Boolean(twoFactorStatus.configured));
+        setTwoFactorEnabled(Boolean(twoFactorStatus.enabled));
         setHardwareKeyEnabled(Boolean(data.user?.hardwareKeyEnabled));
 
         setLogins(data.logins ?? []);
@@ -413,10 +422,52 @@ const SecurityPage = () => {
     }
   };
 
-  const handleToggle2fa = async () => {
+  const handleSetup2fa = async () => {
     setSaving2fa(true);
     try {
-      showStatus('success', '2FA setup will be added in the backend next.');
+      const { data } = await api.post<{ secret: string; otpauthUrl: string }>('/api/settings/2fa/setup');
+      setTwoFactorSecret(data.secret);
+      setTwoFactorUri(data.otpauthUrl);
+      setTwoFactorConfigured(true);
+      setTwoFactorCode('');
+      showStatus('success', 'Scan the QR code with your authenticator app, then enter the generated code to enable 2FA.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to start 2FA setup.');
+    } finally {
+      setSaving2fa(false);
+    }
+  };
+
+  const handleToggle2fa = async () => {
+    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the 6-digit code from your authenticator app.');
+    setSaving2fa(true);
+    try {
+      const endpoint = twoFactorEnabled ? '/api/settings/2fa/disable' : '/api/settings/2fa/enable';
+      await api.post(endpoint, { code: twoFactorCode.trim() });
+      setTwoFactorEnabled(!twoFactorEnabled);
+      setTwoFactorCode('');
+      showStatus('success', twoFactorEnabled ? 'Two-factor authentication disabled.' : 'Two-factor authentication enabled.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to update 2FA.');
+    } finally {
+      setSaving2fa(false);
+    }
+  };
+
+  const handleDelete2fa = async () => {
+    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the current 6-digit authenticator code to delete 2FA.');
+    if (!window.confirm('Delete all 2FA data from your account? You will need to set it up again later.')) return;
+    setSaving2fa(true);
+    try {
+      await api.delete('/api/settings/2fa', { data: { code: twoFactorCode.trim() } });
+      setTwoFactorConfigured(false);
+      setTwoFactorEnabled(false);
+      setTwoFactorSecret('');
+      setTwoFactorUri('');
+      setTwoFactorCode('');
+      showStatus('success', 'All two-factor authentication data was deleted.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to delete 2FA data.');
     } finally {
       setSaving2fa(false);
     }
@@ -592,10 +643,29 @@ const SecurityPage = () => {
 
               <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> 2FA</p>
-                <p style={styles.rowValue}>{twoFactorEnabled ? 'Two-factor authentication enabled' : 'Two-factor authentication disabled'}</p>
-                <div style={styles.buttonRow}>
-                  <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
-                </div>
+                <p style={styles.rowValue}>{twoFactorEnabled ? 'Two-factor authentication enabled' : twoFactorConfigured ? 'Authenticator configured but disabled' : 'Two-factor authentication not set up'}</p>
+                {!twoFactorConfigured ? (
+                  <div style={styles.buttonRow}>
+                    <button type="button" style={styles.button} onClick={() => void handleSetup2fa()} disabled={saving2fa}>{saving2fa ? 'Preparing...' : 'Set up 2FA'}</button>
+                  </div>
+                ) : (
+                  <>
+                    {twoFactorUri ? (
+                      <div style={{ display: 'grid', gap: '8px', justifyItems: 'start' }}>
+                        <QRCodeCanvas value={twoFactorUri} size={180} includeMargin />
+                        <p style={styles.note}>Scan this QR code in Google Authenticator, Authy, or another TOTP app.</p>
+                        <p style={{ ...styles.note, wordBreak: 'break-all' as const }}>Manual key: {twoFactorSecret}</p>
+                      </div>
+                    ) : null}
+                    <div style={styles.control}>
+                      <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
+                      <div style={styles.buttonRow}>
+                        <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
+                        <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div style={styles.row}>
