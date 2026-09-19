@@ -678,7 +678,7 @@ const SigninPage = () => {
                     <div style={styles.optionGrid}>
                       {signInMethods.map((option) => (
                         <button key={option.value} type="button" style={{ ...hybridStyles.optionCard, ...(method === option.value ? hybridStyles.optionCardActive : {}) }} onClick={() => handleStartSignin(option.value)} disabled={isSubmitting}>
-                          <KeyRound size={20} />
+                          {isSubmitting && method === option.value ? <InlineLoadingDots /> : <KeyRound size={20} />}
                           <div>
                             <div style={{ fontWeight: 700, color: theme.text }}>{option.title}</div>
                             <div style={{ color: theme.textMuted, fontSize: '13px', lineHeight: 1.5 }}>{option.description}</div>
@@ -708,7 +708,7 @@ const SigninPage = () => {
                       {resendStatus ? <NotificationBanner tone="success" title="Update received" message={resendStatus} /> : null}
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={hybridStyles.linkButton}>
-                          {isResendingCode ? 'Resending code…' : 'Resend confirmation code'}
+                          {isResendingCode ? <InlineLoadingDots /> : 'Resend confirmation code'}
                         </button>
                       ) : null}
                     </div>
@@ -720,11 +720,11 @@ const SigninPage = () => {
                   {step === 'email' ? (
                     <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={!canContinue}>Continue</button>
                   ) : step === 'password' ? (
-                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>Sign in</button>
+                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Sign in'}</button>
                   ) : step === 'code' ? (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Verify code'}</button>
                   ) : (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>Verify code</button>
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Verify code'}</button>
                   )}
                 </div>
                 <div style={styles.switchRow}>
