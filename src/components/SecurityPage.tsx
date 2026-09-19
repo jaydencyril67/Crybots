@@ -237,12 +237,22 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   button: {
     border: 'none',
-    background: 'transparent',
-    color: theme.text,
-    padding: '0',
-    fontWeight: 800,
+    borderRadius: '999px',
+    padding: '11px 16px',
+    fontWeight: 700,
     cursor: 'pointer',
+    minWidth: '108px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    background: theme.primary,
+    color: theme.textInverse,
     fontSize: '0.98rem',
+  },
+  dangerButton: {
+    background: theme.danger,
+    color: theme.textInverse,
   },
   mutedButton: {
     color: theme.textMuted,
@@ -530,7 +540,7 @@ const SecurityPage = () => {
                               ) : (
                                 <button
                                   type="button"
-                                  style={{ ...styles.button, color: theme.danger, display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                                  style={{ ...styles.button, ...styles.dangerButton, fontSize: '0.85rem' }}
                                   onClick={() => void handleRemoveSession(session.tokenHash)}
                                   disabled={removingSession === session.tokenHash}
                                 >
