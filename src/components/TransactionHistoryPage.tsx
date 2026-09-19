@@ -49,7 +49,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     boxSizing: 'border-box' as const,
   },
   panel: {
-    borderRadius: '28px',
     display: 'grid',
     gap: '16px',
     width: '100%',
@@ -88,10 +87,16 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
   },
   card: {
-    borderRadius: '22px',
+    display: 'grid',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    gap: '20px',
+    padding: 'clamp(18px, 4vw, 28px)',
+    borderRadius: '28px',
     border: `1px solid ${theme.border}`,
     background: theme.surfaceGlass,
-    padding: '18px',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
   },
   cardTitle: {
     margin: 0,
@@ -124,9 +129,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   tableWrap: {
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
-    borderRadius: '22px',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    borderRadius: '28px',
     border: `1px solid ${theme.border}`,
-    background: theme.surfaceMuted,
+    background: theme.surfaceGlass,
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
   },
   table: {
     width: '100%',
@@ -174,8 +183,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
   },
   stat: {
-    borderRadius: '18px',
-    background: theme.surfaceGlass,
+    borderRadius: '16px',
+    background: theme.surfaceMuted,
     border: `1px solid ${theme.border}`,
     padding: '14px',
   },
@@ -344,7 +353,7 @@ const TransactionHistoryPage = () => {
 
   return (
     <HybridTheme mode={themeMode}>
-      <div style={styles.page}>
+      <div data-shadow-free-page="transaction-history" style={styles.page}>
       <Helmet><title>Transaction History | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />
