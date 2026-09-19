@@ -7,13 +7,13 @@ type ReusableConfirmationPageProps = {
   eyebrow: string;
   title: string;
   description: string;
-  statusLabel?: string;
+  statusLabel?: React.ReactNode;
   statusTone?: 'neutral' | 'warning' | 'danger' | 'success';
-  primaryActionLabel: string;
-  secondaryActionLabel?: string;
+  primaryActionLabel: React.ReactNode;
+  secondaryActionLabel?: React.ReactNode;
   onPrimaryAction: () => void;
   onSecondaryAction?: () => void;
-  footerNote?: string;
+  footerNote?: React.ReactNode;
   children?: React.ReactNode;
 };
 

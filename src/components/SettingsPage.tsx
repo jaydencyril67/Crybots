@@ -18,6 +18,8 @@ import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, LockKeyhole, RotateCcw, ShieldCheck, Trash2, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
+import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
@@ -204,6 +206,7 @@ const passwordMeetsRule = (value: string) => {
 
 const SettingsPage = () => {
   const [uid, setUid] = useState('');
+  const [accountLoading, setAccountLoading] = useState(true);
   const [uidAvailable, setUidAvailable] = useState<boolean | null>(null);
   const [uidEditorActive, setUidEditorActive] = useState(false as boolean);
   const [uidChecking, setUidChecking] = useState(false);
@@ -282,6 +285,8 @@ const SettingsPage = () => {
 
       } catch {
         navigate('/signin');
+      } finally {
+        setAccountLoading(false);
       }
     };
 
@@ -634,7 +639,9 @@ const SettingsPage = () => {
               <div style={{ display: 'grid', gap: '14px', marginTop: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
                   <div style={{ ...avatarDisplayStyle, width: '96px', height: '96px', flex: '0 0 auto' }}>
-                    {avatarPreview ? (
+                    {accountLoading ? (
+                      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}><LoadingDots /></div>
+                    ) : avatarPreview ? (
                       <div style={{ position: 'absolute', inset: 0, background: `url(${avatarPreview}) center/cover no-repeat` }} />
                     ) : (
                       <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: theme.surfaceShine }}>
@@ -644,7 +651,7 @@ const SettingsPage = () => {
                   </div>
                   <label style={{ ...styles.button, ...styles.primaryButton, display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                     <Upload size={16} />
-                    <span>{avatarUploading ? 'Uploading...' : 'Choose photo'}</span>
+                    <span>{avatarUploading ? <InlineLoadingDots /> : 'Choose photo'}</span>
                     <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} />
                   </label>
                 </div>
@@ -701,7 +708,7 @@ const SettingsPage = () => {
                 {((activeCard === 'password' && passwordCanSave) || passwordCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSavePassword()} disabled={passwordCardSaving || !passwordCanSave}>
-                      {passwordCardSaving ? 'Saving...' : 'Save password'}
+                      {passwordCardSaving ? <InlineLoadingDots /> : 'Save password'}
                     </button>
                   </div>
                 ) : null}
@@ -765,7 +772,7 @@ const SettingsPage = () => {
                 {((edgeLightEnabled !== edgeLightSavedEnabled || edgeLightColor !== edgeLightSavedColor) || edgeLightCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={handleSaveEdgeLight} disabled={edgeLightCardSaving}>
-                      {edgeLightCardSaving ? 'Saving...' : 'Save edge lighting'}
+                      {edgeLightCardSaving ? <InlineLoadingDots /> : 'Save edge lighting'}
                     </button>
                   </div>
                 ) : null}
@@ -804,7 +811,7 @@ const SettingsPage = () => {
                 {((activeCard === 'wallet' && walletCanSave) || walletCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving || !walletCanSave}>
-                      {walletCardSaving ? 'Saving...' : 'Save wallet'}
+                      {walletCardSaving ? <InlineLoadingDots /> : 'Save wallet'}
                     </button>
                   </div>
                 ) : null}
@@ -830,7 +837,7 @@ const SettingsPage = () => {
                 {((activeCard === 'securityCode' && securityCodeValid) || securityCodeCardSaving) ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveSecurityCode()} disabled={securityCodeCardSaving || !securityCodeValid}>
-                      {securityCodeCardSaving ? 'Saving...' : 'Save security code'}
+                      {securityCodeCardSaving ? <InlineLoadingDots /> : 'Save security code'}
                     </button>
                   </div>
                 ) : null}
@@ -862,7 +869,7 @@ const SettingsPage = () => {
                 {showUidSaveButton ? (
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveUid()} disabled={uidCardSaving || !uidReadyToSave}>
-                      {uidCardSaving ? 'Saving...' : 'Save UID'}
+                      {uidCardSaving ? <InlineLoadingDots /> : 'Save UID'}
                     </button>
                   </div>
                 ) : null}

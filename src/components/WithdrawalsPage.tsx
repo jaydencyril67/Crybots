@@ -4,6 +4,7 @@ import { CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -218,7 +219,6 @@ const WithdrawPage = () => {
       <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         
-        {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0 0' }}><LoadingDots /></div> : null}
         <div style={styles.content}>
           {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
           <section style={styles.section}>
@@ -276,10 +276,10 @@ const WithdrawPage = () => {
             </div>
             <div style={styles.buttonRow}>
               <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || !securityCodeSet || !securityCode}>
-                {withdrawing ? 'Submitting...' : 'Submit withdrawal'}
+                {withdrawing ? <InlineLoadingDots /> : 'Submit withdrawal'}
               </button>
             </div>
-            <p style={styles.sectionText}>Crypto balance: {balances.usdtBalance.toFixed(2)} USDT</p>
+            <p style={styles.sectionText}>Crypto balance: {loading ? <LoadingDots /> : `${balances.usdtBalance.toFixed(2)} USDT`}</p>
           </section>
 
           <section style={styles.section}>

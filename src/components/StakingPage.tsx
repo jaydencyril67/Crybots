@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import api from '../api/axios';
 import { setCachedBalance } from '../utils/balance';
 import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -289,7 +290,7 @@ const StakingPage = () => {
           
           {packagesError ? <NotificationBanner tone="error" title="Package load issue" message={packagesError} /> : null}
           <section style={styles.packageGrid}>
-            {stakingPackages.map((stakingPackage) => (
+            {isLoading ? <div style={styles.panel}><LoadingDots /></div> : stakingPackages.map((stakingPackage) => (
               <article key={stakingPackage.id} style={styles.packageCard}>
                 <span style={styles.packageBadge}>{stakingPackage.id}</span>
                 <h2 style={styles.packageTitle}>{stakingPackage.dailyProfitPercent}% / day</h2>
@@ -305,7 +306,7 @@ const StakingPage = () => {
                 <div ref={packageMenuRef} style={styles.field}>
                   <span style={styles.label}>Package</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsPackageMenuOpen((current) => !current)}>
-                    <span>{selectedPackage.id}</span>
+                    <span>{isLoading ? <LoadingDots /> : selectedPackage.id}</span>
                     <span>▾</span>
                   </button>
                   {isPackageMenuOpen ? (
@@ -330,7 +331,7 @@ const StakingPage = () => {
                   <span style={styles.label}>Amount (USDT)</span>
                   <input value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} inputMode="decimal" placeholder={`Min ${selectedPackage.minAmount} / Max ${selectedPackage.maxAmount}`} />
                 </label>
-                <p style={styles.helper}>{selectedPackage.lockDurationDays} day lock • {selectedPackage.dailyProfitPercent}% daily</p>
+                <p style={styles.helper}>{isLoading ? <LoadingDots /> : `${selectedPackage.lockDurationDays} day lock • ${selectedPackage.dailyProfitPercent}% daily`}</p>
                 <div style={styles.previewCard} aria-live="polite">
                   <p style={styles.previewLabel}>Estimated total at maturity</p>
                   <p style={styles.previewValue}>{isAmountValid ? `${(selectedAmount + projectedProfit).toLocaleString()} USDT` : '—'}</p>
@@ -342,7 +343,7 @@ const StakingPage = () => {
                 </div>
                 {error ? <NotificationBanner tone="error" title="Check your details" message={error} /> : null}
                 {message ? <NotificationBanner tone="success" title="Stake created" message={message} /> : null}
-                <button type="submit" style={styles.button} disabled={isSubmitting}>{isSubmitting ? 'Creating...' : 'Stake now'} <ArrowRight size={16} /></button>
+                <button type="submit" style={styles.button} disabled={isSubmitting}>{isSubmitting ? <InlineLoadingDots /> : 'Stake now'} {!isSubmitting ? <ArrowRight size={16} /> : null}</button>
               </form>
             </div>
           </section>

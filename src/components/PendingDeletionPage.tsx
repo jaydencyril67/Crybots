@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
+import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
@@ -28,8 +30,9 @@ const PendingDeletionPage = () => {
   const recoveryUntil = useMemo(() => window.localStorage.getItem('pendingDeletionRecoveryUntil') || '', []);
   const [status, setStatus] = useState<DeletionStatus | null>(null);
   const [code, setCode] = useState('');
-  const [message, setMessage] = useState('Loading deletion status…');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(true);
   const [codeRequestLoading, setCodeRequestLoading] = useState(false);
 
   const token = useMemo(() => localStorage.getItem('token') || '', []);
@@ -45,6 +48,8 @@ const PendingDeletionPage = () => {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unable to load deletion status.';
         setMessage(errorMessage);
+      } finally {
+        setStatusLoading(false);
       }
     };
 
@@ -93,13 +98,13 @@ const PendingDeletionPage = () => {
       eyebrow="Pending deletion"
       title="Your account is scheduled for deletion"
       description="Sign-in is paused while your account is marked for deletion. You can request a code by email and confirm cancellation here, then wait 24 hours for normal access to return."
-      statusLabel={status?.scheduled ? `Deletion in ${formatDaysLeft(status.daysLeft)} · code expires ${status.codeExpiresAt ? new Date(status.codeExpiresAt).toLocaleString() : 'soon'}` : 'No active deletion request'}
+      statusLabel={statusLoading ? <LoadingDots /> : status?.scheduled ? `Deletion in ${formatDaysLeft(status.daysLeft)} · code expires ${status.codeExpiresAt ? new Date(status.codeExpiresAt).toLocaleString() : 'soon'}` : 'No active deletion request'}
       statusTone="warning"
-      primaryActionLabel={loading ? 'Confirming…' : 'Cancel deletion'}
-      secondaryActionLabel={codeRequestLoading ? 'Sending code…' : 'Send cancellation code'}
+      primaryActionLabel={loading ? <InlineLoadingDots /> : 'Cancel deletion'}
+      secondaryActionLabel={codeRequestLoading ? <InlineLoadingDots /> : 'Send cancellation code'}
       onPrimaryAction={submitCancel}
       onSecondaryAction={requestCode}
-      footerNote={`${message || 'After cancellation, your account stays in a recovery state for 24 hours before returning to normal access.'}${recoveryUntil ? ` Recovery ends at ${new Date(recoveryUntil).toLocaleString()}.` : ''}`}
+      footerNote={statusLoading ? <LoadingDots /> : `${message || 'After cancellation, your account stays in a recovery state for 24 hours before returning to normal access.'}${recoveryUntil ? ` Recovery ends at ${new Date(recoveryUntil).toLocaleString()}.` : ''}`}
     >
       <div style={{ display: 'grid', gap: '10px', marginTop: '18px' }}>
         <div style={{ display: 'grid', gap: '6px' }}>

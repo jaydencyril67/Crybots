@@ -4,6 +4,7 @@ import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -216,7 +217,6 @@ const TransferPage = () => {
       <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         
-        {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0 0' }}><LoadingDots /></div> : null}
         <div style={styles.panel}>
           <div style={styles.body}>
             {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
@@ -270,10 +270,10 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.buttonRow}>
                   <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>
-                    {transferring ? 'Sending...' : 'Send USDT'}
+                    {transferring ? <InlineLoadingDots /> : 'Send USDT'}
                   </button>
                 </div>
-                <p style={styles.cardText}>Available balance: {usdtBalance.toFixed(2)} USDT</p>
+                <p style={styles.cardText}>Available balance: {loading ? <LoadingDots /> : `${usdtBalance.toFixed(2)} USDT`}</p>
               </section>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><BadgeCheck size={18} /> Transfer rules</h2>

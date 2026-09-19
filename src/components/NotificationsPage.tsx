@@ -109,10 +109,10 @@ const NotificationsPage = () => {
           <div style={styles.toolbar}>
             <button type="button" style={styles.markButton} onClick={() => void markAllRead()}><CheckCheck size={16} /> Mark all as read</button>
           </div>
-          {loading ? <LoadingDots /> : null}
           {error ? <p style={{ color: theme.danger }}>{error}</p> : null}
-          {!loading && !notifications.length ? <div style={styles.empty}>You are all caught up.</div> : null}
           <div style={styles.list}>
+            {loading ? <div style={styles.empty}><LoadingDots /></div> : null}
+            {!loading && !notifications.length ? <div style={styles.empty}>You are all caught up.</div> : null}
             {notifications.map((notification) => {
               const Icon = iconForType(notification.type);
               return (
