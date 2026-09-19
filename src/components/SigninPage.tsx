@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import api from '../api/axios';
+import { notifyAuthChanged } from '../utils/notificationEvents';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -515,6 +516,7 @@ const SigninPage = () => {
 
       if (response.data?.token) {
         localStorage.setItem('token', response.data.token);
+        notifyAuthChanged();
       }
 
       if (response.data?.user) {
@@ -547,6 +549,7 @@ const SigninPage = () => {
 
       if (response.data?.token) {
         localStorage.setItem('token', response.data.token);
+        notifyAuthChanged();
       }
 
       if (response.data?.user) {

@@ -4,6 +4,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import api from '../api/axios';
+import { AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
 
 type NotificationItem = {
   id: string;
@@ -49,28 +50,54 @@ const NotificationsPage = () => {
   const loadNotifications = useCallback(async () => {
     try {
       const response = await api.get('/api/notifications');
+      if (!localStorage.getItem('token')) return;
       setNotifications(response.data.notifications || []);
       setError('');
     } catch {
-      setError('Unable to load notifications right now.');
+      if (localStorage.getItem('token')) {
+        setError('Unable to load notifications right now.');
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { void loadNotifications(); }, [loadNotifications]);
+  useEffect(() => {
+    const clearNotifications = () => {
+      setNotifications([]);
+      setLoading(false);
+      setError('');
+    };
+    const refreshNotifications = () => { void loadNotifications(); };
+
+    void loadNotifications();
+    const interval = window.setInterval(() => { void loadNotifications(); }, 10000);
+    window.addEventListener('ke:force-logout', clearNotifications);
+    window.addEventListener(AUTH_CHANGED_EVENT, refreshNotifications);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('ke:force-logout', clearNotifications);
+      window.removeEventListener(AUTH_CHANGED_EVENT, refreshNotifications);
+    };
+  }, [loadNotifications]);
 
   const markRead = async (id: string) => {
     const item = notifications.find((notification) => notification.id === id);
     if (!item || item.readAt) return;
     setNotifications((current) => current.map((notification) => notification.id === id ? { ...notification, readAt: new Date().toISOString() } : notification));
-    try { await api.patch(`/api/notifications/${id}/read`); } catch { void loadNotifications(); }
+    try {
+      await api.patch(`/api/notifications/${id}/read`);
+      notifyNotificationsChanged();
+    } catch { void loadNotifications(); }
   };
 
   const markAllRead = async () => {
     if (!notifications.some((notification) => !notification.readAt)) return;
     setNotifications((current) => current.map((notification) => ({ ...notification, readAt: notification.readAt || new Date().toISOString() })));
-    try { await api.post('/api/notifications/read-all'); } catch { void loadNotifications(); }
+    try {
+      await api.post('/api/notifications/read-all');
+      notifyNotificationsChanged();
+    } catch { void loadNotifications(); }
   };
 
   return (

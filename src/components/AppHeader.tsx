@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import KHLogo from './KHLogo';
+import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
 
 const styles = {
   header: {
@@ -137,12 +138,18 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     }
     const interval = window.setInterval(() => { void loadUnreadCount(); }, 15000);
     window.addEventListener('ke:force-logout', clearNotificationState);
+    const handleNotificationsChanged = () => { void loadUnreadCount(); };
+    const handleAuthChanged = () => { void loadUnreadCount(); };
+    window.addEventListener(NOTIFICATIONS_CHANGED_EVENT, handleNotificationsChanged);
+    window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
     return () => {
       mounted = false;
       window.clearInterval(interval);
       window.clearTimeout(alertTimeout.current);
       alertTimeout.current = undefined;
       window.removeEventListener('ke:force-logout', clearNotificationState);
+      window.removeEventListener(NOTIFICATIONS_CHANGED_EVENT, handleNotificationsChanged);
+      window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
     };
   }, [isPublicPage]);
 
