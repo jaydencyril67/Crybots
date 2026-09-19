@@ -5,6 +5,7 @@ import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
+import CodeInput from './CodeInput';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -272,7 +273,7 @@ const WithdrawPage = () => {
             {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Security code</span>
-              <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
+              <CodeInput length={6} value={securityCode} onChange={setSecurityCode} type="password" color={theme.text} borderColor={theme.border} background={theme.surfaceMuted} disabled={!securityCodeSet} />
             </div>
             <div style={styles.buttonRow}>
               <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || !securityCodeSet || !securityCode}>

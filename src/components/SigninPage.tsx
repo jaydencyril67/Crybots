@@ -6,6 +6,7 @@ import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
+import CodeInput from './CodeInput';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -700,7 +701,7 @@ const SigninPage = () => {
                   {step === 'code' ? (
                     <div style={styles.field}>
                       <label style={hybridStyles.label} htmlFor="signin-code">Sign-in code</label>
-                      <input id="signin-code" style={hybridStyles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
+                      <CodeInput id="signin-code" length={3} value={form.code} onChange={(value) => updateField('code', value)} autoComplete="one-time-code" color={theme.text} borderColor={theme.borderGlass} background={theme.surfaceElevated} />
                       <div style={hybridStyles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
                     </div>
                   ) : null}
