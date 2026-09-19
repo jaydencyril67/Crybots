@@ -119,6 +119,9 @@ const DangerPage = () => {
   const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
+  const theme = HYBRID_THEME_TOKENS.dark;
+  const styles = getStyles(theme);
+
   const submitAction = async (
     action: DangerActionKey,
     state: DangerActionState,
@@ -166,10 +169,12 @@ const DangerPage = () => {
       window.localStorage.removeItem('kingshall_user');
       window.localStorage.removeItem('firstName');
       window.localStorage.removeItem('kingshall_first_name');
+
       if (forceLogout) {
         navigate('/pending-deletion');
         return;
       }
+
       navigate('/pending-deletion');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to complete the action.';
@@ -260,14 +265,15 @@ const DangerPage = () => {
 
             <section style={styles.card}>
               <h3 style={styles.actionTitle}>Delete Account</h3>
-              <p style={styles.actionText}>This starts the hybrid deletion flow. You will first see a dedicated confirmation page before the deletion request is submitted.</p>
+              <p style={styles.actionText}>Delete your account and start the recovery window. You can only cancel this through the email verification flow after the countdown begins.</p>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => setShowDeleteConfirmation(true)} disabled={remove.loading !== null}>Open Delete Confirmation</button>
+                <button type="button" style={styles.actionButton} onClick={() => setShowDeleteConfirmation(true)} disabled={remove.loading !== null}>Delete Account</button>
               </div>
+              {remove.status ? <div style={styles.status}>{remove.status}</div> : null}
             </section>
           </div>
+          <NowBar />
         </div>
-        <NowBar />
       </div>
     </HybridTheme>
   );
