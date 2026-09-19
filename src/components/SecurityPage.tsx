@@ -11,6 +11,7 @@ import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
 import NotificationBanner from './NotificationBanner';
+import { createPasskey, isWebAuthnAvailable } from '../utils/webauthn';
 
 type SecurityDevice = {
   id?: string;
@@ -41,12 +42,15 @@ type SecurityLogin = {
   success?: boolean;
 };
 
+type WebAuthnCredential = { id: string; createdAt?: string };
+
 type SecurityMeResponse = {
   user?: {
     uid?: string;
     securityCodeSet?: boolean;
     twoFactorEnabled?: boolean;
     biometricEnabled?: boolean;
+    webauthnCredentials?: WebAuthnCredential[];
     hardwareKeyEnabled?: boolean;
   };
   devices?: SecurityDevice[];
@@ -323,6 +327,7 @@ const SecurityPage = () => {
   const [twoFactorKeyCopied, setTwoFactorKeyCopied] = useState(false);
   const [showDelete2faConfirmation, setShowDelete2faConfirmation] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [passkeys, setPasskeys] = useState<WebAuthnCredential[]>([]);
   const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
   const [savingUid, setSavingUid] = useState(false);
   const [requestingUidCode, setRequestingUidCode] = useState(false);
@@ -344,6 +349,13 @@ const SecurityPage = () => {
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
         setTwoFactorEnabled(Boolean(data.user?.twoFactorEnabled));
         setBiometricEnabled(Boolean(data.user?.biometricEnabled));
+        try {
+          const { data: passkeyData } = await api.get<{ credentials?: WebAuthnCredential[] }>('/api/webauthn/credentials');
+          setPasskeys(passkeyData.credentials ?? []);
+          setBiometricEnabled((passkeyData.credentials ?? []).length > 0);
+        } catch {
+          // Passkey status is non-critical to the rest of the security page.
+        }
 
         const { data: twoFactorStatus } = await api.get<{ configured?: boolean; enabled?: boolean }>('/api/settings/2fa');
         setTwoFactorConfigured(Boolean(twoFactorStatus.configured));
@@ -570,9 +582,24 @@ const SecurityPage = () => {
   };
 
   const handleToggleBiometric = async () => {
+    if (!isWebAuthnAvailable()) return showStatus('error', 'Passkeys are not supported by this browser.');
     setSavingBiometric(true);
     try {
-      showStatus('success', 'Biometric security will be wired to the backend next.');
+      if (biometricEnabled && passkeys.length) {
+        await api.delete(`/api/webauthn/credentials/${encodeURIComponent(passkeys[0].id)}`);
+        setPasskeys([]);
+        setBiometricEnabled(false);
+        showStatus('success', 'Biometric security disabled.');
+        return;
+      }
+      const { data: options } = await api.post('/api/webauthn/register/options');
+      const credential = await createPasskey(options);
+      const { data } = await api.post('/api/webauthn/register/verify', credential);
+      setPasskeys(data.credentials ?? []);
+      setBiometricEnabled(true);
+      showStatus('success', 'Biometric security enabled with a passkey.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update biometric security.');
     } finally {
       setSavingBiometric(false);
     }
