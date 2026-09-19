@@ -201,6 +201,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/transfer') return 'TRANSFER';
   if (path === '/deposit') return 'DEPOSIT';
   if (path === '/transactions') return 'TRANSACTIONS';
+  if (path === '/notifications') return 'NOTIFICATIONS';
   return 'NOWBAR';
 };
 
