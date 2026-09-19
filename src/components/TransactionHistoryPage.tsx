@@ -45,7 +45,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
     maxWidth: '1320px',
     margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(14px, 3vw, 28px) clamp(8px, 1.5vw, 16px) 40px',
     boxSizing: 'border-box' as const,
   },
   panel: {
@@ -84,7 +84,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   topGrid: {
     display: 'grid',
     gap: '18px',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gridTemplateColumns: '1fr',
   },
   card: {
     display: 'grid',
