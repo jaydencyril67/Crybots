@@ -7,6 +7,7 @@ import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './Hybr
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NowBar from './NowBar';
+import LoadingDots from './LoadingDots';
 
 const baseStyles = {
   page: {
@@ -183,6 +184,8 @@ const ProfilePage = () => {
   }), [theme]);
 
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [balanceLoading, setBalanceLoading] = useState(true);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
     usdtBalance: null,
@@ -212,6 +215,8 @@ const ProfilePage = () => {
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
         setBalance(nextBalance);
         setLiveProfile(serverProfile);
+        setProfileLoading(false);
+        setBalanceLoading(false);
         setBalanceError(null);
       } catch {
         if (!isMounted) {
@@ -220,6 +225,8 @@ const ProfilePage = () => {
 
         setBalance({ usdtBalance: null });
         setLiveProfile(null);
+        setProfileLoading(false);
+        setBalanceLoading(false);
         setBalanceError(null);
       }
     };
@@ -245,10 +252,10 @@ const ProfilePage = () => {
 
   const profileDetails = liveProfile;
   const avatarPicture = profileDetails?.profilePicture ?? null;
-  const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim() || 'Trader';
-  const email = profileDetails?.email || 'Not available';
-  const uid = profileDetails?.uid || 'Pending confirmation';
-  const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : 0;
+  const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim();
+  const email = profileDetails?.email;
+  const uid = profileDetails?.uid;
+  const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : null;
 
 
   const handleLogout = async () => {
@@ -285,11 +292,11 @@ const ProfilePage = () => {
               <div style={styles.infoList}>
                 <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><UserRound size={16} /> Display name</p>
-                  <p style={styles.infoValue}>{fullName}</p>
+                  <div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : fullName}</div>
                 </div>
                 <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><Mail size={16} /> Email</p>
-                  <p style={styles.infoValue}>{email}</p>
+                  <div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : email}</div>
                 </div>
                 <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> Account status</p>
@@ -297,11 +304,13 @@ const ProfilePage = () => {
                 </div>
                 <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> UID</p>
-                  <p style={styles.infoValue}>{uid}</p>
+                  <div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : uid}</div>
                 </div>
                 <div style={styles.infoRow}>
                   <p style={styles.infoLabel}><Coins size={16} /> USDT Balance</p>
-                  <p style={styles.infoValue}>{usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</p>
+                  <div style={styles.infoValue}>
+                    {balanceLoading ? <LoadingDots /> : typeof usdtBalance === 'number' ? `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT` : null}
+                  </div>
                 </div>
               </div>
 

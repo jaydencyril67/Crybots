@@ -458,16 +458,16 @@ const TransactionHistoryPage = () => {
                 <div style={styles.statsGrid}>
                   <div style={styles.stat}>
                     <p style={styles.statLabel}>Total entries</p>
-                    <p style={styles.statValue}>{totalCount}</p>
+                    <p style={styles.statValue}>{loading ? <LoadingDots /> : totalCount}</p>
                   </div>
                   <div style={styles.stat}>
                     <p style={styles.statLabel}>Filtered results</p>
-                    <p style={styles.statValue}>{filteredCount}</p>
-                    <p style={styles.cardText}>Showing {filteredCount === 0 ? 0 : transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredCount)} of {filteredCount}</p>
+                    <p style={styles.statValue}>{loading ? <LoadingDots /> : filteredCount}</p>
+                    <p style={styles.cardText}>{loading ? <LoadingDots /> : `Showing ${filteredCount === 0 ? 0 : transactionHistoryStartIndex + 1}-${Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredCount)} of ${filteredCount}`}</p>
                   </div>
                   <div style={styles.stat}>
                     <p style={styles.statLabel}>Completed</p>
-                    <p style={styles.statValue}>{completedCount}</p>
+                    <p style={styles.statValue}>{loading ? <LoadingDots /> : completedCount}</p>
                     <p style={styles.cardText}>Completed in the current filter set</p>
                   </div>
                 </div>

@@ -6,6 +6,8 @@ import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './Hybr
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
+import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 
 type SecurityDevice = {
   id?: string;
@@ -235,12 +237,22 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   button: {
     border: 'none',
-    background: 'transparent',
-    color: theme.text,
-    padding: '0',
-    fontWeight: 800,
+    borderRadius: '999px',
+    padding: '11px 16px',
+    fontWeight: 700,
     cursor: 'pointer',
+    minWidth: '108px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    background: theme.primary,
+    color: theme.textInverse,
     fontSize: '0.98rem',
+  },
+  dangerButton: {
+    background: theme.danger,
+    color: theme.textInverse,
   },
   mutedButton: {
     color: theme.textMuted,
@@ -260,6 +272,8 @@ const SecurityPage = () => {
   const styles = getStyles(theme);
 
   const [uid, setUid] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -296,6 +310,8 @@ const SecurityPage = () => {
         setLogins(data.logins ?? []);
       } catch {
         setStatus({ kind: 'error', text: 'Unable to load security details right now.' });
+      } finally {
+        setLoading(false);
       }
 
       try {
@@ -304,6 +320,8 @@ const SecurityPage = () => {
         setCurrentTokenHash(data.currentTokenHash ?? '');
       } catch {
         // sessions fetch is non-critical
+      } finally {
+        setSessionsLoading(false);
       }
     };
     void load();
@@ -451,16 +469,16 @@ const SecurityPage = () => {
             <div style={styles.rowList}>
               <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>
-                <p style={styles.rowValue}>{uid || 'Not set yet'}</p>
+                <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
                 <div style={styles.control}>
                   <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
-                  <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? 'Saving...' : 'Save UID'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Save UID'}</button>
                 </div>
               </div>
 
               <div style={styles.row}>
                 <p style={styles.rowLabel}><Smartphone size={16} /> Devices logged in</p>
-                <p style={styles.rowValue}>{currentLoginCount} active device{currentLoginCount === 1 ? '' : 's'} &bull; max 2 per account</p>
+                <p style={styles.rowValue}>{sessionsLoading ? <LoadingDots /> : `${currentLoginCount} active device${currentLoginCount === 1 ? '' : 's'} • max 2 per account`}</p>
                 <div style={styles.tableWrap}>
                   <table style={styles.table}>
                     <thead>
@@ -476,7 +494,9 @@ const SecurityPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {sessions.length === 0 ? (
+                      {sessionsLoading ? (
+                        <tr><td style={styles.tableCell} colSpan={8}><LoadingDots /></td></tr>
+                      ) : sessions.length === 0 ? (
                         <tr>
                           <td style={styles.tableCell} colSpan={8}>
                             <p style={styles.note}>No active sessions found.</p>
@@ -520,7 +540,7 @@ const SecurityPage = () => {
                               ) : (
                                 <button
                                   type="button"
-                                  style={{ ...styles.button, color: theme.danger, display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                                  style={{ ...styles.button, ...styles.dangerButton, fontSize: '0.85rem' }}
                                   onClick={() => void handleRemoveSession(session.tokenHash)}
                                   disabled={removingSession === session.tokenHash}
                                 >
@@ -544,7 +564,7 @@ const SecurityPage = () => {
                   <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
                   <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
-                  <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? 'Saving...' : 'Change password'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change password'}</button>
                 </div>
               </div>
 
@@ -555,7 +575,7 @@ const SecurityPage = () => {
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
                   <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
-                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? 'Saving...' : 'Save security code'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save security code'}</button>
                 </div>
               </div>
 
