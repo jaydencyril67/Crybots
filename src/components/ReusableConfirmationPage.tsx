@@ -3,16 +3,28 @@ import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './Hybr
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
 
+export type ConfirmationDetail = {
+  label: React.ReactNode;
+  value: React.ReactNode;
+};
+
 type ReusableConfirmationPageProps = {
-  eyebrow: string;
-  title: string;
-  description: string;
+  eyebrow?: React.ReactNode;
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  context?: React.ReactNode;
+  details?: ConfirmationDetail[];
+  warning?: React.ReactNode;
+  warningTone?: 'warning' | 'danger';
   statusLabel?: React.ReactNode;
   statusTone?: 'neutral' | 'warning' | 'danger' | 'success';
   primaryActionLabel: React.ReactNode;
+  processingActionLabel?: React.ReactNode;
   secondaryActionLabel?: React.ReactNode;
   onPrimaryAction: () => void;
   onSecondaryAction?: () => void;
+  isProcessing?: boolean;
+  primaryActionDisabled?: boolean;
   footerNote?: React.ReactNode;
   children?: React.ReactNode;
 };
@@ -63,6 +75,47 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.textMuted,
     maxWidth: '68ch',
   },
+  context: {
+    margin: '18px 0 0',
+    padding: '14px 16px',
+    borderRadius: '16px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
+    color: theme.text,
+    lineHeight: 1.6,
+  },
+  details: {
+    display: 'grid',
+    gap: '10px',
+    margin: '18px 0 0',
+  },
+  detail: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    gap: '18px',
+    padding: '12px 0',
+    borderBottom: `1px solid ${theme.borderGlass}`,
+  },
+  detailLabel: {
+    color: theme.textMuted,
+    fontSize: '0.84rem',
+    fontWeight: 700,
+  },
+  detailValue: {
+    color: theme.text,
+    fontSize: '0.9rem',
+    fontWeight: 800,
+    textAlign: 'right' as const,
+  },
+  warning: {
+    margin: '18px 0 0',
+    padding: '14px 16px',
+    borderRadius: '16px',
+    border: `1px solid ${theme.borderGlass}`,
+    lineHeight: 1.6,
+    fontSize: '0.9rem',
+    fontWeight: 700,
+  },
   status: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -88,6 +141,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.textInverse,
     background: theme.danger,
   },
+  disabledButton: {
+    opacity: 0.6,
+    cursor: 'not-allowed',
+  },
   secondaryButton: {
     borderRadius: '18px',
     padding: '12px 18px',
@@ -109,16 +166,28 @@ const getStatusStyle = (theme: typeof HYBRID_THEME_TOKENS.dark, tone: ReusableCo
   color: tone === 'danger' ? theme.danger : tone === 'warning' ? theme.warning : tone === 'success' ? theme.success : theme.text,
 });
 
+const getWarningStyle = (theme: typeof HYBRID_THEME_TOKENS.dark, tone: ReusableConfirmationPageProps['warningTone']) => ({
+  color: tone === 'danger' ? theme.danger : theme.warning,
+  background: tone === 'danger' ? theme.primarySoft : theme.surfaceMuted,
+});
+
 const ReusableConfirmationPage = ({
   eyebrow,
   title,
   description,
+  context,
+  details,
+  warning,
+  warningTone = 'warning',
   statusLabel,
   statusTone = 'neutral',
   primaryActionLabel,
+  processingActionLabel,
   secondaryActionLabel,
   onPrimaryAction,
   onSecondaryAction,
+  isProcessing = false,
+  primaryActionDisabled = false,
   footerNote,
   children,
 }: ReusableConfirmationPageProps) => {
@@ -133,17 +202,34 @@ const ReusableConfirmationPage = ({
           
           <div style={styles.content}>
             <section style={styles.card}>
-              <p style={styles.eyebrow}>{eyebrow}</p>
+              {eyebrow ? <p style={styles.eyebrow}>{eyebrow}</p> : null}
               <h1 style={styles.title}>{title}</h1>
-              <p style={styles.description}>{description}</p>
+              {description ? <div style={styles.description}>{description}</div> : null}
+              {context ? <div style={styles.context}>{context}</div> : null}
+              {details?.length ? (
+                <div style={styles.details}>
+                  {details.map((detail, index) => (
+                    <div key={index} style={styles.detail}>
+                      <span style={styles.detailLabel}>{detail.label}</span>
+                      <span style={styles.detailValue}>{detail.value}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              {warning ? <div style={{ ...styles.warning, ...getWarningStyle(theme, warningTone) }}>{warning}</div> : null}
               {statusLabel ? <div style={{ ...styles.status, ...getStatusStyle(theme, statusTone) }}>{statusLabel}</div> : null}
               {children}
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.primaryButton} onClick={onPrimaryAction}>
-                  {primaryActionLabel}
+                <button
+                  type="button"
+                  style={{ ...styles.primaryButton, ...(isProcessing || primaryActionDisabled ? styles.disabledButton : {}) }}
+                  onClick={onPrimaryAction}
+                  disabled={isProcessing || primaryActionDisabled}
+                >
+                  {isProcessing ? processingActionLabel || 'Processing…' : primaryActionLabel}
                 </button>
                 {secondaryActionLabel && onSecondaryAction ? (
-                  <button type="button" style={styles.secondaryButton} onClick={onSecondaryAction}>
+                  <button type="button" style={styles.secondaryButton} onClick={onSecondaryAction} disabled={isProcessing}>
                     {secondaryActionLabel}
                   </button>
                 ) : null}

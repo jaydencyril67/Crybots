@@ -9,6 +9,7 @@ import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
+import ReusableConfirmationPage from './ReusableConfirmationPage';
 
 type SecurityDevice = {
   id?: string;
@@ -290,6 +291,7 @@ const SecurityPage = () => {
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
   const [twoFactorUri, setTwoFactorUri] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [showDelete2faConfirmation, setShowDelete2faConfirmation] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
   const [savingUid, setSavingUid] = useState(false);
@@ -460,7 +462,10 @@ const SecurityPage = () => {
 
   const handleDelete2fa = async () => {
     if (!twoFactorCode.trim()) return showStatus('error', 'Enter the current 6-digit authenticator code to delete 2FA.');
-    if (!window.confirm('Delete all 2FA data from your account? You will need to set it up again later.')) return;
+    setShowDelete2faConfirmation(true);
+  };
+
+  const confirmDelete2fa = async () => {
     setSaving2fa(true);
     try {
       await api.delete('/api/settings/2fa', { data: { code: twoFactorCode.trim() } });
@@ -475,6 +480,7 @@ const SecurityPage = () => {
       showStatus('error', error?.response?.data?.message || 'Unable to delete 2FA data.');
     } finally {
       setSaving2fa(false);
+      setShowDelete2faConfirmation(false);
     }
   };
 
@@ -507,6 +513,33 @@ const SecurityPage = () => {
       setSavingSecurityQuestion(false);
     }
   };
+
+  if (showDelete2faConfirmation) {
+    return (
+      <ReusableConfirmationPage
+        eyebrow="Two-factor authentication"
+        title="Remove 2FA from this account?"
+        description="You are about to delete the authenticator configuration currently protecting your account."
+        context="After removal, this authenticator will no longer be required when you sign in. You can set up 2FA again later."
+        details={[
+          { label: 'Verification required', value: 'Current authenticator code' },
+          { label: 'Account protection', value: '2FA will be disabled' },
+          { label: 'Recovery', value: 'Available by setting it up again' },
+        ]}
+        warning="This removes all saved two-factor authentication data. Make sure you have another way to secure your account before continuing."
+        warningTone="danger"
+        statusLabel="This action cannot be undone."
+        statusTone="danger"
+        primaryActionLabel="Delete 2FA data"
+        processingActionLabel="Deleting 2FA data…"
+        secondaryActionLabel="Go back"
+        onPrimaryAction={() => { void confirmDelete2fa(); }}
+        onSecondaryAction={() => setShowDelete2faConfirmation(false)}
+        isProcessing={saving2fa}
+        footerNote="Your current authenticator code will be submitted only when you confirm."
+      />
+    );
+  }
 
   return (
     <HybridTheme mode={themeMode}>
