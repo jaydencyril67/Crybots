@@ -116,7 +116,7 @@ const styles = {
   },
   tableCell: {
     padding: '14px',
-    borderBottom: `1px solid ${theme.borderSubtle}`,
+    borderBottom: `1px solid ${theme.border}`,
     verticalAlign: 'top' as const,
   },
   tableRow: {
@@ -218,7 +218,7 @@ const styles = {
   input: {
     width: '100%',
     border: 'none',
-    borderBottom: `1px solid ${theme.borderSubtle}`,
+    borderBottom: `1px solid ${theme.border}`,
     background: 'transparent',
     color: theme.text,
     padding: '12px 0',

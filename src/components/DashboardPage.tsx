@@ -242,7 +242,7 @@ const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never :
     gap: '8px',
     padding: '10px 14px',
     borderRadius: '999px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.border}`, 
     background: theme.surfaceGlass,
     color: theme.highlight,
     fontSize: '13px',
@@ -259,7 +259,7 @@ const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never :
     gap: '14px',
     padding: '12px 14px',
     borderRadius: '20px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.border}`, 
     background: theme.surfaceGlass,
   },
   coinBadge: {
@@ -300,7 +300,7 @@ const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never :
   },
   adviceCard: {
     borderRadius: '22px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.border}`,
     background: theme.surfaceGlass,
     padding: '16px',
     display: 'grid',
@@ -350,7 +350,7 @@ const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never :
     padding: '14px 16px',
     borderRadius: '18px',
     background: theme.surfaceGlass,
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.border}`,
   },
   featureText: {
     margin: 0,
@@ -367,7 +367,7 @@ const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never :
   pill: {
     padding: '10px 14px',
     borderRadius: '999px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.border}`,
     background: theme.surfaceGlass,
     color: theme.text,
     fontSize: '13px',
