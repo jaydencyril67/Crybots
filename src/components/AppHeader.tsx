@@ -196,7 +196,11 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     if (!isPublicPage && localStorage.getItem('token')) navigate('/notifications');
   };
 
-  const headerStyle = isAlertActive
+  // Keep the edge visible while unread notifications exist, and pulse it for
+  // ten seconds whenever a realtime notification arrives. This also covers
+  // notifications created before the header/SSE connection finished loading.
+  const isEdgeLit = isAlertActive || unreadCount > 0;
+  const headerStyle = isEdgeLit
     ? {
       ...styles.header,
       borderColor: '#ef4444',
