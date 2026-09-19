@@ -1,7 +1,8 @@
 import React from 'react';
 import AppHeader from './AppHeader';
-import HybridTheme from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import { useAppTheme } from './AppTheme';
 
 type ReusableConfirmationPageProps = {
   eyebrow: string;
@@ -17,19 +18,14 @@ type ReusableConfirmationPageProps = {
   children?: React.ReactNode;
 };
 
-const toneStyles = {
-  neutral: { borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#ffffff' },
-  warning: { borderColor: 'rgba(245,158,11,0.32)', background: 'rgba(245,158,11,0.12)', color: '#fbbf24' },
-  danger: { borderColor: 'rgba(239,68,68,0.32)', background: 'rgba(239,68,68,0.12)', color: '#f87171' },
-  success: { borderColor: 'rgba(34,197,94,0.32)', background: 'rgba(34,197,94,0.12)', color: '#4ade80' },
-};
-
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
+    background: theme.background,
+    color: theme.text,
   },
   shell: {
     width: '100%',
@@ -44,10 +40,7 @@ const styles = {
     marginTop: '18px',
   },
   card: {
-    borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-    padding: '18px',
+    ...createHybridCardStyles(theme).card,
   },
   eyebrow: {
     margin: 0,
@@ -55,27 +48,28 @@ const styles = {
     fontWeight: 800,
     letterSpacing: '0.14em',
     textTransform: 'uppercase' as const,
-    color: '#f87171',
+    color: theme.danger,
   },
   title: {
     margin: '10px 0 0',
     fontSize: '1.9rem',
     fontWeight: 900,
     letterSpacing: '-0.03em',
-    color: '#ffffff',
+    color: theme.text,
   },
   description: {
     margin: '10px 0 0',
     fontSize: '0.95rem',
     lineHeight: 1.7,
-    color: '#b3b3b3',
+    color: theme.textMuted,
     maxWidth: '68ch',
   },
   status: {
     display: 'inline-flex',
     alignItems: 'center',
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
     padding: '10px 14px',
     fontSize: '0.85rem',
     fontWeight: 800,
@@ -89,28 +83,32 @@ const styles = {
   primaryButton: {
     borderRadius: '18px',
     padding: '12px 18px',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: `1px solid ${theme.borderGlass}`,
     cursor: 'pointer',
     fontWeight: 800,
-    color: '#ffffff',
-    background: 'rgba(239,68,68,0.92)',
+    color: theme.textInverse,
+    background: theme.danger,
   },
   secondaryButton: {
     borderRadius: '18px',
     padding: '12px 18px',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: `1px solid ${theme.borderGlass}`,
     cursor: 'pointer',
     fontWeight: 800,
-    color: '#ffffff',
-    background: 'rgba(255,255,255,0.05)',
+    color: theme.text,
+    background: theme.surfaceGlass,
   },
   footerNote: {
     margin: '14px 0 0',
     fontSize: '0.88rem',
     lineHeight: 1.6,
-    color: '#a3a3a3',
+    color: theme.textMuted,
   },
-};
+});
+
+const getStatusStyle = (theme: typeof HYBRID_THEME_TOKENS.dark, tone: ReusableConfirmationPageProps['statusTone']) => ({
+  color: tone === 'danger' ? theme.danger : tone === 'warning' ? theme.warning : tone === 'success' ? theme.success : theme.text,
+});
 
 const ReusableConfirmationPage = ({
   eyebrow,
@@ -125,10 +123,12 @@ const ReusableConfirmationPage = ({
   footerNote,
   children,
 }: ReusableConfirmationPageProps) => {
-  const statusStyle = toneStyles[statusTone];
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
 
   return (
-    <HybridTheme>
+    <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />
@@ -137,7 +137,7 @@ const ReusableConfirmationPage = ({
               <p style={styles.eyebrow}>{eyebrow}</p>
               <h1 style={styles.title}>{title}</h1>
               <p style={styles.description}>{description}</p>
-              {statusLabel ? <div style={{ ...styles.status, ...statusStyle }}>{statusLabel}</div> : null}
+              {statusLabel ? <div style={{ ...styles.status, ...getStatusStyle(theme, statusTone) }}>{statusLabel}</div> : null}
               {children}
               <div style={styles.buttonRow}>
                 <button type="button" style={styles.primaryButton} onClick={onPrimaryAction}>
