@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import LoadingDots from './LoadingDots';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 import { Helmet } from 'react-helmet-async';
 import {
   Activity,
@@ -75,11 +77,11 @@ const advicePool: AdviceCard[] = [
   { title: 'Think in scenarios', text: 'Before entering, know what you’ll do if price breaks up, fails, or goes sideways.', accent: '#fb7185', icon: <Coins /> },
 ];
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
+    background: theme.background,
+    color: theme.text,
     overflow: 'hidden',
     paddingBottom: '112px',
   },
@@ -92,8 +94,7 @@ const styles = {
   glow: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      'radial-gradient(circle at top left, rgba(34,211,238,0.16), transparent 30%), radial-gradient(circle at 82% 18%, rgba(168,85,247,0.18), transparent 26%), radial-gradient(circle at 70% 70%, rgba(59,130,246,0.12), transparent 24%), linear-gradient(180deg, #09111f 0%, #050816 100%)',
+    background: theme.background,
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -101,7 +102,7 @@ const styles = {
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: 'linear-gradient(to right, transparent, rgba(34,211,238,0.6), transparent)',
+    background: theme.borderStrong,
   },
   header: {
     display: 'flex',
@@ -123,12 +124,12 @@ const styles = {
     fontWeight: 800,
     letterSpacing: '0.28em',
     textTransform: 'uppercase' as const,
-    color: '#67e8f9',
+    color: theme.highlight,
   },
   brandSub: {
     margin: '8px 0 0',
     fontSize: '14px',
-    color: 'rgba(255,255,255,0.62)',
+    color: theme.textMuted,
   },
   headerMeta: {
     display: 'flex',
@@ -136,9 +137,9 @@ const styles = {
     gap: '10px',
     padding: '12px 16px',
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
-    color: 'rgba(255,255,255,0.82)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
+    color: theme.text,
     fontSize: '13px',
     fontWeight: 600,
   },
@@ -152,15 +153,15 @@ const styles = {
   },
   heroCard: {
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
     padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
   },
   greeting: {
     margin: 0,
-    color: '#67e8f9',
+    color: theme.highlight,
     fontSize: '12px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.24em',
@@ -174,7 +175,7 @@ const styles = {
   },
   titleAccent: {
     display: 'block',
-    background: 'linear-gradient(90deg, #67e8f9 0%, #ffffff 45%, #c4b5fd 100%)',
+    background: theme.gradientText,
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
     color: 'transparent',
@@ -182,7 +183,7 @@ const styles = {
   lead: {
     margin: '14px 0 0',
     maxWidth: '62ch',
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
     fontSize: '15px',
     lineHeight: 1.75,
   },
@@ -194,13 +195,13 @@ const styles = {
   },
   metricCard: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(8,12,24,0.72)',
+    border: `1px solid ${theme.borderSubtle}`,
+    background: theme.surfaceGlass,
     padding: '16px',
   },
   metricLabel: {
     margin: '10px 0 0',
-    color: 'rgba(255,255,255,0.64)',
+    color: theme.textMuted,
     fontSize: '12px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.16em',
@@ -213,8 +214,8 @@ const styles = {
   },
   panel: {
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
     padding: 'clamp(22px, 4vw, 30px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
@@ -246,7 +247,7 @@ const styles = {
     borderRadius: '999px',
     border: '1px solid rgba(34,211,238,0.16)',
     background: 'rgba(34,211,238,0.08)',
-    color: '#67e8f9',
+    color: theme.highlight,
     fontSize: '13px',
     fontWeight: 700,
   },
@@ -272,7 +273,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 800,
-    color: '#ffffff',
+    color: theme.text,
   },
   coinName: {
     margin: 0,
@@ -369,9 +370,9 @@ const styles = {
   pill: {
     padding: '10px 14px',
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(255,255,255,0.04)',
-    color: 'rgba(255,255,255,0.8)',
+    border: `1px solid ${theme.borderSubtle}`,
+    background: theme.surfaceGlass,
+    color: theme.text,
     fontSize: '13px',
     fontWeight: 600,
   },
@@ -384,13 +385,13 @@ const styles = {
   icon: {
     width: '20px',
     height: '20px',
-    color: '#67e8f9',
+    color: theme.highlight,
     flexShrink: 0,
   },
   iconLarge: {
     width: '24px',
     height: '24px',
-    color: '#67e8f9',
+    color: theme.highlight,
     flexShrink: 0,
   },
 };
@@ -451,9 +452,12 @@ const getSeededAdviceOrder = (hourKey: number) => {
 const getAdviceIndex = () => {
   const hourKey = Math.floor(Date.now() / (1000 * 60 * 60));
   return getSeededAdviceOrder(hourKey)[hourKey % advicePool.length];
-};
+});
 
 const DashboardPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const [hourlyAdviceIndex, setHourlyAdviceIndex] = useState(getAdviceIndex());
   const [authName, setAuthName] = useState('');
   const [isAuthNameLoaded, setIsAuthNameLoaded] = useState(false);
@@ -539,16 +543,17 @@ const DashboardPage = () => {
   }, []);
 
   return (
-    <>
-      <Helmet>
-        <title>KingsHall Exchange | Dashboard</title>
-      </Helmet>
-      <main style={styles.page}>
-        <div style={styles.shell}>
-          <div style={styles.glow} />
-          <div style={styles.topLine} />
+    <HybridTheme>
+      <>
+        <Helmet>
+          <title>KingsHall Exchange | Dashboard</title>
+        </Helmet>
+        <main style={styles.page}>
+          <div style={styles.shell}>
+            <div style={styles.glow} />
+            <div style={styles.topLine} />
 
-          <AppHeader />
+            <AppHeader />
 
           {!(isAuthNameLoaded && isCoinsLoaded) ? (
             <div style={{ padding: '18px 0 10px', display: 'flex', justifyContent: 'center' }}>
@@ -621,7 +626,12 @@ const DashboardPage = () => {
                     </div>
                     <div>
                       <p style={styles.coinPrice}>{formatCurrency(coin.price)}</p>
-                      <p style={{ ...styles.coinChange, color: coin.change24h >= 0 ? '#4ade80' : '#fb7185' }}>
+                      <p
+                        style={{
+                          ...styles.coinChange,
+                          color: coin.change24h >= 0 ? theme.success : theme.danger,
+                        }}
+                      >
                         {formatChange(coin.change24h)} 24h
                       </p>
                     </div>
@@ -693,8 +703,9 @@ const DashboardPage = () => {
           </div>
         </div>
         <NowBar />
-      </main>
-    </>
+        </main>
+      </>
+    </HybridTheme>
   );
 };
 
