@@ -531,6 +531,7 @@ const SettingsPage = () => {
       window.localStorage.removeItem('token');
       window.localStorage.removeItem('user');
       window.localStorage.removeItem('kingshall_user');
+      window.dispatchEvent(new Event('ke:force-logout'));
       navigate('/');
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to deactivate your account.');

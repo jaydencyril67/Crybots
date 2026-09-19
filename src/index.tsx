@@ -228,6 +228,7 @@ const RouteTransition = () => {
   }, [displayedRouteKey, isAuthenticated]);
 
   const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
+  const isProtectedPage = ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
 
   return (
     <div
@@ -245,7 +246,7 @@ const RouteTransition = () => {
           paddingTop: '80px',
         }}
       >
-        <AppHeader isPublicPage={!showNowBar} />
+        <AppHeader isPublicPage={!isProtectedPage} />
         {appContent}
       </div>
       {showNowBar ? <NowBar /> : null}

@@ -14,6 +14,7 @@ const clearAuthData = () => {
   localStorage.removeItem('kingshall_user');
   localStorage.removeItem('firstName');
   localStorage.removeItem('kingshall_first_name');
+  window.dispatchEvent(new Event('ke:force-logout'));
 };
 
 export const forceLogout = () => {

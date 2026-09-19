@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import KHLogo from './KHLogo';
+import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
 
 const styles = {
   header: {
@@ -93,21 +94,29 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   useEffect(() => {
     let mounted = true;
 
+    const clearNotificationState = () => {
+      previousCount.current = 0;
+      hasLoadedCount.current = false;
+      window.clearTimeout(alertTimeout.current);
+      if (mounted) {
+        setUnreadCount(0);
+        setIsAlertActive(false);
+      }
+    };
+
     const loadUnreadCount = async () => {
-      if (!localStorage.getItem('token')) {
-        previousCount.current = 0;
-        hasLoadedCount.current = false;
-        window.clearTimeout(alertTimeout.current);
-        if (mounted) {
-          setUnreadCount(0);
-          setIsAlertActive(false);
-        }
+      if (isPublicPage || !localStorage.getItem('token')) {
+        clearNotificationState();
         return;
       }
       try {
         const response = await api.get('/api/notifications');
+        if (!mounted || isPublicPage || !localStorage.getItem('token')) {
+          clearNotificationState();
+          return;
+        }
         const nextCount = Number(response.data?.unreadCount || 0);
-        if (mounted && hasLoadedCount.current && nextCount > previousCount.current) {
+        if (hasLoadedCount.current && nextCount > previousCount.current) {
           setIsAlertActive(true);
           window.clearTimeout(alertTimeout.current);
           alertTimeout.current = window.setTimeout(() => setIsAlertActive(false), 10000);
@@ -122,22 +131,39 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       }
     };
 
-    void loadUnreadCount();
+    if (isPublicPage) {
+      clearNotificationState();
+    } else {
+      void loadUnreadCount();
+    }
     const interval = window.setInterval(() => { void loadUnreadCount(); }, 15000);
+    window.addEventListener('ke:force-logout', clearNotificationState);
+    const handleNotificationsChanged = () => { void loadUnreadCount(); };
+    const handleAuthChanged = () => { void loadUnreadCount(); };
+    window.addEventListener(NOTIFICATIONS_CHANGED_EVENT, handleNotificationsChanged);
+    window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
     return () => {
       mounted = false;
       window.clearInterval(interval);
       window.clearTimeout(alertTimeout.current);
       alertTimeout.current = undefined;
+      window.removeEventListener('ke:force-logout', clearNotificationState);
+      window.removeEventListener(NOTIFICATIONS_CHANGED_EVENT, handleNotificationsChanged);
+      window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
     };
-  }, []);
+  }, [isPublicPage]);
 
   const handleHeaderClick = () => {
-    if (!isPublicPage) navigate('/notifications');
+    if (!isPublicPage && localStorage.getItem('token')) navigate('/notifications');
   };
 
   const headerStyle = isAlertActive
-    ? { ...styles.header, borderColor: theme.danger, animation: 'ke-header-alert 1.2s ease-in-out infinite' }
+    ? {
+      ...styles.header,
+      borderColor: '#ef4444',
+      boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 22px rgba(239, 68, 68, 0.85), 0 14px 30px rgba(0,0,0,0.24)',
+      animation: 'ke-header-alert 1.2s ease-in-out infinite',
+    }
     : styles.header;
   const headerTitle = unreadCount > 0
     ? `${unreadCount} New Notification${unreadCount === 1 ? '' : 's'}`
@@ -154,7 +180,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
 
   return (
     <>
-      <style>{`@keyframes ke-header-alert { 0%, 100% { opacity: 1; } 50% { opacity: 0.72; } }`}</style>
+      <style>{`@keyframes ke-header-alert {
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 22px rgba(239, 68, 68, 0.85), 0 14px 30px rgba(0,0,0,0.24); }
+        50% { opacity: 0.72; box-shadow: 0 0 0 3px rgba(239, 68, 68, 1), 0 0 34px rgba(239, 68, 68, 1), 0 14px 30px rgba(0,0,0,0.24); }
+      }`}</style>
       <header
         style={headerStyle}
         onClick={handleHeaderClick}
