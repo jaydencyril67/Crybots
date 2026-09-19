@@ -401,6 +401,8 @@ const SigninPage = () => {
   };
   const [form, setForm] = useState<FormState>(initialState);
   const [method, setMethod] = useState<SignInMethod | null>(null);
+  const [passkeyOptions, setPasskeyOptions] = useState<any | null>(null);
+  const [passkeyAvailable, setPasskeyAvailable] = useState(false);
   const [step, setStep] = useState<'email' | 'method' | 'password' | 'code'>('email');
   const [submitError, setSubmitError] = useState('');
   
@@ -445,9 +447,23 @@ const SigninPage = () => {
 
   const signInDisabled = isSubmitting || !canContinue || (step === 'code' && (!form.code.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6))) || (step === 'password' && (!form.password.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6)));
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!canContinue) return;
-    setStep('method');
+    setSubmitError('');
+    setIsSubmitting(true);
+    try {
+      const { data: options } = await api.post('/api/webauthn/authenticate/options', { email: form.email.trim().toLowerCase() });
+      const hasPasskey = Array.isArray(options.allowCredentials) && options.allowCredentials.length > 0;
+      setPasskeyAvailable(hasPasskey);
+      setPasskeyOptions(hasPasskey ? options : null);
+      setStep('method');
+    } catch {
+      setPasskeyAvailable(false);
+      setPasskeyOptions(null);
+      setStep('method');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -489,7 +505,10 @@ const SigninPage = () => {
       }
       setIsSubmitting(true);
       try {
-        const { data: options } = await api.post('/api/webauthn/authenticate/options', { email: form.email });
+        const options = passkeyOptions || (await api.post('/api/webauthn/authenticate/options', { email: form.email.trim().toLowerCase() })).data;
+        if (!Array.isArray(options.allowCredentials) || options.allowCredentials.length === 0) {
+          throw new Error('Biometric security is not enabled for this account.');
+        }
         const assertion = await authenticateWithPasskey(options);
         const response = await api.post('/api/webauthn/authenticate/verify', assertion);
         if (response.data?.token) {
@@ -724,7 +743,7 @@ const SigninPage = () => {
 
                   {step === 'method' ? (
                     <div style={styles.optionGrid}>
-                      {signInMethods.map((option) => (
+                      {signInMethods.filter((option) => option.value !== 'passkey' || passkeyAvailable).map((option) => (
                         <button key={option.value} type="button" style={{ ...hybridStyles.optionCard, ...(method === option.value ? hybridStyles.optionCardActive : {}) }} onClick={() => handleStartSignin(option.value)} disabled={isSubmitting}>
                           {isSubmitting && method === option.value ? <InlineLoadingDots /> : <KeyRound size={20} />}
                           <div>
