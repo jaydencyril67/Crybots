@@ -266,6 +266,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     lineHeight: 1.6,
     color: theme.textMuted,
   },
+  inlineError: {
+    margin: '6px 0 0',
+    color: theme.danger,
+    fontSize: '0.82rem',
+    lineHeight: 1.4,
+  },
   passwordChecklist: {
     margin: '10px 0 0',
     padding: 0,
