@@ -21,6 +21,7 @@ import SecurityPage from './components/SecurityPage';
 import WithdrawalsPage from './components/WithdrawalsPage';
 import TransferPage from './components/TransferPage';
 import TransactionHistoryPage from './components/TransactionHistoryPage';
+import NotificationsPage from './components/NotificationsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppHeader from './components/AppHeader';
@@ -65,6 +66,7 @@ const getRouteKey = () => {
   if (pathname === '/transfer' || hash === '#/transfer') return 'transfer';
   if (pathname === '/deposit' || hash === '#/deposit') return 'deposit';
   if (pathname === '/transactions' || hash === '#/transactions') return 'transactions';
+  if (pathname === '/notifications' || hash === '#/notifications') return 'notifications';
   return 'landing';
 };
 
@@ -87,6 +89,7 @@ const routeToKey = (path: string) => {
   if (path === '/transfer' || path === '#/transfer') return 'transfer';
   if (path === '/deposit' || path === '#/deposit') return 'deposit';
   if (path === '/transactions' || path === '#/transactions') return 'transactions';
+  if (path === '/notifications' || path === '#/notifications') return 'notifications';
   return 'landing';
 };
 
@@ -215,15 +218,16 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'transfer') return <ProtectedRoute><TransferPage /></ProtectedRoute>;
     if (displayedRouteKey === 'deposit') return <ProtectedRoute><DepositPage /></ProtectedRoute>;
     if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'notifications') return <ProtectedRoute><NotificationsPage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions';
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
 
   return (
     <div
