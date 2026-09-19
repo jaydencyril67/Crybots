@@ -40,6 +40,12 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
   },
+  rightArtwork: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
   brandCopy: {
     minWidth: 0,
     display: 'flex',
@@ -157,6 +163,10 @@ const AppHeader = () => {
         <div style={styles.brandCopy}>
           <p style={styles.brandTitle}>{headerTitle}</p>
         </div>
+      </div>
+
+      <div style={styles.rightArtwork}>
+        <KHLogo size={30} label="KingsHall" />
       </div>
 
       </header>
