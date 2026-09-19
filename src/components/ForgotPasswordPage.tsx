@@ -711,7 +711,7 @@ const ForgotPasswordPage = () => {
                     onClick={goNext}
                     disabled={loading}
                   >
-                    {loading ? 'Please wait...' : step === steps.length - 1 ? 'Reset password' : 'Continue'}
+                    {loading ? <InlineLoadingDots /> : step === steps.length - 1 ? 'Reset password' : 'Continue'}
                   </button>
                 </div>
               </div>

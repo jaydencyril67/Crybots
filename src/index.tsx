@@ -245,7 +245,7 @@ const RouteTransition = () => {
           paddingTop: '80px',
         }}
       >
-        <AppHeader />
+        <AppHeader isPublicPage={!showNowBar} />
         {appContent}
       </div>
       {showNowBar ? <NowBar /> : null}

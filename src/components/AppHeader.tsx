@@ -77,7 +77,11 @@ const styles = {
   },
 };
 
-const AppHeader = () => {
+type AppHeaderProps = {
+  isPublicPage?: boolean;
+};
+
+const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [unreadCount, setUnreadCount] = useState(0);
@@ -128,7 +132,9 @@ const AppHeader = () => {
     };
   }, []);
 
-  const handleHeaderClick = () => navigate('/notifications');
+  const handleHeaderClick = () => {
+    if (!isPublicPage) navigate('/notifications');
+  };
 
   const headerStyle = isAlertActive
     ? { ...styles.header, borderColor: theme.danger, animation: 'ke-header-alert 1.2s ease-in-out infinite' }

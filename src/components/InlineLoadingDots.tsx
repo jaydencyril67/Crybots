@@ -21,11 +21,14 @@ const styles = {
 
 const InlineLoadingDots = () => {
   return (
-    <span style={styles.wrap} aria-hidden="true">
+    <>
+      <style>{`@keyframes inline-loading-dots { 0%, 100% { opacity: 0.35; } 33% { opacity: 1; } 66% { opacity: 0.35; } }`}</style>
+      <span style={styles.wrap} aria-hidden="true">
       <span style={{ ...styles.dot, ...styles.activeDot }} />
       <span style={styles.dot} />
       <span style={styles.dot} />
-    </span>
+      </span>
+    </>
   );
 };
 

@@ -719,16 +719,11 @@ const SignupPage = () => {
                         cursor: canContinue && !isSubmitting ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      {isSubmitting ? 'Finishing...' : 'Finish'} <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} />
+                      {isSubmitting ? <InlineLoadingDots /> : <>Finish <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} /></>}
                     </button>
                   )}
                 </div>
 
-                {isSubmitting ? (
-                  <div style={{ marginTop: '18px', color: theme.textMuted }}>
-                    <InlineLoadingDots />
-                  </div>
-                ) : null}
                 {submitError ? <NotificationBanner tone="warning" title="One more step" message={submitError} /> : null}
                 <div style={styles.switchRow}>
                   <span style={styles.switchText}>Have an account?</span>
