@@ -214,6 +214,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     rowList: { gap: '10px', gridTemplateColumns: '1fr', width: '100%', minWidth: 0 },
     row: { padding: '14px', borderRadius: '16px', maxWidth: '100%' },
     control: { gridTemplateColumns: '1fr', gap: '8px', width: '100%', minWidth: 0 },
+    buttonRow: { gridTemplateColumns: '1fr', gap: '8px', width: '100%', minWidth: 0 },
     button: { width: '100%' },
     input: { width: '100%' },
     sectionTitle: { fontSize: '1.15rem' },
