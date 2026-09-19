@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppHeader from './AppHeader';
-import HybridTheme from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
 import api from '../api/axios';
