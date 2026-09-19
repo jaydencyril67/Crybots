@@ -104,7 +104,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   buttonPrimary: {
     borderRadius: '999px',
     background: theme.surfaceGlass,
-    color: theme.text,
+    color: HYBRID_THEME_TOKENS.dark.text,
     border: `1px solid ${theme.border}`,
     padding: '12px 20px',
     fontWeight: 800,
