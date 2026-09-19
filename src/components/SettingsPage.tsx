@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS, type HybridThemeMode } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import CodeInput from './CodeInput';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: 'rgba(56, 189, 248, 0.9)' },
@@ -827,11 +828,11 @@ const SettingsPage = () => {
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>Security code</span>
-                    <input style={styles.input} type="password" value={securityCode} onChange={(event) => { setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="6 digits" />
+                    <CodeInput length={6} value={securityCode} onChange={(value) => { setSecurityCode(value); setActiveCard('securityCode'); }} type="password" color={theme.text} borderColor={theme.borderGlass} background={theme.surfaceMuted} />
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>Confirm security code</span>
-                    <input style={styles.input} type="password" value={securityCodeConfirm} onChange={(event) => { setSecurityCodeConfirm(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="Repeat 6 digits" />
+                    <CodeInput length={6} value={securityCodeConfirm} onChange={(value) => { setSecurityCodeConfirm(value); setActiveCard('securityCode'); }} type="password" color={theme.text} borderColor={theme.borderGlass} background={theme.surfaceMuted} />
                   </label>
                 </div>
                 {((activeCard === 'securityCode' && securityCodeValid) || securityCodeCardSaving) ? (

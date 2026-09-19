@@ -5,6 +5,7 @@ import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
+import CodeInput from './CodeInput';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -266,7 +267,7 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
-                  <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit code' : 'Set security code to continue'} disabled={!securityCodeBound} />
+                  <CodeInput length={6} value={securityCode} onChange={setSecurityCode} type="password" color={theme.text} borderColor={theme.border} background={theme.surface} disabled={!securityCodeBound} />
                 </div>
                 <div style={styles.buttonRow}>
                   <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>

@@ -4,6 +4,7 @@ import { navigate } from '../utils/navigate';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
+import CodeInput from './CodeInput';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
@@ -111,13 +112,7 @@ const PendingDeletionPage = () => {
           <label style={{ fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: theme.textMuted }} htmlFor="pending-deletion-code">
             Email verification code
           </label>
-          <input
-            id="pending-deletion-code"
-            value={code}
-            onChange={(event) => setCode(event.target.value)}
-            placeholder="Enter the 6-digit code"
-            style={{ width: '100%', boxSizing: 'border-box', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, padding: '12px 14px', outline: 'none' }}
-          />
+          <CodeInput id="pending-deletion-code" length={6} value={code} onChange={setCode} autoComplete="one-time-code" color={theme.text} borderColor={theme.borderGlass} background={theme.surfaceGlass} />
         </div>
       </div>
     </ReusableConfirmationPage>

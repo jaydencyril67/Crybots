@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import InlineLoadingDots from './InlineLoadingDots';
+import CodeInput from './CodeInput';
 import NotificationBanner from './NotificationBanner';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -638,15 +639,19 @@ const ForgotPasswordPage = () => {
               <div style={styles.form}>
                 <label style={styles.field} htmlFor={currentStep.field}>
                   <span style={styles.label}>{currentStep.title}</span>
-                  <input
-                    id={currentStep.field}
-                    type={currentStep.field === 'password' ? 'password' : 'text'}
-                    placeholder={currentStep.placeholder}
-                    value={form[currentStep.field]}
-                    onChange={(event) => updateField(currentStep.field, event.target.value)}
-                    style={hybridStyles.input}
-                    autoComplete={currentStep.field === 'email' ? 'email' : currentStep.field === 'password' ? 'new-password' : 'off'}
-                  />
+                  {currentStep.field === 'code' ? (
+                    <CodeInput id="code" length={3} value={form.code} onChange={(value) => updateField('code', value)} autoComplete="one-time-code" color={theme.text} borderColor={theme.borderGlass} background={theme.surfaceElevated} />
+                  ) : (
+                    <input
+                      id={currentStep.field}
+                      type={currentStep.field === 'password' ? 'password' : 'text'}
+                      placeholder={currentStep.placeholder}
+                      value={form[currentStep.field]}
+                      onChange={(event) => updateField(currentStep.field, event.target.value)}
+                      style={hybridStyles.input}
+                      autoComplete={currentStep.field === 'email' ? 'email' : currentStep.field === 'password' ? 'new-password' : 'off'}
+                    />
+                  )}
                 </label>
 
                 {currentStep.field === 'password' ? (

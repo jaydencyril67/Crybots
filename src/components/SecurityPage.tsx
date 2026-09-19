@@ -8,6 +8,7 @@ import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
+import CodeInput from './CodeInput';
 
 type SecurityDevice = {
   id?: string;
@@ -573,8 +574,8 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
                 <div style={styles.control}>
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
-                  <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
-                  <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
+                  <CodeInput length={6} value={securityCode} onChange={setSecurityCode} type="password" color={theme.text} borderColor={theme.borderStrong} background={theme.surfaceMuted} />
+                  <CodeInput length={6} value={confirmSecurityCode} onChange={setConfirmSecurityCode} type="password" color={theme.text} borderColor={theme.borderStrong} background={theme.surfaceMuted} />
                   <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save security code'}</button>
                 </div>
               </div>
