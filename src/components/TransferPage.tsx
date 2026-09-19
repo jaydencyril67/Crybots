@@ -6,6 +6,8 @@ import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 type TransferRecipientCheckResponse = {
   exists?: boolean;
@@ -29,11 +31,11 @@ type TransferDetailsResponse = {
   };
 };
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#fff',
+    background: theme.background,
+    color: theme.text,
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
@@ -46,12 +48,8 @@ const styles = {
     boxSizing: 'border-box' as const,
   },
   panel: {
+    ...createHybridCardStyles(theme).card,
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
-    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
     overflow: 'hidden',
   },
   body: {
@@ -65,9 +63,7 @@ const styles = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' as const,
   },
   card: {
-    borderRadius: '20px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
+    ...createHybridCardStyles(theme).panel,
     padding: '16px',
   },
   cardTitle: {
@@ -78,28 +74,33 @@ const styles = {
     alignItems: 'center',
     gap: '10px',
     lineHeight: 1.3,
+    color: theme.text,
   },
   cardText: {
     margin: '10px 0 0',
-    color: '#9db0d1',
+    color: theme.textMuted,
     lineHeight: 1.6,
     fontSize: '0.9rem',
   },
   field: { display: 'grid', gap: '8px' },
-  label: { fontSize: '0.78rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
-  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
-  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
-  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)', transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
-  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
-  helper: { fontSize: '0.82rem', color: '#95a8ca', lineHeight: 1.5 },
+  label: { fontSize: '0.78rem', fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '12px 14px', outline: 'none', fontSize: '0.9rem' },
+  selectTrigger: { border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceElevated, border: `1px solid ${theme.border}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
+  selectOption: { border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
+  helper: { fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
-  button: { borderRadius: '999px', border: '1px solid rgba(255,255,255,0.12)', padding: '12px 16px', fontWeight: 700, color: '#fff', background: 'rgba(255,255,255,0.06)', cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
-  primaryButton: { background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)', border: 'none' },
+  button: { borderRadius: '999px', border: `1px solid ${theme.border}`, padding: '12px 16px', fontWeight: 700, color: theme.text, background: theme.surfaceGlass, cursor: 'pointer', width: '100%', maxWidth: '100%', fontSize: '0.92rem' },
+  primaryButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
   narrowCard: { minWidth: 0 },
   summaryRow: { display: 'grid', gap: '12px' },
-};
+});
 
 const TransferPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
+
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [recipientMethod, setRecipientMethod] = useState<'uid' | 'email'>('uid');
@@ -202,7 +203,8 @@ const TransferPage = () => {
   if (loading) return null;
 
   return (
-    <div style={styles.page}>
+    <HybridTheme mode={themeMode}>
+      <div style={styles.page}>
       <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />
@@ -281,9 +283,10 @@ const TransferPage = () => {
             </div>
           </div>
         </div>
+        </div>
         <NowBar />
       </div>
-    </div>
+    </HybridTheme>
   );
 };
 

@@ -17,30 +17,31 @@ import {
 } from 'lucide-react';
 import AppHeader from './AppHeader';
 import NowBar from './NowBar';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 type MarketCoin = {
   symbol: string;
   name: string;
   price: number;
   change24h: number;
-  color: string;
   id: string;
 };
 
 type AdviceCard = {
   title: string;
   text: string;
-  accent: string;
+  accent: 'primary' | 'success' | 'warning' | 'danger' | 'highlight';
   icon: React.ReactNode;
 };
 
 const marketCoins: MarketCoin[] = [
-  { symbol: 'BTC', name: 'Bitcoin', price: 0, change24h: 0, color: '#f59e0b', id: 'bitcoin' },
-  { symbol: 'ETH', name: 'Ethereum', price: 0, change24h: 0, color: '#a78bfa', id: 'ethereum' },
-  { symbol: 'BNB', name: 'BNB', price: 0, change24h: 0, color: '#fbbf24', id: 'binancecoin' },
-  { symbol: 'SOL', name: 'Solana', price: 0, change24h: 0, color: '#22d3ee', id: 'solana' },
-  { symbol: 'XRP', name: 'XRP', price: 0, change24h: 0, color: '#60a5fa', id: 'ripple' },
-  { symbol: 'ADA', name: 'Cardano', price: 0, change24h: 0, color: '#38bdf8', id: 'cardano' },
+  { symbol: 'BTC', name: 'Bitcoin', price: 0, change24h: 0, id: 'bitcoin' },
+  { symbol: 'ETH', name: 'Ethereum', price: 0, change24h: 0, id: 'ethereum' },
+  { symbol: 'BNB', name: 'BNB', price: 0, change24h: 0, id: 'binancecoin' },
+  { symbol: 'SOL', name: 'Solana', price: 0, change24h: 0, id: 'solana' },
+  { symbol: 'XRP', name: 'XRP', price: 0, change24h: 0, id: 'ripple' },
+  { symbol: 'ADA', name: 'Cardano', price: 0, change24h: 0, id: 'cardano' },
 ];
 
 const marketCoinIds = marketCoins.map((coin) => coin.id).join(',');
@@ -53,33 +54,33 @@ const dashboardMetrics = [
 ];
 
 const advicePool: AdviceCard[] = [
-  { title: 'Keep dry powder ready', text: 'Keep some capital liquid so you can act when a clean setup appears instead of chasing noise.', accent: '#22c55e', icon: <ShieldCheck /> },
-  { title: 'Scale into positions', text: 'Split entries into smaller tranches to reduce emotional pressure and avoid chasing one perfect price.', accent: '#38bdf8', icon: <TrendingUp /> },
-  { title: 'Watch volatility windows', text: 'Big moves often cluster around major session opens, macro data, or exchange-specific catalysts.', accent: '#c084fc', icon: <CandlestickChart /> },
-  { title: 'Protect winners', text: 'When a trade works in your favor, reduce some risk so gains can compound more steadily.', accent: '#f59e0b', icon: <Coins /> },
-  { title: 'Prefer high-conviction setups', text: 'Take fewer ideas, but make sure each one has a strong thesis, a clear invalidation point, and real upside.', accent: '#67e8f9', icon: <Activity /> },
-  { title: 'Respect the trend', text: 'Momentum often pays more than prediction. When the trend is strong, patience can be more profitable than fighting it.', accent: '#fb7185', icon: <ArrowUpRight /> },
-  { title: 'Manage risk first', text: 'A good trade idea still needs a hard stop and a clear sizing plan before capital goes in.', accent: '#f97316', icon: <ShieldCheck /> },
-  { title: 'Let winners breathe', text: 'If your plan allows it, avoid cutting strong trades too early just because the next candle looks noisy.', accent: '#14b8a6', icon: <TrendingUp /> },
-  { title: 'Track catalysts', text: 'Earnings, unlocks, and macro headlines can matter more than short-term chart patterns.', accent: '#8b5cf6', icon: <CandlestickChart /> },
-  { title: 'Avoid revenge trading', text: 'If you take a loss, step back and reset before forcing the next position.', accent: '#ef4444', icon: <Coins /> },
-  { title: 'Use confirmations', text: 'Wait for structure, volume, or momentum to confirm the thesis before committing size.', accent: '#06b6d4', icon: <Activity /> },
-  { title: 'Keep a watchlist', text: 'A focused watchlist helps you spot the best setups without staring at everything at once.', accent: '#f43f5e', icon: <ArrowUpRight /> },
-  { title: 'Be patient with entries', text: 'The market gives multiple chances. Sometimes the best move is waiting for your zone.', accent: '#84cc16', icon: <ShieldCheck /> },
-  { title: 'Take profits in layers', text: 'Partial exits can balance upside participation with real gains in the account.', accent: '#0ea5e9', icon: <TrendingUp /> },
-  { title: 'Favor quality over quantity', text: 'One well-planned trade can beat several random ones that were taken out of boredom.', accent: '#d946ef', icon: <Coins /> },
-  { title: 'Use structure breaks', text: 'When price breaks important levels, let the market prove the move before you size up.', accent: '#f59e0b', icon: <CandlestickChart /> },
-  { title: 'Stay consistent', text: 'The edge comes from repeating the same risk rules, not from trying to catch every move.', accent: '#22c55e', icon: <Activity /> },
-  { title: 'Avoid crowded entries', text: 'If everyone is talking about the same move, wait for a better risk-reward window.', accent: '#38bdf8', icon: <ArrowUpRight /> },
-  { title: 'Protect mental capital', text: 'If the day gets choppy, stepping away can preserve both focus and discipline.', accent: '#c084fc', icon: <ShieldCheck /> },
-  { title: 'Think in scenarios', text: 'Before entering, know what you’ll do if price breaks up, fails, or goes sideways.', accent: '#fb7185', icon: <Coins /> },
+  { title: 'Keep dry powder ready', text: 'Keep some capital liquid so you can act when a clean setup appears instead of chasing noise.', accent: 'success', icon: <ShieldCheck /> },
+  { title: 'Scale into positions', text: 'Split entries into smaller tranches to reduce emotional pressure and avoid chasing one perfect price.', accent: 'primary', icon: <TrendingUp /> },
+  { title: 'Watch volatility windows', text: 'Big moves often cluster around major session opens, macro data, or exchange-specific catalysts.', accent: 'highlight', icon: <CandlestickChart /> },
+  { title: 'Protect winners', text: 'When a trade works in your favor, reduce some risk so gains can compound more steadily.', accent: 'warning', icon: <Coins /> },
+  { title: 'Prefer high-conviction setups', text: 'Take fewer ideas, but make sure each one has a strong thesis, a clear invalidation point, and real upside.', accent: 'primary', icon: <Activity /> },
+  { title: 'Respect the trend', text: 'Momentum often pays more than prediction. When the trend is strong, patience can be more profitable than fighting it.', accent: 'danger', icon: <ArrowUpRight /> },
+  { title: 'Manage risk first', text: 'A good trade idea still needs a hard stop and a clear sizing plan before capital goes in.', accent: 'warning', icon: <ShieldCheck /> },
+  { title: 'Let winners breathe', text: 'If your plan allows it, avoid cutting strong trades too early just because the next candle looks noisy.', accent: 'success', icon: <TrendingUp /> },
+  { title: 'Track catalysts', text: 'Earnings, unlocks, and macro headlines can matter more than short-term chart patterns.', accent: 'highlight', icon: <CandlestickChart /> },
+  { title: 'Avoid revenge trading', text: 'If you take a loss, step back and reset before forcing the next position.', accent: 'danger', icon: <Coins /> },
+  { title: 'Use confirmations', text: 'Wait for structure, volume, or momentum to confirm the thesis before committing size.', accent: 'primary', icon: <Activity /> },
+  { title: 'Keep a watchlist', text: 'A focused watchlist helps you spot the best setups without staring at everything at once.', accent: 'danger', icon: <ArrowUpRight /> },
+  { title: 'Be patient with entries', text: 'The market gives multiple chances. Sometimes the best move is waiting for your zone.', accent: 'success', icon: <ShieldCheck /> },
+  { title: 'Take profits in layers', text: 'Partial exits can balance upside participation with real gains in the account.', accent: 'primary', icon: <TrendingUp /> },
+  { title: 'Favor quality over quantity', text: 'One well-planned trade can beat several random ones that were taken out of boredom.', accent: 'highlight', icon: <Coins /> },
+  { title: 'Use structure breaks', text: 'When price breaks important levels, let the market prove the move before you size up.', accent: 'warning', icon: <CandlestickChart /> },
+  { title: 'Stay consistent', text: 'The edge comes from repeating the same risk rules, not from trying to catch every move.', accent: 'success', icon: <Activity /> },
+  { title: 'Avoid crowded entries', text: 'If everyone is talking about the same move, wait for a better risk-reward window.', accent: 'primary', icon: <ArrowUpRight /> },
+  { title: 'Protect mental capital', text: 'If the day gets choppy, stepping away can preserve both focus and discipline.', accent: 'highlight', icon: <ShieldCheck /> },
+  { title: 'Think in scenarios', text: 'Before entering, know what you’ll do if price breaks up, fails, or goes sideways.', accent: 'danger', icon: <Coins /> },
 ];
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
+    background: theme.background,
+    color: theme.text,
     overflow: 'hidden',
     paddingBottom: '112px',
   },
@@ -92,8 +93,7 @@ const styles = {
   glow: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      'radial-gradient(circle at top left, rgba(34,211,238,0.16), transparent 30%), radial-gradient(circle at 82% 18%, rgba(168,85,247,0.18), transparent 26%), radial-gradient(circle at 70% 70%, rgba(59,130,246,0.12), transparent 24%), linear-gradient(180deg, #09111f 0%, #050816 100%)',
+    background: theme.surfaceShine,
     pointerEvents: 'none' as const,
   },
   topLine: {
@@ -101,7 +101,7 @@ const styles = {
     insetInline: 0,
     top: 0,
     height: '1px',
-    background: 'linear-gradient(to right, transparent, rgba(34,211,238,0.6), transparent)',
+    background: theme.primarySoft,
   },
   header: {
     display: 'flex',
@@ -123,12 +123,12 @@ const styles = {
     fontWeight: 800,
     letterSpacing: '0.28em',
     textTransform: 'uppercase' as const,
-    color: '#67e8f9',
+    color: theme.primary,
   },
   brandSub: {
     margin: '8px 0 0',
     fontSize: '14px',
-    color: 'rgba(255,255,255,0.62)',
+    color: theme.textMuted,
   },
   headerMeta: {
     display: 'flex',
@@ -136,9 +136,9 @@ const styles = {
     gap: '10px',
     padding: '12px 16px',
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
-    color: 'rgba(255,255,255,0.82)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
+    color: theme.text,
     fontSize: '13px',
     fontWeight: 600,
   },
@@ -152,15 +152,15 @@ const styles = {
   },
   heroCard: {
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.05)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
     padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
   },
   greeting: {
     margin: 0,
-    color: '#67e8f9',
+    color: theme.primary,
     fontSize: '12px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.24em',
@@ -174,15 +174,12 @@ const styles = {
   },
   titleAccent: {
     display: 'block',
-    background: 'linear-gradient(90deg, #67e8f9 0%, #ffffff 45%, #c4b5fd 100%)',
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: 'transparent',
+    color: theme.primary,
   },
   lead: {
     margin: '14px 0 0',
     maxWidth: '62ch',
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
     fontSize: '15px',
     lineHeight: 1.75,
   },
@@ -194,13 +191,13 @@ const styles = {
   },
   metricCard: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(8,12,24,0.72)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceElevated,
     padding: '16px',
   },
   metricLabel: {
     margin: '10px 0 0',
-    color: 'rgba(255,255,255,0.64)',
+    color: theme.textMuted,
     fontSize: '12px',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.16em',
@@ -213,8 +210,8 @@ const styles = {
   },
   panel: {
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
     padding: 'clamp(22px, 4vw, 30px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
@@ -226,7 +223,7 @@ const styles = {
   },
   panelSub: {
     margin: '8px 0 0',
-    color: 'rgba(255,255,255,0.66)',
+    color: theme.textMuted,
     lineHeight: 1.6,
     fontSize: '14px',
   },
@@ -244,9 +241,9 @@ const styles = {
     gap: '8px',
     padding: '10px 14px',
     borderRadius: '999px',
-    border: '1px solid rgba(34,211,238,0.16)',
-    background: 'rgba(34,211,238,0.08)',
-    color: '#67e8f9',
+    border: `1px solid ${theme.borderStrong}`,
+    background: theme.primarySoft,
+    color: theme.primary,
     fontSize: '13px',
     fontWeight: 700,
   },
@@ -261,8 +258,8 @@ const styles = {
     gap: '14px',
     padding: '12px 14px',
     borderRadius: '20px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(9,14,28,0.72)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceElevated,
   },
   coinBadge: {
     width: '44px',
@@ -272,7 +269,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 800,
-    color: '#ffffff',
+    color: theme.textInverse,
   },
   coinName: {
     margin: 0,
@@ -281,7 +278,7 @@ const styles = {
   },
   coinSymbol: {
     margin: '4px 0 0',
-    color: 'rgba(255,255,255,0.6)',
+    color: theme.textMuted,
     fontSize: '13px',
   },
   coinPrice: {
@@ -302,8 +299,8 @@ const styles = {
   },
   adviceCard: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(8,12,24,0.74)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceElevated,
     padding: '16px',
     display: 'grid',
     gap: '12px',
@@ -328,7 +325,7 @@ const styles = {
   },
   adviceText: {
     margin: 0,
-    color: 'rgba(255,255,255,0.7)',
+    color: theme.textMuted,
     lineHeight: 1.7,
     fontSize: '14px',
   },
@@ -351,14 +348,14 @@ const styles = {
     alignItems: 'flex-start',
     padding: '14px 16px',
     borderRadius: '18px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: theme.surfaceMuted,
+    border: `1px solid ${theme.border}`,
   },
   featureText: {
     margin: 0,
     fontSize: '14px',
     lineHeight: 1.65,
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
   },
   badgeRow: {
     display: 'flex',
@@ -369,31 +366,31 @@ const styles = {
   pill: {
     padding: '10px 14px',
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(255,255,255,0.04)',
-    color: 'rgba(255,255,255,0.8)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceMuted,
+    color: theme.text,
     fontSize: '13px',
     fontWeight: 600,
   },
   footerNote: {
     margin: '18px 0 0',
-    color: 'rgba(255,255,255,0.55)',
+    color: theme.textMuted,
     fontSize: '13px',
     lineHeight: 1.6,
   },
   icon: {
     width: '20px',
     height: '20px',
-    color: '#67e8f9',
+    color: theme.primary,
     flexShrink: 0,
   },
   iconLarge: {
     width: '24px',
     height: '24px',
-    color: '#67e8f9',
+    color: theme.primary,
     flexShrink: 0,
   },
-};
+});
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-US', {
@@ -459,6 +456,9 @@ const DashboardPage = () => {
   const [isAuthNameLoaded, setIsAuthNameLoaded] = useState(false);
   const [liveCoins, setLiveCoins] = useState(marketCoins);
   const [isCoinsLoaded, setIsCoinsLoaded] = useState(false);
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
 
   useEffect(() => {
     const adviceTimer = window.setInterval(() => setHourlyAdviceIndex(getAdviceIndex()), 60_000);
@@ -539,7 +539,7 @@ const DashboardPage = () => {
   }, []);
 
   return (
-    <>
+    <HybridTheme mode={themeMode}>
       <Helmet>
         <title>KingsHall Exchange | Dashboard</title>
       </Helmet>
@@ -612,7 +612,7 @@ const DashboardPage = () => {
               <div style={styles.coinGrid}>
                 {liveCoins.map((coin) => (
                   <article key={coin.symbol} style={styles.coinCard}>
-                    <div style={{ ...styles.coinBadge, background: `linear-gradient(135deg, ${coin.color}, rgba(255,255,255,0.15))` }}>
+                    <div style={{ ...styles.coinBadge, background: theme.primarySoft }}>
                       {coin.symbol.slice(0, 1)}
                     </div>
                     <div>
@@ -621,7 +621,7 @@ const DashboardPage = () => {
                     </div>
                     <div>
                       <p style={styles.coinPrice}>{formatCurrency(coin.price)}</p>
-                      <p style={{ ...styles.coinChange, color: coin.change24h >= 0 ? '#4ade80' : '#fb7185' }}>
+                      <p style={{ ...styles.coinChange, color: coin.change24h >= 0 ? theme.success : theme.danger }}>
                         {formatChange(coin.change24h)} 24h
                       </p>
                     </div>
@@ -671,7 +671,7 @@ const DashboardPage = () => {
               <div style={styles.adviceWrap}>
                 <article style={styles.adviceCard}>
                   <div style={styles.adviceTop}>
-                    <div style={{ ...styles.adviceIconWrap, background: `${advice.accent}22`, color: advice.accent }}>
+                    <div style={{ ...styles.adviceIconWrap, background: theme.primarySoft, color: theme[advice.accent] }}>
                       {advice.icon}
                     </div>
                     <div>
@@ -694,7 +694,7 @@ const DashboardPage = () => {
         </div>
         <NowBar />
       </main>
-    </>
+    </HybridTheme>
   );
 };
 

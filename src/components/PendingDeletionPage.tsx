@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 type DeletionStatus = {
   scheduled: boolean;
@@ -21,6 +23,8 @@ const formatDaysLeft = (daysLeft?: number) => {
 };
 
 const PendingDeletionPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
   const recoveryUntil = useMemo(() => window.localStorage.getItem('pendingDeletionRecoveryUntil') || '', []);
   const [status, setStatus] = useState<DeletionStatus | null>(null);
   const [code, setCode] = useState('');
@@ -99,7 +103,7 @@ const PendingDeletionPage = () => {
     >
       <div style={{ display: 'grid', gap: '10px', marginTop: '18px' }}>
         <div style={{ display: 'grid', gap: '6px' }}>
-          <label style={{ fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8f8f8f' }} htmlFor="pending-deletion-code">
+          <label style={{ fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: theme.textMuted }} htmlFor="pending-deletion-code">
             Email verification code
           </label>
           <input
@@ -107,7 +111,7 @@ const PendingDeletionPage = () => {
             value={code}
             onChange={(event) => setCode(event.target.value)}
             placeholder="Enter the 6-digit code"
-            style={{ width: '100%', boxSizing: 'border-box', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: '#ffffff', padding: '12px 14px', outline: 'none' }}
+            style={{ width: '100%', boxSizing: 'border-box', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, padding: '12px 14px', outline: 'none' }}
           />
         </div>
       </div>
