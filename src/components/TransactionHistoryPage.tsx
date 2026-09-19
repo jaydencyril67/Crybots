@@ -5,6 +5,8 @@ import AppHeader from './AppHeader';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
@@ -30,11 +32,11 @@ type TransactionHistoryResponse = {
 };
 
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ 
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#fff',
+    background: theme.background,
+    color: theme.text,
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
@@ -48,17 +50,16 @@ const styles = {
   },
   panel: {
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
-    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-    overflow: 'hidden',
+    display: 'grid',
+    gap: '16px',
+    width: '100%',
   },
   body: {
-    padding: 'clamp(18px, 4vw, 30px)',
+    padding: 'clamp(0px, 2vw, 30px) 0 0',
     display: 'grid',
-    gap: '18px',
+    gap: '16px',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   header: {
     display: 'grid',
@@ -76,7 +77,7 @@ const styles = {
   },
   subtitle: {
     margin: 0,
-    color: '#9db0d1',
+    color: theme.textMuted,
     lineHeight: 1.6,
     fontSize: '0.94rem',
     maxWidth: '72ch',
@@ -88,8 +89,8 @@ const styles = {
   },
   card: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
     padding: '18px',
   },
   cardTitle: {
@@ -103,7 +104,7 @@ const styles = {
   },
   cardText: {
     margin: '10px 0 0',
-    color: '#9db0d1',
+    color: theme.textMuted,
     lineHeight: 1.6,
     fontSize: '0.92rem',
   },
@@ -114,18 +115,18 @@ const styles = {
     marginTop: '14px',
   },
   field: { display: 'grid', gap: '8px' },
-  label: { fontSize: '0.82rem', fontWeight: 700, color: '#d7e2f8', textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
-  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
-  select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(7,12,24,0.92)', color: '#fff', padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
-  selectTrigger: { border: '1px solid rgba(148, 163, 184, 0.18)', background: 'rgba(2, 6, 23, 0.65)', color: '#fff', borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
-  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: 'rgba(2, 6, 23, 0.92)', border: '1px solid rgba(148, 163, 184, 0.18)', transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
-  selectOption: { border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)', color: '#fff', borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
+  label: { fontSize: '0.82rem', fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
+  select: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, padding: '13px 14px', outline: 'none', fontSize: '0.92rem' },
+  selectTrigger: { border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceElevated, border: `1px solid ${theme.border}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
+  selectOption: { border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   tableWrap: {
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.03)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceMuted,
   },
   table: {
     width: '100%',
@@ -137,14 +138,14 @@ const styles = {
     fontSize: '0.8rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
-    color: '#b9c8e3',
+    color: theme.textMuted,
     padding: '16px 18px',
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.03)',
+    borderBottom: `1px solid ${theme.border}`,
+    background: theme.surfaceMuted,
   },
   td: {
     padding: '16px 18px',
-    borderBottom: '1px solid rgba(255,255,255,0.06)',
+    borderBottom: `1px solid ${theme.border}`,
     verticalAlign: 'top' as const,
     fontSize: '0.92rem',
   },
@@ -153,7 +154,7 @@ const styles = {
     gap: '4px',
   },
   muted: {
-    color: '#9db0d1',
+    color: theme.textMuted,
     fontSize: '0.86rem',
     lineHeight: 1.5,
   },
@@ -174,13 +175,13 @@ const styles = {
   },
   stat: {
     borderRadius: '18px',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: theme.surfaceGlass,
+    border: `1px solid ${theme.border}`,
     padding: '14px',
   },
   statLabel: {
     margin: 0,
-    color: '#9db0d1',
+    color: theme.textMuted,
     fontSize: '0.82rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
@@ -193,19 +194,19 @@ const styles = {
   message: {
     padding: '14px 16px',
     borderRadius: '16px',
-    border: '1px solid rgba(250,204,21,0.22)',
-    background: 'rgba(250,204,21,0.12)',
-    color: '#fde68a',
+    border: `1px solid ${theme.warning}`,
+    background: theme.primarySoft,
+    color: theme.warning,
     fontSize: '0.92rem',
     lineHeight: 1.5,
   },
   loadingState: {
     padding: '24px 18px',
     textAlign: 'center' as const,
-    color: '#9db0d1',
+    color: theme.textMuted,
     fontSize: '0.92rem',
   },
-};
+});
 
 const getTypeLabel = (type: Exclude<TransactionType, 'all'>) => {
   if (type === 'deposit') return 'Deposit';
@@ -216,13 +217,17 @@ const getTypeLabel = (type: Exclude<TransactionType, 'all'>) => {
   return 'Reward';
 };
 
-const getStatusStyle = (status: Exclude<TransactionStatus, 'all'>) => {
-  if (status === 'completed') return { background: 'rgba(34,197,94,0.14)', color: '#86efac', border: '1px solid rgba(34,197,94,0.22)' };
-  if (status === 'pending') return { background: 'rgba(250,204,21,0.14)', color: '#fde68a', border: '1px solid rgba(250,204,21,0.22)' };
-  return { background: 'rgba(239,68,68,0.14)', color: '#fca5a5', border: '1px solid rgba(239,68,68,0.22)' };
+const getStatusStyle = (theme: typeof HYBRID_THEME_TOKENS.dark, status: Exclude<TransactionStatus, 'all'>) => {
+  if (status === 'completed') return { background: theme.primarySoft, color: theme.success, border: `1px solid ${theme.success}` };
+  if (status === 'pending') return { background: theme.primarySoft, color: theme.warning, border: `1px solid ${theme.warning}` };
+  return { background: theme.primarySoft, color: theme.danger, border: `1px solid ${theme.danger}` };
 };
 
 const TransactionHistoryPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
+
   const [typeFilter, setTypeFilter] = useState<TransactionType>('all');
   const [directionFilter, setDirectionFilter] = useState<TransactionDirection>('all');
   const [statusFilter, setStatusFilter] = useState<TransactionStatus>('all');
@@ -338,7 +343,8 @@ const TransactionHistoryPage = () => {
   }, [transactionHistoryCurrentPage, transactionHistoryTotalPages]);
 
   return (
-    <div style={styles.page}>
+    <HybridTheme mode={themeMode}>
+      <div style={styles.page}>
       <Helmet><title>Transaction History | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />
@@ -352,7 +358,7 @@ const TransactionHistoryPage = () => {
                   <div style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Search</span>
                     <div style={{ position: 'relative' }}>
-                      <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#7c8fb0' }} />
+                      <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: theme.textMuted }} />
                       <input style={{ ...styles.input, paddingLeft: '42px' }} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search reference, title, or user" />
                     </div>
                   </div>
@@ -481,14 +487,14 @@ const TransactionHistoryPage = () => {
                       <td style={styles.loadingState} colSpan={6}><LoadingDots /></td>
                     </tr>
                   ) : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => (
-                    <tr key={transaction.id} style={{ background: index % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
+                    <tr key={transaction.id} style={{ background: index % 2 === 0 ? theme.surfaceShine : 'transparent' }}>
                       <td style={styles.td}>
                         <div style={styles.meta}>
                           <strong>{transaction.title}</strong>
                         </div>
                       </td>
                       <td style={styles.td}><strong>{transaction.amount}</strong></td>
-                      <td style={styles.td}><span style={{ ...styles.pill, ...getStatusStyle(transaction.status) }}>{transaction.status}</span></td>
+                      <td style={styles.td}><span style={{ ...styles.pill, ...getStatusStyle(theme, transaction.status) }}>{transaction.status}</span></td>
                       <td style={styles.td}>{transaction.date}</td>
                       <td style={styles.td}>{transaction.time}</td>
                       <td style={styles.td}>
@@ -503,7 +509,7 @@ const TransactionHistoryPage = () => {
                       <td style={styles.td} colSpan={6}>
                         <div style={{ padding: '18px 0', textAlign: 'center' }}>
                           <p style={{ margin: 0, fontWeight: 800 }}>No transactions found</p>
-                          <p style={{ margin: '8px 0 0', color: '#9db0d1', fontSize: '0.92rem' }}>Try changing your search, type, or status filters.</p>
+                          <p style={{ margin: '8px 0 0', color: theme.textMuted, fontSize: '0.92rem' }}>Try changing your search, type, or status filters.</p>
                         </div>
                       </td>
                     </tr>
@@ -528,7 +534,7 @@ const TransactionHistoryPage = () => {
                           style={{
                             ...styles.selectOption,
                             minWidth: '42px',
-                            ...(item === transactionHistoryCurrentPage ? { borderColor: 'rgba(125,211,252,0.55)', background: 'rgba(125,211,252,0.12)' } : {}),
+                            ...(item === transactionHistoryCurrentPage ? { borderColor: theme.primary, background: theme.primarySoft } : {}),
                           }}
                           onClick={() => setTransactionHistoryPage(item)}
                         >
@@ -545,7 +551,8 @@ const TransactionHistoryPage = () => {
         </div>
         <NowBar />
       </div>
-    </div>
+      </div>
+    </HybridTheme>
   );
 };
 
