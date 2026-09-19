@@ -882,6 +882,7 @@ const SettingsPage = () => {
 
           </div>
         </div>
+        </div>
         <NowBar />
       </div>
     </HybridTheme>
