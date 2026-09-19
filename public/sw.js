@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kingshall-pwa-v6-crown-node';
+const CACHE_NAME = 'kingshall-pwa-v7-muted-crown';
 const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/ke-icon.svg'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
