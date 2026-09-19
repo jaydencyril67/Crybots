@@ -26,7 +26,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   title: { margin: '8px 0 0', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 900, letterSpacing: '-0.03em' },
   description: { margin: '8px 0 24px', color: theme.textMuted, lineHeight: 1.65 },
   calendarHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '18px' },
-  month: { margin: 0, fontSize: '1.12rem', fontWeight: 900 },
+  pickerGroup: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flex: 1 },
+  picker: { borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', font: 'inherit', fontWeight: 800, cursor: 'pointer', outline: 'none' },
   navButton: { width: '38px', height: '38px', borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontSize: '1.35rem', lineHeight: 1 },
   weekdays: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', marginBottom: '6px' },
   weekday: { color: theme.textMuted, fontSize: '0.7rem', fontWeight: 800, textAlign: 'center' as const, textTransform: 'uppercase' as const },
@@ -83,8 +84,13 @@ const ReusableDatePage = ({
 
   const isAllowed = (dateKey: string) => (!min || dateKey >= min.split('T')[0]) && (!max || dateKey <= max.split('T')[0]);
   const outputValue = resolvedMode === 'datetime-local' ? `${selectedDate}T${time}` : resolvedMode === 'time' ? time : selectedDate;
-  const monthLabel = month.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  const monthOptions = Array.from({ length: 12 }, (_, index) => new Date(2000, index, 1).toLocaleDateString(undefined, { month: 'long' }));
+  const currentYear = new Date().getFullYear();
+  const minYear = min ? Number(min.slice(0, 4)) : currentYear - 120;
+  const maxYear = max ? Number(max.slice(0, 4)) : currentYear + 20;
+  const yearOptions = Array.from({ length: Math.max(1, maxYear - minYear + 1) }, (_, index) => minYear + index);
   const changeMonth = (offset: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + offset, 1));
+  const changePickerMonth = (nextMonth: number, nextYear = month.getFullYear()) => setMonth(new Date(nextYear, nextMonth, 1));
 
   return (
     <HybridTheme mode={themeMode}>
@@ -98,7 +104,14 @@ const ReusableDatePage = ({
               <>
                 <div style={styles.calendarHeader}>
                   <button type="button" aria-label="Previous month" style={styles.navButton} onClick={() => changeMonth(-1)}>‹</button>
-                  <h2 style={styles.month}>{monthLabel}</h2>
+                  <div style={styles.pickerGroup}>
+                    <select aria-label="Choose month" style={styles.picker} value={month.getMonth()} onChange={(event) => changePickerMonth(Number(event.target.value))}>
+                      {monthOptions.map((monthName, index) => <option key={monthName} value={index}>{monthName}</option>)}
+                    </select>
+                    <select aria-label="Choose year" style={styles.picker} value={month.getFullYear()} onChange={(event) => changePickerMonth(month.getMonth(), Number(event.target.value))}>
+                      {yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
+                    </select>
+                  </div>
                   <button type="button" aria-label="Next month" style={styles.navButton} onClick={() => changeMonth(1)}>›</button>
                 </div>
                 <div style={styles.weekdays}>{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => <span key={day} style={styles.weekday}>{day}</span>)}</div>
