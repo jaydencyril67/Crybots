@@ -188,7 +188,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   note: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontSize: '0.9rem',
     lineHeight: 1.7,
   },
@@ -237,21 +237,21 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   button: {
     border: 'none',
     background: 'transparent',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     padding: '0',
     fontWeight: 800,
     cursor: 'pointer',
     fontSize: '0.98rem',
   },
   mutedButton: {
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontWeight: 700,
   },
   status: {
     margin: '8px 0 0',
     fontSize: '0.9rem',
     lineHeight: 1.6,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
   },
 };
 
