@@ -28,7 +28,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   calendarHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginBottom: '18px' },
   pickerGroup: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', flex: 1 },
   pickerWrapper: { position: 'relative' as const },
-  picker: { borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', font: 'inherit', fontWeight: 800, cursor: 'pointer', outline: 'none', minWidth: '116px', textAlign: 'left' as const },
+  picker: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', font: 'inherit', fontWeight: 800, cursor: 'pointer', outline: 'none', minWidth: '116px', textAlign: 'left' as const },
+  pickerLabel: { minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const },
+  pickerArrow: { marginLeft: 'auto', paddingLeft: '12px', flexShrink: 0, lineHeight: 1 },
   pickerMenu: { position: 'absolute' as const, zIndex: 10, top: 'calc(100% + 6px)', left: 0, right: 0, maxHeight: '240px', overflowY: 'auto' as const, padding: '6px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surface, boxShadow: `0 16px 36px ${theme.borderGlass}` },
   pickerOption: { display: 'block', width: '100%', border: 0, borderRadius: '9px', background: 'transparent', color: theme.text, padding: '9px 10px', font: 'inherit', fontWeight: 700, textAlign: 'left' as const, cursor: 'pointer' },
   selectedPickerOption: { background: theme.primary, color: theme.textInverse },
@@ -112,7 +114,7 @@ const ReusableDatePage = ({
                   <div style={styles.pickerGroup}>
                     <div style={styles.pickerWrapper}>
                       <button type="button" aria-haspopup="listbox" aria-expanded={openPicker === 'month'} aria-label="Choose month" style={styles.picker} onClick={() => setOpenPicker(openPicker === 'month' ? null : 'month')}>
-                        {monthOptions[month.getMonth()]} <span aria-hidden="true">⌄</span>
+                        <span style={styles.pickerLabel}>{monthOptions[month.getMonth()]}</span><span style={styles.pickerArrow} aria-hidden="true">⌄</span>
                       </button>
                       {openPicker === 'month' ? <div role="listbox" aria-label="Months" style={styles.pickerMenu}>
                         {monthOptions.map((monthName, index) => <button key={monthName} type="button" role="option" aria-selected={month.getMonth() === index} style={{ ...styles.pickerOption, ...(month.getMonth() === index ? styles.selectedPickerOption : {}) }} onClick={() => { changePickerMonth(index); setOpenPicker(null); }}>{monthName}</button>)}
@@ -120,7 +122,7 @@ const ReusableDatePage = ({
                     </div>
                     <div style={styles.pickerWrapper}>
                       <button type="button" aria-haspopup="listbox" aria-expanded={openPicker === 'year'} aria-label="Choose year" style={styles.picker} onClick={() => setOpenPicker(openPicker === 'year' ? null : 'year')}>
-                        {month.getFullYear()} <span aria-hidden="true">⌄</span>
+                        <span style={styles.pickerLabel}>{month.getFullYear()}</span><span style={styles.pickerArrow} aria-hidden="true">⌄</span>
                       </button>
                       {openPicker === 'year' ? <div role="listbox" aria-label="Years" style={styles.pickerMenu}>
                         {yearOptions.map((year) => <button key={year} type="button" role="option" aria-selected={month.getFullYear() === year} style={{ ...styles.pickerOption, ...(month.getFullYear() === year ? styles.selectedPickerOption : {}) }} onClick={() => { changePickerMonth(month.getMonth(), year); setOpenPicker(null); }}>{year}</button>)}
