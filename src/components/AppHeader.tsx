@@ -159,7 +159,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
         try {
           const payload = JSON.parse((event as MessageEvent).data) as { unreadCount?: number };
           const nextCount = Number(payload.unreadCount || 0);
-          if (nextCount > previousCount.current) activateAlert();
+          // Every notification event is new by definition. Do not depend on the
+          // unread-count comparison, because another tab can mark it as read
+          // before this header processes the event.
+          activateAlert();
           previousCount.current = nextCount;
           hasLoadedCount.current = true;
           setUnreadCount(nextCount);
