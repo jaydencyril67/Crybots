@@ -98,11 +98,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   actionButton: {
     borderRadius: '999px',
     padding: '12px 16px',
-    border: 'none',
+    border: `1px solid ${theme.primary}`,
     cursor: 'pointer',
     fontWeight: 800,
     color: theme.textInverse,
-    background: `linear-gradient(135deg, ${theme.primarySoft}, ${theme.surfaceGlass})`,
+    background: theme.primary,
     textAlign: 'center' as const,
   },
   status: {

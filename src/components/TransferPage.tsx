@@ -6,7 +6,7 @@ import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
-import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
 type TransferRecipientCheckResponse = {
@@ -44,27 +44,37 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
     maxWidth: '1320px',
     margin: '0 auto',
-    padding: 'clamp(14px, 3vw, 28px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(14px, 3vw, 28px) clamp(8px, 1.5vw, 16px) 40px',
     boxSizing: 'border-box' as const,
   },
   panel: {
-    ...createHybridCardStyles(theme).card,
-    borderRadius: '28px',
-    overflow: 'hidden',
-  },
-  body: {
-    padding: 'clamp(14px, 3.5vw, 24px)',
     display: 'grid',
     gap: '16px',
+    width: '100%',
+  },
+  body: {
+    padding: 'clamp(0px, 2vw, 30px) 0 0',
+    display: 'grid',
+    gap: '16px',
+    width: '100%',
+    boxSizing: 'border-box' as const,
   },
   grid: {
     display: 'grid',
     gap: '16px',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' as const,
+    gridTemplateColumns: '1fr' as const,
   },
   card: {
-    ...createHybridCardStyles(theme).panel,
-    padding: '16px',
+    display: 'grid',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    gap: '20px',
+    padding: 'clamp(18px, 4vw, 28px)',
+    borderRadius: '28px',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
   },
   cardTitle: {
     margin: 0,
