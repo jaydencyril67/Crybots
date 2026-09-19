@@ -1,33 +1,8 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="68" y1="52" x2="444" y2="460" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#050814"/>
-      <stop offset="0.55" stop-color="#0B1220"/>
-      <stop offset="1" stop-color="#111827"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 182) rotate(90) scale(205 205)">
-      <stop stop-color="#8B5CF6" stop-opacity="0.22"/>
-      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="metal" x1="150" y1="126" x2="364" y2="398" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F8FAFC"/>
-      <stop offset="0.18" stop-color="#E2E8F0"/>
-      <stop offset="0.4" stop-color="#C4B5FD"/>
-      <stop offset="0.66" stop-color="#7DD3FC"/>
-      <stop offset="1" stop-color="#F8FAFC"/>
-    </linearGradient>
-    <linearGradient id="outline" x1="144" y1="112" x2="368" y2="408" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF" stop-opacity="0.42"/>
-      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.1"/>
-    </linearGradient>
-  </defs>
-  <rect x="18" y="18" width="476" height="476" rx="140" fill="url(#bg)"/>
-  <rect x="18" y="18" width="476" height="476" rx="140" fill="url(#glow)"/>
-  <circle cx="256" cy="256" r="182" fill="none" stroke="url(#outline)" stroke-width="8"/>
-  <circle cx="256" cy="256" r="152" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2" stroke-dasharray="1 10"/>
-  <path d="M154 146H197L256 231L315 146H358L291 256L358 366H315L256 281L197 366H154L219 256L154 146Z" fill="url(#metal)"/>
-  <path d="M182 156H210L246 206V154H268V360H246V303L210 360H182L230 284L182 156Z" fill="rgba(11,18,32,0.95)"/>
-  <path d="M258 154H328C346 154 360 168 360 186V214C360 228 352 240 340 244C352 248 360 260 360 274V302C360 334 336 360 304 360H258V154Z" fill="rgba(11,18,32,0.95)"/>
-  <path d="M278 176H303C314 176 322 184 322 195V205C322 216 314 224 303 224H278V176Z" fill="url(#metal)"/>
-  <path d="M278 250H309C320 250 328 258 328 269V283C328 294 320 302 309 302H278V250Z" fill="url(#metal)"/>
+  <rect x="24" y="24" width="464" height="464" rx="128" fill="#0B1220"/>
+  <path d="M64 128H108V224L184 128H238L158 246L242 384H188L108 270V384H64V128Z" fill="#FFFFFF"/>
+  <path d="M254 128H298V220H366V128H410V384H366V264H298V384H254V128Z" fill="#FFFFFF"/>
+  <path d="M426 128H474V168H470V344H474V384H426V128Z" fill="#FFFFFF"/>
+  <path d="M426 128H474V168H426V128ZM426 226H468V264H426V226ZM426 344H474V384H426V344Z" fill="#FFFFFF"/>
+  <path d="M64 416H474" stroke="#7DD3FC" stroke-width="12" stroke-linecap="round"/>
 </svg>

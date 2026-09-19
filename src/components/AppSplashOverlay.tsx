@@ -27,9 +27,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     textAlign: 'center' as const,
   },
   logo: {
-    width: '132px',
-    height: '132px',
-    objectFit: 'contain' as const,
+    width: '180px',
+    height: 'auto',
     display: 'block',
   },
   subtitle: {
@@ -50,7 +49,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const AppSplashOverlay = () => {
   const { themeMode } = useAppTheme();
-  const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(false);
 
@@ -78,9 +78,9 @@ const AppSplashOverlay = () => {
   return (
     <div style={{ ...styles.overlay, ...(ready ? styles.hidden : {}) }} aria-hidden={ready}>
       <div style={styles.card}>
-        <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.logo} />
+        <img src="/icons/ke-icon.svg" alt="KHE" style={{ ...styles.logo, color: theme.primary }} />
         <div>
-          <p style={styles.subtitle}>KingsHall Exchange</p>
+          <p style={styles.subtitle}>KHE · KINGSHALL EXCHANGE</p>
         </div>
         <div style={styles.shimmer} />
       </div>
