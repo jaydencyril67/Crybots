@@ -38,7 +38,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   field: { display: 'grid', gap: '7px', marginTop: '22px' },
   label: { color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' as const },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '12px 14px', outline: 'none', font: 'inherit' },
-  actions: { display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap' as const, marginTop: '24px' },
+  actions: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', flexWrap: 'wrap' as const, marginTop: '24px' },
   primary: { borderRadius: '14px', border: `1px solid ${theme.primary}`, padding: '12px 18px', cursor: 'pointer', fontWeight: 800, background: theme.primary, color: theme.textInverse },
   secondary: { borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, padding: '12px 18px', cursor: 'pointer', fontWeight: 800, background: theme.surfaceMuted, color: theme.text },
 });

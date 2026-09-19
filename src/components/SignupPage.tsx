@@ -507,7 +507,6 @@ const SignupPage = () => {
         value={form.dob}
         min="1900-01-01"
         max={maxDob}
-        confirmLabel="Confirm date"
         cancelLabel="Back"
         showNowBar={false}
         onConfirm={(value) => {
