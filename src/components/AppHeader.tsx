@@ -27,9 +27,18 @@ const styles = {
     transition: 'box-shadow 180ms ease, border-color 180ms ease, filter 180ms ease',
     willChange: 'box-shadow, border-color, filter',
   },
-  unreadArtwork: {
+  artworkContainer: {
+    position: 'relative' as const,
     width: '30px',
     height: '30px',
+    flexShrink: 0,
+  },
+  unreadArtwork: {
+    position: 'absolute' as const,
+    top: '-8px',
+    left: '18px',
+    minWidth: '18px',
+    height: '18px',
     display: 'grid',
     placeItems: 'center',
     borderRadius: '999px',
@@ -146,7 +155,8 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     const interval = window.setInterval(() => { void loadUnreadCount(); }, 15000);
     window.addEventListener('ke:force-logout', clearNotificationState);
     const handleNotificationsChanged = () => {
-      activateAlert();
+      // This event also fires when a notification is marked as read. The polling
+      // comparison below is the source of truth for newly arrived notifications.
       void loadUnreadCount();
     };
     const handleAuthChanged = () => { void loadUnreadCount(); };
@@ -185,9 +195,12 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     background: theme.primarySoft,
     border: `1px solid ${theme.primary}`,
   };
-  const renderArtwork = () => unreadCount > 0
-    ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span>
-    : <KHLogo size={30} label="KingsHall" />;
+  const renderArtwork = () => (
+    <span style={styles.artworkContainer}>
+      <KHLogo size={30} label="KingsHall" />
+      {unreadCount > 0 ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span> : null}
+    </span>
+  );
 
   return (
     <>
