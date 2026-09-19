@@ -286,6 +286,7 @@ const SecurityPage = () => {
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorConfigured, setTwoFactorConfigured] = useState(false);
+  const [twoFactorSetupOpen, setTwoFactorSetupOpen] = useState(false);
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
   const [twoFactorUri, setTwoFactorUri] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -429,6 +430,7 @@ const SecurityPage = () => {
       setTwoFactorSecret(data.secret);
       setTwoFactorUri(data.otpauthUrl);
       setTwoFactorConfigured(true);
+      setTwoFactorSetupOpen(true);
       setTwoFactorCode('');
       showStatus('success', 'Scan the QR code with your authenticator app, then enter the generated code to enable 2FA.');
     } catch (error: any) {
@@ -444,7 +446,9 @@ const SecurityPage = () => {
     try {
       const endpoint = twoFactorEnabled ? '/api/settings/2fa/disable' : '/api/settings/2fa/enable';
       await api.post(endpoint, { code: twoFactorCode.trim() });
-      setTwoFactorEnabled(!twoFactorEnabled);
+      const enabling = !twoFactorEnabled;
+      setTwoFactorEnabled(enabling);
+      if (enabling) setTwoFactorSetupOpen(false);
       setTwoFactorCode('');
       showStatus('success', twoFactorEnabled ? 'Two-factor authentication disabled.' : 'Two-factor authentication enabled.');
     } catch (error: any) {
@@ -461,6 +465,7 @@ const SecurityPage = () => {
     try {
       await api.delete('/api/settings/2fa', { data: { code: twoFactorCode.trim() } });
       setTwoFactorConfigured(false);
+      setTwoFactorSetupOpen(false);
       setTwoFactorEnabled(false);
       setTwoFactorSecret('');
       setTwoFactorUri('');
@@ -648,8 +653,8 @@ const SecurityPage = () => {
                   <div style={styles.buttonRow}>
                     <button type="button" style={styles.button} onClick={() => void handleSetup2fa()} disabled={saving2fa}>{saving2fa ? 'Preparing...' : 'Set up 2FA'}</button>
                   </div>
-                ) : (
-                  <>
+                ) : twoFactorSetupOpen ? (
+                  <div style={styles.control}>
                     {twoFactorUri ? (
                       <div style={{ display: 'grid', gap: '8px', justifyItems: 'start' }}>
                         <QRCodeCanvas value={twoFactorUri} size={180} includeMargin />
@@ -657,14 +662,19 @@ const SecurityPage = () => {
                         <p style={{ ...styles.note, wordBreak: 'break-all' as const }}>Manual key: {twoFactorSecret}</p>
                       </div>
                     ) : null}
-                    <div style={styles.control}>
-                      <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
-                      <div style={styles.buttonRow}>
-                        <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
-                        <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button>
-                      </div>
+                    <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
+                    <div style={styles.buttonRow}>
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Enabling...' : 'Enable 2FA'}</button>
                     </div>
-                  </>
+                  </div>
+                ) : (
+                  <div style={styles.control}>
+                    <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
+                    <div style={styles.buttonRow}>
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : 'Disable 2FA'}</button>
+                      <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button>
+                    </div>
+                  </div>
                 )}
               </div>
 
