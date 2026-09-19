@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kingshall-pwa-v1';
+const CACHE_NAME = 'kingshall-pwa-v2';
 const APP_SHELL = ['/', '/index.html', '/manifest.json'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
