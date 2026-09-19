@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import KHLogo from './KHLogo';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   overlay: {
@@ -78,7 +79,7 @@ const AppSplashOverlay = () => {
   return (
     <div style={{ ...styles.overlay, ...(ready ? styles.hidden : {}) }} aria-hidden={ready}>
       <div style={styles.card}>
-        <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.logo} />
+        <KHLogo theme={theme} size={52} label="KingsHall" />
         <div>
           <p style={styles.subtitle}>KingsHall Exchange</p>
         </div>

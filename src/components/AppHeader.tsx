@@ -3,6 +3,7 @@ import { navigate } from '../utils/navigate';
 import api from '../api/axios';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import KHLogo from './KHLogo';
 
 const styles = {
   header: {
@@ -22,13 +23,6 @@ const styles = {
     transform: 'translateX(-50%)',
     boxSizing: 'border-box' as const,
     zIndex: 50,
-  },
-  headerIcon: {
-    width: '30px',
-    height: '30px',
-    display: 'block',
-    objectFit: 'contain' as const,
-    flexShrink: 0,
   },
   unreadArtwork: {
     width: '30px',
@@ -144,7 +138,7 @@ const AppHeader = () => {
   };
   const renderArtwork = () => unreadCount > 0
     ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span>
-    : <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />;
+    : <KHLogo theme={theme} size={30} label="KingsHall" />;
 
   return (
     <>
@@ -165,7 +159,6 @@ const AppHeader = () => {
         </div>
       </div>
 
-        {renderArtwork()}
       </header>
     </>
   );
