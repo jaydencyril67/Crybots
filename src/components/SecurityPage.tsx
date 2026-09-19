@@ -111,7 +111,7 @@ const styles = {
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
     color: theme.textMuted,
-    borderBottom: `1px solid ${theme.borderSubtle}`,
+    borderBottom: `1px solid ${theme.border}`,
     whiteSpace: 'nowrap' as const,
   },
   tableCell: {
@@ -155,7 +155,7 @@ const styles = {
     width: '100%',
     maxWidth: '100%',
     background: theme.surfaceGlass,
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.border}`,
     borderRadius: '18px',
     padding: '16px',
     display: 'grid',

@@ -192,7 +192,7 @@ const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never :
   },
   metricCard: {
     borderRadius: '22px',
-    border: `1px solid ${theme.borderSubtle}`,
+    border: `1px solid ${theme.border}`,
     background: theme.surfaceGlass,
     padding: '16px',
   },
