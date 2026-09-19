@@ -3,9 +3,10 @@ import { Helmet } from 'react-helmet-async';
 import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
-import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
+import { useAppTheme } from './AppTheme';
 
 type SecurityDevice = {
   id?: string;
@@ -55,12 +56,14 @@ type SessionsApiResponse = {
 
 type SaveState = 'idle' | 'saving' | 'success' | 'error';
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
+    background: theme.background,
+    color: theme.text,
   },
   shell: {
     width: '100%',
@@ -79,12 +82,12 @@ const styles = {
     fontSize: '1.45rem',
     fontWeight: 900,
     letterSpacing: '-0.03em',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
   },
   sectionText: {
     margin: '8px 0 0',
     fontSize: '0.92rem',
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     lineHeight: 1.7,
     maxWidth: '64ch',
   },
@@ -110,31 +113,31 @@ const styles = {
     fontSize: '0.8rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    color: theme.textMuted,
+    borderBottom: `1px solid ${theme.border}`,
     whiteSpace: 'nowrap' as const,
   },
   tableCell: {
     padding: '14px',
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    borderBottom: `1px solid ${theme.border}`,
     verticalAlign: 'top' as const,
   },
   tableRow: {
-    background: 'rgba(255,255,255,0.02)',
+    background: theme.highlightSoft,
   },
   tableRowCurrent: {
-    background: 'rgba(34,197,94,0.08)',
+    background: theme.primarySoft,
   },
   tableLabel: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontSize: '0.78rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
   },
   tableValue: {
     margin: '6px 0 0',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     fontSize: '0.95rem',
     fontWeight: 800,
     lineHeight: 1.5,
@@ -154,8 +157,8 @@ const styles = {
   row: {
     width: '100%',
     maxWidth: '100%',
-    background: 'rgba(255,255,255,0.04)',
-    border: '1px solid rgba(255,255,255,0.08)',
+    background: theme.surfaceGlass,
+    border: `1px solid ${theme.borderGlass}`,
     borderRadius: '18px',
     padding: '16px',
     display: 'grid',
@@ -166,7 +169,7 @@ const styles = {
   },
   rowLabel: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontSize: '0.82rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
@@ -176,7 +179,7 @@ const styles = {
   },
   rowValue: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     fontSize: '1rem',
     fontWeight: 800,
     lineHeight: 1.5,
@@ -199,13 +202,13 @@ const styles = {
     minWidth: 0,
   },
   card: {
-    ...HYBRID_CARD_STYLES.card,
+    ...createHybridCardStyles(theme).card,
   },
   '@media (max-width: 640px)': {
     page: { paddingBottom: '156px' },
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
-    card: { ...HYBRID_CARD_STYLES.card, ...HYBRID_CARD_STYLES.cardMobile },
+    card: { ...createHybridCardStyles(theme).card, ...createHybridCardStyles(theme).cardMobile },
     table: { minWidth: '820px' },
     rowList: { gap: '10px', gridTemplateColumns: '1fr', width: '100%', minWidth: 0 },
     row: { padding: '14px', borderRadius: '16px', maxWidth: '100%' },
@@ -218,9 +221,9 @@ const styles = {
   input: {
     width: '100%',
     border: 'none',
-    borderBottom: '1px solid rgba(255,255,255,0.14)',
+    borderBottom: `1px solid ${theme.borderStrong}`,
     background: 'transparent',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     padding: '12px 0',
     outline: 'none',
     fontSize: '1rem',
@@ -253,6 +256,10 @@ const styles = {
 };
 
 const SecurityPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
+
   const [uid, setUid] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -429,7 +436,7 @@ const SecurityPage = () => {
   };
 
   return (
-    <HybridTheme>
+    <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <div style={styles.shell}>
           <Helmet>
@@ -514,7 +521,7 @@ const SecurityPage = () => {
                               ) : (
                                 <button
                                   type="button"
-                                  style={{ ...styles.button, color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                                  style={{ ...styles.button, color: theme.danger, display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
                                   onClick={() => void handleRemoveSession(session.tokenHash)}
                                   disabled={removingSession === session.tokenHash}
                                 >
