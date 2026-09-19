@@ -452,7 +452,7 @@ const getSeededAdviceOrder = (hourKey: number) => {
 const getAdviceIndex = () => {
   const hourKey = Math.floor(Date.now() / (1000 * 60 * 60));
   return getSeededAdviceOrder(hourKey)[hourKey % advicePool.length];
-});
+}
 
 const DashboardPage = () => {
   const { themeMode } = useAppTheme();
