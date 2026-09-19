@@ -274,6 +274,8 @@ const SecurityPage = () => {
   const styles = getStyles(theme);
 
   const [uid, setUid] = useState('');
+  const [uidCode, setUidCode] = useState('');
+  const [uidCodeRequested, setUidCodeRequested] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -295,6 +297,7 @@ const SecurityPage = () => {
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
   const [savingUid, setSavingUid] = useState(false);
+  const [requestingUidCode, setRequestingUidCode] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [savingSecurityCode, setSavingSecurityCode] = useState(false);
   const [saving2fa, setSaving2fa] = useState(false);
@@ -359,11 +362,29 @@ const SecurityPage = () => {
 
   const showStatus = (kind: SaveState, text: string) => setStatus({ kind, text });
 
+  const handleUidCodeRequest = async () => {
+    if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
+    setRequestingUidCode(true);
+    try {
+      await api.post('/api/settings/uid-code');
+      setUidCodeRequested(true);
+      setUidCode('');
+      showStatus('success', 'A confirmation code was sent to your email.');
+    } catch (error: any) {
+      showStatus('error', error?.response?.data?.message || 'Unable to send UID confirmation code.');
+    } finally {
+      setRequestingUidCode(false);
+    }
+  };
+
   const handleUidSave = async () => {
     if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
+    if (!uidCode.trim()) return showStatus('error', 'Enter the confirmation code sent to your email.');
     setSavingUid(true);
     try {
-      await api.patch('/api/settings/uid', { uid: uid.trim() });
+      await api.patch('/api/settings/uid', { uid: uid.trim(), code: uidCode.trim() });
+      setUidCode('');
+      setUidCodeRequested(false);
       showStatus('success', 'UID updated successfully.');
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update UID.');
@@ -572,7 +593,9 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
-                  <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
+                  {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Email confirmation code" inputMode="numeric" maxLength={6} /> : null}
+                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
                 </div>
               </div>
 
