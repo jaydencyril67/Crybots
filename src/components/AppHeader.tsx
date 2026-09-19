@@ -9,7 +9,7 @@ import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notifi
 const styles = {
   header: {
     display: 'grid',
-    gridTemplateColumns: 'auto auto auto',
+    gridTemplateColumns: 'auto max-content auto',
     alignItems: 'center',
     gap: '10px',
     padding: '7px 16px',
@@ -20,8 +20,8 @@ const styles = {
     position: 'fixed' as const,
     top: '12px',
     left: '50%',
-    width: 'fit-content',
-    maxWidth: 'calc(100% - 32px)',
+    width: 'max-content',
+    maxWidth: 'calc(100% - 20px)',
     transform: 'translateX(-50%)',
     boxSizing: 'border-box' as const,
     zIndex: 50,
@@ -49,7 +49,7 @@ const styles = {
     letterSpacing: '0.02em',
   },
   brand: {
-    minWidth: 0,
+    minWidth: 'max-content',
     display: 'flex',
     justifyContent: 'center',
   },
@@ -68,9 +68,7 @@ const styles = {
   },
   brandTitle: {
     margin: 0,
-    maxWidth: 'min(240px, calc(100vw - 132px))',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    maxWidth: 'calc(100vw - 112px)',
     fontSize: '14px',
     fontWeight: 900,
     letterSpacing: '0.12em',
@@ -207,10 +205,12 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const headerStyle = isEdgeLit
     ? {
       ...styles.header,
-      borderColor: '#ef4444',
-      boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.98), 0 0 0 6px rgba(239, 68, 68, 0.16), 0 0 26px rgba(239, 68, 68, 0.88), 0 14px 30px rgba(0,0,0,0.24)',
-      animation: 'ke-header-alert 1.2s ease-in-out infinite',
-      filter: 'drop-shadow(0 0 12px rgba(239, 68, 68, 0.55))',
+      borderColor: 'rgba(239, 68, 68, 0.72)',
+      boxShadow: isAlertActive
+        ? '0 0 0 1px rgba(239, 68, 68, 0.72), 0 0 16px rgba(239, 68, 68, 0.48), 0 14px 30px rgba(0,0,0,0.24)'
+        : '0 0 0 1px rgba(239, 68, 68, 0.42), 0 0 10px rgba(239, 68, 68, 0.24), 0 14px 30px rgba(0,0,0,0.24)',
+      animation: isAlertActive ? 'ke-header-alert 1.2s ease-in-out infinite' : 'none',
+      filter: isAlertActive ? 'drop-shadow(0 0 7px rgba(239, 68, 68, 0.34))' : 'none',
     }
     : styles.header;
   const headerTitle = unreadCount > 0
@@ -232,8 +232,8 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   return (
     <>
       <style>{`@keyframes ke-header-alert {
-        0%, 100% { opacity: 1; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.98), 0 0 0 6px rgba(239, 68, 68, 0.16), 0 0 26px rgba(239, 68, 68, 0.88), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.55)); }
-        50% { opacity: 0.78; box-shadow: 0 0 0 3px rgba(239, 68, 68, 1), 0 0 0 10px rgba(239, 68, 68, 0.2), 0 0 36px rgba(239, 68, 68, 1), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 16px rgba(239, 68, 68, 0.8)); }
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.72), 0 0 16px rgba(239, 68, 68, 0.48), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px rgba(239, 68, 68, 0.34)); }
+        50% { opacity: 0.9; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.78), 0 0 22px rgba(239, 68, 68, 0.62), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.48)); }
       }`}</style>
       <header
         style={headerStyle}
