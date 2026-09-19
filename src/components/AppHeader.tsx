@@ -213,9 +213,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       filter: isAlertActive ? 'drop-shadow(0 0 7px rgba(239, 68, 68, 0.34))' : 'none',
     }
     : styles.header;
-  const headerTitle = unreadCount > 0
-    ? `${unreadCount} New Notification${unreadCount === 1 ? '' : 's'}`
-    : 'KingsHall Exchange';
+  const headerTitle = unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
   const artworkStyle = {
     ...styles.unreadArtwork,
     color: theme.primary,
