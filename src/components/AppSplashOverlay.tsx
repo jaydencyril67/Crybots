@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   overlay: {
     position: 'fixed' as const,
     inset: 0,
@@ -8,8 +10,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'radial-gradient(circle at top, rgba(34,211,238,0.16), transparent 34%), radial-gradient(circle at 80% 20%, rgba(168,85,247,0.18), transparent 28%), linear-gradient(180deg, #050816 0%, #0b1220 100%)',
-    color: '#ffffff',
+    background: theme.background,
+    color: theme.text,
     transition: 'opacity 320ms ease, visibility 320ms ease',
   },
   hidden: {
@@ -29,11 +31,10 @@ const styles = {
     height: '132px',
     objectFit: 'contain' as const,
     display: 'block',
-    filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.38))',
   },
   subtitle: {
     margin: 0,
-    color: 'rgba(255,255,255,0.68)',
+    color: theme.textMuted,
     fontSize: '13px',
     letterSpacing: '0.14em',
     textTransform: 'uppercase' as const,
@@ -42,12 +43,14 @@ const styles = {
     width: '180px',
     height: '3px',
     borderRadius: '999px',
-    background: 'linear-gradient(90deg, transparent 0%, rgba(103,232,249,0.75) 50%, transparent 100%)',
+    background: theme.primary,
     animation: 'ke-splash-shimmer 1.4s ease-in-out infinite',
   },
-};
+});
 
 const AppSplashOverlay = () => {
+  const { themeMode } = useAppTheme();
+  const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
   const [ready, setReady] = useState(false);
   const [active, setActive] = useState(false);
 

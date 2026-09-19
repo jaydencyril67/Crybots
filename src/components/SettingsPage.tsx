@@ -45,11 +45,11 @@ type WalletValidationState = {
 const passwordRuleMessage = 'Password must be at least 8 characters and include uppercase, lowercase, number, and symbol.';
 const trc20WalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
+    background: theme.background,
+    color: theme.text,
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
@@ -63,9 +63,8 @@ const styles = {
   },
   panel: {
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'linear-gradient(180deg, rgba(14,18,33,0.92), rgba(9,12,24,0.86))',
-    boxShadow: '0 22px 80px rgba(0,0,0,0.35)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
     overflow: 'hidden',
@@ -82,8 +81,8 @@ const styles = {
   } as const,
   card: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
     padding: '18px',
   },
   cardTitle: {
@@ -96,7 +95,7 @@ const styles = {
   },
   cardText: {
     margin: '10px 0 0',
-    color: '#9db0d1',
+    color: theme.textMuted,
     lineHeight: 1.6,
   },
   formGrid: {
@@ -111,21 +110,21 @@ const styles = {
   label: {
     fontSize: '0.9rem',
     fontWeight: 700,
-    color: '#d7e2f8',
+    color: theme.text,
   },
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
     borderRadius: '14px',
-    border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(7,12,24,0.92)',
-    color: '#ffffff',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
+    color: theme.text,
     padding: '13px 14px',
     outline: 'none',
   },
   helper: {
     fontSize: '0.85rem',
-    color: '#95a8ca',
+    color: theme.textMuted,
     lineHeight: 1.5,
   },
   buttonRow: {
@@ -137,11 +136,11 @@ const styles = {
   },
   button: {
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.12)',
+    border: `1px solid ${theme.borderGlass}`,
     padding: '12px 16px',
     fontWeight: 700,
-    color: '#ffffff',
-    background: 'rgba(255,255,255,0.06)',
+    color: theme.text,
+    background: theme.surfaceMuted,
     cursor: 'pointer',
   },
   toggleRow: {
@@ -153,16 +152,17 @@ const styles = {
   },
   togglePill: {
     borderRadius: '999px',
-    border: '1px solid rgba(255,255,255,0.12)',
+    border: `1px solid ${theme.borderGlass}`,
     padding: '10px 14px',
     fontWeight: 700,
-    color: '#ffffff',
-    background: 'rgba(255,255,255,0.06)',
+    color: theme.text,
+    background: theme.surfaceMuted,
     cursor: 'pointer',
   },
   togglePillActive: {
-    background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)',
-    border: 'none',
+    background: theme.primary,
+    color: theme.textInverse,
+    border: `1px solid ${theme.primary}`,
   },
   colorSwatches: {
     display: 'flex',
@@ -177,21 +177,23 @@ const styles = {
     width: '38px',
     height: '38px',
     borderRadius: '999px',
-    border: '2px solid rgba(255,255,255,0.14)',
+    border: `2px solid ${theme.borderGlass}`,
     cursor: 'pointer',
   },
   colorSwatchActive: {
-    boxShadow: '0 0 0 3px rgba(255,255,255,0.18)',
+    borderColor: theme.primary,
   },
   primaryButton: {
-    background: 'linear-gradient(135deg, #22d3ee, #8b5cf6)',
-    border: 'none',
+    background: theme.primary,
+    color: theme.textInverse,
+    border: `1px solid ${theme.primary}`,
   },
   dangerButton: {
-    background: 'linear-gradient(135deg, #ef4444, #b91c1c)',
-    border: 'none',
+    background: theme.danger,
+    color: theme.textInverse,
+    border: `1px solid ${theme.danger}`,
   },
-};
+});
 
 const passwordMeetsRule = (value: string) => {
   const hasMinLength = value.length >= 8;
@@ -226,6 +228,8 @@ const SettingsPage = () => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const { themeMode, setThemeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState<EdgeLightColorKey>('blue');
   const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
@@ -330,10 +334,10 @@ const SettingsPage = () => {
   const passwordMismatch = newPassword.length > 0 && confirmPassword.length > 0 && newPassword !== confirmPassword;
   const passwordCanSave = currentPassword.length > 0 && newPassword.length > 0 && confirmPassword.length > 0 && passwordValid && !passwordMismatch;
   const passwordFieldStyle = newPassword.length > 0 && !passwordValid
-    ? { ...styles.input, borderColor: 'rgba(239, 68, 68, 0.9)', boxShadow: '0 0 0 1px rgba(239, 68, 68, 0.35)' }
+    ? { ...styles.input, borderColor: theme.danger }
     : styles.input;
   const confirmPasswordFieldStyle = confirmPassword.length > 0 && passwordMismatch
-    ? { ...styles.input, borderColor: 'rgba(239, 68, 68, 0.9)', boxShadow: '0 0 0 1px rgba(239, 68, 68, 0.35)' }
+    ? { ...styles.input, borderColor: theme.danger }
     : styles.input;
   const currentPasswordFieldStyle = styles.input;
   const walletAddressChanged = walletAddress.trim() !== '';
@@ -603,13 +607,13 @@ const SettingsPage = () => {
     aspectRatio: '1 / 1',
     borderRadius: '18px',
     overflow: 'hidden',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.04)',
-    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
   };
 
   return (
-    <div style={styles.page}>
+    <HybridTheme mode={themeMode}>
+      <div style={styles.page}>
       <Helmet>
         <title>Settings | KingsHall Exchange</title>
       </Helmet>
@@ -634,7 +638,7 @@ const SettingsPage = () => {
                     {avatarPreview ? (
                       <div style={{ position: 'absolute', inset: 0, background: `url(${avatarPreview}) center/cover no-repeat` }} />
                     ) : (
-                      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: 'radial-gradient(circle at 30% 20%, rgba(125,211,252,0.26), rgba(14,18,33,1) 58%)' }}>
+                      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: theme.surfaceShine }}>
                         <UserCircle2 size={42} />
                       </div>
                     )}
@@ -692,7 +696,7 @@ const SettingsPage = () => {
                       }}
                       onFocus={() => setActiveCard('password')}
                     />
-                    {passwordMismatch ? <span style={{ ...styles.helper, color: '#fca5a5' }}>Passwords do not match.</span> : null}
+                    {passwordMismatch ? <span style={{ ...styles.helper, color: theme.danger }}>Passwords do not match.</span> : null}
                   </label>
                 </div>
                 {((activeCard === 'password' && passwordCanSave) || passwordCardSaving) ? (
@@ -880,7 +884,7 @@ const SettingsPage = () => {
         </div>
         <NowBar />
       </div>
-    </div>
+    </HybridTheme>
   );
 };
 

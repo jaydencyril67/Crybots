@@ -4,38 +4,37 @@ import { ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import InlineLoadingDots from './InlineLoadingDots';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    color: '#ffffff',
+    color: theme.text,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '24px',
-    background:
-      'radial-gradient(circle at top, rgba(103,232,249,0.18), transparent 34%), radial-gradient(circle at bottom right, rgba(196,181,253,0.16), transparent 30%), linear-gradient(180deg, #071022 0%, #050816 100%)',
+    background: theme.background,
     position: 'relative' as const,
     overflow: 'hidden',
   },
   backdrop: {
     position: 'absolute' as const,
     inset: 0,
-    background:
-      'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.03) 100%)',
+    background: theme.surfaceShine,
     pointerEvents: 'none' as const,
   },
   card: {
     width: '100%',
     maxWidth: '560px',
     borderRadius: '32px',
-    border: '1px solid rgba(255,255,255,0.14)',
-    background: 'rgba(8,15,33,0.72)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
     padding: '36px',
     textAlign: 'center' as const,
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
-    boxShadow: '0 24px 80px rgba(0,0,0,0.35)',
     position: 'relative' as const,
     zIndex: 1,
   },
@@ -43,8 +42,8 @@ const styles = {
     marginTop: '28px',
     border: 'none',
     borderRadius: '999px',
-    background: 'linear-gradient(135deg, #67e8f9 0%, #c4b5fd 100%)',
-    color: '#050816',
+    background: theme.primary,
+    color: theme.textInverse,
     padding: '13px 22px',
     fontWeight: 800,
     display: 'inline-flex',
@@ -52,7 +51,6 @@ const styles = {
     justifyContent: 'center',
     gap: '10px',
     textDecoration: 'none',
-    boxShadow: '0 12px 30px rgba(103,232,249,0.2)',
 
   },
   iconWrap: {
@@ -63,8 +61,7 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: '22px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18)',
+    border: `1px solid ${theme.borderGlass}`,
   },
   title: {
     margin: 0,
@@ -74,14 +71,17 @@ const styles = {
   },
   text: {
     margin: '14px 0 0',
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
     lineHeight: 1.75,
     fontSize: '15px',
   },
-  meta: { marginTop: '22px', fontSize: '14px', color: '#67e8f9', fontWeight: 700 },
-};
+  meta: { marginTop: '22px', fontSize: '14px', color: theme.primary, fontWeight: 700 },
+});
 
 const VerifyEmailPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verifying your email address...');
   const [secondsLeft, setSecondsLeft] = useState(5);
@@ -132,11 +132,11 @@ const VerifyEmailPage = () => {
   }, [status]);
 
   const icon = status === 'success' ? <CheckCircle2 size={30} /> : status === 'error' ? <XCircle size={30} /> : <CheckCircle2 size={30} />;
-  const iconBackground = status === 'success' ? 'rgba(34,197,94,0.14)' : status === 'error' ? 'rgba(248,113,113,0.14)' : 'rgba(103,232,249,0.14)';
-  const iconColor = status === 'success' ? '#4ade80' : status === 'error' ? '#f87171' : '#67e8f9';
+  const iconBackground = status === 'success' ? theme.highlightSoft : status === 'error' ? theme.primarySoft : theme.surfaceShine;
+  const iconColor = status === 'success' ? theme.success : status === 'error' ? theme.danger : theme.primary;
 
   return (
-    <>
+    <HybridTheme mode={themeMode}>
       <Helmet>
         <title>KingsHall Exchange | Verify email</title>
       </Helmet>
@@ -147,7 +147,7 @@ const VerifyEmailPage = () => {
           <h2 style={styles.title}>{status === 'success' ? 'Account confirmed' : status === 'error' ? 'Verification failed' : 'Verifying account'}</h2>
           <p style={styles.text}>{message}</p>
           {status === 'loading' ? (
-            <div style={{ marginTop: '18px', color: 'rgba(255,255,255,0.7)' }}>
+            <div style={{ marginTop: '18px', color: theme.textMuted }}>
               <InlineLoadingDots />
             </div>
           ) : null}
@@ -167,7 +167,7 @@ const VerifyEmailPage = () => {
           ) : null}
         </section>
       </main>
-    </>
+    </HybridTheme>
   );
 };
 

@@ -1,29 +1,34 @@
 import React from 'react';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   wrap: {
     display: 'inline-flex',
     alignItems: 'center',
     gap: '6px',
     padding: '8px 12px',
     borderRadius: '999px',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: theme.surfaceMuted,
+    border: `1px solid ${theme.borderGlass}`,
   },
   dot: {
     width: '8px',
     height: '8px',
     borderRadius: '999px',
-    background: '#7dd3fc',
+    background: theme.primary,
     opacity: 0.35,
     animation: 'loading-dots 1.2s infinite steps(1, end)',
   },
   activeDot: {
     opacity: 1,
   },
-} as const;
+});
 
 const LoadingDots = () => {
+  const { themeMode } = useAppTheme();
+  const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
+
   return (
     <div style={styles.wrap} aria-hidden="true">
       <span style={{ ...styles.dot, ...styles.activeDot }} />
