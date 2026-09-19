@@ -9,7 +9,7 @@ import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notifi
 const styles = {
   header: {
     display: 'grid',
-    gridTemplateColumns: 'auto auto auto',
+    gridTemplateColumns: 'auto max-content auto',
     alignItems: 'center',
     gap: '10px',
     padding: '7px 16px',
@@ -20,8 +20,8 @@ const styles = {
     position: 'fixed' as const,
     top: '12px',
     left: '50%',
-    width: 'fit-content',
-    maxWidth: 'calc(100% - 32px)',
+    width: 'max-content',
+    maxWidth: 'calc(100% - 20px)',
     transform: 'translateX(-50%)',
     boxSizing: 'border-box' as const,
     zIndex: 50,
@@ -49,7 +49,7 @@ const styles = {
     letterSpacing: '0.02em',
   },
   brand: {
-    minWidth: 0,
+    minWidth: 'max-content',
     display: 'flex',
     justifyContent: 'center',
   },
@@ -68,9 +68,7 @@ const styles = {
   },
   brandTitle: {
     margin: 0,
-    maxWidth: 'min(240px, calc(100vw - 132px))',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    maxWidth: 'calc(100vw - 112px)',
     fontSize: '14px',
     fontWeight: 900,
     letterSpacing: '0.12em',
