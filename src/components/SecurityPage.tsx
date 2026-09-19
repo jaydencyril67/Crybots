@@ -253,7 +253,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     lineHeight: 1.6,
     color: theme.textMuted,
   },
-};
+});
 
 const SecurityPage = () => {
   const { themeMode } = useAppTheme();
