@@ -8,10 +8,12 @@ import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import { authenticateWithPasskey, isWebAuthnAvailable } from '../utils/webauthn';
 
 const signInMethods = [
   { value: 'password', title: 'Password', description: 'Use your account password to sign in.' },
   { value: 'code', title: 'Email sign-in code', description: 'Receive a 4-digit code by email.' },
+  { value: 'passkey', title: 'Biometric / passkey', description: 'Use your fingerprint, face, or security key.' },
 ] as const;
 
 
@@ -476,6 +478,33 @@ const SigninPage = () => {
 
     if (selectedMethod === 'password') {
       setStep('password');
+      return;
+    }
+
+    if (selectedMethod === 'passkey') {
+      if (!isWebAuthnAvailable()) {
+        setSubmitError('Passkeys are not supported by this browser.');
+        setMethod(null);
+        return;
+      }
+      setIsSubmitting(true);
+      try {
+        const { data: options } = await api.post('/api/webauthn/authenticate/options', { email: form.email });
+        const assertion = await authenticateWithPasskey(options);
+        const response = await api.post('/api/webauthn/authenticate/verify', assertion);
+        if (response.data?.token) {
+          localStorage.setItem('token', response.data.token);
+          notifyAuthChanged();
+        }
+        if (response.data?.user) localStorage.setItem('user', JSON.stringify(response.data.user));
+        navigate('/dashboard');
+      } catch (error) {
+        const response = (error as { response?: { data?: { message?: string } } })?.response;
+        setSubmitError(response?.data?.message || (error as Error)?.message || 'Unable to authenticate with your passkey.');
+        setMethod(null);
+      } finally {
+        setIsSubmitting(false);
+      }
       return;
     }
 
