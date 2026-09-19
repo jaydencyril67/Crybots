@@ -30,6 +30,17 @@ const styles = {
     objectFit: 'contain' as const,
     flexShrink: 0,
   },
+  unreadArtwork: {
+    width: '30px',
+    height: '30px',
+    display: 'grid',
+    placeItems: 'center',
+    borderRadius: '999px',
+    flexShrink: 0,
+    fontSize: '12px',
+    fontWeight: 900,
+    letterSpacing: '0.02em',
+  },
   brand: {
     minWidth: 0,
     display: 'flex',
@@ -122,9 +133,18 @@ const AppHeader = () => {
   const headerStyle = isAlertActive
     ? { ...styles.header, borderColor: theme.danger, animation: 'ke-header-alert 1.2s ease-in-out infinite' }
     : styles.header;
-  const headerTitle = isAlertActive && unreadCount > 0
+  const headerTitle = unreadCount > 0
     ? `${unreadCount} New Notification${unreadCount === 1 ? '' : 's'}`
     : 'KingsHall Exchange';
+  const artworkStyle = {
+    ...styles.unreadArtwork,
+    color: theme.primary,
+    background: theme.primarySoft,
+    border: `1px solid ${theme.primary}`,
+  };
+  const renderArtwork = () => unreadCount > 0
+    ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span>
+    : <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />;
 
   return (
     <>
@@ -137,7 +157,7 @@ const AppHeader = () => {
         tabIndex={0}
         aria-label={headerTitle}
       >
-      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
+      {renderArtwork()}
 
       <div style={styles.brand}>
         <div style={styles.brandCopy}>
@@ -145,7 +165,7 @@ const AppHeader = () => {
         </div>
       </div>
 
-        <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
+        {renderArtwork()}
       </header>
     </>
   );
