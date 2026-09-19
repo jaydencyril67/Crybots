@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import LoadingDots from './LoadingDots';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -77,7 +77,7 @@ const advicePool: AdviceCard[] = [
   { title: 'Think in scenarios', text: 'Before entering, know what you’ll do if price breaks up, fails, or goes sideways.', accent: '#fb7185', icon: <Coins /> },
 ];
 
-const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
+const getStyles = (theme: typeof HYBRID_CARD_STYLES.card extends never ? never : typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     background: theme.background,
