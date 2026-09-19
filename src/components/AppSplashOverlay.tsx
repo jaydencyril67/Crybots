@@ -79,7 +79,7 @@ const AppSplashOverlay = () => {
   return (
     <div style={{ ...styles.overlay, ...(ready ? styles.hidden : {}) }} aria-hidden={ready}>
       <div style={styles.card}>
-        <KHLogo theme={theme} size={52} label="KingsHall" />
+        <KHLogo size={52} label="KingsHall" />
         <div>
           <p style={styles.subtitle}>KingsHall Exchange</p>
         </div>

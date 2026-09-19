@@ -138,7 +138,7 @@ const AppHeader = () => {
   };
   const renderArtwork = () => unreadCount > 0
     ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span>
-    : <KHLogo theme={theme} size={30} label="KingsHall" />;
+    : <KHLogo size={30} label="KingsHall" />;
 
   return (
     <>
