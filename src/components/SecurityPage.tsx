@@ -79,12 +79,12 @@ const styles = {
     fontSize: '1.45rem',
     fontWeight: 900,
     letterSpacing: '-0.03em',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
   },
   sectionText: {
     margin: '8px 0 0',
     fontSize: '0.92rem',
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     lineHeight: 1.7,
     maxWidth: '64ch',
   },
@@ -110,7 +110,7 @@ const styles = {
     fontSize: '0.8rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     borderBottom: '1px solid rgba(255,255,255,0.08)',
     whiteSpace: 'nowrap' as const,
   },
@@ -127,14 +127,14 @@ const styles = {
   },
   tableLabel: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontSize: '0.78rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
   },
   tableValue: {
     margin: '6px 0 0',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     fontSize: '0.95rem',
     fontWeight: 800,
     lineHeight: 1.5,
@@ -166,7 +166,7 @@ const styles = {
   },
   rowLabel: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontSize: '0.82rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
@@ -176,7 +176,7 @@ const styles = {
   },
   rowValue: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     fontSize: '1rem',
     fontWeight: 800,
     lineHeight: 1.5,
@@ -185,7 +185,7 @@ const styles = {
   },
   note: {
     margin: 0,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontSize: '0.9rem',
     lineHeight: 1.7,
   },
@@ -220,7 +220,7 @@ const styles = {
     border: 'none',
     borderBottom: '1px solid rgba(255,255,255,0.14)',
     background: 'transparent',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     padding: '12px 0',
     outline: 'none',
     fontSize: '1rem',
@@ -234,25 +234,29 @@ const styles = {
   button: {
     border: 'none',
     background: 'transparent',
-    color: HYBRID_THEME_TOKENS.dark.text,
+    color: theme.text,
     padding: '0',
     fontWeight: 800,
     cursor: 'pointer',
     fontSize: '0.98rem',
   },
   mutedButton: {
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
     fontWeight: 700,
   },
   status: {
     margin: '8px 0 0',
     fontSize: '0.9rem',
     lineHeight: 1.6,
-    color: HYBRID_THEME_TOKENS.dark.textMuted,
+    color: theme.textMuted,
   },
 };
 
 const SecurityPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
+
   const [uid, setUid] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -514,7 +518,7 @@ const SecurityPage = () => {
                               ) : (
                                 <button
                                   type="button"
-                                  style={{ ...styles.button, color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
+                                  style={{ ...styles.button, color: theme.danger, display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem' }}
                                   onClick={() => void handleRemoveSession(session.tokenHash)}
                                   disabled={removingSession === session.tokenHash}
                                 >
