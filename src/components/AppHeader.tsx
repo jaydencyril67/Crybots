@@ -24,6 +24,8 @@ const styles = {
     transform: 'translateX(-50%)',
     boxSizing: 'border-box' as const,
     zIndex: 50,
+    transition: 'box-shadow 180ms ease, border-color 180ms ease, filter 180ms ease',
+    willChange: 'box-shadow, border-color, filter',
   },
   unreadArtwork: {
     width: '30px',
@@ -161,8 +163,9 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     ? {
       ...styles.header,
       borderColor: '#ef4444',
-      boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 22px rgba(239, 68, 68, 0.85), 0 14px 30px rgba(0,0,0,0.24)',
+      boxShadow: '0 0 0 2px rgba(239, 68, 68, 0.98), 0 0 0 6px rgba(239, 68, 68, 0.16), 0 0 26px rgba(239, 68, 68, 0.88), 0 14px 30px rgba(0,0,0,0.24)',
       animation: 'ke-header-alert 1.2s ease-in-out infinite',
+      filter: 'drop-shadow(0 0 12px rgba(239, 68, 68, 0.55))',
     }
     : styles.header;
   const headerTitle = unreadCount > 0
@@ -181,8 +184,8 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   return (
     <>
       <style>{`@keyframes ke-header-alert {
-        0%, 100% { opacity: 1; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 22px rgba(239, 68, 68, 0.85), 0 14px 30px rgba(0,0,0,0.24); }
-        50% { opacity: 0.72; box-shadow: 0 0 0 3px rgba(239, 68, 68, 1), 0 0 34px rgba(239, 68, 68, 1), 0 14px 30px rgba(0,0,0,0.24); }
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.98), 0 0 0 6px rgba(239, 68, 68, 0.16), 0 0 26px rgba(239, 68, 68, 0.88), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.55)); }
+        50% { opacity: 0.78; box-shadow: 0 0 0 3px rgba(239, 68, 68, 1), 0 0 0 10px rgba(239, 68, 68, 0.2), 0 0 36px rgba(239, 68, 68, 1), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 16px rgba(239, 68, 68, 0.8)); }
       }`}</style>
       <header
         style={headerStyle}
