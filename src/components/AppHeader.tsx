@@ -82,15 +82,15 @@ const AppHeader = () => {
 
   return (
     <header style={styles.header}>
-      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
+      <img src="/icons/ke-icon.svg" alt="KHE" style={styles.headerIcon} />
 
       <div style={styles.brand}>
         <div style={styles.brandCopy}>
-          <p style={styles.brandTitle}>KingsHall Exchange</p>
+          <p style={styles.brandTitle}>KHE</p>
         </div>
       </div>
 
-      <img src="/icons/ke-icon.svg" alt="KingsHall Exchange" style={styles.headerIcon} />
+      <img src="/icons/ke-icon.svg" alt="KHE" style={styles.headerIcon} />
     </header>
   );
 };
