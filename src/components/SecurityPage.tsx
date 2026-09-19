@@ -10,6 +10,7 @@ import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
+import NotificationBanner from './NotificationBanner';
 
 type SecurityDevice = {
   id?: string;
@@ -829,7 +830,13 @@ const SecurityPage = () => {
               </div>
             </div>
 
-            {status.text ? <p style={styles.status}>{status.text}</p> : null}
+            {status.kind !== 'idle' ? (
+              <NotificationBanner
+                tone={status.kind === 'success' ? 'success' : 'error'}
+                title={status.kind === 'success' ? 'Security settings updated' : 'Check your details'}
+                message={status.text}
+              />
+            ) : null}
           </div>
         </div>
         <NowBar />
