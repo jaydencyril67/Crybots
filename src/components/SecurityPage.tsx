@@ -197,7 +197,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     display: 'grid',
     gap: '10px',
     marginTop: '8px',
-    gridTemplateColumns: 'minmax(0, 1fr) auto',
     alignItems: 'start',
     width: '100%',
     minWidth: 0,
@@ -455,6 +454,17 @@ const SecurityPage = () => {
 
   return (
     <HybridTheme mode={themeMode}>
+      <style>{`.security-control {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      @media (max-width: 640px) {
+        .security-control {
+          grid-template-columns: 1fr;
+        }
+        .security-control > button {
+          width: 100%;
+        }
+      }`}</style>
       <div style={styles.page}>
         <div style={styles.shell}>
           <Helmet>
@@ -471,7 +481,7 @@ const SecurityPage = () => {
               <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>
                 <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
-                <div style={styles.control}>
+                <div className="security-control" style={styles.control}>
                   <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
                   <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button>
                 </div>
@@ -561,7 +571,7 @@ const SecurityPage = () => {
               <div style={styles.row}>
                 <p style={styles.rowLabel}><KeyRound size={16} /> Password</p>
                 <p style={styles.rowValue}>Change your account password</p>
-                <div style={styles.control}>
+                <div className="security-control" style={styles.control}>
                   <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
                   <input style={styles.input} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
@@ -572,7 +582,7 @@ const SecurityPage = () => {
               <div style={styles.row}>
                 <p style={styles.rowLabel}><LockKeyhole size={16} /> Security code</p>
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
-                <div style={styles.control}>
+                <div className="security-control" style={styles.control}>
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
                   <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />

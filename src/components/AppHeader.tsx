@@ -106,6 +106,13 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       }
     };
 
+    const activateAlert = () => {
+      if (!mounted) return;
+      setIsAlertActive(true);
+      window.clearTimeout(alertTimeout.current);
+      alertTimeout.current = window.setTimeout(() => setIsAlertActive(false), 10000);
+    };
+
     const loadUnreadCount = async () => {
       if (isPublicPage || !localStorage.getItem('token')) {
         clearNotificationState();
@@ -119,9 +126,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
         }
         const nextCount = Number(response.data?.unreadCount || 0);
         if (hasLoadedCount.current && nextCount > previousCount.current) {
-          setIsAlertActive(true);
-          window.clearTimeout(alertTimeout.current);
-          alertTimeout.current = window.setTimeout(() => setIsAlertActive(false), 10000);
+          activateAlert();
         }
         if (mounted) {
           previousCount.current = nextCount;
@@ -140,7 +145,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     }
     const interval = window.setInterval(() => { void loadUnreadCount(); }, 15000);
     window.addEventListener('ke:force-logout', clearNotificationState);
-    const handleNotificationsChanged = () => { void loadUnreadCount(); };
+    const handleNotificationsChanged = () => {
+      activateAlert();
+      void loadUnreadCount();
+    };
     const handleAuthChanged = () => { void loadUnreadCount(); };
     window.addEventListener(NOTIFICATIONS_CHANGED_EVENT, handleNotificationsChanged);
     window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
