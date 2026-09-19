@@ -307,7 +307,6 @@ const WithdrawPage = () => {
             setScheduledFor(value);
             setShowSchedulePage(false);
           }}
-          confirmLabel="Confirm schedule"
           cancelLabel="Back"
         />
       ) : null}
