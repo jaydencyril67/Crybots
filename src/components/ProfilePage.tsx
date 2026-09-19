@@ -262,6 +262,7 @@ const ProfilePage = () => {
     window.localStorage.removeItem('kingshall_user');
     window.localStorage.removeItem('firstName');
     window.localStorage.removeItem('kingshall_first_name');
+    window.dispatchEvent(new Event('ke:force-logout'));
     navigate('/');
   };
 

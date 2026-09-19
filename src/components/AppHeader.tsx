@@ -93,21 +93,29 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   useEffect(() => {
     let mounted = true;
 
+    const clearNotificationState = () => {
+      previousCount.current = 0;
+      hasLoadedCount.current = false;
+      window.clearTimeout(alertTimeout.current);
+      if (mounted) {
+        setUnreadCount(0);
+        setIsAlertActive(false);
+      }
+    };
+
     const loadUnreadCount = async () => {
-      if (!localStorage.getItem('token')) {
-        previousCount.current = 0;
-        hasLoadedCount.current = false;
-        window.clearTimeout(alertTimeout.current);
-        if (mounted) {
-          setUnreadCount(0);
-          setIsAlertActive(false);
-        }
+      if (isPublicPage || !localStorage.getItem('token')) {
+        clearNotificationState();
         return;
       }
       try {
         const response = await api.get('/api/notifications');
+        if (!mounted || isPublicPage || !localStorage.getItem('token')) {
+          clearNotificationState();
+          return;
+        }
         const nextCount = Number(response.data?.unreadCount || 0);
-        if (mounted && hasLoadedCount.current && nextCount > previousCount.current) {
+        if (hasLoadedCount.current && nextCount > previousCount.current) {
           setIsAlertActive(true);
           window.clearTimeout(alertTimeout.current);
           alertTimeout.current = window.setTimeout(() => setIsAlertActive(false), 10000);
@@ -122,18 +130,24 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       }
     };
 
-    void loadUnreadCount();
+    if (isPublicPage) {
+      clearNotificationState();
+    } else {
+      void loadUnreadCount();
+    }
     const interval = window.setInterval(() => { void loadUnreadCount(); }, 15000);
+    window.addEventListener('ke:force-logout', clearNotificationState);
     return () => {
       mounted = false;
       window.clearInterval(interval);
       window.clearTimeout(alertTimeout.current);
       alertTimeout.current = undefined;
+      window.removeEventListener('ke:force-logout', clearNotificationState);
     };
-  }, []);
+  }, [isPublicPage]);
 
   const handleHeaderClick = () => {
-    if (!isPublicPage) navigate('/notifications');
+    if (!isPublicPage && localStorage.getItem('token')) navigate('/notifications');
   };
 
   const headerStyle = isAlertActive
