@@ -268,7 +268,7 @@ const SettingsPage = () => {
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
 
-  const securityCodeValid = securityCode.trim().replace(/\D/g, '').length === 6 && securityCode === securityCodeConfirm;
+  const securityCodeValid = securityCode.trim().replace(/\D/g, '').length === 4 && securityCode === securityCodeConfirm;
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
   };
@@ -346,7 +346,7 @@ const SettingsPage = () => {
     }
 
     if (!securityCodeValid) {
-      showStatus('error', 'Security code must be 6 digits and match confirmation.');
+      showStatus('error', 'Security code must be 4 digits and match confirmation.');
       return;
     }
 
@@ -584,11 +584,11 @@ const SettingsPage = () => {
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>Security code</span>
-                    <input style={styles.input} type="password" value={securityCode} onChange={(event) => { setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="6 digits" />
+                    <input style={styles.input} type="password" value={securityCode} onChange={(event) => { setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 4)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="4 digits" />
                   </label>
                   <label style={styles.field}>
                     <span style={styles.label}>Confirm security code</span>
-                    <input style={styles.input} type="password" value={securityCodeConfirm} onChange={(event) => { setSecurityCodeConfirm(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="Repeat 6 digits" />
+                    <input style={styles.input} type="password" value={securityCodeConfirm} onChange={(event) => { setSecurityCodeConfirm(event.target.value.replace(/\D/g, '').slice(0, 4)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="Repeat 4 digits" />
                   </label>
                 </div>
                 {((activeCard === 'securityCode' && securityCodeValid) || securityCodeCardSaving) ? (
