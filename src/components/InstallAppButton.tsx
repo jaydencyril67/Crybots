@@ -1,5 +1,7 @@
 import React from 'react';
 import { Download } from 'lucide-react';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 type BeforeInstallPromptEvent = Event & {
   readonly platforms: string[];
@@ -16,6 +18,8 @@ const isAppInstalled = () => {
 };
 
 const InstallAppButton = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
   const [deferredPrompt, setDeferredPrompt] = React.useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = React.useState(isAppInstalled());
 
@@ -66,7 +70,7 @@ const InstallAppButton = () => {
   }
 
   return (
-    <button type="button" onClick={handleInstallClick} style={styles.button}>
+    <button type="button" onClick={handleInstallClick} style={{ ...styles.button, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text }}>
       <Download size={18} strokeWidth={2.4} />
       Install App
     </button>
@@ -75,10 +79,7 @@ const InstallAppButton = () => {
 
 const styles = {
   button: {
-    border: '1px solid rgba(255,255,255,0.14)',
     borderRadius: '999px',
-    background: 'rgba(255,255,255,0.05)',
-    color: '#ffffff',
     padding: '12px 18px',
     fontWeight: 700,
     display: 'inline-flex',

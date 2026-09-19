@@ -4,9 +4,10 @@ import { CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
+import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
-import { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -212,13 +213,13 @@ const WithdrawPage = () => {
     }
   };
 
-  if (loading) return null;
-
   return (
-    <div data-shadow-free-page="withdrawals" style={styles.page}>
+    <HybridTheme mode={themeMode}>
+      <div data-shadow-free-page="withdrawals" style={styles.page}>
       <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />
+        {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0 0' }}><LoadingDots /></div> : null}
         <div style={styles.content}>
           {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
           <section style={styles.section}>
@@ -311,7 +312,8 @@ const WithdrawPage = () => {
           cancelLabel="Back"
         />
       ) : null}
-    </div>
+      </div>
+    </HybridTheme>
   );
 };
 

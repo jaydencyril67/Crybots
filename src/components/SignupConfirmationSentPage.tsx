@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { navigate } from '../utils/navigate';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2 } from 'lucide-react';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    background: '#050816',
-    color: '#ffffff',
+    background: theme.background,
+    color: theme.text,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -17,8 +19,8 @@ const styles = {
     width: '100%',
     maxWidth: '560px',
     borderRadius: '28px',
-    border: '1px solid rgba(255,255,255,0.12)',
-    background: 'rgba(255,255,255,0.06)',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceGlass,
     padding: '32px',
     textAlign: 'center' as const,
     backdropFilter: 'blur(18px)',
@@ -31,8 +33,8 @@ const styles = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(34,197,94,0.14)',
-    color: '#4ade80',
+    background: theme.highlightSoft,
+    color: theme.success,
     marginBottom: '20px',
   },
   title: {
@@ -42,19 +44,22 @@ const styles = {
   },
   text: {
     margin: '12px 0 0',
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
     lineHeight: 1.7,
     fontSize: '15px',
   },
   countdown: {
     marginTop: '20px',
     fontSize: '14px',
-    color: '#67e8f9',
+    color: theme.primary,
     fontWeight: 700,
   },
-};
+});
 
 const SignupConfirmationSentPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const [secondsLeft, setSecondsLeft] = useState(5);
 
   useEffect(() => {
@@ -74,7 +79,7 @@ const SignupConfirmationSentPage = () => {
   }, []);
 
   return (
-    <>
+    <HybridTheme mode={themeMode}>
       <Helmet>
         <title>KingsHall Exchange | Confirm your account</title>
       </Helmet>
@@ -90,7 +95,7 @@ const SignupConfirmationSentPage = () => {
           <p style={styles.countdown}>Redirecting to sign in in {secondsLeft} seconds...</p>
         </section>
       </main>
-    </>
+    </HybridTheme>
   );
 };
 

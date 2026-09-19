@@ -301,7 +301,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   buttonPrimary: {
     background: theme.primary,
     color: theme.textInverse,
-    boxShadow: 'none',
   },
   footerNote: {
     margin: '18px 0 0',

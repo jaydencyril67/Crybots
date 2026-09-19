@@ -294,7 +294,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     marginTop: '18px',
   },
   switchText: {
-    color: 'rgba(255,255,255,0.72)',
+    color: theme.textMuted,
     fontSize: '14px',
   },
   switchLink: {
@@ -322,7 +322,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   buttonPrimary: {
     background: theme.primary,
     color: theme.textInverse,
-    boxShadow: 'none',
   },
   footerNote: {
     margin: '18px 0 0',
@@ -384,7 +383,7 @@ const SignupPage = () => {
 
   const emailInputStyle =
     form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
-      ? { ...styles.input, borderColor: theme.danger, boxShadow: `0 0 0 1px ${theme.danger}`, background: theme.surfaceMuted }
+      ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted }
       : styles.input;
 
   const passwordHasLetter = /[A-Za-z]/.test(form.password);
@@ -398,7 +397,7 @@ const SignupPage = () => {
   const passwordErrorMessage = form.password && !passwordMeetsRequirement ? passwordNotice : '';
   const passwordInputStyle =
     passwordErrorMessage
-      ? { ...styles.input, borderColor: 'rgba(248, 113, 113, 0.9)', boxShadow: '0 0 0 1px rgba(248, 113, 113, 0.35)', background: 'rgba(127, 29, 29, 0.14)' }
+      ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted }
       : styles.input;
 
   const isAtLeast18 = (value: string) => {
@@ -598,7 +597,7 @@ const SignupPage = () => {
                 textAlign: 'left',
                 cursor: 'pointer',
                 ...(form.dob && !dobMeetsRequirement
-                  ? { borderColor: theme.danger, boxShadow: `0 0 0 1px ${theme.danger}`, background: theme.surfaceMuted }
+                  ? { borderColor: theme.danger, background: theme.surfaceMuted }
                   : null),
               }}
             >

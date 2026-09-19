@@ -4,6 +4,7 @@ import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from
 import api from '../api/axios';
 import AppHeader from './AppHeader';
 import NotificationBanner from './NotificationBanner';
+import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -210,14 +211,13 @@ const TransferPage = () => {
     }
   };
 
-  if (loading) return null;
-
   return (
     <HybridTheme mode={themeMode}>
       <div style={styles.page}>
       <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         <AppHeader />
+        {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: '18px 0 0' }}><LoadingDots /></div> : null}
         <div style={styles.panel}>
           <div style={styles.body}>
             {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}

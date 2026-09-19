@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AppHeader from './AppHeader';
-import HybridTheme from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 
 type ReusableDatePageProps = {
@@ -17,7 +18,7 @@ type ReusableDatePageProps = {
   mode?: 'auto' | 'date' | 'datetime-local' | 'time';
 };
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
@@ -38,15 +39,15 @@ const styles = {
   },
   card: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
     padding: '18px',
   },
   eyebrow: {
     margin: 0,
     fontSize: '0.82rem',
     fontWeight: 800,
-    color: '#8f8f8f',
+    color: theme.textMuted,
     letterSpacing: '0.08em',
     textTransform: 'uppercase' as const,
   },
@@ -55,12 +56,12 @@ const styles = {
     fontSize: '1.45rem',
     fontWeight: 900,
     letterSpacing: '-0.02em',
-    color: '#ffffff',
+    color: theme.text,
   },
   description: {
     margin: '8px 0 0',
     fontSize: '0.92rem',
-    color: '#b3b3b3',
+    color: theme.textMuted,
     lineHeight: 1.7,
     maxWidth: '62ch',
   },
@@ -72,7 +73,7 @@ const styles = {
   label: {
     fontSize: '0.82rem',
     fontWeight: 800,
-    color: '#8f8f8f',
+    color: theme.textMuted,
     letterSpacing: '0.08em',
     textTransform: 'uppercase' as const,
   },
@@ -80,9 +81,9 @@ const styles = {
     width: '100%',
     boxSizing: 'border-box' as const,
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.03)',
-    color: '#ffffff',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
+    color: theme.text,
     padding: '12px 14px',
     outline: 'none',
   },
@@ -98,22 +99,22 @@ const styles = {
     padding: '12px 18px',
     cursor: 'pointer',
     fontWeight: 800,
-    background: '#ffffff',
-    color: '#000000',
+    background: theme.primary,
+    color: theme.textInverse,
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: theme.borderGlass,
   },
   secondaryButton: {
     borderRadius: '18px',
     padding: '12px 18px',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: `1px solid ${theme.borderGlass}`,
     cursor: 'pointer',
     fontWeight: 800,
-    background: 'rgba(255,255,255,0.04)',
-    color: '#ffffff',
+    background: theme.surfaceMuted,
+    color: theme.text,
   },
-} as const;
+});
 
 const ReusableDatePage = ({
   title,
@@ -132,6 +133,9 @@ const ReusableDatePage = ({
     mode === 'auto' ? (value.includes('T') ? 'datetime-local' : 'date') : mode;
   const resolvedLabel = label ?? (resolvedMode === 'time' ? 'Time' : resolvedMode === 'datetime-local' ? 'Date and time' : 'Date');
   const inputType = resolvedMode;
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const [date, setDate] = useState(value);
 
   useEffect(() => {
@@ -141,7 +145,7 @@ const ReusableDatePage = ({
   const parsedMax = useMemo(() => max, [max]);
 
   return (
-    <HybridTheme>
+    <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />

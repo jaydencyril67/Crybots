@@ -1,5 +1,7 @@
 import React from 'react';
 import { AlertTriangle, CheckCircle2, ShieldCheck, Info } from 'lucide-react';
+import { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme } from './AppTheme';
 
 export type NotificationTone = 'error' | 'success' | 'info' | 'warning';
 
@@ -37,35 +39,36 @@ const styles = {
   },
 } as const;
 
-const toneStyles: Record<NotificationTone, { border: string; background: string; color: string; icon: React.ReactNode }> = {
+const getToneStyles = (theme: typeof HYBRID_THEME_TOKENS.dark): Record<NotificationTone, { border: string; background: string; color: string; icon: React.ReactNode }> => ({
   error: {
-    border: '1px solid rgba(248,113,113,0.32)',
-    background: 'rgba(248,113,113,0.08)',
-    color: '#fee2e2',
+    border: `1px solid ${theme.danger}`,
+    background: theme.primarySoft,
+    color: theme.danger,
     icon: <AlertTriangle />,
   },
   success: {
-    border: '1px solid rgba(74,222,128,0.3)',
-    background: 'rgba(74,222,128,0.08)',
-    color: '#d1fae5',
+    border: `1px solid ${theme.success}`,
+    background: theme.highlightSoft,
+    color: theme.success,
     icon: <CheckCircle2 />,
   },
   info: {
-    border: '1px solid rgba(96,165,250,0.3)',
-    background: 'rgba(96,165,250,0.08)',
-    color: '#dbeafe',
+    border: `1px solid ${theme.primary}`,
+    background: theme.primarySoft,
+    color: theme.primary,
     icon: <Info />,
   },
   warning: {
-    border: '1px solid rgba(251,191,36,0.3)',
-    background: 'rgba(251,191,36,0.08)',
-    color: '#fef3c7',
+    border: `1px solid ${theme.warning}`,
+    background: theme.highlightSoft,
+    color: theme.warning,
     icon: <ShieldCheck />,
   },
-};
+});
 
 const NotificationBanner = ({ tone = 'info', title, message }: NotificationBannerProps) => {
-  const theme = toneStyles[tone];
+  const { themeMode } = useAppTheme();
+  const theme = getToneStyles(HYBRID_THEME_TOKENS[themeMode])[tone];
 
   return (
     <div style={{ ...styles.banner, border: theme.border, background: theme.background, color: theme.color }} role="alert" aria-live="polite">
