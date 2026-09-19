@@ -23,9 +23,9 @@ const steps = [
   },
   {
     title: 'Verification code',
-    description: 'We will send a 3-digit code to your email once your details match.',
+    description: 'We will send a 4-digit code to your email once your details match.',
     field: 'code',
-    placeholder: 'Enter 3-digit code',
+    placeholder: 'Enter 4-digit code',
   },
   {
     title: 'New password',
@@ -335,7 +335,7 @@ const validateField = (field: StepField, value: string, form?: FormState) => {
 
   if (field === 'code') {
     if (!trimmed) return 'Verification code is required.';
-    if (!/^\d{3}$/.test(trimmed)) return 'Enter the 3-digit code sent to your email.';
+    if (!/^\d{4}$/.test(trimmed)) return 'Enter the 4-digit code sent to your email.';
   }
 
   if (field === 'password') {
@@ -348,7 +348,7 @@ const validateField = (field: StepField, value: string, form?: FormState) => {
     if (form?.password && form.password !== value) return 'Passwords do not match.';
   }
 
-  if (field === 'code' && !/^[0-9]{3}$/.test(trimmed)) return 'Verification code must contain exactly 3 digits.';
+  if (field === 'code' && !/^[0-9]{4}$/.test(trimmed)) return 'Verification code must contain exactly 4 digits.';
 
   return '';
 };
@@ -495,7 +495,7 @@ const ForgotPasswordPage = () => {
           fullName: normalizeFullName(form.fullName),
         });
         const message = response.data?.message;
-        setStatus(message || 'Email found. We sent a 3-digit code to your email.');
+        setStatus(message || 'Email found. We sent a 4-digit code to your email.');
         setStep(2);
         return;
       }
@@ -585,7 +585,7 @@ const ForgotPasswordPage = () => {
         <title>Forgot Password | Kingshall</title>
         <meta
           name="description"
-          content="Reset your account password by verifying your email, full name, and a 3-digit recovery code."
+          content="Reset your account password by verifying your email, full name, and a 4-digit recovery code."
         />
       </Helmet>
       <div style={hybridStyles.page}>
@@ -607,7 +607,7 @@ const ForgotPasswordPage = () => {
               <p style={hybridStyles.stepLabel}>Password recovery</p>
               <h2 style={styles.title}>
                 <span style={styles.titleAccent}>Reset your password safely.</span>
-                Confirm your identity, receive a 3-digit code, and set a new password.
+                Confirm your identity, receive a 4-digit code, and set a new password.
               </h2>
               {completed ? (
                 <NotificationBanner
@@ -643,9 +643,11 @@ const ForgotPasswordPage = () => {
                     type={currentStep.field === 'password' ? 'password' : 'text'}
                     placeholder={currentStep.placeholder}
                     value={form[currentStep.field]}
-                    onChange={(event) => updateField(currentStep.field, event.target.value)}
+                    onChange={(event) => updateField(currentStep.field, currentStep.field === 'code' ? event.target.value.replace(/\D/g, '').slice(0, 4) : event.target.value)}
+                    inputMode={currentStep.field === 'code' ? 'numeric' : undefined}
+                    maxLength={currentStep.field === 'code' ? 4 : undefined}
                     style={hybridStyles.input}
-                    autoComplete={currentStep.field === 'email' ? 'email' : currentStep.field === 'password' ? 'new-password' : 'off'}
+                    autoComplete={currentStep.field === 'email' ? 'email' : currentStep.field === 'password' ? 'new-password' : 'one-time-code'}
                   />
                 </label>
 

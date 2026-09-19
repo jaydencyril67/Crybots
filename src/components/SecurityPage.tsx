@@ -658,7 +658,7 @@ const SecurityPage = () => {
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
                   <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
-                  {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Email confirmation code" inputMode="numeric" maxLength={6} /> : null}
+                  {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit email confirmation code" inputMode="numeric" maxLength={4} /> : null}
                   {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
                 </div>
               </div>

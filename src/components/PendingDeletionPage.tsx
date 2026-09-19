@@ -114,8 +114,10 @@ const PendingDeletionPage = () => {
           <input
             id="pending-deletion-code"
             value={code}
-            onChange={(event) => setCode(event.target.value)}
-            placeholder="Enter the 6-digit code"
+            onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 4))}
+            placeholder="Enter the 4-digit code"
+            inputMode="numeric"
+            maxLength={4}
             style={{ width: '100%', boxSizing: 'border-box', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, padding: '12px 14px', outline: 'none' }}
           />
         </div>

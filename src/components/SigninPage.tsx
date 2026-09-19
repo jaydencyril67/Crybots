@@ -11,7 +11,7 @@ import { navigate } from '../utils/navigate';
 
 const signInMethods = [
   { value: 'password', title: 'Password', description: 'Use your account password to sign in.' },
-  { value: 'code', title: 'Email sign-in code', description: 'Receive a 3-digit code by email.' },
+  { value: 'code', title: 'Email sign-in code', description: 'Receive a 4-digit code by email.' },
 ] as const;
 
 
@@ -668,7 +668,7 @@ const SigninPage = () => {
                     <>
                       <p style={hybridStyles.stepLabel}>Choose method</p>
                       <h2 style={{ ...styles.stepTitle, color: theme.text }}>Pick how you want to sign in</h2>
-                      <p style={hybridStyles.stepDesc}>Password is instant if you remember it. Code sign-in sends a 3-digit email code through Resend.</p>
+                      <p style={hybridStyles.stepDesc}>Password is instant if you remember it. Code sign-in sends a 4-digit email code through Resend.</p>
                     </>
                   ) : step === 'password' ? (
                     <>
@@ -714,7 +714,7 @@ const SigninPage = () => {
                       {twoFactorRequired ? (
                         <>
                           <label style={hybridStyles.label} htmlFor="signin-2fa-password">Authenticator code</label>
-                          <input id="signin-2fa-password" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
+                          <input id="signin-2fa-password" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
                         </>
                       ) : null}
                     </div>
@@ -722,11 +722,11 @@ const SigninPage = () => {
                   {step === 'code' ? (
                     <div style={styles.field}>
                       <label style={hybridStyles.label} htmlFor="signin-code">Sign-in code</label>
-                      <input id="signin-code" style={hybridStyles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
+                      <input id="signin-code" style={hybridStyles.input} inputMode="numeric" maxLength={4} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" autoComplete="one-time-code" />
                       {twoFactorRequired ? (
                         <>
                           <label style={hybridStyles.label} htmlFor="signin-2fa-code">Authenticator code</label>
-                          <input id="signin-2fa-code" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
+                          <input id="signin-2fa-code" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
                         </>
                       ) : null}
                       <div style={hybridStyles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>

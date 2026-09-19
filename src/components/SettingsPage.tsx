@@ -268,7 +268,7 @@ const SettingsPage = () => {
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
 
-  const securityCodeValid = securityCode.trim().replace(/\D/g, '').length === 6 && securityCode === securityCodeConfirm;
+  const securityCodeValid = securityCode.trim().replace(/\D/g, '').length === 4 && securityCode === securityCodeConfirm;
   const showStatus = (kind: StatusState['kind'], message: string) => {
     setStatus({ kind, message });
   };
@@ -346,7 +346,7 @@ const SettingsPage = () => {
     }
 
     if (!securityCodeValid) {
-      showStatus('error', 'Security code must be 6 digits and match confirmation.');
+      showStatus('error', 'Security code must be 4 digits and match confirmation.');
       return;
     }
 
