@@ -16,7 +16,7 @@ type DangerActionState = {
   loading: DangerActionKey | null;
 };
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
@@ -37,8 +37,8 @@ const styles = {
   },
   card: {
     borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
+    border: `1px solid ${theme.borderSubtle}`,
+    background: theme.surfaceGlass,
     padding: '18px',
   },
   sectionTitle: {
@@ -46,12 +46,12 @@ const styles = {
     fontSize: '1.45rem',
     fontWeight: 900,
     letterSpacing: '-0.02em',
-    color: '#ffffff',
+    color: theme.text,
   },
   sectionText: {
     margin: '8px 0 0',
     fontSize: '0.92rem',
-    color: '#a3a3a3',
+    color: theme.textMuted,
     lineHeight: 1.7,
     maxWidth: '62ch',
   },
@@ -59,12 +59,12 @@ const styles = {
     margin: 0,
     fontSize: '1.1rem',
     fontWeight: 800,
-    color: '#ffffff',
+    color: theme.text,
   },
   actionText: {
     margin: '8px 0 0',
     fontSize: '0.88rem',
-    color: '#b3b3b3',
+    color: theme.textMuted,
     lineHeight: 1.55,
     maxWidth: '64ch',
   },
@@ -76,7 +76,7 @@ const styles = {
   label: {
     fontSize: '0.82rem',
     fontWeight: 800,
-    color: '#8f8f8f',
+    color: theme.textMuted,
     letterSpacing: '0.08em',
     textTransform: 'uppercase' as const,
   },
@@ -84,9 +84,9 @@ const styles = {
     width: '100%',
     boxSizing: 'border-box' as const,
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.03)',
-    color: '#ffffff',
+    border: `1px solid ${theme.borderSubtle}`,
+    background: theme.surfaceGlass,
+    color: theme.text,
     padding: '12px 14px',
     outline: 'none',
   },
@@ -98,18 +98,18 @@ const styles = {
   actionButton: {
     borderRadius: '18px',
     padding: '12px 18px',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: `1px solid ${theme.borderSubtle}`,
     cursor: 'pointer',
     fontWeight: 800,
-    color: '#ffffff',
-    background: 'rgba(255,255,255,0.05)',
+    color: theme.text,
+    background: theme.surfaceGlass,
     textAlign: 'center' as const,
   },
   status: {
     marginTop: '14px',
     fontSize: '0.92rem',
     fontWeight: 700,
-    color: '#ffffff',
+    color: theme.text,
   },
 };
 
