@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import AppHeader from './AppHeader';
-import HybridTheme from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
+import { useAppTheme } from './AppTheme';
 
 type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
 
@@ -16,12 +17,14 @@ type DangerActionState = {
   loading: DangerActionKey | null;
 };
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
     paddingBottom: '132px',
+    background: theme.background,
+    color: theme.text,
   },
   shell: {
     width: '100%',
@@ -36,22 +39,19 @@ const styles = {
     marginTop: '18px',
   },
   card: {
-    borderRadius: '22px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.04)',
-    padding: '18px',
+    ...createHybridCardStyles(theme).card,
   },
   sectionTitle: {
     margin: 0,
     fontSize: '1.45rem',
     fontWeight: 900,
     letterSpacing: '-0.02em',
-    color: '#ffffff',
+    color: theme.text,
   },
   sectionText: {
     margin: '8px 0 0',
     fontSize: '0.92rem',
-    color: '#a3a3a3',
+    color: theme.textMuted,
     lineHeight: 1.7,
     maxWidth: '62ch',
   },
@@ -59,12 +59,12 @@ const styles = {
     margin: 0,
     fontSize: '1.1rem',
     fontWeight: 800,
-    color: '#ffffff',
+    color: theme.text,
   },
   actionText: {
     margin: '8px 0 0',
     fontSize: '0.88rem',
-    color: '#b3b3b3',
+    color: theme.textMuted,
     lineHeight: 1.55,
     maxWidth: '64ch',
   },
@@ -76,7 +76,7 @@ const styles = {
   label: {
     fontSize: '0.82rem',
     fontWeight: 800,
-    color: '#8f8f8f',
+    color: theme.textMuted,
     letterSpacing: '0.08em',
     textTransform: 'uppercase' as const,
   },
@@ -84,9 +84,9 @@ const styles = {
     width: '100%',
     boxSizing: 'border-box' as const,
     borderRadius: '18px',
-    border: '1px solid rgba(255,255,255,0.08)',
-    background: 'rgba(255,255,255,0.03)',
-    color: '#ffffff',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+    color: theme.text,
     padding: '12px 14px',
     outline: 'none',
   },
@@ -98,22 +98,26 @@ const styles = {
   actionButton: {
     borderRadius: '18px',
     padding: '12px 18px',
-    border: '1px solid rgba(255,255,255,0.08)',
+    border: `1px solid ${theme.borderGlass}`,
     cursor: 'pointer',
     fontWeight: 800,
-    color: '#ffffff',
-    background: 'rgba(255,255,255,0.05)',
+    color: theme.textInverse,
+    background: theme.primary,
     textAlign: 'center' as const,
   },
   status: {
     marginTop: '14px',
     fontSize: '0.92rem',
     fontWeight: 700,
-    color: '#ffffff',
+    color: theme.textMuted,
   },
-};
+});
 
 const DangerPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
+
   const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
   const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
   const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
@@ -206,7 +210,7 @@ const DangerPage = () => {
   }
 
   return (
-    <HybridTheme>
+    <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <div style={styles.shell}>
           <AppHeader />
