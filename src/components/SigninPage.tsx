@@ -408,6 +408,7 @@ const SigninPage = () => {
   const [isCodeLocked, setIsCodeLocked] = useState(false);
   const [isResendingCode, setIsResendingCode] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(5);
+  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
   const [resendStatus, setResendStatus] = useState('');
   const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in') || resendStatus.toLowerCase().includes('confirmation email has been sent');
 
@@ -440,7 +441,7 @@ const SigninPage = () => {
         }
       : hybridStyles.input;
 
-  const signInDisabled = isSubmitting || !canContinue || (step === 'code' && !form.code.trim()) || (step === 'password' && !form.password.trim());
+  const signInDisabled = isSubmitting || !canContinue || (step === 'code' && (!form.code.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6))) || (step === 'password' && (!form.password.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6)));
 
   const handleNext = () => {
     if (!canContinue) return;
@@ -471,6 +472,7 @@ const SigninPage = () => {
   const handleStartSignin = async (selectedMethod: SignInMethod) => {
     setSubmitError('');
     setMethod(selectedMethod);
+    setTwoFactorRequired(false);
 
     if (selectedMethod === 'password') {
       setStep('password');
@@ -512,7 +514,7 @@ const SigninPage = () => {
       const response = await api.post('/api/auth/signin', {
         email: form.email,
         password: form.password,
-        twoFactorCode: form.twoFactorCode,
+        ...(twoFactorRequired ? { twoFactorCode: form.twoFactorCode } : {}),
       });
 
       
@@ -532,9 +534,14 @@ const SigninPage = () => {
 
       navigate('/dashboard');
     } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean } } })?.response;
       const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
-      setSubmitError(message);
+      if (response?.data?.twoFactorRequired) {
+        setTwoFactorRequired(true);
+        setSubmitError('Enter the 6-digit code from your authenticator app to continue.');
+      } else {
+        setSubmitError(message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -548,7 +555,7 @@ const SigninPage = () => {
       const response = await api.post('/api/auth/signin/verify-code', {
         email: form.email,
         code: form.code,
-        twoFactorCode: form.twoFactorCode,
+        ...(twoFactorRequired ? { twoFactorCode: form.twoFactorCode } : {}),
       });
 
       if (response.data?.token) {
@@ -566,9 +573,14 @@ const SigninPage = () => {
 
       navigate('/dashboard');
     } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
+      const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean } } })?.response;
       const message = response?.data?.message || 'Unable to verify code right now. Please try again.';
-      setSubmitError(message);
+      if (response?.data?.twoFactorRequired) {
+        setTwoFactorRequired(true);
+        setSubmitError('Enter the 6-digit code from your authenticator app to continue.');
+      } else {
+        setSubmitError(message);
+      }
       if (response?.status === 423) {
         setIsCodeLocked(true);
       }
@@ -699,16 +711,24 @@ const SigninPage = () => {
                     <div style={styles.field}>
                       <label style={hybridStyles.label} htmlFor="signin-password">Password</label>
                       <input id="signin-password" style={hybridStyles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
-                      <label style={hybridStyles.label} htmlFor="signin-2fa-password">Authenticator code (if enabled)</label>
-                      <input id="signin-2fa-password" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
+                      {twoFactorRequired ? (
+                        <>
+                          <label style={hybridStyles.label} htmlFor="signin-2fa-password">Authenticator code</label>
+                          <input id="signin-2fa-password" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
+                        </>
+                      ) : null}
                     </div>
                   ) : null}
                   {step === 'code' ? (
                     <div style={styles.field}>
                       <label style={hybridStyles.label} htmlFor="signin-code">Sign-in code</label>
                       <input id="signin-code" style={hybridStyles.input} inputMode="numeric" maxLength={3} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 3))} placeholder="000" autoComplete="one-time-code" />
-                      <label style={hybridStyles.label} htmlFor="signin-2fa-code">Authenticator code (if enabled)</label>
-                      <input id="signin-2fa-code" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
+                      {twoFactorRequired ? (
+                        <>
+                          <label style={hybridStyles.label} htmlFor="signin-2fa-code">Authenticator code</label>
+                          <input id="signin-2fa-code" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit code" autoComplete="one-time-code" />
+                        </>
+                      ) : null}
                       <div style={hybridStyles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
                     </div>
                   ) : null}
