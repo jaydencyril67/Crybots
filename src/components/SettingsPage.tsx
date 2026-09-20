@@ -346,12 +346,6 @@ const SettingsPage = () => {
     }
   };
 
-  const handleToggleTheme = () => {
-    const nextPreference = themeMode === 'dark' ? 'light' : 'dark';
-    persistTheme(nextPreference);
-    showStatus('success', `Theme switched to ${nextPreference === 'dark' ? 'Dark' : 'Light'} mode.`, 'theme');
-  };
-
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -459,7 +453,7 @@ const SettingsPage = () => {
                 {renderStatus('theme')}
                 <h2 style={styles.cardTitle}>🎨 Theme</h2>
                 <p style={styles.cardText}>Choose Light, Dark, System, or Shift mode. System follows your device theme; Shift uses Light from 6 AM to 6 PM and Dark overnight.</p>
-                <div style={{ ...styles.toggleRow, flexWrap: 'wrap' }}>
+                <div style={{ ...styles.toggleRow, justifyContent: 'center', flexWrap: 'nowrap', gap: '8px', width: '100%' }}>
                   <button
                     type="button"
                     style={{ ...styles.togglePill, ...(themePreference === 'dark' ? styles.togglePillActive : {}) }}
@@ -487,11 +481,6 @@ const SettingsPage = () => {
                     onClick={() => persistTheme('shift')}
                   >
                     Shift
-                  </button>
-                </div>
-                <div style={styles.buttonRow}>
-                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={handleToggleTheme}>
-                    Toggle Light / Dark
                   </button>
                 </div>
               </section>
