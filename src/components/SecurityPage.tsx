@@ -315,7 +315,7 @@ const SecurityPage = () => {
   const [currentSecurityPassword, setCurrentSecurityPassword] = useState('');
   const [securityCode, setSecurityCode] = useState('');
   const [confirmSecurityCode, setConfirmSecurityCode] = useState('');
-  const [status, setStatus] = useState<{ kind: SaveState; text: string }>({ kind: 'idle', text: '' });
+  const [status, setStatus] = useState<{ kind: SaveState; text: string; section: string }>({ kind: 'idle', text: '', section: 'security' });
   const [logins, setLogins] = useState<SecurityLogin[]>([]);
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
@@ -364,7 +364,7 @@ const SecurityPage = () => {
 
         setLogins(data.logins ?? []);
       } catch {
-        setStatus({ kind: 'error', text: 'Unable to load security details right now.' });
+        setStatus({ kind: 'error', text: 'Unable to load security details right now.', section: 'security' });
       } finally {
         setLoading(false);
       }
@@ -389,45 +389,53 @@ const SecurityPage = () => {
     try {
       await api.delete(`/api/auth/sessions/${tokenHash}`);
       setSessions((prev) => prev.filter((s) => s.tokenHash !== tokenHash));
-      setStatus({ kind: 'success', text: 'Device session removed successfully.' });
+      setStatus({ kind: 'success', text: 'Device session removed successfully.', section: 'sessions' });
     } catch (error: any) {
       setStatus({
         kind: 'error',
         text: error?.response?.data?.message || 'Unable to remove device session.',
+        section: 'sessions',
       });
     } finally {
       setRemovingSession(null);
     }
   };
 
-  const showStatus = (kind: SaveState, text: string) => setStatus({ kind, text });
+  const showStatus = (kind: SaveState, text: string, section = 'security') => setStatus({ kind, text, section });
+  const renderStatus = (section: string) => status.kind !== 'idle' && status.section === section ? (
+    <NotificationBanner
+      tone={status.kind === 'success' ? 'success' : 'error'}
+      title={status.kind === 'success' ? 'Security settings updated' : 'Check your details'}
+      message={status.text}
+    />
+  ) : null;
 
   const handleUidCodeRequest = async () => {
-    if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
+    if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.', 'uid');
     setRequestingUidCode(true);
     try {
       await api.post('/api/settings/uid-code');
       setUidCodeRequested(true);
       setUidCode('');
-      showStatus('success', 'A confirmation code was sent to your email.');
+      showStatus('success', 'A confirmation code was sent to your email.', 'uid');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to send UID confirmation code.');
+      showStatus('error', error?.response?.data?.message || 'Unable to send UID confirmation code.', 'uid');
     } finally {
       setRequestingUidCode(false);
     }
   };
 
   const handleUidSave = async () => {
-    if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.');
-    if (!uidCode.trim()) return showStatus('error', 'Enter the confirmation code sent to your email.');
+    if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.', 'uid');
+    if (!uidCode.trim()) return showStatus('error', 'Enter the confirmation code sent to your email.', 'uid');
     setSavingUid(true);
     try {
       await api.patch('/api/settings/uid', { uid: uid.trim(), code: uidCode.trim() });
       setUidCode('');
       setUidCodeRequested(false);
-      showStatus('success', 'UID updated successfully.');
+      showStatus('success', 'UID updated successfully.', 'uid');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update UID.');
+      showStatus('error', error?.response?.data?.message || 'Unable to update UID.', 'uid');
     } finally {
       setSavingUid(false);
     }
@@ -454,15 +462,15 @@ const SecurityPage = () => {
 
   const handlePasswordSave = async () => {
     if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
-      return showStatus('error', 'Enter your current password, new password, and confirmation.');
+      return showStatus('error', 'Enter your current password, new password, and confirmation.', 'password');
     }
 
     if (!passwordMeetsRequirement) {
-      return showStatus('error', passwordNotice);
+      return showStatus('error', passwordNotice, 'password');
     }
 
     if (newPassword !== confirmPassword) {
-      return showStatus('error', 'New password and confirmation must match.');
+      return showStatus('error', 'New password and confirmation must match.', 'password');
     }
 
     setSavingPassword(true);
@@ -471,12 +479,12 @@ const SecurityPage = () => {
         currentPassword: currentPassword.trim(),
         newPassword: newPassword.trim(),
       });
-      showStatus('success', 'Password updated successfully.');
+      showStatus('success', 'Password updated successfully.', 'password');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update password.');
+      showStatus('error', error?.response?.data?.message || 'Unable to update password.', 'password');
     } finally {
       setSavingPassword(false);
     }
@@ -484,11 +492,11 @@ const SecurityPage = () => {
 
   const handleSecurityCodeSave = async () => {
     if (!currentSecurityPassword.trim()) {
-      return showStatus('error', 'Enter your current password to update the security code.');
+      return showStatus('error', 'Enter your current password to update the security code.', 'securityCode');
     }
 
     if (securityCode.length !== 6 || securityCode !== confirmSecurityCode) {
-      return showStatus('error', 'Security code must be 6 digits and match confirmation.');
+      return showStatus('error', 'Security code must be 6 digits and match confirmation.', 'securityCode');
     }
 
     setSavingSecurityCode(true);
@@ -501,9 +509,9 @@ const SecurityPage = () => {
       setCurrentSecurityPassword('');
       setSecurityCode('');
       setConfirmSecurityCode('');
-      showStatus('success', 'Security code updated successfully.');
+      showStatus('success', 'Security code updated successfully.', 'securityCode');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update security code.');
+      showStatus('error', error?.response?.data?.message || 'Unable to update security code.', 'securityCode');
     } finally {
       setSavingSecurityCode(false);
     }
@@ -518,9 +526,9 @@ const SecurityPage = () => {
       setTwoFactorConfigured(true);
       setTwoFactorSetupOpen(true);
       setTwoFactorCode('');
-      showStatus('success', 'Scan the QR code with your authenticator app, then enter the generated code to enable 2FA.');
+      showStatus('success', 'Scan the QR code with your authenticator app, then enter the generated code to enable 2FA.', 'twoFactor');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to start 2FA setup.');
+      showStatus('error', error?.response?.data?.message || 'Unable to start 2FA setup.', 'twoFactor');
     } finally {
       setSaving2fa(false);
     }
@@ -532,15 +540,15 @@ const SecurityPage = () => {
     try {
       await navigator.clipboard.writeText(twoFactorSecret);
       setTwoFactorKeyCopied(true);
-      showStatus('success', 'Manual key copied to clipboard.');
+      showStatus('success', 'Manual key copied to clipboard.', 'twoFactor');
       window.setTimeout(() => setTwoFactorKeyCopied(false), 2000);
     } catch {
-      showStatus('error', 'Unable to copy the manual key.');
+      showStatus('error', 'Unable to copy the manual key.', 'twoFactor');
     }
   };
 
   const handleToggle2fa = async () => {
-    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the 6-digit code from your authenticator app.');
+    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the 6-digit code from your authenticator app.', 'twoFactor');
     setSaving2fa(true);
     try {
       const endpoint = twoFactorEnabled ? '/api/settings/2fa/disable' : '/api/settings/2fa/enable';
@@ -549,16 +557,16 @@ const SecurityPage = () => {
       setTwoFactorEnabled(enabling);
       if (enabling) setTwoFactorSetupOpen(false);
       setTwoFactorCode('');
-      showStatus('success', twoFactorEnabled ? 'Two-factor authentication disabled.' : 'Two-factor authentication enabled.');
+      showStatus('success', twoFactorEnabled ? 'Two-factor authentication disabled.' : 'Two-factor authentication enabled.', 'twoFactor');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update 2FA.');
+      showStatus('error', error?.response?.data?.message || 'Unable to update 2FA.', 'twoFactor');
     } finally {
       setSaving2fa(false);
     }
   };
 
   const handleDelete2fa = async () => {
-    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the current 6-digit authenticator code to delete 2FA.');
+    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the current 6-digit authenticator code to delete 2FA.', 'twoFactor');
     setShowDelete2faConfirmation(true);
   };
 
@@ -572,9 +580,9 @@ const SecurityPage = () => {
       setTwoFactorSecret('');
       setTwoFactorUri('');
       setTwoFactorCode('');
-      showStatus('success', 'All two-factor authentication data was deleted.');
+      showStatus('success', 'All two-factor authentication data was deleted.', 'twoFactor');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to delete 2FA data.');
+      showStatus('error', error?.response?.data?.message || 'Unable to delete 2FA data.', 'twoFactor');
     } finally {
       setSaving2fa(false);
       setShowDelete2faConfirmation(false);
@@ -582,14 +590,14 @@ const SecurityPage = () => {
   };
 
   const handleToggleBiometric = async () => {
-    if (!isWebAuthnAvailable()) return showStatus('error', 'Passkeys are not supported by this browser.');
+    if (!isWebAuthnAvailable()) return showStatus('error', 'Passkeys are not supported by this browser.', 'biometric');
     setSavingBiometric(true);
     try {
       if (biometricEnabled && passkeys.length) {
         await api.delete(`/api/webauthn/credentials/${encodeURIComponent(passkeys[0].id)}`);
         setPasskeys([]);
         setBiometricEnabled(false);
-        showStatus('success', 'Biometric security disabled.');
+        showStatus('success', 'Biometric security disabled.', 'biometric');
         return;
       }
       const { data: options } = await api.post('/api/webauthn/register/options');
@@ -597,9 +605,9 @@ const SecurityPage = () => {
       const { data } = await api.post('/api/webauthn/register/verify', credential);
       setPasskeys(data.credentials ?? []);
       setBiometricEnabled(true);
-      showStatus('success', 'Biometric security enabled with a passkey.');
+      showStatus('success', 'Biometric security enabled with a passkey.', 'biometric');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update biometric security.');
+      showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update biometric security.', 'biometric');
     } finally {
       setSavingBiometric(false);
     }
@@ -608,7 +616,7 @@ const SecurityPage = () => {
   const handleToggleHardware = async () => {
     setSavingHardware(true);
     try {
-      showStatus('success', 'Hardware security will be wired to the backend next.');
+      showStatus('success', 'Hardware security will be wired to the backend next.', 'hardware');
     } finally {
       setSavingHardware(false);
     }
@@ -618,7 +626,7 @@ const SecurityPage = () => {
     setSavingSecurityQuestion(true);
     try {
       await api.patch('/api/settings/security-question', {});
-      showStatus('success', 'Security question updated successfully.');
+      showStatus('success', 'Security question updated successfully.', 'security');
     } catch (error: any) {
       showStatus('error', error?.response?.data?.message || 'Unable to update security question.');
     } finally {
@@ -676,6 +684,7 @@ const SecurityPage = () => {
             <section style={styles.card}>
               <h1 style={styles.sectionTitle}>Security</h1>
               <p style={styles.sectionText}>Manage identity, sign-in protection, device access, and future security tooling from one flat, direct page.</p>
+              {renderStatus('security')}
             </section>
 
             <div style={styles.rowList}>
@@ -688,6 +697,7 @@ const SecurityPage = () => {
                   {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit email confirmation code" inputMode="numeric" maxLength={4} /> : null}
                   {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
                 </div>
+                {renderStatus('uid')}
               </div>
 
               <div style={styles.row}>
@@ -769,6 +779,7 @@ const SecurityPage = () => {
                     </tbody>
                   </table>
                 </div>
+                {renderStatus('sessions')}
               </div>
 
               <div style={styles.row}>
@@ -790,6 +801,7 @@ const SecurityPage = () => {
                   {confirmPasswordMismatch ? <p style={styles.inlineError}>Passwords do not match.</p> : null}
                   <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change'}</button>
                 </div>
+                {renderStatus('password')}
               </div>
 
               <div style={styles.row}>
@@ -801,6 +813,7 @@ const SecurityPage = () => {
                   <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
                   <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
                 </div>
+                {renderStatus('securityCode')}
               </div>
 
               <div style={styles.row}>
@@ -838,6 +851,7 @@ const SecurityPage = () => {
                     </div>
                   </div>
                 )}
+                {renderStatus('twoFactor')}
               </div>
 
               <div style={styles.row}>
@@ -846,6 +860,7 @@ const SecurityPage = () => {
                 <div style={styles.buttonRow}>
                   <button type="button" style={styles.button} onClick={() => void handleToggleBiometric()} disabled={savingBiometric}>{savingBiometric ? 'Updating...' : biometricEnabled ? 'Disable biometric' : 'Enable biometric'}</button>
                 </div>
+                {renderStatus('biometric')}
               </div>
 
               <div style={styles.row}>
@@ -854,16 +869,9 @@ const SecurityPage = () => {
                 <div style={styles.buttonRow}>
                   <button type="button" style={styles.button} onClick={() => void handleToggleHardware()} disabled={savingHardware}>{savingHardware ? 'Updating...' : hardwareKeyEnabled ? 'Disable hardware security' : 'Enable hardware security'}</button>
                 </div>
+                {renderStatus('hardware')}
               </div>
             </div>
-
-            {status.kind !== 'idle' ? (
-              <NotificationBanner
-                tone={status.kind === 'success' ? 'success' : 'error'}
-                title={status.kind === 'success' ? 'Security settings updated' : 'Check your details'}
-                message={status.text}
-              />
-            ) : null}
           </div>
         </div>
         <NowBar />
