@@ -274,7 +274,7 @@ const StakingPage = () => {
       setError('');
       setAmount('');
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Unable to create staking plan.');
+      setError(getFriendlyErrorMessage(submitError, 'Unable to create staking plan.'));
     } finally {
       setIsSubmitting(false);
     }

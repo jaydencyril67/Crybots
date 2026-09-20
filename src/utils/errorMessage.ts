@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const friendlyMessages: Array<[RegExp, string]> = [
-  [/insufficient\s+(?:usdt\s+)?balance|not enough\s+(?:usdt\s+)?balance|insufficient funds/i, 'You do not have enough USDT balance to complete this transaction.'],
+  [/insufficient\s+(?:usdt\s+)?balance|(?:not|do not have) enough\s+(?:usdt\s+)?balance|insufficient funds/i, 'You do not have enough USDT balance to complete this transaction.'],
   [/invalid\s+security\s+code|incorrect\s+security\s+code|security\s+code.*(?:invalid|incorrect)/i, 'That security code is incorrect. Please check it and try again.'],
   [/invalid\s+(?:current\s+)?password|incorrect\s+(?:current\s+)?password/i, 'The password you entered is incorrect.'],
   [/user not found|recipient.*not found|account.*not found/i, 'We could not find that account. Please check the details and try again.'],
