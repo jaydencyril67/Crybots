@@ -797,7 +797,7 @@ const SigninPage = () => {
                 <div style={styles.navRow}>
                   <button type="button" onClick={handleBack} style={{ ...styles.button, ...hybridStyles.buttonGhost }}>Back</button>
                   {step === 'email' ? (
-                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={!canContinue}>Continue</button>
+                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={isSubmitting || !canContinue}>{isSubmitting ? <InlineLoadingDots /> : 'Continue'}</button>
                   ) : step === 'password' ? (
                     <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Sign in'}</button>
                   ) : step === 'code' ? (
