@@ -285,8 +285,8 @@ const WithdrawPage = () => {
 
           <section style={styles.section}>
             <h2 style={styles.sectionTitle}><ShieldCheck size={18} /> Security code</h2>
-            <p style={styles.sectionText}>Use the settings page to bind or change your security code. Withdrawals only work after it has been set.</p>
-            <p style={styles.sectionText}>If you have not set a security code yet, go to Settings and bind one first before submitting a withdrawal.</p>
+            <p style={styles.sectionText}>Use the Settings page to set or change your security code. Withdrawals only work after it has been set.</p>
+            <p style={styles.sectionText}>If you have not set a security code yet, go to Settings and set one before submitting a withdrawal.</p>
           </section>
 
           <section style={styles.section}>
