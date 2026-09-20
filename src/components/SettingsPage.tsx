@@ -453,7 +453,7 @@ const SettingsPage = () => {
                 {renderStatus('theme')}
                 <h2 style={styles.cardTitle}>🎨 Theme</h2>
                 <p style={styles.cardText}>Choose Light, Dark, System, or Shift mode. System follows your device theme; Shift uses Light from 6 AM to 6 PM and Dark overnight.</p>
-                <div style={{ ...styles.toggleRow, flexWrap: 'wrap' }}>
+                <div style={{ ...styles.toggleRow, justifyContent: 'center', flexWrap: 'nowrap', gap: '8px', width: '100%' }}>
                   <button
                     type="button"
                     style={{ ...styles.togglePill, ...(themePreference === 'dark' ? styles.togglePillActive : {}) }}
