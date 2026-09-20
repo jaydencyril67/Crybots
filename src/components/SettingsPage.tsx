@@ -13,14 +13,15 @@ const EDGE_LIGHT_COLOR_OPTIONS = [
 ] as const;
 
 type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
-type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
+type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse-light' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
 
 const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
   { key: 'stable-light', label: 'Stable Light' },
   { key: 'stable', label: 'Stable glow' },
   { key: 'blink-light', label: 'Blinking Light' },
   { key: 'blink', label: 'Blinking glow' },
-  { key: 'pulse', label: 'Breathing pulse' },
+  { key: 'pulse-light', label: 'Breathing Light' },
+  { key: 'pulse', label: 'Breathing glow' },
   { key: 'sweep', label: 'Moving border light' },
   { key: 'color-cycle', label: 'Changing border colors' },
   { key: 'rainbow', label: 'Changing light colors' },
