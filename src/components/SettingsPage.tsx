@@ -541,13 +541,14 @@ const SettingsPage = () => {
                 <div style={{ ...styles.field, marginTop: '14px' }}>
                   <span style={styles.label}>Choose any color</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                    <input
-                      type="color"
-                      value={edgeLightColor}
-                      aria-label="Choose NowBar edge light color"
-                      onChange={(event) => handleSetEdgeLightColor(event.target.value)}
-                      style={{ width: '58px', height: '44px', padding: '2px', borderRadius: '12px', border: `2px solid ${theme.borderGlass}`, background: theme.surfaceMuted, cursor: 'pointer' }}
-                    />
+                    <button
+                      type="button"
+                      onClick={() => navigate('/nowbar-color')}
+                      style={{ ...styles.button, display: 'inline-flex', alignItems: 'center', gap: '10px', borderRadius: '12px' }}
+                    >
+                      <span style={{ width: '24px', height: '24px', borderRadius: '8px', background: edgeLightColor, boxShadow: `0 0 14px ${edgeLightColor}` }} />
+                      Choose color
+                    </button>
                     <code style={{ color: theme.textMuted, fontSize: '0.85rem' }}>{edgeLightColor.toUpperCase()}</code>
                     {edgeLightColorHistory.length > 0 ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
