@@ -48,6 +48,7 @@ type WebAuthnCredential = { id: string; createdAt?: string };
 type SecurityMeResponse = {
   user?: {
     uid?: string;
+    uidChangeAvailableAt?: string | null;
     securityCodeSet?: boolean;
     securityCodeChangeAvailableAt?: string | null;
     twoFactorEnabled?: boolean;
@@ -302,6 +303,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const securityCodeChangeCooldownMs = 30 * 24 * 60 * 60 * 1000;
+const uidChangeCooldownMs = 30 * 24 * 60 * 60 * 1000;
 
 const SecurityPage = () => {
   const { themeMode } = useAppTheme();
@@ -323,6 +325,7 @@ const SecurityPage = () => {
   const [logins, setLogins] = useState<SecurityLogin[]>([]);
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
   const [securityCodeChangeAvailableAt, setSecurityCodeChangeAvailableAt] = useState<string | null>(null);
+  const [uidChangeAvailableAt, setUidChangeAvailableAt] = useState<string | null>(null);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorConfigured, setTwoFactorConfigured] = useState(false);
   const [twoFactorSetupOpen, setTwoFactorSetupOpen] = useState(false);
@@ -351,6 +354,7 @@ const SecurityPage = () => {
       try {
         const { data } = await api.get<SecurityMeResponse>('/api/settings/me');
         setUid(data.user?.uid ?? '');
+        setUidChangeAvailableAt(data.user?.uidChangeAvailableAt ?? null);
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
         setSecurityCodeChangeAvailableAt(data.user?.securityCodeChangeAvailableAt ?? null);
         setTwoFactorEnabled(Boolean(data.user?.twoFactorEnabled));
@@ -416,7 +420,14 @@ const SecurityPage = () => {
     />
   ) : null;
 
+  const uidChangeLocked = Boolean(uidChangeAvailableAt && new Date(uidChangeAvailableAt).getTime() > Date.now());
+  const uidChangeDate = uidChangeAvailableAt ? new Date(uidChangeAvailableAt) : null;
+  const uidChangeMessage = uidChangeLocked && uidChangeDate && !Number.isNaN(uidChangeDate.getTime())
+    ? `You can change your UID again after ${uidChangeDate.toLocaleDateString()}.`
+    : 'For your protection, you can change your UID only once every 30 days.';
+
   const handleUidCodeRequest = async () => {
+    if (uidChangeLocked) return showStatus('error', uidChangeMessage, 'uid');
     if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.', 'uid');
     setRequestingUidCode(true);
     try {
@@ -439,6 +450,7 @@ const SecurityPage = () => {
       await api.patch('/api/settings/uid', { uid: uid.trim(), code: uidCode.trim() });
       setUidCode('');
       setUidCodeRequested(false);
+      setUidChangeAvailableAt(new Date(Date.now() + uidChangeCooldownMs).toISOString());
       showStatus('success', 'UID updated successfully.', 'uid');
     } catch (error: any) {
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your UID. Please check your details and try again.'), 'uid');
@@ -704,11 +716,12 @@ const SecurityPage = () => {
               <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>
                 <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
+                <p style={styles.note}>{uidChangeMessage}</p>
                 <div className="security-control" style={styles.control}>
-                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
-                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
+                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} disabled={uidChangeLocked} />
+                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid || uidChangeLocked}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
                   {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit email confirmation code" inputMode="numeric" maxLength={4} /> : null}
-                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
+                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid || uidChangeLocked}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
                 </div>
                 {renderStatus('uid')}
               </div>
