@@ -19,7 +19,7 @@ const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
   { key: 'stable-light', label: 'Stable Light' },
   { key: 'stable', label: 'Stable glow' },
   { key: 'blink-light', label: 'Blinking Light' },
-  { key: 'blink', label: 'Blinking light' },
+  { key: 'blink', label: 'Blinking glow' },
   { key: 'pulse', label: 'Breathing pulse' },
   { key: 'sweep', label: 'Moving border light' },
   { key: 'color-cycle', label: 'Changing border colors' },
