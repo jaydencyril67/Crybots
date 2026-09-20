@@ -40,6 +40,8 @@ const styles = {
     left: '18px',
     minWidth: '18px',
     height: '18px',
+    padding: '0 4px',
+    boxSizing: 'border-box' as const,
     display: 'grid',
     placeItems: 'center',
     borderRadius: '999px',
@@ -216,9 +218,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const headerTitle = unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
   const artworkStyle = {
     ...styles.unreadArtwork,
-    color: theme.primary,
-    background: theme.primarySoft,
-    border: `1px solid ${theme.primary}`,
+    color: theme.textInverse,
+    background: theme.danger,
+    border: `2px solid ${theme.surfaceElevated}`,
+    boxShadow: `0 2px 8px ${theme.danger}66`,
   };
   const renderArtwork = () => (
     <span style={styles.artworkContainer}>
