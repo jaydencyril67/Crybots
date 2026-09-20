@@ -13,6 +13,7 @@ import DashboardPage from './components/DashboardPage';
 import ProfilePage from './components/ProfilePage';
 import StakingPage from './components/StakingPage';
 import SettingsPage from './components/SettingsPage';
+import NowBarColorPage from './components/NowBarColorPage';
 import DepositPage from './components/DepositPage';
 import PortfolioPage from './components/PortfolioPage';
 import DangerPage from './components/DangerPage';
@@ -58,6 +59,7 @@ const getRouteKey = () => {
   if (pathname === '/profile' || hash === '#/profile') return 'profile';
   if (pathname === '/staking' || hash === '#/staking') return 'staking';
   if (pathname === '/settings' || hash === '#/settings') return 'settings';
+  if (pathname === '/nowbar-color' || hash === '#/nowbar-color') return 'nowbar-color';
   if (pathname === '/portfolio' || hash === '#/portfolio') return 'portfolio';
   if (pathname === '/danger' || hash === '#/danger') return 'danger';
   if (pathname === '/pending-deletion' || hash === '#/pending-deletion') return 'pending-deletion';
@@ -81,6 +83,7 @@ const routeToKey = (path: string) => {
   if (path === '/profile' || path === '#/profile') return 'profile';
   if (path === '/staking' || path === '#/staking') return 'staking';
   if (path === '/settings' || path === '#/settings') return 'settings';
+  if (path === '/nowbar-color' || path === '#/nowbar-color') return 'nowbar-color';
   if (path === '/portfolio' || path === '#/portfolio') return 'portfolio';
   if (path === '/danger' || path === '#/danger') return 'danger';
   if (path === '/pending-deletion' || path === '#/pending-deletion') return 'pending-deletion';
@@ -216,6 +219,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
     if (displayedRouteKey === 'staking') return <ProtectedRoute><StakingPage /></ProtectedRoute>;
     if (displayedRouteKey === 'settings') return <ProtectedRoute><SettingsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'nowbar-color') return <ProtectedRoute><NowBarColorPage /></ProtectedRoute>;
     if (displayedRouteKey === 'portfolio') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
     if (displayedRouteKey === 'danger') return <ProtectedRoute><DangerPage /></ProtectedRoute>;
     if (displayedRouteKey === 'pending-deletion') return <PendingDeletionPage />;
@@ -226,7 +230,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
     if (displayedRouteKey === 'notifications') return <ProtectedRoute><NotificationsPage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'nowbar-color', 'portfolio', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
@@ -234,7 +238,7 @@ const RouteTransition = () => {
   }, [displayedRouteKey, isAuthenticated]);
 
   const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
-  const isProtectedPage = ['dashboard', 'profile', 'staking', 'settings', 'portfolio', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
+  const isProtectedPage = ['dashboard', 'profile', 'staking', 'settings', 'nowbar-color', 'portfolio', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
 
   return (
     <div
