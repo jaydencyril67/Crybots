@@ -13,11 +13,12 @@ const EDGE_LIGHT_COLOR_OPTIONS = [
 ] as const;
 
 type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
-type EdgeLightMode = 'stable-light' | 'stable' | 'blink' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
+type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
 
 const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
   { key: 'stable-light', label: 'Stable Light' },
   { key: 'stable', label: 'Stable glow' },
+  { key: 'blink-light', label: 'Blinking Light' },
   { key: 'blink', label: 'Blinking light' },
   { key: 'pulse', label: 'Breathing pulse' },
   { key: 'sweep', label: 'Moving border light' },
@@ -565,7 +566,7 @@ const SettingsPage = () => {
                 </div>
                 <div style={{ ...styles.field, marginTop: '16px' }}>
                   <span style={styles.label}>Lighting style</span>
-                  <div style={{ display: 'grid', gap: '8px', marginTop: '4px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '4px' }}>
                     {EDGE_LIGHT_MODES.map((option) => (
                       <button key={option.key} type="button" onClick={() => handleSetEdgeLightMode(option.key)} style={{ ...styles.button, borderRadius: '14px', textAlign: 'left', display: 'grid', gap: '3px', ...(edgeLightMode === option.key ? styles.primaryButton : {}) }}>
                         <span>{option.label}</span>
