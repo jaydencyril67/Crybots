@@ -52,11 +52,52 @@ const baseStyles = {
     gridColumn: '1 / -1',
   },
   card: {},
+  profileIdentity: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '18px',
+    padding: '4px 0 6px',
+  },
+  profileAvatar: {
+    width: '112px',
+    height: '112px',
+    borderRadius: '24px',
+    objectFit: 'cover' as const,
+    border: '4px solid rgba(255,255,255,0.9)',
+    boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)',
+    background: '#111827',
+    flexShrink: 0,
+  },
+  profileAvatarFallback: {
+    width: '112px',
+    height: '112px',
+    borderRadius: '24px',
+    display: 'grid',
+    placeItems: 'center',
+    border: '4px solid rgba(255,255,255,0.9)',
+    boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)',
+    background: '#111827',
+    flexShrink: 0,
+  },
+  profileIdentityName: {
+    margin: 0,
+    fontSize: 'clamp(1.25rem, 3vw, 1.8rem)',
+    fontWeight: 900,
+    lineHeight: 1.15,
+  },
+  profileIdentityEmail: {
+    margin: '6px 0 0',
+    fontSize: '0.95rem',
+    lineHeight: 1.4,
+  },
   '@media (max-width: 640px)': {
     page: { paddingBottom: '156px' },
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
     card: {},
+    profileIdentity: { gap: '12px' },
+    profileAvatar: { width: '88px', height: '88px', borderRadius: '20px' },
+    profileAvatarFallback: { width: '88px', height: '88px', borderRadius: '20px' },
     sectionTitle: { fontSize: '1.15rem' },
     sectionSub: { maxWidth: '100%' },
     infoList: { gap: '10px', gridTemplateColumns: 'minmax(0, 1fr)' },
@@ -173,6 +214,18 @@ const ProfilePage = () => {
       ...baseStyles.logoutButton,
       color: theme.text,
     },
+    profileIdentityEmail: {
+      ...baseStyles.profileIdentityEmail,
+      color: theme.textMuted,
+    },
+    profileIdentityName: {
+      ...baseStyles.profileIdentityName,
+      color: theme.text,
+    },
+    profileAvatarFallback: {
+      ...baseStyles.profileAvatarFallback,
+      color: theme.text,
+    },
     card: createHybridCardStyles(theme).card,
     infoRow: {
       ...baseStyles.infoRow,
@@ -284,10 +337,19 @@ const ProfilePage = () => {
             
 
             <div style={styles.content}>
-              <section style={styles.card}>
-                <h1 style={styles.sectionTitle}>Details</h1>
-                <p style={styles.sectionSub}>Your account summary is shown here in a simple direct layout.</p>
-              </section>
+              <div style={styles.profileIdentity}>
+                {avatarPicture ? (
+                  <img src={avatarPicture} alt={`${fullName || 'User'} profile`} style={styles.profileAvatar} />
+                ) : (
+                  <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder">
+                    <CircleUserRound size={58} strokeWidth={1.6} />
+                  </div>
+                )}
+                <div>
+                  <h1 style={styles.profileIdentityName}>{profileLoading ? <LoadingDots /> : fullName || 'Your details'}</h1>
+                  {!profileLoading && email ? <p style={styles.profileIdentityEmail}>{email}</p> : null}
+                </div>
+              </div>
 
               <div style={styles.infoList}>
                 <div style={styles.infoRow}>

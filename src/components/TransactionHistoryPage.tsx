@@ -352,6 +352,29 @@ const TransactionHistoryPage = () => {
 
   return (
     <HybridTheme mode={themeMode}>
+      <style>{`@media (max-width: 640px) {
+        .transaction-history-filters {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 10px !important;
+        }
+        .transaction-history-filters > div {
+          min-width: 0;
+        }
+        .transaction-history-filters input,
+        .transaction-history-filters button {
+          min-width: 0;
+          font-size: 0.78rem;
+          padding-left: 9px;
+          padding-right: 9px;
+        }
+        .transaction-history-filters input {
+          padding-left: 32px;
+        }
+        .transaction-history-filters span {
+          font-size: 0.68rem;
+          letter-spacing: 0.04em;
+        }
+      }`}</style>
       <div data-shadow-free-page="transaction-history" style={styles.page}>
       <Helmet><title>Transaction History | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
@@ -362,7 +385,7 @@ const TransactionHistoryPage = () => {
               <div style={styles.card}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
                 <p style={styles.cardText}>Use the filters below to narrow your activity log.</p>
-                <div style={styles.filters}>
+                <div className="transaction-history-filters" style={styles.filters}>
                   <div style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Search</span>
                     <div style={{ position: 'relative' }}>
