@@ -49,10 +49,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   previewColor: { width: '44px', height: '44px', borderRadius: '14px', flexShrink: 0 },
   sectionTitle: { margin: '0 0 14px', fontSize: '1rem', fontWeight: 800 },
   colorPicker: { width: 'min(76vw, 330px)', margin: '8px auto 22px' },
-  hueRing: { width: '100%', aspectRatio: '1', borderRadius: '50%', background: 'conic-gradient(from -0.5turn, hsl(0 100% 50%) 0deg, hsl(30 100% 50%) 30deg, hsl(60 100% 50%) 60deg, hsl(90 100% 50%) 90deg, hsl(120 100% 50%) 120deg, hsl(150 100% 50%) 150deg, hsl(180 100% 50%) 180deg, hsl(210 100% 50%) 210deg, hsl(240 100% 50%) 240deg, hsl(270 100% 50%) 270deg, hsl(300 100% 50%) 300deg, hsl(330 100% 50%) 330deg, hsl(360 100% 50%) 360deg)', padding: '24px', boxSizing: 'border-box' as const, cursor: 'crosshair', position: 'relative' as const, boxShadow: '0 0 0 1px rgba(255,255,255,.16), 0 12px 30px rgba(0,0,0,.22)' },
+  hueRing: { width: '100%', aspectRatio: '1', borderRadius: '50%', background: 'conic-gradient(from 0turn, hsl(0 100% 50%) 0deg, hsl(30 100% 50%) 30deg, hsl(60 100% 50%) 60deg, hsl(90 100% 50%) 90deg, hsl(120 100% 50%) 120deg, hsl(150 100% 50%) 150deg, hsl(180 100% 50%) 180deg, hsl(210 100% 50%) 210deg, hsl(240 100% 50%) 240deg, hsl(270 100% 50%) 270deg, hsl(300 100% 50%) 300deg, hsl(330 100% 50%) 330deg, hsl(360 100% 50%) 360deg)', padding: '24px', boxSizing: 'border-box' as const, cursor: 'crosshair', position: 'relative' as const, boxShadow: '0 0 0 1px rgba(255,255,255,.16), 0 12px 30px rgba(0,0,0,.22)' },
   colorField: { position: 'absolute' as const, inset: '24px', borderRadius: '50%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.96) 100%), linear-gradient(to right, #fff 0%, var(--picker-hue) 100%)', cursor: 'crosshair', overflow: 'hidden' as const, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.3), inset 0 0 18px rgba(0,0,0,.28)' },
   colorFieldPoint: { position: 'absolute' as const, width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
-  huePoint: { position: 'absolute' as const, left: '50%', top: '50%', width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
+  huePointTrack: { position: 'absolute' as const, inset: '12px', borderRadius: '50%', pointerEvents: 'none' as const },
+  huePoint: { position: 'absolute' as const, left: '50%', top: 0, width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
   inputRow: { display: 'flex', gap: '10px', marginTop: '18px', flexWrap: 'wrap' as const },
   input: { flex: '1 1 180px', minWidth: 0, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '12px 14px', fontSize: '0.95rem', outline: 'none' },
   rgbRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '12px' },
@@ -120,6 +121,23 @@ const NowBarColorPage = () => {
     selectColor(normalizedColor);
   };
 
+  const selectHueAtPoint = (clientX: number, clientY: number, element: HTMLDivElement) => {
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const distance = Math.hypot(clientX - centerX, clientY - centerY);
+    const outerRadius = Math.min(rect.width, rect.height) / 2;
+    const innerRadius = outerRadius - 24;
+
+    if (distance < innerRadius || distance > outerRadius) {
+      return;
+    }
+
+    const nextHue = (Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI + 90 + 360) % 360;
+    setHue(nextHue);
+    selectColor(hsvToHex(nextHue, saturation, value));
+  };
+
   const updateColorField = (event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     const nextSaturation = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
@@ -162,15 +180,14 @@ const NowBarColorPage = () => {
               style={styles.colorPicker}
             >
               <div
-                style={styles.hueRing}
+                style={{ ...styles.hueRing, touchAction: 'manipulation' }}
                 onClick={(event) => {
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  const nextHue = (Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI + 90 + 360) % 360;
-                  setHue(nextHue);
-                  selectColor(hsvToHex(nextHue, saturation, value));
+                  selectHueAtPoint(event.clientX, event.clientY, event.currentTarget);
                 }}
               >
-                <span style={{ ...styles.huePoint, transform: `translate(-50%, -50%) rotate(${hue}deg) translateY(-${(50 - 9)}%)` }} />
+                <span style={{ ...styles.huePointTrack, transform: `rotate(${hue}deg)` }}>
+                  <span style={styles.huePoint} />
+                </span>
                 <div
                   style={{ ...styles.colorField, '--picker-hue': hsvToHex(hue, 1, 1) } as React.CSSProperties}
                   onClick={(event) => {
