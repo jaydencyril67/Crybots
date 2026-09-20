@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import HybridTheme, { HYBRID_THEME_TOKENS, type HybridThemeMode } from './HybridTheme';
-import { useAppTheme } from './AppTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { useAppTheme, type AppThemePreference } from './AppTheme';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
@@ -200,7 +200,7 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '', section: 'profile' });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const { themeMode, setThemeMode } = useAppTheme();
+  const { themeMode, themePreference, setThemePreference } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
@@ -306,8 +306,8 @@ const SettingsPage = () => {
 
 
 
-  const persistTheme = (nextMode: HybridThemeMode) => {
-    setThemeMode(nextMode);
+  const persistTheme = (nextPreference: AppThemePreference) => {
+    setThemePreference(nextPreference);
   };
 
   const persistEdgeLight = (enabled: boolean, color: string, mode: EdgeLightMode) => {
@@ -347,8 +347,9 @@ const SettingsPage = () => {
   };
 
   const handleToggleTheme = () => {
-    persistTheme(themeMode === 'dark' ? 'light' : 'dark');
-    showStatus('success', `Theme switched to ${themeMode === 'dark' ? 'Light' : 'Dark'} mode.`, 'theme');
+    const nextPreference = themeMode === 'dark' ? 'light' : 'dark';
+    persistTheme(nextPreference);
+    showStatus('success', `Theme switched to ${nextPreference === 'dark' ? 'Dark' : 'Light'} mode.`, 'theme');
   };
 
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -457,26 +458,40 @@ const SettingsPage = () => {
               <section style={styles.card}>
                 {renderStatus('theme')}
                 <h2 style={styles.cardTitle}>🎨 Theme</h2>
-                <p style={styles.cardText}>Switch the app theme instantly. The choice is saved across reloads.</p>
-                <div style={styles.toggleRow}>
+                <p style={styles.cardText}>Choose Light, Dark, System, or Shift mode. System follows your device theme; Shift uses Light from 6 AM to 6 PM and Dark overnight.</p>
+                <div style={{ ...styles.toggleRow, flexWrap: 'wrap' }}>
                   <button
                     type="button"
-                    style={{ ...styles.togglePill, ...(themeMode === 'dark' ? styles.togglePillActive : {}) }}
+                    style={{ ...styles.togglePill, ...(themePreference === 'dark' ? styles.togglePillActive : {}) }}
                     onClick={() => persistTheme('dark')}
                   >
                     Dark
                   </button>
                   <button
                     type="button"
-                    style={{ ...styles.togglePill, ...(themeMode === 'light' ? styles.togglePillActive : {}) }}
+                    style={{ ...styles.togglePill, ...(themePreference === 'light' ? styles.togglePillActive : {}) }}
                     onClick={() => persistTheme('light')}
                   >
                     Light
                   </button>
+                  <button
+                    type="button"
+                    style={{ ...styles.togglePill, ...(themePreference === 'system' ? styles.togglePillActive : {}) }}
+                    onClick={() => persistTheme('system')}
+                  >
+                    System
+                  </button>
+                  <button
+                    type="button"
+                    style={{ ...styles.togglePill, ...(themePreference === 'shift' ? styles.togglePillActive : {}) }}
+                    onClick={() => persistTheme('shift')}
+                  >
+                    Shift
+                  </button>
                 </div>
                 <div style={styles.buttonRow}>
                   <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={handleToggleTheme}>
-                    Toggle theme
+                    Toggle Light / Dark
                   </button>
                 </div>
               </section>
