@@ -15,15 +15,27 @@ const hexToRgb = (hex: string) => ({
 
 const rgbToHex = (r: number, g: number, b: number) => `#${[r, g, b].map((value) => Math.max(0, Math.min(255, value)).toString(16).padStart(2, '0')).join('')}`;
 
-const hueToHex = (hue: number) => {
-  const saturation = 1;
-  const lightness = 0.55;
-  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+const hsvToHex = (hue: number, saturation: number, value: number) => {
+  const chroma = value * saturation;
   const segment = hue / 60;
   const secondary = chroma * (1 - Math.abs((segment % 2) - 1));
   const [red, green, blue] = segment < 1 ? [chroma, secondary, 0] : segment < 2 ? [secondary, chroma, 0] : segment < 3 ? [0, chroma, secondary] : segment < 4 ? [0, secondary, chroma] : segment < 5 ? [secondary, 0, chroma] : [chroma, 0, secondary];
-  const match = lightness - chroma / 2;
+  const match = value - chroma;
   return rgbToHex(Math.round((red + match) * 255), Math.round((green + match) * 255), Math.round((blue + match) * 255));
+};
+
+const hueFromHex = (hex: string) => {
+  const { r, g, b } = hexToRgb(hex);
+  const red = r / 255;
+  const green = g / 255;
+  const blue = b / 255;
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  const delta = max - min;
+  if (delta === 0) return 0;
+  if (max === red) return ((60 * ((green - blue) / delta) + 360) % 360);
+  if (max === green) return 60 * ((blue - red) / delta + 2);
+  return 60 * ((red - green) / delta + 4);
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -36,8 +48,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   preview: { display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
   previewColor: { width: '44px', height: '44px', borderRadius: '14px', flexShrink: 0 },
   sectionTitle: { margin: '0 0 14px', fontSize: '1rem', fontWeight: 800 },
-  colorWheel: { width: 'min(76vw, 330px)', aspectRatio: '1', margin: '8px auto 22px', borderRadius: '50%', background: 'conic-gradient(#ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)', border: `10px solid ${theme.surfaceMuted}`, boxShadow: `0 0 0 1px ${theme.borderGlass}, 0 12px 35px rgba(0,0,0,.25)`, cursor: 'crosshair', position: 'relative' as const },
-  wheelCenter: { position: 'absolute' as const, inset: '25%', borderRadius: '50%', background: theme.background, border: `8px solid ${theme.surfaceMuted}`, pointerEvents: 'none' as const },
+  colorPicker: { width: 'min(76vw, 330px)', margin: '8px auto 22px' },
+  hueRing: { width: '100%', aspectRatio: '1', borderRadius: '50%', background: 'conic-gradient(#ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)', padding: '18px', boxSizing: 'border-box' as const, cursor: 'crosshair', position: 'relative' as const },
+  colorField: { position: 'absolute' as const, inset: '18px', borderRadius: '12px', background: 'linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, var(--picker-hue))', cursor: 'crosshair' },
+  colorFieldPoint: { position: 'absolute' as const, width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
+  huePoint: { position: 'absolute' as const, left: '50%', top: '50%', width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
   inputRow: { display: 'flex', gap: '10px', marginTop: '18px', flexWrap: 'wrap' as const },
   input: { flex: '1 1 180px', minWidth: 0, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '12px 14px', fontSize: '0.95rem', outline: 'none' },
   rgbRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '12px' },
@@ -54,6 +69,9 @@ const NowBarColorPage = () => {
   const [color, setColor] = useState('#38bdf8');
   const [customColor, setCustomColor] = useState('#38bdf8');
   const [rgb, setRgb] = useState({ r: 56, g: 189, b: 248 });
+  const [hue, setHue] = useState(197);
+  const [saturation, setSaturation] = useState(0.77);
+  const [value, setValue] = useState(0.97);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -63,7 +81,13 @@ const NowBarColorPage = () => {
         const storedColor = stored.color.toLowerCase();
         setColor(storedColor);
         setCustomColor(storedColor);
-        setRgb(hexToRgb(storedColor));
+        const storedRgb = hexToRgb(storedColor);
+        const storedMax = Math.max(storedRgb.r, storedRgb.g, storedRgb.b) / 255;
+        const storedMin = Math.min(storedRgb.r, storedRgb.g, storedRgb.b) / 255;
+        setRgb(storedRgb);
+        setHue(hueFromHex(storedColor));
+        setValue(storedMax);
+        setSaturation(storedMax === 0 ? 0 : (storedMax - storedMin) / storedMax);
       }
     } catch {
       // Keep the default color when saved data is invalid.
@@ -77,7 +101,13 @@ const NowBarColorPage = () => {
     window.dispatchEvent(new Event('nowbar-edge-light-changed'));
     setColor(normalizedColor);
     setCustomColor(normalizedColor);
-    setRgb(hexToRgb(normalizedColor));
+    const nextRgb = hexToRgb(normalizedColor);
+    const nextMax = Math.max(nextRgb.r, nextRgb.g, nextRgb.b) / 255;
+    const nextMin = Math.min(nextRgb.r, nextRgb.g, nextRgb.b) / 255;
+    setRgb(nextRgb);
+    setHue(hueFromHex(normalizedColor));
+    setValue(nextMax);
+    setSaturation(nextMax === 0 ? 0 : (nextMax - nextMin) / nextMax);
     setError('');
   };
 
@@ -120,14 +150,33 @@ const NowBarColorPage = () => {
               role="slider"
               tabIndex={0}
               aria-label="Choose NowBar color from color wheel"
-              style={styles.colorWheel}
-              onClick={(event) => {
-                const rect = event.currentTarget.getBoundingClientRect();
-                const hue = (Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI + 90 + 360) % 360;
-                selectColor(hueToHex(hue));
-              }}
+              style={styles.colorPicker}
             >
-              <span style={{ ...styles.wheelCenter, background: color }} />
+              <div
+                style={styles.hueRing}
+                onClick={(event) => {
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  const nextHue = (Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2)) * 180 / Math.PI + 90 + 360) % 360;
+                  setHue(nextHue);
+                  selectColor(hsvToHex(nextHue, saturation, value));
+                }}
+              >
+                <span style={{ ...styles.huePoint, transform: `translate(-50%, -50%) rotate(${hue}deg) translateY(-${(50 - 9)}%)` }} />
+                <div
+                  style={{ ...styles.colorField, '--picker-hue': hsvToHex(hue, 1, 1) } as React.CSSProperties}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    const rect = event.currentTarget.getBoundingClientRect();
+                    const nextSaturation = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+                    const nextValue = Math.max(0, Math.min(1, 1 - (event.clientY - rect.top) / rect.height));
+                    setSaturation(nextSaturation);
+                    setValue(nextValue);
+                    selectColor(hsvToHex(hue, nextSaturation, nextValue));
+                  }}
+                >
+                  <span style={{ ...styles.colorFieldPoint, left: `${saturation * 100}%`, top: `${(1 - value) * 100}%` }} />
+                </div>
+              </div>
             </div>
             <div style={styles.inputRow}>
               <input aria-label="HEX color" value={customColor} onChange={(event) => setCustomColor(event.target.value)} placeholder="#38bdf8" style={styles.input} />
