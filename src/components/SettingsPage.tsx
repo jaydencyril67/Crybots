@@ -29,8 +29,6 @@ const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
 ];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
-const EDGE_LIGHT_COLOR_HISTORY_KEY = 'nowbar_edge_light_color_history';
-const MAX_EDGE_LIGHT_COLOR_HISTORY = 5;
 import { Helmet } from 'react-helmet-async';
 import { RotateCcw, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
@@ -183,25 +181,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.textInverse,
     border: `1px solid ${theme.primary}`,
   },
-  colorSwatches: {
-    display: 'flex',
-    flexWrap: 'nowrap' as const,
-    gap: '10px',
-    marginTop: '12px',
-    overflowX: 'auto' as const,
-    overflowY: 'hidden' as const,
-    WebkitOverflowScrolling: 'touch' as const,
-  },
-  colorSwatch: {
-    width: '38px',
-    height: '38px',
-    borderRadius: '999px',
-    border: `2px solid ${theme.borderGlass}`,
-    cursor: 'pointer',
-  },
-  colorSwatchActive: {
-    borderColor: theme.primary,
-  },
   primaryButton: {
     background: theme.primary,
     color: theme.textInverse,
@@ -228,7 +207,6 @@ const SettingsPage = () => {
   const styles = getStyles(theme);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState('#38bdf8');
-  const [edgeLightColorHistory, setEdgeLightColorHistory] = useState<string[]>([]);
   const [edgeLightMode, setEdgeLightMode] = useState<EdgeLightMode>('stable');
   const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
   const [edgeLightSavedColor, setEdgeLightSavedColor] = useState('#38bdf8');
@@ -260,16 +238,6 @@ const SettingsPage = () => {
       setEdgeLightSavedColor(nextColor);
       setEdgeLightSavedMode(nextMode);
 
-      let storedHistory: unknown = [];
-      try {
-        storedHistory = JSON.parse(window.localStorage.getItem(EDGE_LIGHT_COLOR_HISTORY_KEY) ?? '[]') as unknown;
-      } catch {
-        storedHistory = [];
-      }
-      const history = Array.isArray(storedHistory)
-        ? storedHistory.filter((color): color is string => typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color)).map((color) => color.toLowerCase())
-        : [];
-      setEdgeLightColorHistory(Array.from(new Set(history)).slice(0, MAX_EDGE_LIGHT_COLOR_HISTORY));
     } catch {
       // Ignore invalid localStorage data and keep defaults.
     }
@@ -362,16 +330,6 @@ const SettingsPage = () => {
       showStatus('success', nextEnabled ? 'NowBar edge lighting turned on.' : 'NowBar edge lighting turned off.', 'edgeLight');
       return nextEnabled;
     });
-  };
-
-  const handleSetEdgeLightColor = (nextColor: string) => {
-    const normalizedColor = nextColor.toLowerCase();
-    const nextHistory = Array.from(new Set([normalizedColor, ...edgeLightColorHistory])).slice(0, MAX_EDGE_LIGHT_COLOR_HISTORY);
-    setEdgeLightColor(normalizedColor);
-    setEdgeLightColorHistory(nextHistory);
-    window.localStorage.setItem(EDGE_LIGHT_COLOR_HISTORY_KEY, JSON.stringify(nextHistory));
-    persistEdgeLight(edgeLightEnabled, normalizedColor, edgeLightMode);
-    showStatus('success', 'NowBar edge lighting color updated.', 'edgeLight');
   };
 
   const handleSetEdgeLightMode = (nextMode: EdgeLightMode) => {
@@ -529,7 +487,7 @@ const SettingsPage = () => {
                 {renderStatus('edgeLight')}
                 <h2 style={styles.cardTitle}>⚡ NowBar edge lighting</h2>
                 <p style={styles.cardText}>Create a fully customizable NowBar edge effect with any color and multiple professional lighting styles.</p>
-                <div style={styles.toggleRow}>
+                <div style={{ ...styles.toggleRow, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                   <button
                     type="button"
                     style={{ ...styles.togglePill, ...(edgeLightEnabled ? styles.togglePillActive : {}) }}
@@ -537,35 +495,15 @@ const SettingsPage = () => {
                   >
                     {edgeLightEnabled ? 'On' : 'Off'}
                   </button>
-                </div>
-                <div style={{ ...styles.field, marginTop: '14px' }}>
-                  <span style={styles.label}>Choose any color</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      onClick={() => navigate('/nowbar-color')}
-                      style={{ ...styles.button, display: 'inline-flex', alignItems: 'center', gap: '10px', borderRadius: '12px' }}
-                    >
-                      <span style={{ width: '24px', height: '24px', borderRadius: '8px', background: edgeLightColor, boxShadow: `0 0 14px ${edgeLightColor}` }} />
-                      Choose color
-                    </button>
-                    <code style={{ color: theme.textMuted, fontSize: '0.85rem' }}>{edgeLightColor.toUpperCase()}</code>
-                    {edgeLightColorHistory.length > 0 ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        <span style={{ color: theme.textMuted, fontSize: '0.78rem' }}>Recent</span>
-                        {edgeLightColorHistory.map((color) => (
-                          <button
-                            key={color}
-                            type="button"
-                            aria-label={`Use recent edge light color ${color}`}
-                            title={color.toUpperCase()}
-                            onClick={() => handleSetEdgeLightColor(color)}
-                            style={{ ...styles.colorSwatch, background: color, ...(edgeLightColor.toLowerCase() === color ? styles.colorSwatchActive : {}) }}
-                          />
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/nowbar-color')}
+                    style={{ ...styles.button, display: 'inline-flex', alignItems: 'center', gap: '10px', borderRadius: '12px' }}
+                  >
+                    <span style={{ width: '24px', height: '24px', borderRadius: '8px', background: edgeLightColor, boxShadow: `0 0 14px ${edgeLightColor}` }} />
+                    Choose color
+                  </button>
+                  <code style={{ color: theme.textMuted, fontSize: '0.85rem' }}>{edgeLightColor.toUpperCase()}</code>
                 </div>
                 <div style={{ ...styles.field, marginTop: '16px' }}>
                   <span style={styles.label}>Lighting style</span>
