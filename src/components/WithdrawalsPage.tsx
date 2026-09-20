@@ -220,8 +220,8 @@ const WithdrawPage = () => {
       <div style={styles.shell}>
         
         <div style={styles.content}>
-          {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
           <section style={styles.section}>
+            {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
             <h2 style={styles.sectionTitle}><Coins size={18} /> Withdraw USDT</h2>
             <p style={styles.sectionText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
             <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>

@@ -24,8 +24,10 @@ const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string; description: 
 ];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
+const EDGE_LIGHT_COLOR_HISTORY_KEY = 'nowbar_edge_light_color_history';
+const MAX_EDGE_LIGHT_COLOR_HISTORY = 6;
 import { Helmet } from 'react-helmet-async';
-import { RotateCcw, ShieldCheck, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
+import { RotateCcw, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
@@ -43,9 +45,12 @@ type MeResponse = {
 };
 
 
+type SettingsStatusSection = 'profile' | 'theme' | 'edgeLight' | 'wallet';
+
 type StatusState = {
   kind: 'idle' | 'success' | 'error';
   message: string;
+  section: SettingsStatusSection;
 };
 
 type WalletValidationState = {
@@ -207,14 +212,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 const SettingsPage = () => {
   const [accountLoading, setAccountLoading] = useState(true);
   const [walletCardSaving, setWalletCardSaving] = useState(false);
-  const [securityCodeCardSaving, setSecurityCodeCardSaving] = useState(false);
-  const [activeCard, setActiveCard] = useState<'wallet' | 'securityCode' | null>(null);
+  const [activeCard, setActiveCard] = useState<'wallet' | null>(null);
   const [walletAddress, setWalletAddress] = useState('');
-  const [securityCode, setSecurityCode] = useState('');
-  const [securityCodeConfirm, setSecurityCodeConfirm] = useState('');
-  const [currentSecurityPassword, setCurrentSecurityPassword] = useState('');
   const [walletValidation, setWalletValidation] = useState<WalletValidationState>({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
-  const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '' });
+  const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '', section: 'profile' });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const { themeMode, setThemeMode } = useAppTheme();
@@ -222,6 +223,7 @@ const SettingsPage = () => {
   const styles = getStyles(theme);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
   const [edgeLightColor, setEdgeLightColor] = useState('#38bdf8');
+  const [edgeLightColorHistory, setEdgeLightColorHistory] = useState<string[]>([]);
   const [edgeLightMode, setEdgeLightMode] = useState<EdgeLightMode>('stable');
   const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
   const [edgeLightSavedColor, setEdgeLightSavedColor] = useState('#38bdf8');
@@ -252,6 +254,17 @@ const SettingsPage = () => {
       setEdgeLightSavedEnabled(nextEnabled);
       setEdgeLightSavedColor(nextColor);
       setEdgeLightSavedMode(nextMode);
+
+      let storedHistory: unknown = [];
+      try {
+        storedHistory = JSON.parse(window.localStorage.getItem(EDGE_LIGHT_COLOR_HISTORY_KEY) ?? '[]') as unknown;
+      } catch {
+        storedHistory = [];
+      }
+      const history = Array.isArray(storedHistory)
+        ? storedHistory.filter((color): color is string => typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color)).map((color) => color.toLowerCase())
+        : [];
+      setEdgeLightColorHistory(Array.from(new Set(history)).slice(0, MAX_EDGE_LIGHT_COLOR_HISTORY));
     } catch {
       // Ignore invalid localStorage data and keep defaults.
     }
@@ -283,17 +296,24 @@ const SettingsPage = () => {
   const walletAddressChanged = walletAddress.trim() !== '';
   const walletCanSave = walletAddressChanged && walletValidation.valid;
 
-  const securityCodeValid = securityCode.trim().replace(/\D/g, '').length === 4 && securityCode === securityCodeConfirm;
-  const showStatus = (kind: StatusState['kind'], message: string) => {
-    setStatus({ kind, message });
+  const showStatus = (kind: StatusState['kind'], message: string, section: SettingsStatusSection) => {
+    setStatus({ kind, message, section });
   };
+
+  const renderStatus = (section: SettingsStatusSection) => status.kind !== 'idle' && status.section === section ? (
+    <NotificationBanner
+      tone={status.kind === 'success' ? 'success' : 'error'}
+      title={status.kind === 'success' ? 'Settings updated' : 'Check your details'}
+      message={status.message}
+    />
+  ) : null;
 
   const handleSaveWallet = async () => {
     const trimmedWallet = walletAddress.trim();
 
     if (!trc20WalletPattern.test(trimmedWallet)) {
       setWalletValidation({ valid: false, message: 'Wallet address must be a valid TRC-20 address starting with T.' });
-      showStatus('error', 'Enter a valid TRC-20 wallet address before saving.');
+      showStatus('error', 'Enter a valid TRC-20 wallet address before saving.', 'wallet');
       return;
     }
 
@@ -303,11 +323,11 @@ const SettingsPage = () => {
         walletAddress: trimmedWallet,
       });
       setWalletValidation({ valid: true, message: 'TRC-20 wallet format looks valid.' });
-      showStatus('success', 'Wallet address saved successfully.');
+      showStatus('success', 'Wallet address saved successfully.', 'wallet');
       setActiveCard(null);
     } catch (error: any) {
       setWalletValidation({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
-      showStatus('error', error?.response?.data?.message || 'Unable to save wallet address.');
+      showStatus('error', error?.response?.data?.message || 'Unable to save wallet address.', 'wallet');
     } finally {
       setWalletCardSaving(false);
     }
@@ -334,65 +354,40 @@ const SettingsPage = () => {
     setEdgeLightEnabled((current) => {
       const nextEnabled = !current;
       persistEdgeLight(nextEnabled, edgeLightColor, edgeLightMode);
-      showStatus('success', nextEnabled ? 'NowBar edge lighting turned on.' : 'NowBar edge lighting turned off.');
+      showStatus('success', nextEnabled ? 'NowBar edge lighting turned on.' : 'NowBar edge lighting turned off.', 'edgeLight');
       return nextEnabled;
     });
   };
 
   const handleSetEdgeLightColor = (nextColor: string) => {
-    setEdgeLightColor(nextColor);
-    persistEdgeLight(edgeLightEnabled, nextColor, edgeLightMode);
-    showStatus('success', 'NowBar edge lighting color updated.');
+    const normalizedColor = nextColor.toLowerCase();
+    const nextHistory = Array.from(new Set([normalizedColor, ...edgeLightColorHistory])).slice(0, MAX_EDGE_LIGHT_COLOR_HISTORY);
+    setEdgeLightColor(normalizedColor);
+    setEdgeLightColorHistory(nextHistory);
+    window.localStorage.setItem(EDGE_LIGHT_COLOR_HISTORY_KEY, JSON.stringify(nextHistory));
+    persistEdgeLight(edgeLightEnabled, normalizedColor, edgeLightMode);
+    showStatus('success', 'NowBar edge lighting color updated.', 'edgeLight');
   };
 
   const handleSetEdgeLightMode = (nextMode: EdgeLightMode) => {
     setEdgeLightMode(nextMode);
     persistEdgeLight(edgeLightEnabled, edgeLightColor, nextMode);
-    showStatus('success', 'NowBar edge lighting style updated.');
+    showStatus('success', 'NowBar edge lighting style updated.', 'edgeLight');
   };
 
   const handleSaveEdgeLight = () => {
     setEdgeLightCardSaving(true);
     try {
       persistEdgeLight(edgeLightEnabled, edgeLightColor, edgeLightMode);
-      showStatus('success', 'NowBar edge lighting updated.');
+      showStatus('success', 'NowBar edge lighting updated.', 'edgeLight');
     } finally {
       setEdgeLightCardSaving(false);
     }
   };
 
-  const handleSaveSecurityCode = async () => {
-    if (!currentSecurityPassword) {
-      showStatus('error', 'Enter your current password to update your security code.');
-      return;
-    }
-
-    if (!securityCodeValid) {
-      showStatus('error', 'Security code must be 4 digits and match confirmation.');
-      return;
-    }
-
-    setSecurityCodeCardSaving(true);
-    try {
-      await api.patch('/api/withdrawals/security-code', {
-        currentPassword: currentSecurityPassword,
-        securityCode,
-      });
-      showStatus('success', 'Security code updated successfully.');
-      setCurrentSecurityPassword('');
-      setSecurityCode('');
-      setSecurityCodeConfirm('');
-      setActiveCard(null);
-    } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update security code.');
-    } finally {
-      setSecurityCodeCardSaving(false);
-    }
-  };
-
   const handleToggleTheme = () => {
     persistTheme(themeMode === 'dark' ? 'light' : 'dark');
-    showStatus('success', `Theme switched to ${themeMode === 'dark' ? 'Light' : 'Dark'} mode.`);
+    showStatus('success', `Theme switched to ${themeMode === 'dark' ? 'Light' : 'Dark'} mode.`, 'theme');
   };
 
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -402,7 +397,7 @@ const SettingsPage = () => {
     }
 
     if (!file.type.startsWith('image/')) {
-      showStatus('error', 'Please choose an image file.');
+      showStatus('error', 'Please choose an image file.', 'profile');
       return;
     }
 
@@ -439,10 +434,10 @@ const SettingsPage = () => {
       });
 
       setAvatarPreview(uploadedFile.secure_url);
-      showStatus('success', 'Profile picture updated.');
+      showStatus('success', 'Profile picture updated.', 'profile');
     } catch (error) {
       console.error('[SettingsPage] avatar upload failed:', error);
-      showStatus('error', error instanceof Error ? error.message : 'Unable to upload image.');
+      showStatus('error', error instanceof Error ? error.message : 'Unable to upload image.', 'profile');
     } finally {
       setAvatarUploading(false);
       event.target.value = '';
@@ -470,15 +465,8 @@ const SettingsPage = () => {
         
         <div style={styles.panel}>
           <div style={styles.body}>
-            {status.kind !== 'idle' ? (
-              <NotificationBanner
-                tone={status.kind === 'success' ? 'success' : 'error'}
-                title={status.kind === 'success' ? 'Settings updated' : 'Check your details'}
-                message={status.message}
-              />
-            ) : null}
-
             <section style={styles.card}>
+              {renderStatus('profile')}
               <h2 style={styles.cardTitle}><UserCircle2 size={18} /> Profile picture</h2>
               <p style={styles.cardText}>Choose a photo and upload it directly as-is.</p>
               <div style={{ display: 'grid', gap: '14px', marginTop: '14px' }}>
@@ -506,6 +494,7 @@ const SettingsPage = () => {
             <div style={styles.grid}>
 
               <section style={styles.card}>
+                {renderStatus('theme')}
                 <h2 style={styles.cardTitle}>🎨 Theme</h2>
                 <p style={styles.cardText}>Switch the app theme instantly. The choice is saved across reloads.</p>
                 <div style={styles.toggleRow}>
@@ -532,6 +521,7 @@ const SettingsPage = () => {
               </section>
 
               <section style={styles.card}>
+                {renderStatus('edgeLight')}
                 <h2 style={styles.cardTitle}>⚡ NowBar edge lighting</h2>
                 <p style={styles.cardText}>Create a fully customizable NowBar edge effect with any color and multiple professional lighting styles.</p>
                 <div style={styles.toggleRow}>
@@ -554,18 +544,21 @@ const SettingsPage = () => {
                       style={{ width: '58px', height: '44px', padding: '2px', borderRadius: '12px', border: `2px solid ${theme.borderGlass}`, background: theme.surfaceMuted, cursor: 'pointer' }}
                     />
                     <code style={{ color: theme.textMuted, fontSize: '0.85rem' }}>{edgeLightColor.toUpperCase()}</code>
-                    <div style={styles.colorSwatches}>
-                      {EDGE_LIGHT_COLOR_OPTIONS.map((option) => (
-                        <button
-                          key={option.key}
-                          type="button"
-                          aria-label={`${option.label} edge light`}
-                          title={option.label}
-                          onClick={() => handleSetEdgeLightColor(option.value)}
-                          style={{ ...styles.colorSwatch, background: option.value, ...(edgeLightColor.toLowerCase() === option.value ? styles.colorSwatchActive : {}) }}
-                        />
-                      ))}
-                    </div>
+                    {edgeLightColorHistory.length > 0 ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ color: theme.textMuted, fontSize: '0.78rem' }}>Recent</span>
+                        {edgeLightColorHistory.map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            aria-label={`Use recent edge light color ${color}`}
+                            title={color.toUpperCase()}
+                            onClick={() => handleSetEdgeLightColor(color)}
+                            style={{ ...styles.colorSwatch, background: color, ...(edgeLightColor.toLowerCase() === color ? styles.colorSwatchActive : {}) }}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
                 <div style={{ ...styles.field, marginTop: '16px' }}>
@@ -589,6 +582,7 @@ const SettingsPage = () => {
               </section>
 
               <section style={styles.card}>
+                {renderStatus('wallet')}
                 <h2 style={styles.cardTitle}><WalletCards size={18} /> Withdrawal wallet</h2>
                 <p style={styles.cardText}>Bind your TRC-20 wallet address now so withdrawals can be added later without changing your profile again.</p>
                 <div style={styles.formGrid}>
@@ -622,32 +616,6 @@ const SettingsPage = () => {
                   <div style={styles.buttonRow}>
                     <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveWallet()} disabled={walletCardSaving || !walletCanSave}>
                       {walletCardSaving ? <InlineLoadingDots /> : 'Save wallet'}
-                    </button>
-                  </div>
-                ) : null}
-              </section>
-
-              <section style={styles.card}>
-                <h2 style={styles.cardTitle}><ShieldCheck size={18} /> Security code</h2>
-                <p style={styles.cardText}>Set or change a withdrawal security code. Changing it requires your password.</p>
-                <div style={styles.formGrid}>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Current password</span>
-                    <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => { setCurrentSecurityPassword(event.target.value); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} />
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Security code</span>
-                    <input style={styles.input} type="password" value={securityCode} onChange={(event) => { setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="6 digits" />
-                  </label>
-                  <label style={styles.field}>
-                    <span style={styles.label}>Confirm security code</span>
-                    <input style={styles.input} type="password" value={securityCodeConfirm} onChange={(event) => { setSecurityCodeConfirm(event.target.value.replace(/\D/g, '').slice(0, 6)); setActiveCard('securityCode'); }} onFocus={() => setActiveCard('securityCode')} placeholder="Repeat 6 digits" />
-                  </label>
-                </div>
-                {((activeCard === 'securityCode' && securityCodeValid) || securityCodeCardSaving) ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSaveSecurityCode()} disabled={securityCodeCardSaving || !securityCodeValid}>
-                      {securityCodeCardSaving ? <InlineLoadingDots /> : 'Save security code'}
                     </button>
                   </div>
                 ) : null}
