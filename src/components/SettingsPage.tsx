@@ -15,13 +15,13 @@ const EDGE_LIGHT_COLOR_OPTIONS = [
 type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
 type EdgeLightMode = 'stable' | 'blink' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
 
-const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string; description: string }> = [
-  { key: 'stable', label: 'Stable glow', description: 'A steady single-color border.' },
-  { key: 'blink', label: 'Blinking light', description: 'The glow turns on and off softly.' },
-  { key: 'pulse', label: 'Breathing pulse', description: 'The color expands and fades continuously.' },
-  { key: 'sweep', label: 'Moving border light', description: 'A stronger light travels across the edge.' },
-  { key: 'color-cycle', label: 'Changing border colors', description: 'Cycles through vivid border colors.' },
-  { key: 'rainbow', label: 'Changing light colors', description: 'Cycles both glow and border colors.' },
+const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
+  { key: 'stable', label: 'Stable glow' },
+  { key: 'blink', label: 'Blinking light' },
+  { key: 'pulse', label: 'Breathing pulse' },
+  { key: 'sweep', label: 'Moving border light' },
+  { key: 'color-cycle', label: 'Changing border colors' },
+  { key: 'rainbow', label: 'Changing light colors' },
 ];
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
@@ -568,7 +568,6 @@ const SettingsPage = () => {
                     {EDGE_LIGHT_MODES.map((option) => (
                       <button key={option.key} type="button" onClick={() => handleSetEdgeLightMode(option.key)} style={{ ...styles.button, borderRadius: '14px', textAlign: 'left', display: 'grid', gap: '3px', ...(edgeLightMode === option.key ? styles.primaryButton : {}) }}>
                         <span>{option.label}</span>
-                        <small style={{ opacity: 0.75, fontWeight: 500 }}>{option.description}</small>
                       </button>
                     ))}
                   </div>
