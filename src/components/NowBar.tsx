@@ -12,11 +12,11 @@ const EDGE_LIGHT_COLORS = {
 } as const;
 
 type EdgeLightColor = keyof typeof EDGE_LIGHT_COLORS;
-type EdgeLightMode = 'stable' | 'blink' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
+type EdgeLightMode = 'stable-light' | 'stable' | 'blink' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
 type EdgeLightSettings = { enabled: boolean; color: string; mode: EdgeLightMode };
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
-const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable', 'blink', 'pulse', 'sweep', 'color-cycle', 'rainbow'];
+const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable-light', 'stable', 'blink', 'pulse', 'sweep', 'color-cycle', 'rainbow'];
 
 const getEdgeLightSettings = (): EdgeLightSettings => {
   if (typeof window === 'undefined') {
@@ -381,7 +381,8 @@ const NowBar = ({ actions }: NowBarProps) => {
             '--edge-light': edgeLightColor,
             '--edge-light-mode': edgeLight.mode,
             borderColor: edgeLightColor,
-            animation: edgeLight.mode === 'stable' ? undefined : `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' ? '3.2s' : edgeLight.mode === 'rainbow' ? '5.5s' : edgeLight.mode === 'color-cycle' ? '6s' : edgeLight.mode === 'sweep' ? '2.4s' : '2.8s'} ease-in-out infinite`,
+            ...(edgeLight.mode === 'stable-light' ? { boxShadow: '0 18px 50px rgba(0,0,0,.82)' } : {}),
+            animation: edgeLight.mode === 'stable' || edgeLight.mode === 'stable-light' ? undefined : `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' ? '3.2s' : edgeLight.mode === 'rainbow' ? '5.5s' : edgeLight.mode === 'color-cycle' ? '6s' : edgeLight.mode === 'sweep' ? '2.4s' : '2.8s'} ease-in-out infinite`,
             animationFillMode: 'both',
             willChange: 'border-color, box-shadow, filter',
           } : {}),
