@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS, type HybridThemeMode } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
 const EDGE_LIGHT_COLOR_OPTIONS = [
   { key: 'blue', label: 'Blue', value: '#38bdf8' },
@@ -327,7 +328,7 @@ const SettingsPage = () => {
       setActiveCard(null);
     } catch (error: any) {
       setWalletValidation({ valid: false, message: 'Enter a valid TRC-20 wallet address.' });
-      showStatus('error', error?.response?.data?.message || 'Unable to save wallet address.', 'wallet');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to save your wallet address. Please check it and try again.'), 'wallet');
     } finally {
       setWalletCardSaving(false);
     }

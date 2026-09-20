@@ -7,6 +7,7 @@ import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
+import { getFriendlyErrorMessage } from '../utils/errorMessage';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
@@ -205,7 +206,7 @@ const TransferPage = () => {
       setAmount('');
       setSecurityCode('');
     } catch (error: any) {
-      setMessage({ kind: 'error', text: error?.response?.data?.message || 'Unable to complete transfer.' });
+      setMessage({ kind: 'error', text: getFriendlyErrorMessage(error, 'Unable to complete transfer. Please check your details and try again.') });
     } finally {
       setTransferring(false);
     }

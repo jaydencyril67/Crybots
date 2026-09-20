@@ -9,6 +9,7 @@ import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
 type StakingPackage = {
   id: 'STK 01' | 'STK 02' | 'STK 03';
@@ -194,7 +195,7 @@ const StakingPage = () => {
         }
       } catch (loadError) {
         if (!cancelled) {
-          setError(loadError instanceof Error ? loadError.message : 'Unable to load staking data.');
+          setError(getFriendlyErrorMessage(loadError, 'Unable to load staking data. Please try again.'));
         }
       } finally {
         if (!cancelled) setIsLoading(false);

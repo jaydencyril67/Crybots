@@ -12,6 +12,7 @@ import InlineLoadingDots from './InlineLoadingDots';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
 import NotificationBanner from './NotificationBanner';
 import { createPasskey, isWebAuthnAvailable } from '../utils/webauthn';
+import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
 type SecurityDevice = {
   id?: string;
@@ -393,7 +394,7 @@ const SecurityPage = () => {
     } catch (error: any) {
       setStatus({
         kind: 'error',
-        text: error?.response?.data?.message || 'Unable to remove device session.',
+        text: getFriendlyErrorMessage(error, 'Unable to remove this device session. Please try again.'),
         section: 'sessions',
       });
     } finally {
@@ -419,7 +420,7 @@ const SecurityPage = () => {
       setUidCode('');
       showStatus('success', 'A confirmation code was sent to your email.', 'uid');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to send UID confirmation code.', 'uid');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to send the confirmation code. Please try again.'), 'uid');
     } finally {
       setRequestingUidCode(false);
     }
@@ -435,7 +436,7 @@ const SecurityPage = () => {
       setUidCodeRequested(false);
       showStatus('success', 'UID updated successfully.', 'uid');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update UID.', 'uid');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your UID. Please check your details and try again.'), 'uid');
     } finally {
       setSavingUid(false);
     }
@@ -484,7 +485,7 @@ const SecurityPage = () => {
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update password.', 'password');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your password. Please check your details and try again.'), 'password');
     } finally {
       setSavingPassword(false);
     }
@@ -511,7 +512,7 @@ const SecurityPage = () => {
       setConfirmSecurityCode('');
       showStatus('success', 'Security code updated successfully.', 'securityCode');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update security code.', 'securityCode');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your security code. Please check your details and try again.'), 'securityCode');
     } finally {
       setSavingSecurityCode(false);
     }
@@ -528,7 +529,7 @@ const SecurityPage = () => {
       setTwoFactorCode('');
       showStatus('success', 'Scan the QR code with your authenticator app, then enter the generated code to enable 2FA.', 'twoFactor');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to start 2FA setup.', 'twoFactor');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to start two-factor authentication. Please try again.'), 'twoFactor');
     } finally {
       setSaving2fa(false);
     }
@@ -559,7 +560,7 @@ const SecurityPage = () => {
       setTwoFactorCode('');
       showStatus('success', twoFactorEnabled ? 'Two-factor authentication disabled.' : 'Two-factor authentication enabled.', 'twoFactor');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update 2FA.', 'twoFactor');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to update two-factor authentication. Please try again.'), 'twoFactor');
     } finally {
       setSaving2fa(false);
     }
@@ -582,7 +583,7 @@ const SecurityPage = () => {
       setTwoFactorCode('');
       showStatus('success', 'All two-factor authentication data was deleted.', 'twoFactor');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to delete 2FA data.', 'twoFactor');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to remove two-factor authentication. Please try again.'), 'twoFactor');
     } finally {
       setSaving2fa(false);
       setShowDelete2faConfirmation(false);
@@ -607,7 +608,7 @@ const SecurityPage = () => {
       setBiometricEnabled(true);
       showStatus('success', 'Biometric security enabled with a passkey.', 'biometric');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || error?.message || 'Unable to update biometric security.', 'biometric');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to update biometric security. Please try again.'), 'biometric');
     } finally {
       setSavingBiometric(false);
     }
@@ -628,7 +629,7 @@ const SecurityPage = () => {
       await api.patch('/api/settings/security-question', {});
       showStatus('success', 'Security question updated successfully.', 'security');
     } catch (error: any) {
-      showStatus('error', error?.response?.data?.message || 'Unable to update security question.');
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your security question. Please try again.'));
     } finally {
       setSavingSecurityQuestion(false);
     }

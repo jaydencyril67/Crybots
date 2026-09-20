@@ -10,6 +10,7 @@ import ReusableDatePage from './ReusableDatePage';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
 type WithdrawalDetailsResponse = {
   user?: {
@@ -186,7 +187,7 @@ const WithdrawPage = () => {
       setNewSecurityCode('');
       setSecurityCodeSet(true);
     } catch (error: any) {
-      setMessage({ kind: 'error', text: error?.response?.data?.message || 'Unable to update security code.' });
+      setMessage({ kind: 'error', text: getFriendlyErrorMessage(error, 'Unable to update your security code. Please check your details and try again.') });
     } finally {
       setSavingSecurityCode(false);
     }
@@ -207,7 +208,7 @@ const WithdrawPage = () => {
       setMessage({ kind: 'success', text: data.message || 'Withdrawal submitted successfully.' });
       setBalances(data.balances || balances);
     } catch (error: any) {
-      setMessage({ kind: 'error', text: error?.response?.data?.message || 'Unable to submit withdrawal.' });
+      setMessage({ kind: 'error', text: getFriendlyErrorMessage(error, 'Unable to submit your withdrawal. Please check your details and try again.') });
     } finally {
       setWithdrawing(false);
     }
