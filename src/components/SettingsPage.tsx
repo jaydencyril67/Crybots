@@ -346,12 +346,6 @@ const SettingsPage = () => {
     }
   };
 
-  const handleToggleTheme = () => {
-    const nextPreference = themeMode === 'dark' ? 'light' : 'dark';
-    persistTheme(nextPreference);
-    showStatus('success', `Theme switched to ${nextPreference === 'dark' ? 'Dark' : 'Light'} mode.`, 'theme');
-  };
-
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -487,11 +481,6 @@ const SettingsPage = () => {
                     onClick={() => persistTheme('shift')}
                   >
                     Shift
-                  </button>
-                </div>
-                <div style={styles.buttonRow}>
-                  <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={handleToggleTheme}>
-                    Toggle Light / Dark
                   </button>
                 </div>
               </section>
