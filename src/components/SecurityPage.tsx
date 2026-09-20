@@ -383,6 +383,34 @@ const SecurityPage = () => {
     void load();
   }, []);
 
+  useEffect(() => {
+    const refreshSecurityCodeStatus = async () => {
+      try {
+        const { data } = await api.get<SecurityMeResponse>('/api/settings/me');
+        setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
+      } catch {
+        // Keep the last known status visible if a live refresh is unavailable.
+      }
+    };
+
+    const handleWindowFocus = () => {
+      void refreshSecurityCodeStatus();
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshSecurityCodeStatus();
+      }
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   const currentLoginCount = useMemo(() => sessions.length, [sessions.length]);
 
   const handleRemoveSession = async (tokenHash: string) => {

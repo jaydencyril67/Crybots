@@ -59,7 +59,7 @@ const styles = {
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
     height: 'calc(1.6 * 72px)',
-    boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
+    boxShadow: '0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
   },
   bar: {
     display: 'flex',
@@ -67,9 +67,11 @@ const styles = {
     gap: '12px',
     padding: '10px 12px',
     borderRadius: '20px',
+    position: 'relative' as const,
+    isolation: 'isolate' as const,
     border: '2.5px solid rgba(255,255,255,0.88)',
     background: '#000000',
-    boxShadow: '0 0 0 1px rgba(255,255,255,0.12), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.12)',
+    boxShadow: '0 18px 50px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.12)',
     backdropFilter: 'blur(18px) saturate(120%)',
     WebkitBackdropFilter: 'blur(18px) saturate(120%)',
     pointerEvents: 'auto' as const,
@@ -366,11 +368,14 @@ const NowBar = ({ actions }: NowBarProps) => {
 
   return (
     <>
-      <style>{`@keyframes nowbar-edge-blink { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), 0 0 26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 0 2px transparent, 0 18px 50px rgba(0,0,0,.82); } }
-@keyframes nowbar-edge-pulse { 0%, 100% { border-color: var(--edge-light); filter: saturate(1); box-shadow: 0 0 0 1px var(--edge-light), 0 0 15px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); filter: saturate(1.8); box-shadow: 0 0 0 3px var(--edge-light), 0 0 38px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
-@keyframes nowbar-edge-sweep { 0%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), -18px 0 28px var(--edge-light), 18px 0 8px rgba(255,255,255,.18), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); box-shadow: 0 0 0 3px var(--edge-light), 18px 0 28px var(--edge-light), -18px 0 8px rgba(255,255,255,.18), 0 18px 50px rgba(0,0,0,.82); } }
-@keyframes nowbar-edge-color-cycle { 0%, 100% { border-color: #38bdf8; box-shadow: 0 0 0 1px #38bdf8, 0 0 22px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } 25% { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e, 0 0 22px #22c55e, 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: #a855f7; box-shadow: 0 0 0 1px #a855f7, 0 0 22px #a855f7, 0 18px 50px rgba(0,0,0,.82); } 75% { border-color: #ec4899; box-shadow: 0 0 0 1px #ec4899, 0 0 22px #ec4899, 0 18px 50px rgba(0,0,0,.82); } }
-@keyframes nowbar-edge-rainbow { 0% { border-color: #38bdf8; box-shadow: 0 0 0 2px #38bdf8, 0 0 28px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } 20% { border-color: #22c55e; box-shadow: 0 0 0 2px #22c55e, 0 0 28px #22c55e, 0 18px 50px rgba(0,0,0,.82); } 40% { border-color: #facc15; box-shadow: 0 0 0 2px #facc15, 0 0 28px #facc15, 0 18px 50px rgba(0,0,0,.82); } 60% { border-color: #f97316; box-shadow: 0 0 0 2px #f97316, 0 0 28px #f97316, 0 18px 50px rgba(0,0,0,.82); } 80% { border-color: #ec4899; box-shadow: 0 0 0 2px #ec4899, 0 0 28px #ec4899, 0 18px 50px rgba(0,0,0,.82); } 100% { border-color: #38bdf8; box-shadow: 0 0 0 2px #38bdf8, 0 0 28px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } }
+      <style>{`@keyframes nowbar-edge-blink { 0%, 42%, 100% { border-color: var(--edge-light); } 48%, 94% { border-color: rgba(255,255,255,.88); } }
+@keyframes nowbar-edge-pulse { 0%, 100% { border-color: var(--edge-light); } 50% { border-color: var(--edge-light); } }
+@keyframes nowbar-edge-sweep { from { --edge-angle: 0deg; } to { --edge-angle: 360deg; } }
+@keyframes nowbar-edge-color-cycle { 0%, 16.66% { border-color: #38bdf8; } 16.67%, 33.32% { border-color: #a855f7; } 33.33%, 49.98% { border-color: #ec4899; } 49.99%, 66.64% { border-color: #22c55e; } 66.65%, 83.3% { border-color: #f59e0b; } 83.31%, 100% { border-color: #ef4444; } }
+@keyframes nowbar-edge-rainbow { 0%, 16.66% { border-color: #38bdf8; } 16.67%, 33.32% { border-color: #a855f7; } 33.33%, 49.98% { border-color: #ec4899; } 49.99%, 66.64% { border-color: #22c55e; } 66.65%, 83.3% { border-color: #f59e0b; } 83.31%, 100% { border-color: #ef4444; } }
+@property --edge-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+[data-nowbar-edge-light='sweep']::after { content: ''; position: absolute; inset: -2px; z-index: -1; border-radius: inherit; padding: 2.5px; background: conic-gradient(from var(--edge-angle), transparent 0deg 300deg, var(--edge-light) 330deg 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; animation: nowbar-edge-sweep 2.4s linear infinite; pointer-events: none; }
+[data-nowbar-edge-light='sweep'] { border-color: transparent !important; }
 `}</style>
       <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
       <div
@@ -383,7 +388,7 @@ const NowBar = ({ actions }: NowBarProps) => {
             borderColor: edgeLightColor,
             animation: edgeLight.mode === 'stable' ? undefined : `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' ? '3.2s' : edgeLight.mode === 'rainbow' ? '5.5s' : edgeLight.mode === 'color-cycle' ? '6s' : edgeLight.mode === 'sweep' ? '2.4s' : '2.8s'} ease-in-out infinite`,
             animationFillMode: 'both',
-            willChange: 'border-color, box-shadow, filter',
+            willChange: edgeLight.mode === 'sweep' ? 'border-color, --edge-angle' : 'border-color',
           } : {}),
           ...(isExpanded ? styles.barExpanded : {}),
         }}
