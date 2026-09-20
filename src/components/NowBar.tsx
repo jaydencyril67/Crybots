@@ -368,8 +368,8 @@ const NowBar = ({ actions }: NowBarProps) => {
   return (
     <>
       <style>{`@keyframes nowbar-edge-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-[data-nowbar-edge-light="sweep-light"]::before, [data-nowbar-edge-light="sweep"]::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 2.5px; background: conic-gradient(from -90deg, transparent 0deg 348deg, var(--edge-light) 353deg, rgba(255,255,255,.98) 358deg, transparent 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 2; animation: nowbar-edge-orbit 2.4s linear infinite; }
-[data-nowbar-edge-light="sweep"]::before { filter: drop-shadow(0 0 8px var(--edge-light)) drop-shadow(0 0 14px var(--edge-light)); }
+[data-nowbar-edge-light="sweep-light"]::before, [data-nowbar-edge-light="sweep"]::before { content: ''; position: absolute; inset: -2.5px; border-radius: inherit; padding: 2.5px; background: conic-gradient(from -90deg, transparent 0deg 350deg, var(--edge-light) 354deg, rgba(255,255,255,.98) 358deg, transparent 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; pointer-events: none; z-index: 3; animation: nowbar-edge-orbit 2.4s linear infinite; }
+[data-nowbar-edge-light="sweep"]::before { filter: drop-shadow(0 0 7px var(--edge-light)) drop-shadow(0 0 13px var(--edge-light)); }
 @keyframes nowbar-edge-blink-light { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 18px 50px rgba(0,0,0,.82); } }
 @keyframes nowbar-edge-blink { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), 0 0 26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 0 2px transparent, 0 18px 50px rgba(0,0,0,.82); } }
 @keyframes nowbar-edge-pulse-light { 0%, 100% { border-color: var(--edge-light); filter: saturate(1); box-shadow: 0 0 0 1px var(--edge-light), 0 0 7px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); filter: saturate(1.25); box-shadow: 0 0 0 2px var(--edge-light), 0 0 16px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
@@ -387,7 +387,7 @@ const NowBar = ({ actions }: NowBarProps) => {
           ...(edgeLight.enabled ? {
             '--edge-light': edgeLightColor,
             '--edge-light-mode': edgeLight.mode,
-            borderColor: edgeLight.mode === 'sweep' || edgeLight.mode === 'sweep-light' ? 'transparent' : edgeLightColor,
+            borderColor: edgeLightColor,
             ...(['stable-light', 'sweep-light'].includes(edgeLight.mode) ? { boxShadow: '0 18px 50px rgba(0,0,0,.82)' } : {}),
             animation: edgeLight.mode === 'stable' || edgeLight.mode === 'stable-light' || edgeLight.mode === 'sweep' || edgeLight.mode === 'sweep-light' ? undefined : `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' || edgeLight.mode === 'blink-light' || edgeLight.mode === 'pulse' || edgeLight.mode === 'pulse-light' ? '3.2s' : edgeLight.mode === 'color' || edgeLight.mode === 'color-light' ? '6s' : '2.8s'} ease-in-out infinite`,
             animationFillMode: 'both',
