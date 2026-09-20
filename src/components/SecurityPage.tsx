@@ -49,6 +49,7 @@ type SecurityMeResponse = {
   user?: {
     uid?: string;
     securityCodeSet?: boolean;
+    securityCodeChangeAvailableAt?: string | null;
     twoFactorEnabled?: boolean;
     biometricEnabled?: boolean;
     webauthnCredentials?: WebAuthnCredential[];
@@ -300,6 +301,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
 });
 
+const securityCodeChangeCooldownMs = 30 * 24 * 60 * 60 * 1000;
+
 const SecurityPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
@@ -319,6 +322,7 @@ const SecurityPage = () => {
   const [status, setStatus] = useState<{ kind: SaveState; text: string; section: string }>({ kind: 'idle', text: '', section: 'security' });
   const [logins, setLogins] = useState<SecurityLogin[]>([]);
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
+  const [securityCodeChangeAvailableAt, setSecurityCodeChangeAvailableAt] = useState<string | null>(null);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorConfigured, setTwoFactorConfigured] = useState(false);
   const [twoFactorSetupOpen, setTwoFactorSetupOpen] = useState(false);
@@ -348,6 +352,7 @@ const SecurityPage = () => {
         const { data } = await api.get<SecurityMeResponse>('/api/settings/me');
         setUid(data.user?.uid ?? '');
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
+        setSecurityCodeChangeAvailableAt(data.user?.securityCodeChangeAvailableAt ?? null);
         setTwoFactorEnabled(Boolean(data.user?.twoFactorEnabled));
         setBiometricEnabled(Boolean(data.user?.biometricEnabled));
         try {
@@ -491,6 +496,12 @@ const SecurityPage = () => {
     }
   };
 
+  const securityCodeChangeLocked = Boolean(securityCodeChangeAvailableAt && new Date(securityCodeChangeAvailableAt).getTime() > Date.now());
+  const securityCodeChangeDate = securityCodeChangeAvailableAt ? new Date(securityCodeChangeAvailableAt) : null;
+  const securityCodeChangeMessage = securityCodeChangeLocked && securityCodeChangeDate && !Number.isNaN(securityCodeChangeDate.getTime())
+    ? `You can change your security code again after ${securityCodeChangeDate.toLocaleDateString()}.`
+    : 'For your protection, you can change your security code only once every 30 days.';
+
   const handleSecurityCodeSave = async () => {
     if (!currentSecurityPassword.trim()) {
       return showStatus('error', 'Enter your current password to update the security code.', 'securityCode');
@@ -507,6 +518,7 @@ const SecurityPage = () => {
         securityCode,
       });
       setSecurityCodeSet(true);
+      setSecurityCodeChangeAvailableAt(new Date(Date.now() + securityCodeChangeCooldownMs).toISOString());
       setCurrentSecurityPassword('');
       setSecurityCode('');
       setConfirmSecurityCode('');
@@ -808,11 +820,12 @@ const SecurityPage = () => {
               <div style={styles.row}>
                 <p style={styles.rowLabel}><LockKeyhole size={16} /> Security code</p>
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
+                <p style={styles.note}>{securityCodeChangeMessage}</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
                   <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
-                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode || securityCodeChangeLocked}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
                 </div>
                 {renderStatus('securityCode')}
               </div>
