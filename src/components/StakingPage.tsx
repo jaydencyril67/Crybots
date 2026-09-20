@@ -288,8 +288,8 @@ const StakingPage = () => {
         <main style={styles.page}>
         <div style={styles.shell}>
           
-          {packagesError ? <NotificationBanner tone="error" title="Package load issue" message={packagesError} /> : null}
           <section style={styles.packageGrid}>
+            {packagesError ? <NotificationBanner tone="error" title="Package load issue" message={packagesError} /> : null}
             {isLoading ? <div style={styles.panel}><LoadingDots /></div> : stakingPackages.map((stakingPackage) => (
               <article key={stakingPackage.id} style={styles.packageCard}>
                 <span style={styles.packageBadge}>{stakingPackage.id}</span>

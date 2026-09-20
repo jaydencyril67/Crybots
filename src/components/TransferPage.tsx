@@ -219,9 +219,9 @@ const TransferPage = () => {
         
         <div style={styles.panel}>
           <div style={styles.body}>
-            {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
             <div style={styles.grid}>
               <section style={styles.card}>
+                {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
                 <h2 style={styles.cardTitle}><ArrowRightLeft size={18} /> Send USDT to another user</h2>
                 <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
                 <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
