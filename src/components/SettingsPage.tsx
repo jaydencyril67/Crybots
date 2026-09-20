@@ -25,7 +25,7 @@ const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string; description: 
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 const EDGE_LIGHT_COLOR_HISTORY_KEY = 'nowbar_edge_light_color_history';
-const MAX_EDGE_LIGHT_COLOR_HISTORY = 6;
+const MAX_EDGE_LIGHT_COLOR_HISTORY = 5;
 import { Helmet } from 'react-helmet-async';
 import { RotateCcw, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
