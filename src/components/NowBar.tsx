@@ -12,11 +12,11 @@ const EDGE_LIGHT_COLORS = {
 } as const;
 
 type EdgeLightColor = keyof typeof EDGE_LIGHT_COLORS;
-type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse-light' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
+type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse-light' | 'pulse' | 'sweep-light' | 'sweep' | 'color-cycle' | 'rainbow';
 type EdgeLightSettings = { enabled: boolean; color: string; mode: EdgeLightMode };
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
-const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable-light', 'stable', 'blink-light', 'blink', 'pulse-light', 'pulse', 'sweep', 'color-cycle', 'rainbow'];
+const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable-light', 'stable', 'blink-light', 'blink', 'pulse-light', 'pulse', 'sweep-light', 'sweep', 'color-cycle', 'rainbow'];
 
 const getEdgeLightSettings = (): EdgeLightSettings => {
   if (typeof window === 'undefined') {
@@ -68,6 +68,7 @@ const styles = {
     padding: '10px 12px',
     borderRadius: '20px',
     border: '2.5px solid rgba(255,255,255,0.88)',
+    position: 'relative' as const,
     background: '#000000',
     boxShadow: '0 0 0 1px rgba(255,255,255,0.12), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.12)',
     backdropFilter: 'blur(18px) saturate(120%)',
@@ -366,11 +367,15 @@ const NowBar = ({ actions }: NowBarProps) => {
 
   return (
     <>
-      <style>{`@keyframes nowbar-edge-blink-light { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 18px 50px rgba(0,0,0,.82); } }
+      <style>{`@keyframes nowbar-edge-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+[data-nowbar-edge-light="sweep-light"]::before, [data-nowbar-edge-light="sweep"]::before { content: ''; position: absolute; inset: -2px; border-radius: inherit; padding: 2px; background: conic-gradient(from 0deg, transparent 0deg 300deg, var(--edge-light) 330deg, rgba(255,255,255,.95) 350deg, transparent 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 2; animation: nowbar-edge-orbit 2.4s linear infinite; }
+[data-nowbar-edge-light="sweep"]::before { filter: drop-shadow(0 0 8px var(--edge-light)) drop-shadow(0 0 14px var(--edge-light)); }
+@keyframes nowbar-edge-blink-light { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 18px 50px rgba(0,0,0,.82); } }
 @keyframes nowbar-edge-blink { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), 0 0 26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 0 2px transparent, 0 18px 50px rgba(0,0,0,.82); } }
 @keyframes nowbar-edge-pulse-light { 0%, 100% { border-color: var(--edge-light); filter: saturate(1); box-shadow: 0 0 0 1px var(--edge-light), 0 0 7px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); filter: saturate(1.25); box-shadow: 0 0 0 2px var(--edge-light), 0 0 16px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
  @keyframes nowbar-edge-pulse { 0%, 100% { border-color: var(--edge-light); filter: saturate(1); box-shadow: 0 0 0 1px var(--edge-light), 0 0 15px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); filter: saturate(1.8); box-shadow: 0 0 0 3px var(--edge-light), 0 0 38px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
-@keyframes nowbar-edge-sweep { 0%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), -18px 0 28px var(--edge-light), 18px 0 8px rgba(255,255,255,.18), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); box-shadow: 0 0 0 3px var(--edge-light), 18px 0 28px var(--edge-light), -18px 0 8px rgba(255,255,255,.18), 0 18px 50px rgba(0,0,0,.82); } }
+@keyframes nowbar-edge-sweep-light { 0% { border-color: var(--edge-light); box-shadow: inset 28px 0 0 -26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 25% { border-color: var(--edge-light); box-shadow: inset 0 28px 0 -26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); box-shadow: inset -28px 0 0 -26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 75% { border-color: var(--edge-light); box-shadow: inset 0 -28px 0 -26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 100% { border-color: var(--edge-light); box-shadow: inset 28px 0 0 -26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
++@keyframes nowbar-edge-sweep { 0% { border-color: var(--edge-light); box-shadow: inset 34px 0 10px -25px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 25% { border-color: var(--edge-light); box-shadow: inset 0 34px 10px -25px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); box-shadow: inset -34px 0 10px -25px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 75% { border-color: var(--edge-light); box-shadow: inset 0 -34px 10px -25px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 100% { border-color: var(--edge-light); box-shadow: inset 34px 0 10px -25px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
 @keyframes nowbar-edge-color-cycle { 0%, 100% { border-color: #38bdf8; box-shadow: 0 0 0 1px #38bdf8, 0 0 22px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } 25% { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e, 0 0 22px #22c55e, 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: #a855f7; box-shadow: 0 0 0 1px #a855f7, 0 0 22px #a855f7, 0 18px 50px rgba(0,0,0,.82); } 75% { border-color: #ec4899; box-shadow: 0 0 0 1px #ec4899, 0 0 22px #ec4899, 0 18px 50px rgba(0,0,0,.82); } }
 @keyframes nowbar-edge-rainbow { 0% { border-color: #38bdf8; box-shadow: 0 0 0 2px #38bdf8, 0 0 28px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } 20% { border-color: #22c55e; box-shadow: 0 0 0 2px #22c55e, 0 0 28px #22c55e, 0 18px 50px rgba(0,0,0,.82); } 40% { border-color: #facc15; box-shadow: 0 0 0 2px #facc15, 0 0 28px #facc15, 0 18px 50px rgba(0,0,0,.82); } 60% { border-color: #f97316; box-shadow: 0 0 0 2px #f97316, 0 0 28px #f97316, 0 18px 50px rgba(0,0,0,.82); } 80% { border-color: #ec4899; box-shadow: 0 0 0 2px #ec4899, 0 0 28px #ec4899, 0 18px 50px rgba(0,0,0,.82); } 100% { border-color: #38bdf8; box-shadow: 0 0 0 2px #38bdf8, 0 0 28px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } }
 `}</style>
@@ -382,9 +387,9 @@ const NowBar = ({ actions }: NowBarProps) => {
           ...(edgeLight.enabled ? {
             '--edge-light': edgeLightColor,
             '--edge-light-mode': edgeLight.mode,
-            borderColor: edgeLightColor,
-            ...(edgeLight.mode === 'stable-light' ? { boxShadow: '0 18px 50px rgba(0,0,0,.82)' } : {}),
-            animation: edgeLight.mode === 'stable' || edgeLight.mode === 'stable-light' ? undefined : `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' || edgeLight.mode === 'blink-light' || edgeLight.mode === 'pulse' || edgeLight.mode === 'pulse-light' ? '3.2s' : edgeLight.mode === 'rainbow' ? '5.5s' : edgeLight.mode === 'color-cycle' ? '6s' : edgeLight.mode === 'sweep' ? '2.4s' : '2.8s'} ease-in-out infinite`,
+            borderColor: edgeLight.mode === 'sweep' || edgeLight.mode === 'sweep-light' ? 'transparent' : edgeLightColor,
+            ...(['stable-light', 'sweep-light'].includes(edgeLight.mode) ? { boxShadow: '0 18px 50px rgba(0,0,0,.82)' } : {}),
+            animation: edgeLight.mode === 'stable' || edgeLight.mode === 'stable-light' || edgeLight.mode === 'sweep' || edgeLight.mode === 'sweep-light' ? undefined : `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' || edgeLight.mode === 'blink-light' || edgeLight.mode === 'pulse' || edgeLight.mode === 'pulse-light' ? '3.2s' : edgeLight.mode === 'rainbow' ? '5.5s' : edgeLight.mode === 'color-cycle' ? '6s' : '2.8s'} ease-in-out infinite`,
             animationFillMode: 'both',
             willChange: 'border-color, box-shadow, filter',
           } : {}),
