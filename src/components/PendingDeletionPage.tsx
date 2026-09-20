@@ -1,128 +1,88 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
-import { navigate } from '../utils/navigate';
-import ReusableConfirmationPage from './ReusableConfirmationPage';
-import LoadingDots from './LoadingDots';
-import InlineLoadingDots from './InlineLoadingDots';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
-
-type DeletionStatus = {
-  scheduled: boolean;
-  deletionScheduledAtIso?: string;
-  daysLeft?: number;
-  codeSentAt?: string;
-  codeExpiresAt?: string;
-  accountStatus?: string;
-  accountStatusReason?: string;
-  accountStatusUpdatedAt?: string;
-  reactivationAtIso?: string;
-};
-
-const formatDaysLeft = (daysLeft?: number) => {
-  if (!daysLeft || Number.isNaN(daysLeft)) return 'Unknown';
-  return `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`;
-};
+import NotificationBanner from './NotificationBanner';
+import InlineLoadingDots from './InlineLoadingDots';
+import { navigate } from '../utils/navigate';
 
 const PendingDeletionPage = () => {
-  const { themeMode } = useAppTheme();
-  const theme = HYBRID_THEME_TOKENS[themeMode];
-  const recoveryUntil = useMemo(() => window.localStorage.getItem('pendingDeletionRecoveryUntil') || '', []);
-  const [status, setStatus] = useState<DeletionStatus | null>(null);
+  const { themeMode: mode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[mode];
+  const [email, setEmail] = useState(() => new URLSearchParams(window.location.search).get('email') || '');
+  const [name, setName] = useState('');
+  const [dob, setDob] = useState('');
   const [code, setCode] = useState('');
+  const [codeSent, setCodeSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [statusLoading, setStatusLoading] = useState(true);
-  const [codeRequestLoading, setCodeRequestLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const token = useMemo(() => localStorage.getItem('token') || '', []);
-
-  useEffect(() => {
-    const loadStatus = async () => {
-      try {
-        const response = await api.get('/api/settings/danger/deletion-status', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setStatus(response.data as DeletionStatus);
-        setMessage(response.data?.scheduled ? 'Your account is scheduled for deletion.' : 'No deletion is currently scheduled.');
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unable to load deletion status.';
-        setMessage(errorMessage);
-      } finally {
-        setStatusLoading(false);
-      }
-    };
-
-    void loadStatus();
-  }, [token]);
+  const fieldStyle = {
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    padding: '13px 14px',
+    borderRadius: '12px',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceMuted,
+    color: theme.text,
+    fontSize: '15px',
+  };
+  const canRequestCode = Boolean(email.trim() && name.trim() && dob);
 
   const requestCode = async () => {
-    setCodeRequestLoading(true);
-    setMessage('Sending cancellation code…');
-
+    if (!canRequestCode || isLoading) return;
+    setMessage('');
+    setIsLoading(true);
     try {
-      await api.post('/api/settings/danger/deletion-cancel-code', {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessage('A cancellation code has been sent to your email.');
+      const response = await api.post('/api/auth/pending-deletion/code', { email, name, dob });
+      setCodeSent(true);
+      setMessage(response.data?.message || 'A verification code has been sent to your email.');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unable to send cancellation code.';
-      setMessage(errorMessage);
+      const response = (error as { response?: { data?: { message?: string } } })?.response;
+      setMessage(response?.data?.message || 'Unable to send the verification code.');
     } finally {
-      setCodeRequestLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const submitCancel = async () => {
-    setLoading(true);
-    setMessage('Verifying cancellation code…');
-
+  const cancelDeletion = async () => {
+    if (!codeSent || code.length !== 4 || isLoading) return;
+    setMessage('');
+    setIsLoading(true);
     try {
-      const response = await api.post('/api/settings/danger/deletion-cancel', { code }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const reactivationAtIso = (response.data as { reactivationAtIso?: string })?.reactivationAtIso || new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString();
-      window.localStorage.setItem('pendingDeletionRecoveryUntil', reactivationAtIso);
-      setMessage('Deletion cancelled successfully. Full access will return after 24 hours. Redirecting…');
-      navigate('/dashboard');
+      const response = await api.post('/api/auth/pending-deletion/cancel', { email, name, dob, code });
+      setSuccess(true);
+      setMessage(response.data?.message || 'Account deletion cancelled successfully.');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unable to cancel deletion.';
-      setMessage(errorMessage);
+      const response = (error as { response?: { data?: { message?: string } } })?.response;
+      setMessage(response?.data?.message || 'Unable to cancel account deletion.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <ReusableConfirmationPage
-      eyebrow="Pending deletion"
-      title="Your account is scheduled for deletion"
-      description="Sign-in is paused while your account is marked for deletion. You can request a code by email and confirm cancellation here, then wait 24 hours for normal access to return."
-      statusLabel={statusLoading ? <LoadingDots /> : status?.scheduled ? `Deletion in ${formatDaysLeft(status.daysLeft)} · code expires ${status.codeExpiresAt ? new Date(status.codeExpiresAt).toLocaleString() : 'soon'}` : 'No active deletion request'}
-      statusTone="warning"
-      primaryActionLabel={loading ? <InlineLoadingDots /> : 'Cancel deletion'}
-      secondaryActionLabel={codeRequestLoading ? <InlineLoadingDots /> : 'Send cancellation code'}
-      onPrimaryAction={submitCancel}
-      onSecondaryAction={requestCode}
-      footerNote={statusLoading ? <LoadingDots /> : `${message || 'After cancellation, your account stays in a recovery state for 24 hours before returning to normal access.'}${recoveryUntil ? ` Recovery ends at ${new Date(recoveryUntil).toLocaleString()}.` : ''}`}
-    >
-      <div style={{ display: 'grid', gap: '10px', marginTop: '18px' }}>
-        <div style={{ display: 'grid', gap: '6px' }}>
-          <label style={{ fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: theme.textMuted }} htmlFor="pending-deletion-code">
-            Email verification code
-          </label>
-          <input
-            id="pending-deletion-code"
-            value={code}
-            onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 4))}
-            placeholder="Enter the 4-digit code"
-            inputMode="numeric"
-            maxLength={4}
-            style={{ width: '100%', boxSizing: 'border-box', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, padding: '12px 14px', outline: 'none' }}
-          />
-        </div>
-      </div>
-    </ReusableConfirmationPage>
+    <>
+      <Helmet><title>KingsHall Exchange | Cancel account deletion</title></Helmet>
+      <main style={{ minHeight: '100vh', padding: '48px 20px', display: 'grid', placeItems: 'center' }}>
+        <section style={{ width: 'min(100%, 520px)', padding: 'clamp(22px, 5vw, 38px)', borderRadius: '26px', background: theme.surface, border: `1px solid ${theme.border}`, boxShadow: '0 18px 60px rgba(0,0,0,.18)' }}>
+          <p style={{ margin: 0, color: theme.accent, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase' }}>Account recovery</p>
+          <h1 style={{ color: theme.text, margin: '12px 0 10px' }}>Cancel account deletion</h1>
+          <p style={{ color: theme.textMuted, lineHeight: 1.6, marginTop: 0 }}>Confirm the details on your account. We will send a verification code to your account email before restoring access.</p>
+          <div style={{ display: 'grid', gap: 14, marginTop: 24 }}>
+            <label style={{ color: theme.text }}>Email<input style={fieldStyle} type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" /></label>
+            <label style={{ color: theme.text }}>Name on account<input style={fieldStyle} type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label>
+            <label style={{ color: theme.text }}>Date of birth<input style={fieldStyle} type="date" value={dob} onChange={(event) => setDob(event.target.value)} /></label>
+            {codeSent ? <label style={{ color: theme.text }}>Email verification code<input style={fieldStyle} inputMode="numeric" maxLength={4} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" autoComplete="one-time-code" /></label> : null}
+            {message ? <NotificationBanner tone={success ? 'success' : 'warning'} title={success ? 'Deletion cancelled' : 'Action required'} message={message} /> : null}
+            {!success ? <button type="button" onClick={codeSent ? cancelDeletion : requestCode} disabled={isLoading || (codeSent ? code.length !== 4 : !canRequestCode)} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.accent, color: theme.onAccent, fontWeight: 800 }}>{isLoading ? <InlineLoadingDots /> : codeSent ? 'Cancel deletion' : 'Email me a verification code'}</button> : <button type="button" onClick={() => navigate('/signin')} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.accent, color: theme.onAccent, fontWeight: 800 }}>Return to sign in</button>}
+            {!success && codeSent ? <button type="button" onClick={requestCode} disabled={isLoading || !canRequestCode} style={{ border: 0, background: 'transparent', color: theme.accent, cursor: 'pointer' }}>Request a new code</button> : null}
+          </div>
+        </section>
+      </main>
+    </>
   );
 };
 
