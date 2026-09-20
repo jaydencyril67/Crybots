@@ -151,28 +151,17 @@ const DangerPage = () => {
 
     try {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
-      const response = await api.delete('/api/settings/danger/delete', {
+      await api.delete('/api/settings/danger/delete', {
         headers,
         data: { password: remove.password, confirmation: remove.confirmation, reason: remove.reason },
       });
-      const forceLogout = Boolean((response.data as { forceLogout?: boolean })?.forceLogout);
-      const reactivationAtIso = (response.data as { reactivationAtIso?: string })?.reactivationAtIso;
-
-      if (reactivationAtIso) {
-        window.localStorage.setItem('pendingDeletionRecoveryUntil', reactivationAtIso);
-      }
-
       window.localStorage.removeItem('token');
       window.localStorage.removeItem('user');
       window.localStorage.removeItem('kingshall_user');
       window.localStorage.removeItem('firstName');
       window.localStorage.removeItem('kingshall_first_name');
       window.dispatchEvent(new Event('ke:force-logout'));
-      if (forceLogout) {
-        navigate('/pending-deletion');
-        return;
-      }
-      navigate('/pending-deletion');
+      navigate('/');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to complete the action.';
       setRemove((current) => ({ ...current, status: message }));
