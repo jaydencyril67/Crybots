@@ -50,7 +50,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   sectionTitle: { margin: '0 0 14px', fontSize: '1rem', fontWeight: 800 },
   colorPicker: { width: 'min(76vw, 330px)', margin: '8px auto 22px' },
   hueRing: { width: '100%', aspectRatio: '1', borderRadius: '50%', background: 'conic-gradient(#ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)', padding: '16px', boxSizing: 'border-box' as const, cursor: 'crosshair', position: 'relative' as const, boxShadow: '0 0 0 1px rgba(255,255,255,.16), 0 12px 30px rgba(0,0,0,.22)' },
-  colorField: { position: 'absolute' as const, inset: '16px', borderRadius: '50%', background: 'linear-gradient(to bottom, transparent 45%, rgba(0,0,0,.96)), radial-gradient(circle, #fff 0%, transparent 72%), var(--picker-hue)', cursor: 'crosshair', overflow: 'hidden' as const, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.3), inset 0 0 18px rgba(0,0,0,.28)' },
+  colorField: { position: 'absolute' as const, inset: '16px', borderRadius: '50%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.96) 100%), linear-gradient(to right, #fff 0%, var(--picker-hue) 100%)', cursor: 'crosshair', overflow: 'hidden' as const, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.3), inset 0 0 18px rgba(0,0,0,.28)' },
   colorFieldPoint: { position: 'absolute' as const, width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
   huePoint: { position: 'absolute' as const, left: '50%', top: '50%', width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
   inputRow: { display: 'flex', gap: '10px', marginTop: '18px', flexWrap: 'wrap' as const },
@@ -120,6 +120,15 @@ const NowBarColorPage = () => {
     selectColor(normalizedColor);
   };
 
+  const updateColorField = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const nextSaturation = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+    const nextValue = Math.max(0, Math.min(1, 1 - ((event.clientY - rect.top) / rect.height)));
+    setSaturation(nextSaturation);
+    setValue(nextValue);
+    selectColor(hsvToHex(hue, nextSaturation, nextValue));
+  };
+
   const updateRgb = (channel: 'r' | 'g' | 'b', value: string) => {
     const nextRgb = { ...rgb, [channel]: Math.max(0, Math.min(255, Number(value) || 0)) };
     setRgb(nextRgb);
@@ -166,18 +175,7 @@ const NowBarColorPage = () => {
                   style={{ ...styles.colorField, '--picker-hue': hsvToHex(hue, 1, 1) } as React.CSSProperties}
                   onClick={(event) => {
                     event.stopPropagation();
-                    const rect = event.currentTarget.getBoundingClientRect();
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const x = event.clientX - rect.left - centerX;
-                    const y = event.clientY - rect.top - centerY;
-                    const radius = Math.sqrt((x * x) + (y * y));
-                    const maxRadius = Math.min(rect.width, rect.height) / 2;
-                    const nextSaturation = Math.max(0, Math.min(1, radius / maxRadius));
-                    const nextValue = Math.max(0, Math.min(1, 1 - ((y / maxRadius) + 1) / 2));
-                    setSaturation(nextSaturation);
-                    setValue(nextValue);
-                    selectColor(hsvToHex(hue, nextSaturation, nextValue));
+                    updateColorField(event);
                   }}
                 >
                   <span style={{ ...styles.colorFieldPoint, left: `${saturation * 100}%`, top: `${(1 - value) * 100}%` }} />
