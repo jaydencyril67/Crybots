@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, ShieldCheck, Info } from 'lucide-react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -68,7 +68,17 @@ const getToneStyles = (theme: typeof HYBRID_THEME_TOKENS.dark): Record<Notificat
 
 const NotificationBanner = ({ tone = 'info', title, message }: NotificationBannerProps) => {
   const { themeMode } = useAppTheme();
+  const [isVisible, setIsVisible] = useState(true);
   const theme = getToneStyles(HYBRID_THEME_TOKENS[themeMode])[tone];
+
+  useEffect(() => {
+    setIsVisible(true);
+    const timeout = window.setTimeout(() => setIsVisible(false), 6000);
+
+    return () => window.clearTimeout(timeout);
+  }, [message, title, tone]);
+
+  if (!isVisible) return null;
 
   return (
     <div style={{ ...styles.banner, border: theme.border, background: theme.background, color: theme.color }} role="alert" aria-live="polite">
