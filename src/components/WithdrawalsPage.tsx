@@ -214,6 +214,24 @@ const WithdrawPage = () => {
     }
   };
 
+  if (showSchedulePage) {
+    return (
+      <ReusableDatePage
+        title="Schedule withdrawal"
+        description="Choose the date and time you want this withdrawal to be processed."
+        label="Schedule date and time"
+        mode="datetime-local"
+        value={scheduledFor}
+        onCancel={() => setShowSchedulePage(false)}
+        onConfirm={(value) => {
+          setScheduledFor(value);
+          setShowSchedulePage(false);
+        }}
+        cancelLabel="Back"
+      />
+    );
+  }
+
   return (
     <HybridTheme mode={themeMode}>
       <div data-shadow-free-page="withdrawals" style={styles.page}>
@@ -296,21 +314,6 @@ const WithdrawPage = () => {
         </div>
         <NowBar />
       </div>
-      {showSchedulePage ? (
-        <ReusableDatePage
-          title="Schedule withdrawal"
-          description="Choose the date and time you want this withdrawal to be processed."
-          label="Schedule date and time"
-          mode="auto"
-          value={scheduledFor}
-          onCancel={() => setShowSchedulePage(false)}
-          onConfirm={(value) => {
-            setScheduledFor(value);
-            setShowSchedulePage(false);
-          }}
-          cancelLabel="Back"
-        />
-      ) : null}
       </div>
     </HybridTheme>
   );
