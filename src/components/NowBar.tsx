@@ -3,36 +3,43 @@ import { ArrowLeftRight, ArrowUpDown, Banknote, BarChart3, CalendarClock, Chevro
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
-  blue: 'rgba(56, 189, 248, 0.9)',
-  purple: 'rgba(168, 85, 247, 0.9)',
-  pink: 'rgba(236, 72, 153, 0.9)',
-  green: 'rgba(34, 197, 94, 0.9)',
-  amber: 'rgba(245, 158, 11, 0.9)',
-  red: 'rgba(239, 68, 68, 0.9)',
+  blue: '#38bdf8',
+  purple: '#a855f7',
+  pink: '#ec4899',
+  green: '#22c55e',
+  amber: '#f59e0b',
+  red: '#ef4444',
 } as const;
 
 type EdgeLightColor = keyof typeof EDGE_LIGHT_COLORS;
+type EdgeLightMode = 'stable' | 'blink' | 'pulse' | 'sweep' | 'color-cycle' | 'rainbow';
+type EdgeLightSettings = { enabled: boolean; color: string; mode: EdgeLightMode };
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
+const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable', 'blink', 'pulse', 'sweep', 'color-cycle', 'rainbow'];
 
-const getEdgeLightSettings = () => {
+const getEdgeLightSettings = (): EdgeLightSettings => {
   if (typeof window === 'undefined') {
-    return { enabled: false, color: 'blue' as EdgeLightColor };
+    return { enabled: false, color: EDGE_LIGHT_COLORS.blue, mode: 'stable' as EdgeLightMode }; 
   }
 
   try {
     const raw = window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY);
     if (!raw) {
-      return { enabled: false, color: 'blue' as EdgeLightColor };
+      return { enabled: false, color: EDGE_LIGHT_COLORS.blue, mode: 'stable' as EdgeLightMode };
     }
 
-    const parsed = JSON.parse(raw) as { enabled?: boolean; color?: EdgeLightColor };
+    const parsed = JSON.parse(raw) as { enabled?: boolean; color?: string | EdgeLightColor; mode?: EdgeLightMode };
+    const legacyColor = parsed.color && parsed.color in EDGE_LIGHT_COLORS
+      ? EDGE_LIGHT_COLORS[parsed.color as EdgeLightColor]
+      : parsed.color;
     return {
       enabled: Boolean(parsed.enabled),
-      color: parsed.color && EDGE_LIGHT_COLORS[parsed.color] ? parsed.color : ('blue' as EdgeLightColor),
-    };
+      color: typeof legacyColor === 'string' && /^#[0-9a-f]{6}$/i.test(legacyColor) ? legacyColor : EDGE_LIGHT_COLORS.blue,
+      mode: parsed.mode && EDGE_LIGHT_MODES.includes(parsed.mode) ? parsed.mode : 'stable',
+    }; 
   } catch {
-    return { enabled: false, color: 'blue' as EdgeLightColor };
+    return { enabled: false, color: EDGE_LIGHT_COLORS.blue, mode: 'stable' };
   }
 };
 
@@ -275,7 +282,7 @@ const createDefaultActions = (): NowBarAction[] => [
 const NowBar = ({ actions }: NowBarProps) => {
   const [edgeLightVersion, setEdgeLightVersion] = useState(0);
   const edgeLight = useMemo(() => getEdgeLightSettings(), [edgeLightVersion]);
-  const edgeLightColor = EDGE_LIGHT_COLORS[edgeLight.color];
+  const edgeLightColor = edgeLight.color;
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
   const [holdTimer, setHoldTimer] = useState<number | null>(null);
@@ -358,14 +365,27 @@ const NowBar = ({ actions }: NowBarProps) => {
   };
 
   return (
-    <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
+    <>
+      <style>{`@keyframes nowbar-edge-blink { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), 0 0 26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 0 2px transparent, 0 18px 50px rgba(0,0,0,.82); } }
+@keyframes nowbar-edge-pulse { 0%, 100% { border-color: var(--edge-light); filter: saturate(1); box-shadow: 0 0 0 1px var(--edge-light), 0 0 15px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); filter: saturate(1.8); box-shadow: 0 0 0 3px var(--edge-light), 0 0 38px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
+@keyframes nowbar-edge-sweep { 0%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), -18px 0 20px color-mix(in srgb, var(--edge-light) 45%, transparent), 18px 0 20px color-mix(in srgb, var(--edge-light) 45%, transparent), 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: var(--edge-light); box-shadow: 0 0 0 3px var(--edge-light), 0 0 34px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } }
+@keyframes nowbar-edge-color-cycle { 0%, 100% { border-color: #38bdf8; box-shadow: 0 0 0 1px #38bdf8, 0 0 22px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } 25% { border-color: #22c55e; box-shadow: 0 0 0 1px #22c55e, 0 0 22px #22c55e, 0 18px 50px rgba(0,0,0,.82); } 50% { border-color: #a855f7; box-shadow: 0 0 0 1px #a855f7, 0 0 22px #a855f7, 0 18px 50px rgba(0,0,0,.82); } 75% { border-color: #ec4899; box-shadow: 0 0 0 1px #ec4899, 0 0 22px #ec4899, 0 18px 50px rgba(0,0,0,.82); } }
+@keyframes nowbar-edge-rainbow { 0% { border-color: #38bdf8; box-shadow: 0 0 0 2px #38bdf8, 0 0 28px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } 20% { border-color: #22c55e; box-shadow: 0 0 0 2px #22c55e, 0 0 28px #22c55e, 0 18px 50px rgba(0,0,0,.82); } 40% { border-color: #facc15; box-shadow: 0 0 0 2px #facc15, 0 0 28px #facc15, 0 18px 50px rgba(0,0,0,.82); } 60% { border-color: #f97316; box-shadow: 0 0 0 2px #f97316, 0 0 28px #f97316, 0 18px 50px rgba(0,0,0,.82); } 80% { border-color: #ec4899; box-shadow: 0 0 0 2px #ec4899, 0 0 28px #ec4899, 0 18px 50px rgba(0,0,0,.82); } 100% { border-color: #38bdf8; box-shadow: 0 0 0 2px #38bdf8, 0 0 28px #38bdf8, 0 18px 50px rgba(0,0,0,.82); } }
+@media (prefers-reduced-motion: reduce) { [data-nowbar-edge-light] { animation: none !important; } }`}</style>
+      <div style={{ ...styles.dock, ...(isExpanded ? styles.dockExpanded : {}) }} aria-label="Quick navigation bar">
       <div
         ref={barRef}
         style={{
           ...styles.bar,
-          ...(edgeLight.enabled ? { '--edge-light': edgeLightColor } : {}),
+          ...(edgeLight.enabled ? {
+            '--edge-light': edgeLightColor,
+            '--edge-light-mode': edgeLight.mode,
+            borderColor: edgeLightColor,
+            animation: edgeLight.mode === 'stable' ? undefined : `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' ? '3.2s' : edgeLight.mode === 'rainbow' ? '5.5s' : edgeLight.mode === 'color-cycle' ? '6s' : edgeLight.mode === 'sweep' ? '2.4s' : '2.8s'} ease-in-out infinite`,
+          } : {}),
           ...(isExpanded ? styles.barExpanded : {}),
         }}
+        data-nowbar-edge-light={edgeLight.enabled ? edgeLight.mode : undefined}
         role="button"
         tabIndex={0}
         aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
@@ -416,7 +436,8 @@ const NowBar = ({ actions }: NowBarProps) => {
           ))
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
