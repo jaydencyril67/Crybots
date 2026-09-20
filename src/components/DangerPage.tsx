@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
-import ReusableConfirmationPage from './ReusableConfirmationPage';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
@@ -120,7 +119,6 @@ const DangerPage = () => {
   const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
   const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
   const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   const submitAction = async (
     action: DangerActionKey,
@@ -155,7 +153,7 @@ const DangerPage = () => {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
       const response = await api.delete('/api/settings/danger/delete', {
         headers,
-        data: { password: remove.password, confirmation: remove.confirmation },
+        data: { password: remove.password, confirmation: remove.confirmation, reason: remove.reason },
       });
       const forceLogout = Boolean((response.data as { forceLogout?: boolean })?.forceLogout);
       const reactivationAtIso = (response.data as { reactivationAtIso?: string })?.reactivationAtIso;
@@ -182,32 +180,6 @@ const DangerPage = () => {
       setRemove((current) => ({ ...current, loading: null }));
     }
   };
-
-  if (showDeleteConfirmation) {
-    return (
-      <ReusableConfirmationPage
-        eyebrow="Delete account"
-        title="Confirm account deletion"
-        description="Review the warnings carefully. Your account will be marked for deletion, sign-in will be blocked, and you can only cancel it with an email code after the cooldown window begins."
-        statusLabel="This starts a 30-day deletion countdown."
-        statusTone="danger"
-        primaryActionLabel={remove.loading === 'delete' ? 'Confirming…' : 'Confirm delete'}
-        secondaryActionLabel="Go back"
-        onPrimaryAction={confirmDeleteAccount}
-        onSecondaryAction={() => setShowDeleteConfirmation(false)}
-        footerNote={remove.status || 'Deleting your account immediately logs you out and prevents normal use until cancellation is approved.'}
-      >
-        <div style={styles.field}>
-          <label style={styles.label} htmlFor="danger-delete-password">Password</label>
-          <input id="danger-delete-password" style={styles.input} type="password" value={remove.password} onChange={(event) => setRemove((current) => ({ ...current, password: event.target.value }))} />
-        </div>
-        <div style={styles.field}>
-          <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
-          <input id="danger-delete-confirmation" style={styles.input} value={remove.confirmation} onChange={(event) => setRemove((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DELETE" />
-        </div>
-      </ReusableConfirmationPage>
-    );
-  }
 
   return (
     <HybridTheme mode={themeMode}>
@@ -264,10 +236,23 @@ const DangerPage = () => {
 
             <section style={styles.card}>
               <h3 style={styles.actionTitle}>Delete Account</h3>
-              <p style={styles.actionText}>This starts the hybrid deletion flow. You will first see a dedicated confirmation page before the deletion request is submitted.</p>
-              <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => setShowDeleteConfirmation(true)} disabled={remove.loading !== null}>Open Delete Confirmation</button>
+              <p style={styles.actionText}>This starts a 30-day deletion countdown. Sign-in will be blocked while your account is pending deletion.</p>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-delete-password">Password</label>
+                <input id="danger-delete-password" style={styles.input} type="password" value={remove.password} onChange={(event) => setRemove((current) => ({ ...current, password: event.target.value }))} />
               </div>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
+                <input id="danger-delete-confirmation" style={styles.input} value={remove.confirmation} onChange={(event) => setRemove((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DELETE" />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-delete-reason">Reason</label>
+                <input id="danger-delete-reason" style={styles.input} value={remove.reason} onChange={(event) => setRemove((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for deleting" />
+              </div>
+              <div style={styles.buttonRow}>
+                <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? 'Deleting…' : 'Delete Account'}</button>
+              </div>
+              {remove.status ? <div style={styles.status}>{remove.status}</div> : null}
             </section>
           </div>
         </div>
