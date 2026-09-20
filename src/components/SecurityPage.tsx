@@ -48,7 +48,9 @@ type WebAuthnCredential = { id: string; createdAt?: string };
 type SecurityMeResponse = {
   user?: {
     uid?: string;
+    uidChangeAvailableAt?: string | null;
     securityCodeSet?: boolean;
+    securityCodeChangeAvailableAt?: string | null;
     twoFactorEnabled?: boolean;
     biometricEnabled?: boolean;
     webauthnCredentials?: WebAuthnCredential[];
@@ -300,6 +302,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
 });
 
+const securityCodeChangeCooldownMs = 30 * 24 * 60 * 60 * 1000;
+const uidChangeCooldownMs = 30 * 24 * 60 * 60 * 1000;
+
 const SecurityPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
@@ -319,12 +324,15 @@ const SecurityPage = () => {
   const [status, setStatus] = useState<{ kind: SaveState; text: string; section: string }>({ kind: 'idle', text: '', section: 'security' });
   const [logins, setLogins] = useState<SecurityLogin[]>([]);
   const [securityCodeSet, setSecurityCodeSet] = useState(false);
+  const [securityCodeChangeAvailableAt, setSecurityCodeChangeAvailableAt] = useState<string | null>(null);
+  const [uidChangeAvailableAt, setUidChangeAvailableAt] = useState<string | null>(null);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [twoFactorConfigured, setTwoFactorConfigured] = useState(false);
   const [twoFactorSetupOpen, setTwoFactorSetupOpen] = useState(false);
   const [twoFactorSecret, setTwoFactorSecret] = useState('');
   const [twoFactorUri, setTwoFactorUri] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [twoFactorCodeError, setTwoFactorCodeError] = useState('');
   const [twoFactorKeyCopied, setTwoFactorKeyCopied] = useState(false);
   const [showDelete2faConfirmation, setShowDelete2faConfirmation] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
@@ -347,7 +355,9 @@ const SecurityPage = () => {
       try {
         const { data } = await api.get<SecurityMeResponse>('/api/settings/me');
         setUid(data.user?.uid ?? '');
+        setUidChangeAvailableAt(data.user?.uidChangeAvailableAt ?? null);
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
+        setSecurityCodeChangeAvailableAt(data.user?.securityCodeChangeAvailableAt ?? null);
         setTwoFactorEnabled(Boolean(data.user?.twoFactorEnabled));
         setBiometricEnabled(Boolean(data.user?.biometricEnabled));
         try {
@@ -411,7 +421,14 @@ const SecurityPage = () => {
     />
   ) : null;
 
+  const uidChangeLocked = Boolean(uidChangeAvailableAt && new Date(uidChangeAvailableAt).getTime() > Date.now());
+  const uidChangeDate = uidChangeAvailableAt ? new Date(uidChangeAvailableAt) : null;
+  const uidChangeMessage = uidChangeLocked && uidChangeDate && !Number.isNaN(uidChangeDate.getTime())
+    ? `You can change your UID again after ${uidChangeDate.toLocaleDateString()}.`
+    : 'For your protection, you can change your UID only once every 30 days.';
+
   const handleUidCodeRequest = async () => {
+    if (uidChangeLocked) return showStatus('error', uidChangeMessage, 'uid');
     if (!uid.trim()) return showStatus('error', 'Enter a UID to continue.', 'uid');
     setRequestingUidCode(true);
     try {
@@ -434,6 +451,7 @@ const SecurityPage = () => {
       await api.patch('/api/settings/uid', { uid: uid.trim(), code: uidCode.trim() });
       setUidCode('');
       setUidCodeRequested(false);
+      setUidChangeAvailableAt(new Date(Date.now() + uidChangeCooldownMs).toISOString());
       showStatus('success', 'UID updated successfully.', 'uid');
     } catch (error: any) {
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your UID. Please check your details and try again.'), 'uid');
@@ -491,6 +509,12 @@ const SecurityPage = () => {
     }
   };
 
+  const securityCodeChangeLocked = Boolean(securityCodeChangeAvailableAt && new Date(securityCodeChangeAvailableAt).getTime() > Date.now());
+  const securityCodeChangeDate = securityCodeChangeAvailableAt ? new Date(securityCodeChangeAvailableAt) : null;
+  const securityCodeChangeMessage = securityCodeChangeLocked && securityCodeChangeDate && !Number.isNaN(securityCodeChangeDate.getTime())
+    ? `You can change your security code again after ${securityCodeChangeDate.toLocaleDateString()}.`
+    : 'For your protection, you can change your security code only once every 30 days.';
+
   const handleSecurityCodeSave = async () => {
     if (!currentSecurityPassword.trim()) {
       return showStatus('error', 'Enter your current password to update the security code.', 'securityCode');
@@ -507,6 +531,7 @@ const SecurityPage = () => {
         securityCode,
       });
       setSecurityCodeSet(true);
+      setSecurityCodeChangeAvailableAt(new Date(Date.now() + securityCodeChangeCooldownMs).toISOString());
       setCurrentSecurityPassword('');
       setSecurityCode('');
       setConfirmSecurityCode('');
@@ -527,6 +552,7 @@ const SecurityPage = () => {
       setTwoFactorConfigured(true);
       setTwoFactorSetupOpen(true);
       setTwoFactorCode('');
+      setTwoFactorCodeError('');
       showStatus('success', 'Scan the QR code with your authenticator app, then enter the generated code to enable 2FA.', 'twoFactor');
     } catch (error: any) {
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to start two-factor authentication. Please try again.'), 'twoFactor');
@@ -549,7 +575,15 @@ const SecurityPage = () => {
   };
 
   const handleToggle2fa = async () => {
-    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the 6-digit code from your authenticator app.', 'twoFactor');
+    if (!twoFactorCode.trim()) {
+      setTwoFactorCodeError('Enter the 6-digit authenticator code before continuing.');
+      return showStatus('error', 'Enter the 6-digit authenticator code before continuing.', 'twoFactor');
+    }
+    if (twoFactorCode.length !== 6) {
+      setTwoFactorCodeError('Enter the complete 6-digit authenticator code.');
+      return showStatus('error', 'Enter the complete 6-digit authenticator code.', 'twoFactor');
+    }
+    setTwoFactorCodeError('');
     setSaving2fa(true);
     try {
       const endpoint = twoFactorEnabled ? '/api/settings/2fa/disable' : '/api/settings/2fa/enable';
@@ -558,6 +592,7 @@ const SecurityPage = () => {
       setTwoFactorEnabled(enabling);
       if (enabling) setTwoFactorSetupOpen(false);
       setTwoFactorCode('');
+      setTwoFactorCodeError('');
       showStatus('success', twoFactorEnabled ? 'Two-factor authentication disabled.' : 'Two-factor authentication enabled.', 'twoFactor');
     } catch (error: any) {
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to update two-factor authentication. Please try again.'), 'twoFactor');
@@ -567,7 +602,15 @@ const SecurityPage = () => {
   };
 
   const handleDelete2fa = async () => {
-    if (!twoFactorCode.trim()) return showStatus('error', 'Enter the current 6-digit authenticator code to delete 2FA.', 'twoFactor');
+    if (!twoFactorCode.trim()) {
+      setTwoFactorCodeError('Enter the 6-digit authenticator code before deleting 2FA.');
+      return showStatus('error', 'Enter the 6-digit authenticator code before deleting 2FA.', 'twoFactor');
+    }
+    if (twoFactorCode.length !== 6) {
+      setTwoFactorCodeError('Enter the complete 6-digit authenticator code.');
+      return showStatus('error', 'Enter the complete 6-digit authenticator code.', 'twoFactor');
+    }
+    setTwoFactorCodeError('');
     setShowDelete2faConfirmation(true);
   };
 
@@ -581,6 +624,7 @@ const SecurityPage = () => {
       setTwoFactorSecret('');
       setTwoFactorUri('');
       setTwoFactorCode('');
+      setTwoFactorCodeError('');
       showStatus('success', 'All two-factor authentication data was deleted.', 'twoFactor');
     } catch (error: any) {
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to remove two-factor authentication. Please try again.'), 'twoFactor');
@@ -692,11 +736,12 @@ const SecurityPage = () => {
               <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>
                 <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
+                <p style={styles.note}>{uidChangeMessage}</p>
                 <div className="security-control" style={styles.control}>
-                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} />
-                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
+                  <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} disabled={uidChangeLocked} />
+                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid || uidChangeLocked}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
                   {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit email confirmation code" inputMode="numeric" maxLength={4} /> : null}
-                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
+                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid || uidChangeLocked}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
                 </div>
                 {renderStatus('uid')}
               </div>
@@ -808,11 +853,12 @@ const SecurityPage = () => {
               <div style={styles.row}>
                 <p style={styles.rowLabel}><LockKeyhole size={16} /> Security code</p>
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
+                <p style={styles.note}>{securityCodeChangeMessage}</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
                   <input style={styles.input} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
                   <input style={styles.input} type="password" value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
-                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode || securityCodeChangeLocked}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
                 </div>
                 {renderStatus('securityCode')}
               </div>
@@ -838,17 +884,19 @@ const SecurityPage = () => {
                         </div>
                       </div>
                     ) : null}
-                    <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
+                    <input style={twoFactorCodeError ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => { setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setTwoFactorCodeError(''); }} placeholder="6-digit authenticator code" autoComplete="one-time-code" aria-invalid={Boolean(twoFactorCodeError)} />
+                    {twoFactorCodeError ? <p style={styles.inlineError}>{twoFactorCodeError}</p> : null}
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Enabling...' : 'Enable 2FA'}</button>
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? 'Enabling...' : 'Enable 2FA'}</button>
                     </div>
                   </div>
                 ) : (
                   <div style={styles.control}>
-                    <input style={styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
+                    <input style={twoFactorCodeError ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => { setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setTwoFactorCodeError(''); }} placeholder="6-digit authenticator code" autoComplete="one-time-code" aria-invalid={Boolean(twoFactorCodeError)} />
+                    {twoFactorCodeError ? <p style={styles.inlineError}>{twoFactorCodeError}</p> : null}
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa || twoFactorCode.length !== 6}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
-                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa || twoFactorCode.length !== 6}><Trash2 size={16} /> Delete 2FA</button> : null}
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? 'Updating...' : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
+                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa}><Trash2 size={16} /> Delete 2FA</button> : null}
                     </div>
                   </div>
                 )}
