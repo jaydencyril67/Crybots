@@ -78,6 +78,9 @@ const PortfolioPage = () => {
     if (label === 'Details') {
       navigate('/profile');
     }
+    if (label === 'Statistics') {
+      navigate('/portfolio/statistics');
+    }
     if (label === 'Security') {
       navigate('/security');
     }
