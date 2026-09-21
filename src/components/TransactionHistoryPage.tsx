@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import navigate from '../utils/navigate';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
@@ -63,6 +64,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     display: 'grid',
     gap: '10px',
   },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   title: {
     margin: 0,
     fontSize: 'clamp(1.35rem, 2.8vw, 2rem)',
@@ -380,6 +382,7 @@ const TransactionHistoryPage = () => {
       <div style={styles.shell}>
         
         <div style={styles.panel}>
+          <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
           <div style={styles.body}>
             <section style={styles.topGrid}>
               <div style={styles.card}>
