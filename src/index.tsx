@@ -18,6 +18,7 @@ import DepositPage from './components/DepositPage';
 import PortfolioPage from './components/PortfolioPage';
 import DangerPage from './components/DangerPage';
 import PendingDeletionPage from './components/PendingDeletionPage';
+import EnableAccountPage from './components/EnableAccountPage';
 import SecurityPage from './components/SecurityPage';
 import WithdrawalsPage from './components/WithdrawalsPage';
 import TransferPage from './components/TransferPage';
@@ -63,6 +64,7 @@ const getRouteKey = () => {
   if (pathname === '/portfolio' || hash === '#/portfolio') return 'portfolio';
   if (pathname === '/danger' || hash === '#/danger') return 'danger';
   if (pathname === '/pending-deletion' || hash === '#/pending-deletion') return 'pending-deletion';
+  if (pathname === '/enable-account' || hash === '#/enable-account') return 'enable-account';
   if (pathname === '/security' || hash === '#/security') return 'security';
   if (pathname === '/withdrawals' || hash === '#/withdrawals') return 'withdrawals';
   if (pathname === '/transfer' || hash === '#/transfer') return 'transfer';
@@ -87,6 +89,7 @@ const routeToKey = (path: string) => {
   if (path === '/portfolio' || path === '#/portfolio') return 'portfolio';
   if (path === '/danger' || path === '#/danger') return 'danger';
   if (path === '/pending-deletion' || path === '#/pending-deletion') return 'pending-deletion';
+  if (path === '/enable-account' || path === '#/enable-account') return 'enable-account';
   if (path === '/security' || path === '#/security') return 'security';
   if (path === '/withdrawals' || path === '#/withdrawals') return 'withdrawals';
   if (path === '/transfer' || path === '#/transfer') return 'transfer';
@@ -223,6 +226,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'portfolio') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
     if (displayedRouteKey === 'danger') return <ProtectedRoute><DangerPage /></ProtectedRoute>;
     if (displayedRouteKey === 'pending-deletion') return <PendingDeletionPage />;
+    if (displayedRouteKey === 'enable-account') return <EnableAccountPage />;
     if (displayedRouteKey === 'security') return <ProtectedRoute><SecurityPage /></ProtectedRoute>;
     if (displayedRouteKey === 'withdrawals') return <ProtectedRoute><WithdrawalsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'transfer') return <ProtectedRoute><TransferPage /></ProtectedRoute>;

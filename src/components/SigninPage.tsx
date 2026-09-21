@@ -593,6 +593,9 @@ const SigninPage = () => {
       } else if (response?.status === 423 && response?.data?.accountStatus === 'self_excluded') {
         setSubmitError(message);
         setMethod(null);
+      } else if (response?.status === 423 && response?.data?.accountStatus === 'disabled') {
+        setSubmitError(message);
+        setMethod(null);
       } else {
         setSubmitError(message);
       }
@@ -635,7 +638,9 @@ const SigninPage = () => {
       } else {
         setSubmitError(message);
       }
-      if (response?.status === 423) {
+      if (response?.status === 423 && response?.data?.accountStatus === 'disabled') {
+        setIsCodeLocked(false);
+      } else if (response?.status === 423) {
         setIsCodeLocked(true);
       }
       if (response?.status === 400 && message.toLowerCase().includes('attempt')) {
@@ -799,6 +804,11 @@ const SigninPage = () => {
                       {submitError.toLowerCase().includes('pending deletion') ? (
                         <button type="button" onClick={() => navigate(`/pending-deletion?email=${encodeURIComponent(form.email.trim())}`)} style={hybridStyles.linkButton}>
                           Cancel deletion request
+                        </button>
+                      ) : null}
+                      {submitError.toLowerCase().includes('account disabled') ? (
+                        <button type="button" onClick={() => navigate(`/enable-account?email=${encodeURIComponent(form.email.trim())}`)} style={hybridStyles.linkButton}>
+                          Enable account
                         </button>
                       ) : null}
                     </div>
