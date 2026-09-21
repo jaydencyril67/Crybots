@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { Camera, CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { ArrowLeft, Camera, CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -222,6 +222,18 @@ const ProfilePage = () => {
       ...baseStyles.logoutButton,
       color: theme.text,
     },
+    portfolioBack: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px',
+      border: `1px solid ${theme.borderGlass}`,
+      borderRadius: '10px',
+      padding: '7px 10px',
+      background: theme.surfaceGlass,
+      color: theme.text,
+      cursor: 'pointer',
+      fontSize: '0.84rem',
+    },
     avatarCameraButton: {
       ...baseStyles.avatarCameraButton,
       background: theme.primary,
@@ -378,6 +390,7 @@ const ProfilePage = () => {
           <div style={styles.shell}>
             
 
+            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
             <div style={styles.content}>
               <div style={styles.profileIdentity}>
                 <div style={styles.profileAvatarFrame}>

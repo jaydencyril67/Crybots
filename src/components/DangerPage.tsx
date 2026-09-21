@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import api from '../api/axios';
@@ -40,6 +41,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   card: {
     ...createHybridCardStyles(theme).card,
   },
+  portfolioBack: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
   sectionTitle: {
     margin: 0,
     fontSize: '1.45rem',
@@ -188,6 +190,7 @@ const DangerPage = () => {
         <div style={styles.shell}>
           
           <div style={styles.content}>
+            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
             <section style={styles.card}>
               <h2 style={styles.sectionTitle}>Danger Zone</h2>
               <p style={styles.sectionText}>These actions are irreversible or highly restrictive. Read each warning carefully before continuing.</p>
