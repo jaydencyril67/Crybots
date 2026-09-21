@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, ArrowUpDown, Banknote, BarChart3, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpDown, Banknote, BarChart3, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Settings2, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -185,6 +185,7 @@ type NowBarAction = {
   onClick: () => void;
   icon?: React.ReactNode;
   active?: boolean;
+  textModeOnly?: boolean;
 };
 
 type NowBarProps = {
@@ -203,6 +204,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/staking') return 'STAKING';
   if (path === '/settings') return 'SETTINGS';
   if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
   if (path === '/withdrawals') return 'WITHDRAW';
@@ -214,14 +216,6 @@ const getCurrentPageTitle = (path: string) => {
 };
 
 const createDefaultActions = (): NowBarAction[] => [
-  {
-    label: 'Deposit',
-    icon: <Banknote size={18} />,
-    onClick: () => {
-      navigate('/deposit');
-    },
-    active: getActivePath() === '/deposit',
-  },
   {
     label: 'Dashboard',
     icon: <Home size={18} />,
@@ -239,6 +233,14 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/portfolio',
   },
   {
+    label: 'Asset',
+    icon: <WalletCards size={18} />,
+    onClick: () => {
+      navigate('/asset');
+    },
+    active: getActivePath() === '/asset',
+  },
+  {
     label: 'Staking',
     icon: <Coins size={18} />,
     onClick: () => {
@@ -247,12 +249,22 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/staking',
   },
   {
+    label: 'Deposit',
+    icon: <Banknote size={18} />,
+    onClick: () => {
+      navigate('/deposit');
+    },
+    active: getActivePath() === '/deposit',
+    textModeOnly: true,
+  },
+  {
     label: 'Withdraw',
     icon: <ArrowUpDown size={18} />,
     onClick: () => {
       navigate('/withdrawals');
     },
     active: getActivePath() === '/withdrawals',
+    textModeOnly: true,
   },
   {
     label: 'Transfer',
@@ -261,6 +273,7 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/transfer');
     },
     active: getActivePath() === '/transfer',
+    textModeOnly: true,
   },
   {
     label: 'Transactions',
@@ -294,6 +307,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
   const isExpanded = mode === 'expanded';
+  const visibleActions = isExpanded ? resolvedActions : resolvedActions.filter((action) => !action.textModeOnly);
 
   useEffect(() => {
     const syncPath = () => {
@@ -426,7 +440,7 @@ const NowBar = ({ actions }: NowBarProps) => {
             <ChevronDown size={16} style={{ opacity: 0.8 }} />
           </div>
         ) : (
-          resolvedActions.map((action, index) => (
+          visibleActions.map((action, index) => (
             <div key={`now-bar-slot-${index}`} style={{ ...styles.slot, ...(isExpanded ? styles.slotExpanded : {}) }}>
               <button
                 type="button"
