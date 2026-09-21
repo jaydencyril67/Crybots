@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Bell, Check, Mail, Smartphone } from 'lucide-react';
+import { ArrowLeft, Bell, Mail, Smartphone } from 'lucide-react';
 import api from '../api/axios';
 import type { AlertPreferences, AlertPreferencesResponse } from '../types/alertPreferences';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import NotificationBanner from './NotificationBanner';
 
 const preferenceTopics = [
   { key: 'account', label: 'Account activity', description: 'Profile changes, sign-ins and account updates.' },
@@ -53,9 +54,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   knob: { display: 'block', width: '22px', height: '22px', borderRadius: '50%', background: theme.textMuted, transition: 'transform 160ms ease, background 160ms ease' },
   knobOn: { transform: 'translateX(20px)', background: theme.textInverse },
   save: { marginTop: '18px', width: '100%', border: 0, borderRadius: '14px', padding: '13px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: 'pointer' },
-  saved: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', margin: '12px 0 0', color: theme.success, fontSize: '0.82rem', fontWeight: 700 },
-  status: { margin: '12px 0 0', color: theme.textMuted, textAlign: 'center' as const, fontSize: '0.82rem' },
-  error: { margin: '12px 0 0', color: theme.danger, textAlign: 'center' as const, fontSize: '0.82rem' },
 });
 
 const AlertSettingsPage = () => {
@@ -118,6 +116,9 @@ const AlertSettingsPage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
           <h1 style={styles.heading}>Alert settings</h1>
           <p style={styles.intro}>Choose which updates you receive and where KingsHall Exchange should deliver them.</p>
+          {loading ? <NotificationBanner tone="info" title="Loading preferences" message="Retrieving your saved alert settings." /> : null}
+          {saved ? <NotificationBanner tone="success" title="Preferences saved" message="Your alert settings have been updated." /> : null}
+          {error ? <NotificationBanner tone="error" title="Unable to update preferences" message={error} /> : null}
 
           <section style={styles.card}>
             <h2 style={styles.cardHeading}>What would you like to hear about?</h2>
@@ -159,9 +160,6 @@ const AlertSettingsPage = () => {
               ))}
             </div>
             <button type="button" disabled={loading || saving} style={styles.save} onClick={() => void savePreferences()}>{saving ? 'Saving…' : 'Save preferences'}</button>
-            {loading ? <p style={styles.status}>Loading your saved preferences…</p> : null}
-            {saved ? <p style={styles.saved}><Check size={16} /> Preferences saved</p> : null}
-            {error ? <p role="alert" style={styles.error}>{error}</p> : null}
           </section>
         </div>
       </main>
