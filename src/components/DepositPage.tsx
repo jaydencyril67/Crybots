@@ -11,29 +11,29 @@ const DepositPage = () => {
   const styles = useMemo(() => ({
     page: {
       minHeight: '100vh',
-      padding: 'clamp(16px, 4vw, 24px) clamp(12px, 4vw, 16px) 104px',
+      padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 118px',
       background: theme.background,
       color: theme.text,
     },
     shell: {
-      width: 'min(920px, 100%)',
+      width: 'min(1160px, 100%)',
       margin: '0 auto',
     },
     card: {
       ...HYBRID_CARD_STYLES.card,
-      borderRadius: '28px',
-      padding: 'clamp(16px, 4vw, 22px)',
+      borderRadius: '16px',
+      padding: 'clamp(12px, 2.5vw, 16px)',
     },
     headerRow: {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: '12px',
-      marginBottom: '18px',
+      marginBottom: '12px',
       flexWrap: 'wrap' as const,
     },
     title: {
-      margin: '18px 0 0',
+      margin: '4px 0 0',
       fontSize: 'clamp(1.3rem, 4vw, 1.45rem)',
       fontWeight: 800,
       letterSpacing: '-0.03em',
@@ -42,14 +42,14 @@ const DepositPage = () => {
     subtitle: {
       margin: '8px 0 0',
       color: theme.textMuted,
-      lineHeight: 1.6,
-      fontSize: '0.92rem',
+      lineHeight: 1.4,
+      fontSize: '0.82rem',
       maxWidth: '58ch',
     },
     mutedCard: {
       ...HYBRID_CARD_STYLES.panel,
-      marginTop: '16px',
-      borderRadius: '22px',
+      marginTop: '10px',
+      borderRadius: '13px',
       color: theme.textMuted,
     },
   }), [theme]);
