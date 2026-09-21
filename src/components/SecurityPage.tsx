@@ -78,15 +78,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   shell: {
     width: '100%',
-    maxWidth: '1320px',
+    maxWidth: '1160px',
     margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
     boxSizing: 'border-box' as const,
   },
   content: {
     display: 'grid',
-    gap: '18px',
-    marginTop: '18px',
+    gap: '14px',
+    marginTop: '14px',
   },
   portfolioBack: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
   sectionTitle: {
@@ -121,7 +121,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   tableHeadCell: {
     textAlign: 'left' as const,
-    padding: '12px 14px',
+    padding: '10px 12px',
     fontSize: '0.8rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
@@ -130,7 +130,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     whiteSpace: 'nowrap' as const,
   },
   tableCell: {
-    padding: '14px',
+    padding: '11px',
     borderBottom: `1px solid ${theme.border}`,
     verticalAlign: 'top' as const,
   },
@@ -182,7 +182,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   rowLabel: {
     margin: 0,
     color: theme.textMuted,
-    fontSize: '0.82rem',
+    fontSize: '0.74rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
     display: 'inline-flex',
@@ -192,7 +192,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   rowValue: {
     margin: 0,
     color: theme.text,
-    fontSize: '1rem',
+    fontSize: '0.94rem',
     fontWeight: 800,
     lineHeight: 1.5,
     wordBreak: 'break-word' as const,
@@ -201,8 +201,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   note: {
     margin: 0,
     color: theme.textMuted,
-    fontSize: '0.9rem',
-    lineHeight: 1.7,
+    fontSize: '0.82rem',
+    lineHeight: 1.4,
   },
   control: {
     display: 'grid',
@@ -259,7 +259,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '6px',
     background: theme.primary,
     color: theme.textInverse,
-    fontSize: '0.98rem',
+    fontSize: '0.88rem',
   },
   dangerButton: {
     background: theme.danger,
