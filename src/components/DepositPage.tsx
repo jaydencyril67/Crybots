@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ShieldCheck } from 'lucide-react';
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import { navigate } from '../utils/navigate';
 
 const DepositPage = () => {
   const { themeMode } = useAppTheme();
@@ -24,6 +25,7 @@ const DepositPage = () => {
       borderRadius: '16px',
       padding: 'clamp(12px, 2.5vw, 16px)',
     },
+    back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
     headerRow: {
       display: 'flex',
       alignItems: 'center',
@@ -67,7 +69,7 @@ const DepositPage = () => {
     <div data-shadow-free-page="deposit" style={styles.page}>
       <style>{'[data-shadow-free-page="deposit"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
       <div style={styles.shell}>
-        
+        <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
         <div style={styles.card}>
           <div style={styles.headerRow}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '0.92rem', color: theme.textMuted }}>

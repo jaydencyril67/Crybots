@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import api from '../api/axios';
 import { setCachedBalance } from '../utils/balance';
 import LoadingDots from './LoadingDots';
@@ -9,6 +9,7 @@ import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import { navigate } from '../utils/navigate';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
 type StakingPackage = {
@@ -48,6 +49,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     overflowY: 'visible' as const,
     paddingBottom: '118px',
   },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   shell: {
     position: 'relative' as const,
     width: '100%',
@@ -288,7 +290,7 @@ const StakingPage = () => {
       <HybridTheme mode={themeMode}>
         <main style={styles.page}>
         <div style={styles.shell}>
-          
+          <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
           <section style={styles.packageGrid}>
             {packagesError ? <NotificationBanner tone="error" title="Package load issue" message={packagesError} /> : null}
             {isLoading ? <div style={styles.panel}><LoadingDots /></div> : stakingPackages.map((stakingPackage) => (
