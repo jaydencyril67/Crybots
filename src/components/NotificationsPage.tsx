@@ -3,6 +3,7 @@ import { Bell, Info, ShieldAlert, WalletCards } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
+import NotificationBanner from './NotificationBanner';
 import api from '../api/axios';
 import { AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
 
@@ -99,7 +100,7 @@ const NotificationsPage = () => {
         <div style={styles.shell}>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
-          {error ? <p style={{ color: theme.danger }}>{error}</p> : null}
+          {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}
           <div style={styles.list}>
             {loading ? <div style={styles.empty}><LoadingDots /></div> : null}
             {!loading && !notifications.length ? <div style={styles.empty}>You are all caught up.</div> : null}
