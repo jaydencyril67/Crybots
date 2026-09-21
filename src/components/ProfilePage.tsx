@@ -203,14 +203,6 @@ const ProfilePage = () => {
       ...baseStyles.logoutButton,
       color: theme.text,
     },
-    profileIdentityEmail: {
-      ...baseStyles.profileIdentityEmail,
-      color: theme.textMuted,
-    },
-    profileIdentityName: {
-      ...baseStyles.profileIdentityName,
-      color: theme.text,
-    },
     profileAvatarFallback: {
       ...baseStyles.profileAvatarFallback,
       color: theme.text,
