@@ -50,14 +50,6 @@ api.interceptors.response.use(
       forceLogout();
       return Promise.reject(error);
     }
-
-    if (error?.response?.status === 423) {
-      const redirectPath = '/pending-deletion';
-      if (window.location.pathname !== redirectPath) {
-        window.localStorage.setItem('ke:navigation-redirect', redirectPath);
-        window.location.href = redirectPath;
-      }
-    }
     return Promise.reject(error);
   },
 );
