@@ -11,6 +11,7 @@ type DangerActionState = {
   password: string;
   confirmation: string;
   reason: string;
+  durationDays: string;
   status: string;
   loading: DangerActionKey | null;
 };
@@ -116,9 +117,9 @@ const DangerPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
 
-  const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
-  const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
-  const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', status: '', loading: null });
+  const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', loading: null });
+  const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', loading: null });
+  const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', loading: null });
 
   const submitAction = async (
     action: DangerActionKey,
@@ -129,7 +130,7 @@ const DangerPage = () => {
 
     try {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
-      const payload = { password: state.password, confirmation: state.confirmation, reason: state.reason };
+      const payload = { password: state.password, confirmation: state.confirmation, reason: state.reason, ...(action === 'self-exclude' ? { durationDays: Number(state.durationDays) } : {}) };
 
       if (action === 'disable') {
         await api.patch('/api/settings/danger/disable', payload, { headers });
@@ -214,11 +215,15 @@ const DangerPage = () => {
                 <input id="danger-self-exclude-confirmation" style={styles.input} value={selfExclude.confirmation} onChange={(event) => setSelfExclude((current) => ({ ...current, confirmation: event.target.value }))} placeholder="SELF EXCLUDE" />
               </div>
               <div style={styles.field}>
+                <label style={styles.label} htmlFor="danger-self-exclude-duration">Exclusion duration (days)</label>
+                <input id="danger-self-exclude-duration" style={styles.input} type="number" min="1" max="3650" step="1" value={selfExclude.durationDays} onChange={(event) => setSelfExclude((current) => ({ ...current, durationDays: event.target.value.replace(/\D/g, '') }))} placeholder="Enter number of days" />
+              </div>
+              <div style={styles.field}>
                 <label style={styles.label} htmlFor="danger-self-exclude-reason">Reason</label>
                 <input id="danger-self-exclude-reason" style={styles.input} value={selfExclude.reason} onChange={(event) => setSelfExclude((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for self exclusion" />
               </div>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null}>Self Exclude Account</button>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null || !selfExclude.durationDays}>Self Exclude Account</button>
               </div>
               {selfExclude.status ? <div style={styles.status}>{selfExclude.status}</div> : null}
             </section>
