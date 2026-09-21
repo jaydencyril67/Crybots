@@ -218,7 +218,7 @@ const TransferPage = () => {
       <div style={styles.page}>
       <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
-        <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
+        <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
         <div style={styles.panel}>
           <div style={styles.body}>
             <div style={styles.grid}>
