@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowDownToLine, ArrowLeft, ArrowUpFromLine, CalendarDays, CheckCircle2, CircleDollarSign, LockKeyhole, LogIn, ShieldAlert, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
@@ -56,7 +56,7 @@ const PortfolioStatisticsPage = () => {
     return () => { active = false; };
   }, []);
 
-  const cards = useMemo(() => data ? [
+  const cards = data ? [
     { label: 'Total deposits', value: formatUsdt(data.finance.totalDeposits), note: `${data.finance.depositCount} completed deposits`, icon: <ArrowDownToLine size={19} /> },
     { label: 'Total withdrawals', value: formatUsdt(data.finance.totalWithdrawals), note: `${data.finance.withdrawalCount} completed withdrawals`, icon: <ArrowUpFromLine size={19} /> },
     { label: 'Total transfers', value: formatUsdt(data.finance.totalTransfers), note: `${data.finance.transferCount} completed transfers`, icon: <Users size={19} /> },
