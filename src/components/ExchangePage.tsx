@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Bitcoin, Cloud, Copy } from 'lucide-react';
+import { Bitcoin, Cloud, Copy } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
@@ -21,7 +21,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
     boxSizing: 'border-box' as const,
   },
-  back: { display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   content: { display: 'grid', gap: '18px', marginTop: '18px' },
   section: { display: 'grid', gap: '10px' },
   sectionTitle: { margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em', color: theme.text },
@@ -58,7 +57,6 @@ const ExchangePage = () => {
     <HybridTheme>
       <div style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
           <div style={styles.content}>
             <section style={styles.section}>
               <h2 style={styles.sectionTitle}>Exchange</h2>
