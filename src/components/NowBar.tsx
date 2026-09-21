@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Home, Info, LifeBuoy, Settings2, Sparkles, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Code2, Home, Info, LifeBuoy, Bot, Settings2, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -244,7 +244,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'AGENT',
-    icon: <Sparkles size={18} />,
+    icon: <Bot size={18} />,
     onClick: () => {
       navigate('/agent');
     },
@@ -308,7 +308,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'DEVELOPER',
-    icon: <Sparkles size={18} />,
+    icon: <Code2 size={18} />,
     onClick: () => {
       navigate('/developer');
     },
