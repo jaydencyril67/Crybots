@@ -153,8 +153,8 @@ const baseStyles = {
   },
   avatarCameraButton: {
     position: 'absolute' as const,
-    right: '-6px',
-    bottom: '-6px',
+    right: '-18px',
+    bottom: '-18px',
     width: '36px',
     height: '36px',
     display: 'grid',
