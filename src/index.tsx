@@ -20,6 +20,7 @@ import AgentPage from './components/AgentPage';
 import ExchangePage from './components/ExchangePage';
 import RecordsPage from './components/RecordsPage';
 import ContactPage from './components/ContactPage';
+import OptionsPage from './components/OptionsPage';
 import AssetPage from './components/AssetPage';
 import DangerPage from './components/DangerPage';
 import PendingDeletionPage from './components/PendingDeletionPage';
@@ -71,6 +72,7 @@ const getRouteKey = () => {
   if (pathname === '/exchange' || hash === '#/exchange') return 'exchange';
   if (pathname === '/records' || hash === '#/records') return 'records';
   if (pathname === '/contact' || hash === '#/contact') return 'contact';
+  if (pathname === '/options' || hash === '#/options') return 'options';
   if (pathname === '/asset' || hash === '#/asset') return 'asset';
   if (pathname === '/danger' || hash === '#/danger') return 'danger';
   if (pathname === '/pending-deletion' || hash === '#/pending-deletion') return 'pending-deletion';
@@ -101,6 +103,7 @@ const routeToKey = (path: string) => {
   if (path === '/exchange' || path === '#/exchange') return 'exchange';
   if (path === '/records' || path === '#/records') return 'records';
   if (path === '/contact' || path === '#/contact') return 'contact';
+  if (path === '/options' || path === '#/options') return 'options';
   if (path === '/asset' || path === '#/asset') return 'asset';
   if (path === '/danger' || path === '#/danger') return 'danger';
   if (path === '/pending-deletion' || path === '#/pending-deletion') return 'pending-deletion';
@@ -243,6 +246,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'exchange') return <ProtectedRoute><ExchangePage /></ProtectedRoute>;
     if (displayedRouteKey === 'records') return <ProtectedRoute><RecordsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'contact') return <ProtectedRoute><ContactPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'options') return <ProtectedRoute><OptionsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'asset') return <ProtectedRoute><AssetPage /></ProtectedRoute>;
     if (displayedRouteKey === 'danger') return <ProtectedRoute><DangerPage /></ProtectedRoute>;
     if (displayedRouteKey === 'pending-deletion') return <PendingDeletionPage />;
@@ -254,15 +258,15 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
     if (displayedRouteKey === 'notifications') return <ProtectedRoute><NotificationsPage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'options', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'agent' || displayedRouteKey === 'exchange' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
-  const isProtectedPage = ['dashboard', 'profile', 'staking', 'settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'agent' || displayedRouteKey === 'exchange' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'options' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
+  const isProtectedPage = ['dashboard', 'profile', 'staking', 'settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'options', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
 
   return (
     <div

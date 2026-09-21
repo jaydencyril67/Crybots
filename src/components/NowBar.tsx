@@ -207,6 +207,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/exchange') return 'EXCHANGE';
   if (path === '/records') return 'RECORDS';
   if (path === '/contact') return 'CONTACT';
+  if (path === '/options') return 'OPTIONS';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -274,6 +275,14 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/contact');
     },
     active: getActivePath() === '/contact',
+  },
+  {
+    label: 'OPTIONS',
+    icon: <Settings2 size={18} />,
+    onClick: () => {
+      navigate('/options');
+    },
+    active: getActivePath() === '/options',
   },
   {
     label: 'Settings',
