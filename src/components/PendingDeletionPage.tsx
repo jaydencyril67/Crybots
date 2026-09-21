@@ -92,8 +92,8 @@ const PendingDeletionPage = () => {
   return (
     <>
       <Helmet><title>KingsHall Exchange | Cancel account deletion</title></Helmet>
-      <main style={{ minHeight: 'calc(100vh - 80px)', padding: '20px 20px 48px', display: 'grid', alignItems: 'start', justifyItems: 'center' }}>
-        <section style={{ width: 'min(100%, 520px)', padding: 'clamp(22px, 5vw, 38px)', borderRadius: '26px', background: theme.surface, border: `1px solid ${theme.border}`, boxShadow: '0 18px 60px rgba(0,0,0,.18)' }}>
+      <main style={{ minHeight: 'calc(100vh - 80px)', padding: '20px clamp(12px, 2.5vw, 24px) 48px', boxSizing: 'border-box', display: 'grid', alignItems: 'start', justifyItems: 'center' }}>
+        <section style={{ width: '100%', maxWidth: '520px', boxSizing: 'border-box', padding: 'clamp(22px, 5vw, 38px)', borderRadius: '26px', background: theme.surface, border: `1px solid ${theme.border}`, boxShadow: '0 18px 60px rgba(0,0,0,.18)' }}>
           <p style={{ margin: 0, color: theme.primary, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase' }}>Account recovery</p>
           <h1 style={{ color: theme.text, margin: '12px 0 10px' }}>Cancel account deletion</h1>
           <p style={{ color: theme.textMuted, lineHeight: 1.6, marginTop: 0 }}>Confirm the details on your account. We will send a verification code to your account email before restoring access.</p>
