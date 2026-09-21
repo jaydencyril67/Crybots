@@ -223,6 +223,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/deposit') return 'DEPOSIT';
   if (path === '/transactions') return 'TRANSACTIONS';
   if (path === '/notifications') return 'NOTIFICATIONS';
+  if (path === '/alert-settings') return 'ALERT SETTINGS';
   return 'NOWBAR';
 };
 

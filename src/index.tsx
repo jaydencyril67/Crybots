@@ -36,6 +36,7 @@ import WithdrawalsPage from './components/WithdrawalsPage';
 import TransferPage from './components/TransferPage';
 import TransactionHistoryPage from './components/TransactionHistoryPage';
 import NotificationsPage from './components/NotificationsPage';
+import AlertSettingsPage from './components/AlertSettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppHeader from './components/AppHeader';
@@ -95,6 +96,7 @@ const getRouteKey = () => {
   if (pathname === '/deposit' || hash === '#/deposit') return 'deposit';
   if (pathname === '/transactions' || hash === '#/transactions') return 'transactions';
   if (pathname === '/notifications' || hash === '#/notifications') return 'notifications';
+  if (pathname === '/alert-settings' || hash === '#/alert-settings') return 'alert-settings';
   return 'landing';
 };
 
@@ -132,6 +134,7 @@ const routeToKey = (path: string) => {
   if (path === '/deposit' || path === '#/deposit') return 'deposit';
   if (path === '/transactions' || path === '#/transactions') return 'transactions';
   if (path === '/notifications' || path === '#/notifications') return 'notifications';
+  if (path === '/alert-settings' || path === '#/alert-settings') return 'alert-settings';
   return 'landing';
 };
 
@@ -281,16 +284,17 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'deposit') return <ProtectedRoute><DepositPage /></ProtectedRoute>;
     if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
     if (displayedRouteKey === 'notifications') return <ProtectedRoute><NotificationsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'alert-settings') return <ProtectedRoute><AlertSettingsPage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'portfolio-statistics', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'portfolio-statistics', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'manage' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'portfolio-statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'exchange' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
-  const isProtectedPage = ['dashboard', 'profile', 'staking', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'portfolio-statistics', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'manage' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'portfolio-statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'exchange' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings';
+  const isProtectedPage = ['dashboard', 'profile', 'staking', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'portfolio-statistics', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings'].includes(displayedRouteKey);
 
   return (
     <div
