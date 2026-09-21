@@ -69,7 +69,7 @@ const DepositPage = () => {
     <div data-shadow-free-page="deposit" style={styles.page}>
       <style>{'[data-shadow-free-page="deposit"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
       <div style={styles.shell}>
-        <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
+        <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
         <div style={styles.card}>
           <div style={styles.headerRow}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '0.92rem', color: theme.textMuted }}>
