@@ -43,7 +43,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   cardSubtext: { margin: 0, fontSize: '0.86rem', color: theme.textMuted, lineHeight: 1.6 },
 });
 
-const pageButtons = ['Deposit', 'Withdraw', 'Transfer', 'Manage'];
+const pageButtons = [
+  { label: 'Deposit', description: 'Add USDT to your wallet from an external address.' },
+  { label: 'Withdraw', description: 'Send USDT from your wallet to an external address.' },
+  { label: 'Transfer', description: 'Send USDT to another KingsHall user.' },
+  { label: 'Manage', description: 'Review and manage your assets.' },
+];
 
 const AssetPage = () => {
   const { themeMode } = useAppTheme();
@@ -67,10 +72,10 @@ const AssetPage = () => {
               <p style={styles.sectionText}>Manage your funds and choose an asset action below.</p>
             </section>
             <div style={styles.buttonList}>
-              {pageButtons.map((label) => (
+              {pageButtons.map(({ label, description }) => (
                 <button key={label} type="button" style={styles.cardButton} onClick={() => handleButtonClick(label)}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>{label}</h3>
-                  {label === 'Manage' ? <p style={styles.cardSubtext}>Review and manage your assets.</p> : null}
+                  <p style={styles.cardSubtext}>{description}</p>
                 </button>
               ))}
             </div>
