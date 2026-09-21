@@ -31,7 +31,7 @@ const baseStyles = {
   },
   shell: {
     width: '100%',
-    maxWidth: '1320px',
+    maxWidth: '1160px',
     margin: '0 auto',
     padding: 'clamp(14px, 3vw, 28px) clamp(12px, 2.5vw, 24px) 40px',
     boxSizing: 'border-box' as const,
