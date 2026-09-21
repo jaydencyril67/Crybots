@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, Upload, UserRound, Wallet } from 'lucide-react';
+import { Camera, CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -58,6 +58,11 @@ const baseStyles = {
     justifyContent: 'center',
     padding: '4px 0 6px',
   },
+  profileAvatarFrame: {
+    position: 'relative' as const,
+    width: '112px',
+    height: '112px',
+  },
   profileAvatar: {
     width: '112px',
     height: '112px',
@@ -85,6 +90,7 @@ const baseStyles = {
     content: { gap: '14px', marginTop: '14px' },
     card: {},
     profileIdentity: { gap: '12px' },
+    profileAvatarFrame: { width: '88px', height: '88px' },
     profileAvatar: { width: '88px', height: '88px', borderRadius: '20px' },
     profileAvatarFallback: { width: '88px', height: '88px', borderRadius: '20px' },
     sectionTitle: { fontSize: '1.15rem' },
@@ -144,6 +150,19 @@ const baseStyles = {
     alignItems: 'center',
     gap: '8px',
   },
+  avatarCameraButton: {
+    position: 'absolute' as const,
+    right: '-6px',
+    bottom: '-6px',
+    width: '36px',
+    height: '36px',
+    display: 'grid',
+    placeItems: 'center',
+    borderRadius: '999px',
+    border: '3px solid #111827',
+    cursor: 'pointer',
+    boxShadow: '0 6px 16px rgba(0,0,0,0.28)',
+  },
   logoutButton: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -202,6 +221,12 @@ const ProfilePage = () => {
     logoutButton: {
       ...baseStyles.logoutButton,
       color: theme.text,
+    },
+    avatarCameraButton: {
+      ...baseStyles.avatarCameraButton,
+      background: theme.primary,
+      color: theme.textInverse,
+      borderColor: theme.surface,
     },
     profileAvatarFallback: {
       ...baseStyles.profileAvatarFallback,
@@ -355,18 +380,24 @@ const ProfilePage = () => {
 
             <div style={styles.content}>
               <div style={styles.profileIdentity}>
-                {avatarPicture ? (
-                  <img src={avatarPicture} alt={`${fullName || 'User'} profile`} style={styles.profileAvatar} />
-                ) : (
-                  <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder">
-                    <CircleUserRound size={58} strokeWidth={1.6} />
-                  </div>
-                )}
+                <div style={styles.profileAvatarFrame}>
+                  {avatarPicture ? (
+                    <img src={avatarPicture} alt={`${fullName || 'User'} profile`} style={styles.profileAvatar} />
+                  ) : (
+                    <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder">
+                      <CircleUserRound size={58} strokeWidth={1.6} />
+                    </div>
+                  )}
+                  <label
+                    style={styles.avatarCameraButton}
+                    aria-label={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
+                    title={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
+                  >
+                    {avatarUploading ? <LoadingDots /> : <Camera size={17} strokeWidth={2.2} />}
+                    <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} disabled={avatarUploading} />
+                  </label>
+                </div>
               </div>
-              <label style={{ ...styles.helperAction, justifySelf: 'center', cursor: 'pointer', background: theme.primary, color: theme.textInverse }}>
-                <Upload size={16} /> {avatarUploading ? <LoadingDots /> : 'Update profile picture'}
-                <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} disabled={avatarUploading} />
-              </label>
               {avatarError ? <p style={{ ...styles.helperText, color: theme.danger }}>{avatarError}</p> : null}
 
               <div style={styles.infoList}>
