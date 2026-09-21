@@ -138,6 +138,17 @@ const DangerPage = () => {
         await api.patch('/api/settings/danger/self-exclude', payload, { headers });
       }
 
+      if (action === 'self-exclude') {
+        window.localStorage.removeItem('token');
+        window.localStorage.removeItem('user');
+        window.localStorage.removeItem('kingshall_user');
+        window.localStorage.removeItem('firstName');
+        window.localStorage.removeItem('kingshall_first_name');
+        window.dispatchEvent(new Event('ke:force-logout'));
+        navigate('/');
+        return;
+      }
+
       setState((current) => ({ ...current, status: 'Success: account action completed.' }));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to complete the action.';

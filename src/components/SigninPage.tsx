@@ -590,6 +590,9 @@ const SigninPage = () => {
       } else if (response?.status === 423 && message.toLowerCase().includes('pending deletion')) {
         setSubmitError(message);
         setMethod(null);
+      } else if (response?.status === 423 && response?.data?.accountStatus === 'self_excluded') {
+        setSubmitError(message);
+        setMethod(null);
       } else {
         setSubmitError(message);
       }
