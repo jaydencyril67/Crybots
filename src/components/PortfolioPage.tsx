@@ -71,7 +71,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
 });
 
-const pageButtons = ['Details', 'Statistics', 'Security', 'Danger'];
+const pageButtons = [
+  { label: 'Details', description: 'View and manage your personal profile information.' },
+  { label: 'Statistics', description: 'Review your deposits, withdrawals, transfers, activity, and account totals.' },
+  { label: 'Security', description: 'Manage your password, two-factor authentication, sessions, and security controls.' },
+  { label: 'Danger', description: 'Access account recovery and irreversible account actions.' },
+];
 
 const PortfolioPage = () => {
   const handleButtonClick = (label: string) => {
@@ -105,10 +110,10 @@ const PortfolioPage = () => {
             </section>
 
             <div style={styles.buttonList}>
-              {pageButtons.map((label) => (
+              {pageButtons.map(({ label, description }) => (
                 <button key={label} type="button" style={styles.cardButton} onClick={() => handleButtonClick(label)}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>{label}</h3>
-                  {label === 'Danger' ? <p style={styles.cardSubtext}>Account recovery and irreversible actions.</p> : null}
+                  <p style={styles.cardSubtext}>{description}</p>
                 </button>
               ))}
             </div>
