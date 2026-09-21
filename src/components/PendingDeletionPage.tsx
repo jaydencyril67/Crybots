@@ -68,7 +68,7 @@ const PendingDeletionPage = () => {
       <Helmet><title>KingsHall Exchange | Cancel account deletion</title></Helmet>
       <main style={{ minHeight: '100vh', padding: '48px 20px', display: 'grid', placeItems: 'center' }}>
         <section style={{ width: 'min(100%, 520px)', padding: 'clamp(22px, 5vw, 38px)', borderRadius: '26px', background: theme.surface, border: `1px solid ${theme.border}`, boxShadow: '0 18px 60px rgba(0,0,0,.18)' }}>
-          <p style={{ margin: 0, color: theme.accent, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase' }}>Account recovery</p>
+          <p style={{ margin: 0, color: theme.primary, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase' }}>Account recovery</p>
           <h1 style={{ color: theme.text, margin: '12px 0 10px' }}>Cancel account deletion</h1>
           <p style={{ color: theme.textMuted, lineHeight: 1.6, marginTop: 0 }}>Confirm the details on your account. We will send a verification code to your account email before restoring access.</p>
           <div style={{ display: 'grid', gap: 14, marginTop: 24 }}>
@@ -77,8 +77,8 @@ const PendingDeletionPage = () => {
             <label style={{ color: theme.text }}>Date of birth<input style={fieldStyle} type="date" value={dob} onChange={(event) => setDob(event.target.value)} /></label>
             {codeSent ? <label style={{ color: theme.text }}>Email verification code<input style={fieldStyle} inputMode="numeric" maxLength={4} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" autoComplete="one-time-code" /></label> : null}
             {message ? <NotificationBanner tone={success ? 'success' : 'warning'} title={success ? 'Deletion cancelled' : 'Action required'} message={message} /> : null}
-            {!success ? <button type="button" onClick={codeSent ? cancelDeletion : requestCode} disabled={isLoading || (codeSent ? code.length !== 4 : !canRequestCode)} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.accent, color: theme.onAccent, fontWeight: 800 }}>{isLoading ? <InlineLoadingDots /> : codeSent ? 'Cancel deletion' : 'Email me a verification code'}</button> : <button type="button" onClick={() => navigate('/signin')} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.accent, color: theme.onAccent, fontWeight: 800 }}>Return to sign in</button>}
-            {!success && codeSent ? <button type="button" onClick={requestCode} disabled={isLoading || !canRequestCode} style={{ border: 0, background: 'transparent', color: theme.accent, cursor: 'pointer' }}>Request a new code</button> : null}
+            {!success ? <button type="button" onClick={codeSent ? cancelDeletion : requestCode} disabled={isLoading || (codeSent ? code.length !== 4 : !canRequestCode)} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>{isLoading ? <InlineLoadingDots /> : codeSent ? 'Cancel deletion' : 'Email me a verification code'}</button> : <button type="button" onClick={() => navigate('/signin')} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>Return to sign in</button>}
+            {!success && codeSent ? <button type="button" onClick={requestCode} disabled={isLoading || !canRequestCode} style={{ border: 0, background: 'transparent', color: theme.primary, cursor: 'pointer' }}>Request a new code</button> : null}
           </div>
         </section>
       </main>
