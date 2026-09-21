@@ -1,32 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
-import { useAppTheme, type AppThemePreference } from './AppTheme';
+import { useAppTheme } from './AppTheme';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
-const EDGE_LIGHT_COLOR_OPTIONS = [
-  { key: 'blue', label: 'Blue', value: '#38bdf8' },
-  { key: 'purple', label: 'Purple', value: '#a855f7' },
-  { key: 'pink', label: 'Pink', value: '#ec4899' },
-  { key: 'green', label: 'Green', value: '#22c55e' },
-  { key: 'amber', label: 'Amber', value: '#f59e0b' },
-  { key: 'red', label: 'Red', value: '#ef4444' },
-] as const;
-
-type EdgeLightColorKey = typeof EDGE_LIGHT_COLOR_OPTIONS[number]['key'];
-type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse-light' | 'pulse' | 'color-light' | 'color';
-
-const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
-  { key: 'stable-light', label: 'Stable Light' },
-  { key: 'stable', label: 'Stable glow' },
-  { key: 'blink-light', label: 'Blinking Light' },
-  { key: 'blink', label: 'Blinking glow' },
-  { key: 'pulse-light', label: 'Breathing Light' },
-  { key: 'pulse', label: 'Breathing glow' },
-  { key: 'color-light', label: 'Changing Light' },
-  { key: 'color', label: 'Changing glow' },
-];
-
-const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 import { Helmet } from 'react-helmet-async';
 import { RotateCcw, Upload, WalletCards, Landmark, UserCircle2 } from 'lucide-react';
 import api from '../api/axios';
@@ -46,7 +22,7 @@ type MeResponse = {
 };
 
 
-type SettingsStatusSection = 'profile' | 'theme' | 'edgeLight' | 'wallet';
+type SettingsStatusSection = 'profile' | 'wallet';
 
 type StatusState = {
   kind: 'idle' | 'success' | 'error';
@@ -200,47 +176,9 @@ const SettingsPage = () => {
   const [status, setStatus] = useState<StatusState>({ kind: 'idle', message: '', section: 'profile' });
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const { themeMode, themePreference, setThemePreference } = useAppTheme();
+  const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
-  const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
-  const [edgeLightColor, setEdgeLightColor] = useState('#38bdf8');
-  const [edgeLightMode, setEdgeLightMode] = useState<EdgeLightMode>('stable');
-  const [edgeLightSavedEnabled, setEdgeLightSavedEnabled] = useState(false);
-  const [edgeLightSavedColor, setEdgeLightSavedColor] = useState('#38bdf8');
-  const [edgeLightSavedMode, setEdgeLightSavedMode] = useState<EdgeLightMode>('stable');
-  const [edgeLightCardSaving, setEdgeLightCardSaving] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-
-    try {
-      const raw = window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY);
-      if (!raw) {
-        return;
-      }
-
-      const parsed = JSON.parse(raw) as { enabled?: boolean; color?: string | EdgeLightColorKey; mode?: EdgeLightMode };
-      const legacyOption = EDGE_LIGHT_COLOR_OPTIONS.find((option) => option.key === parsed.color);
-      const legacyColor = legacyOption?.value ?? parsed.color;
-      const nextEnabled = Boolean(parsed.enabled);
-      const nextColor = typeof legacyColor === 'string' && /^#[0-9a-f]{6}$/i.test(legacyColor) ? legacyColor : '#38bdf8';
-      const nextMode = parsed.mode && EDGE_LIGHT_MODES.some((option) => option.key === parsed.mode) ? parsed.mode : 'stable';
-      setEdgeLightEnabled(nextEnabled);
-      setEdgeLightColor(nextColor);
-      setEdgeLightMode(nextMode);
-      setEdgeLightSavedEnabled(nextEnabled);
-      setEdgeLightSavedColor(nextColor);
-      setEdgeLightSavedMode(nextMode);
-
-    } catch {
-      // Ignore invalid localStorage data and keep defaults.
-    }
-  }, []);
-
   useEffect(() => {
     const loadAccount = async () => {
       try {
@@ -305,46 +243,6 @@ const SettingsPage = () => {
   };
 
 
-
-  const persistTheme = (nextPreference: AppThemePreference) => {
-    setThemePreference(nextPreference);
-  };
-
-  const persistEdgeLight = (enabled: boolean, color: string, mode: EdgeLightMode) => {
-    window.localStorage.setItem(
-      EDGE_LIGHT_STORAGE_KEY,
-      JSON.stringify({ enabled, color, mode }),
-    );
-    window.dispatchEvent(new Event('nowbar-edge-light-changed'));
-    setEdgeLightSavedEnabled(enabled);
-    setEdgeLightSavedColor(color);
-    setEdgeLightSavedMode(mode);
-  };
-
-  const handleToggleEdgeLight = () => {
-    setEdgeLightEnabled((current) => {
-      const nextEnabled = !current;
-      persistEdgeLight(nextEnabled, edgeLightColor, edgeLightMode);
-      showStatus('success', nextEnabled ? 'NowBar edge lighting turned on.' : 'NowBar edge lighting turned off.', 'edgeLight');
-      return nextEnabled;
-    });
-  };
-
-  const handleSetEdgeLightMode = (nextMode: EdgeLightMode) => {
-    setEdgeLightMode(nextMode);
-    persistEdgeLight(edgeLightEnabled, edgeLightColor, nextMode);
-    showStatus('success', 'NowBar edge lighting style updated.', 'edgeLight');
-  };
-
-  const handleSaveEdgeLight = () => {
-    setEdgeLightCardSaving(true);
-    try {
-      persistEdgeLight(edgeLightEnabled, edgeLightColor, edgeLightMode);
-      showStatus('success', 'NowBar edge lighting updated.', 'edgeLight');
-    } finally {
-      setEdgeLightCardSaving(false);
-    }
-  };
 
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -448,83 +346,6 @@ const SettingsPage = () => {
             </section>
 
             <div style={styles.grid}>
-
-              <section style={styles.card}>
-                {renderStatus('theme')}
-                <h2 style={styles.cardTitle}>🎨 Theme</h2>
-                <p style={styles.cardText}>Choose Light, Dark, System, or Shift mode. System follows your device theme; Shift uses Light from 6 AM to 6 PM and Dark overnight.</p>
-                <div style={{ ...styles.toggleRow, justifyContent: 'center', flexWrap: 'nowrap', gap: '8px', width: '100%' }}>
-                  <button
-                    type="button"
-                    style={{ ...styles.togglePill, ...(themePreference === 'dark' ? styles.togglePillActive : {}) }}
-                    onClick={() => persistTheme('dark')}
-                  >
-                    Dark
-                  </button>
-                  <button
-                    type="button"
-                    style={{ ...styles.togglePill, ...(themePreference === 'light' ? styles.togglePillActive : {}) }}
-                    onClick={() => persistTheme('light')}
-                  >
-                    Light
-                  </button>
-                  <button
-                    type="button"
-                    style={{ ...styles.togglePill, ...(themePreference === 'system' ? styles.togglePillActive : {}) }}
-                    onClick={() => persistTheme('system')}
-                  >
-                    System
-                  </button>
-                  <button
-                    type="button"
-                    style={{ ...styles.togglePill, ...(themePreference === 'shift' ? styles.togglePillActive : {}) }}
-                    onClick={() => persistTheme('shift')}
-                  >
-                    Shift
-                  </button>
-                </div>
-              </section>
-
-              <section style={styles.card}>
-                {renderStatus('edgeLight')}
-                <h2 style={styles.cardTitle}>⚡ NowBar edge lighting</h2>
-                <p style={styles.cardText}>Create a fully customizable NowBar edge effect with any color and multiple professional lighting styles.</p>
-                <div style={{ ...styles.toggleRow, display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    style={{ ...styles.togglePill, ...(edgeLightEnabled ? styles.togglePillActive : {}) }}
-                    onClick={handleToggleEdgeLight}
-                  >
-                    {edgeLightEnabled ? 'On' : 'Off'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/nowbar-color')}
-                    style={{ ...styles.button, display: 'inline-flex', alignItems: 'center', gap: '10px', borderRadius: '12px' }}
-                  >
-                    <span style={{ width: '24px', height: '24px', borderRadius: '8px', background: edgeLightColor, boxShadow: `0 0 14px ${edgeLightColor}` }} />
-                    Choose color
-                  </button>
-                  <code style={{ color: theme.textMuted, fontSize: '0.85rem' }}>{edgeLightColor.toUpperCase()}</code>
-                </div>
-                <div style={{ ...styles.field, marginTop: '16px' }}>
-                  <span style={styles.label}>Lighting style</span>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '4px' }}>
-                    {EDGE_LIGHT_MODES.map((option) => (
-                      <button key={option.key} type="button" onClick={() => handleSetEdgeLightMode(option.key)} style={{ ...styles.button, borderRadius: '14px', textAlign: 'left', display: 'grid', gap: '3px', ...(edgeLightMode === option.key ? styles.primaryButton : {}) }}>
-                        <span>{option.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {((edgeLightEnabled !== edgeLightSavedEnabled || edgeLightColor !== edgeLightSavedColor || edgeLightMode !== edgeLightSavedMode) || edgeLightCardSaving) ? (
-                  <div style={styles.buttonRow}>
-                    <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={handleSaveEdgeLight} disabled={edgeLightCardSaving}>
-                      {edgeLightCardSaving ? <InlineLoadingDots /> : 'Save edge lighting'}
-                    </button>
-                  </div>
-                ) : null}
-              </section>
 
               <section style={styles.card}>
                 {renderStatus('wallet')}
