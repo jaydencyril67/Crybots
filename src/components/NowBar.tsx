@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BarChart3, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Settings2, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Home, Info, LifeBuoy, Settings2, Sparkles, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -203,6 +203,14 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/staking') return 'STAKING';
   if (path === '/settings') return 'SETTINGS';
   if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/agent') return 'AGENT';
+  if (path === '/exchange') return 'EXCHANGE';
+  if (path === '/records') return 'RECORDS';
+  if (path === '/contact') return 'CONTACT';
+  if (path === '/options') return 'OPTIONS';
+  if (path === '/library') return 'LIBRARY';
+  if (path === '/about') return 'ABOUT';
+  if (path === '/developer') return 'DEVELOPER';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -232,6 +240,30 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/portfolio',
   },
   {
+    label: 'AGENT',
+    icon: <Sparkles size={18} />,
+    onClick: () => {
+      navigate('/agent');
+    },
+    active: getActivePath() === '/agent',
+  },
+  {
+    label: 'EXCHANGE',
+    icon: <ArrowLeftRight size={18} />,
+    onClick: () => {
+      navigate('/exchange');
+    },
+    active: getActivePath() === '/exchange',
+  },
+  {
+    label: 'RECORDS',
+    icon: <CalendarClock size={18} />,
+    onClick: () => {
+      navigate('/records');
+    },
+    active: getActivePath() === '/records',
+  },
+  {
     label: 'Asset',
     icon: <WalletCards size={18} />,
     onClick: () => {
@@ -240,20 +272,28 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/asset',
   },
   {
-    label: 'Staking',
-    icon: <Coins size={18} />,
+    label: 'CONTACT',
+    icon: <LifeBuoy size={18} />,
     onClick: () => {
-      navigate('/staking');
+      navigate('/contact');
     },
-    active: getActivePath() === '/staking',
+    active: getActivePath() === '/contact',
   },
   {
-    label: 'Transactions',
-    icon: <CalendarClock size={18} />,
+    label: 'OPTIONS',
+    icon: <Settings2 size={18} />,
     onClick: () => {
-      navigate('/transactions');
+      navigate('/options');
     },
-    active: getActivePath() === '/transactions',
+    active: getActivePath() === '/options',
+  },
+  {
+    label: 'LIBRARY',
+    icon: <BookOpen size={18} />,
+    onClick: () => {
+      navigate('/library');
+    },
+    active: getActivePath() === '/library',
   },
   {
     label: 'Settings',
@@ -262,6 +302,22 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/settings');
     },
     active: getActivePath() === '/settings',
+  },
+  {
+    label: 'ABOUT',
+    icon: <Info size={18} />,
+    onClick: () => {
+      navigate('/about');
+    },
+    active: getActivePath() === '/about',
+  },
+  {
+    label: 'DEVELOPER',
+    icon: <Sparkles size={18} />,
+    onClick: () => {
+      navigate('/developer');
+    },
+    active: getActivePath() === '/developer',
   },
 ];
 
