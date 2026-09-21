@@ -6,7 +6,7 @@ import NowBar from './NowBar';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
-import navigate from '../utils/navigate';
+import { navigate } from '../utils/navigate';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
