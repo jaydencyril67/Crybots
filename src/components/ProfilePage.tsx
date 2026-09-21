@@ -55,7 +55,7 @@ const baseStyles = {
   profileIdentity: {
     display: 'flex',
     alignItems: 'center',
-    gap: '18px',
+    justifyContent: 'center',
     padding: '4px 0 6px',
   },
   profileAvatar: {
@@ -78,17 +78,6 @@ const baseStyles = {
     boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)',
     background: '#111827',
     flexShrink: 0,
-  },
-  profileIdentityName: {
-    margin: 0,
-    fontSize: 'clamp(1.25rem, 3vw, 1.8rem)',
-    fontWeight: 900,
-    lineHeight: 1.15,
-  },
-  profileIdentityEmail: {
-    margin: '6px 0 0',
-    fontSize: '0.95rem',
-    lineHeight: 1.4,
   },
   '@media (max-width: 640px)': {
     page: { paddingBottom: '156px' },
@@ -345,10 +334,6 @@ const ProfilePage = () => {
                     <CircleUserRound size={58} strokeWidth={1.6} />
                   </div>
                 )}
-                <div>
-                  <h1 style={styles.profileIdentityName}>{profileLoading ? <LoadingDots /> : fullName || 'Your details'}</h1>
-                  {!profileLoading && email ? <p style={styles.profileIdentityEmail}>{email}</p> : null}
-                </div>
               </div>
 
               <div style={styles.infoList}>
