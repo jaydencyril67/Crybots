@@ -49,7 +49,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     overflowY: 'visible' as const,
     paddingBottom: '118px',
   },
-  back: { alignSelf: 'start', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
+  back: { alignSelf: 'start', justifySelf: 'start', width: 'fit-content', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   shell: {
     position: 'relative' as const,
     width: '100%',
