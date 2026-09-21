@@ -135,7 +135,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     hero: { padding: '16px' },
     packageGrid: {
       gridTemplateColumns: 'repeat(3, minmax(240px, 82vw))',
-      gap: '14px',
+      gap: '20px',
+      columnGap: '20px',
       overflowX: 'auto' as const,
       overflowY: 'hidden' as const,
       padding: '0 4px 4px',
