@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Bell, Info, ShieldAlert, WalletCards } from 'lucide-react';
+import { ArrowLeft, Bell, Info, ShieldAlert, WalletCards } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import api from '../api/axios';
 import { AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
+import { navigate } from '../utils/navigate';
 
 type NotificationItem = {
   id: string;
@@ -19,7 +20,8 @@ type NotificationItem = {
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '120px' },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 3vw, 32px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
-  heading: { margin: 0, fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
+  heading: { margin: '20px 0 8px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
   list: { display: 'grid', gap: '10px' },
   item: { display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '16px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, textAlign: 'left' as const, cursor: 'pointer', width: '100%', boxSizing: 'border-box' as const },
@@ -98,6 +100,7 @@ const NotificationsPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
+          <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
           {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}

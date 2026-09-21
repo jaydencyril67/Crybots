@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
@@ -42,6 +42,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     overflowY: 'auto' as const,
     paddingBottom: '118px',
   },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   shell: {
     width: '100%',
     maxWidth: '1160px',
@@ -217,7 +218,7 @@ const TransferPage = () => {
       <div style={styles.page}>
       <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
-        
+        <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
         <div style={styles.panel}>
           <div style={styles.body}>
             <div style={styles.grid}>

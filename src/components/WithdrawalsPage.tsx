@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
+import { ArrowLeft, CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
@@ -29,6 +29,7 @@ const baseStyles = {
     overflowY: 'auto' as const,
     paddingBottom: '118px',
   },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '10px', padding: '7px 10px', cursor: 'pointer', fontSize: '0.84rem' },
   shell: {
     width: '100%',
     maxWidth: '1160px',
@@ -95,6 +96,7 @@ const WithdrawPage = () => {
       background: theme.background,
       color: theme.text,
     },
+    back: { ...baseStyles.back, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text },
     section: { ...baseStyles.section, border: `1px solid ${theme.border}`, background: theme.surfaceGlass },
     sectionText: { ...baseStyles.sectionText, color: theme.textMuted },
     label: { ...baseStyles.label, color: theme.textMuted },
@@ -237,7 +239,7 @@ const WithdrawPage = () => {
       <div data-shadow-free-page="withdrawals" style={styles.page}>
       <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
-        
+        <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
         <div style={styles.content}>
           <section style={styles.section}>
             {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
