@@ -12,7 +12,7 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
 import ProfilePage from './components/ProfilePage';
 import StakingPage from './components/StakingPage';
-import SettingsPage from './components/SettingsPage';
+import ManagePage from './components/ManagePage';
 import ThemeSettingsPage from './components/ThemeSettingsPage';
 import NowBarSettingsPage from './components/NowBarSettingsPage';
 import NowBarColorPage from './components/NowBarColorPage';
@@ -70,7 +70,7 @@ const getRouteKey = () => {
   if (pathname === '/dashboard' || hash === '#/dashboard') return 'dashboard';
   if (pathname === '/profile' || hash === '#/profile') return 'profile';
   if (pathname === '/staking' || hash === '#/staking') return 'staking';
-  if (pathname === '/settings' || hash === '#/settings') return 'settings';
+  if (pathname === '/manage' || hash === '#/manage') return 'manage';
   if (pathname === '/theme-settings' || hash === '#/theme-settings') return 'theme-settings';
   if (pathname === '/nowbar-settings' || hash === '#/nowbar-settings') return 'nowbar-settings';
   if (pathname === '/nowbar-color' || hash === '#/nowbar-color') return 'nowbar-color';
@@ -106,7 +106,7 @@ const routeToKey = (path: string) => {
   if (path === '/dashboard' || path === '#/dashboard') return 'dashboard';
   if (path === '/profile' || path === '#/profile') return 'profile';
   if (path === '/staking' || path === '#/staking') return 'staking';
-  if (path === '/settings' || path === '#/settings') return 'settings';
+  if (path === '/manage' || path === '#/manage') return 'manage';
   if (path === '/theme-settings' || path === '#/theme-settings') return 'theme-settings';
   if (path === '/nowbar-settings' || path === '#/nowbar-settings') return 'nowbar-settings';
   if (path === '/nowbar-color' || path === '#/nowbar-color') return 'nowbar-color';
@@ -254,7 +254,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'dashboard') return <ProtectedRoute><DashboardPage /></ProtectedRoute>;
     if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
     if (displayedRouteKey === 'staking') return <ProtectedRoute><StakingPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'settings') return <ProtectedRoute><SettingsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'manage') return <ProtectedRoute><ManagePage /></ProtectedRoute>;
     if (displayedRouteKey === 'theme-settings') return <ProtectedRoute><ThemeSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-settings') return <ProtectedRoute><NowBarSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-color') return <ProtectedRoute><NowBarColorPage /></ProtectedRoute>;
@@ -278,15 +278,15 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'transactions') return <ProtectedRoute><TransactionHistoryPage /></ProtectedRoute>;
     if (displayedRouteKey === 'notifications') return <ProtectedRoute><NotificationsPage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'settings', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'profile', 'staking', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'settings' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'agent' || displayedRouteKey === 'exchange' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
-  const isProtectedPage = ['dashboard', 'profile', 'staking', 'settings', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'staking' || displayedRouteKey === 'manage' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'agent' || displayedRouteKey === 'exchange' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications';
+  const isProtectedPage = ['dashboard', 'profile', 'staking', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'portfolio', 'agent', 'exchange', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications'].includes(displayedRouteKey);
 
   return (
     <div
