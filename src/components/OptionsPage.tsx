@@ -9,7 +9,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     minHeight: '100vh',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    paddingBottom: '132px',
+    paddingBottom: '118px',
     background: theme.background,
     color: theme.text,
   },
@@ -20,18 +20,18 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
     boxSizing: 'border-box' as const,
   },
-  content: { display: 'grid', gap: '18px', marginTop: '18px' },
+  content: { display: 'grid', gap: '14px', marginTop: '10px' },
   section: { display: 'grid', gap: '10px' },
-  sectionTitle: { margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em', color: theme.text },
-  sectionText: { margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7, maxWidth: '62ch' },
+  sectionTitle: { margin: 0, fontSize: '1.15rem', fontWeight: 900, letterSpacing: '-0.02em', color: theme.text },
+  sectionText: { margin: 0, fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4, maxWidth: '62ch' },
   buttonList: { display: 'grid', gap: '10px', marginTop: '6px' },
   cardButton: {
-    display: 'grid', gap: '6px', width: '100%', padding: '16px 18px', borderRadius: '18px',
+    display: 'grid', gap: '5px', width: '100%', padding: '11px', borderRadius: '13px',
     border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text,
     textAlign: 'left' as const, boxSizing: 'border-box' as const, cursor: 'pointer',
     backdropFilter: 'blur(24px) saturate(1.15)', WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
   },
-  cardSubtext: { margin: 0, fontSize: '0.86rem', color: theme.textMuted, lineHeight: 1.6 },
+  cardSubtext: { margin: 0, fontSize: '0.74rem', color: theme.textMuted, lineHeight: 1.35 },
 });
 
 const pageButtons = [

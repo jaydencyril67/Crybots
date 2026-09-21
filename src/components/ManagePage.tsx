@@ -16,9 +16,9 @@ type MeResponse = { user?: { walletAddress?: string } };
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', paddingBottom: '132px', background: theme.background, color: theme.text },
+  page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
-  card: { maxWidth: '720px', margin: '18px auto 0', padding: '22px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  card: { maxWidth: '720px', margin: '12px auto 0', padding: '18px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   title: { margin: 0, fontSize: '1.6rem', fontWeight: 900 },
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.6 },
   form: { display: 'grid', gap: '12px', marginTop: '18px' },

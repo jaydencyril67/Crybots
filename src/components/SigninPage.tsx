@@ -40,9 +40,9 @@ const styles = {
   },
   shell: {
     position: 'relative' as const,
-    maxWidth: '1200px',
+    maxWidth: '1160px',
     margin: '0 auto',
-    padding: 'clamp(20px, 3vw, 32px) clamp(16px, 2.5vw, 24px) 40px',
+    padding: 'clamp(14px, 2.4vw, 24px) clamp(12px, 2.2vw, 20px) 28px',
   },
   glow: {
     position: 'absolute' as const,

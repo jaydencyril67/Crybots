@@ -39,16 +39,16 @@ const hueFromHex = (hex: string) => {
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '120px' },
-  shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
+  page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '118px' },
+  shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 3vw, 20px) clamp(12px, 2.5vw, 24px) 28px', boxSizing: 'border-box' as const },
   backButton: { display: 'inline-flex', alignItems: 'center', gap: '8px', border: 0, background: 'transparent', color: theme.textMuted, padding: 0, cursor: 'pointer', fontSize: '0.92rem', fontWeight: 700 },
-  heading: { margin: '24px 0 8px', fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontWeight: 900 },
-  intro: { margin: 0, color: theme.textMuted, lineHeight: 1.6 },
-  card: { marginTop: '24px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
-  preview: { display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
+  heading: { margin: '18px 0 6px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
+  intro: { margin: 0, color: theme.textMuted, lineHeight: 1.5 },
+  card: { marginTop: '18px', padding: '14px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  preview: { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '14px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
   previewColor: { width: '44px', height: '44px', borderRadius: '14px', flexShrink: 0 },
   sectionTitle: { margin: '0 0 14px', fontSize: '1rem', fontWeight: 800 },
-  colorPicker: { width: 'min(76vw, 330px)', margin: '8px auto 22px' },
+  colorPicker: { width: 'min(76vw, 300px)', margin: '6px auto 18px' },
   hueRing: { width: '100%', aspectRatio: '1', borderRadius: '50%', background: 'conic-gradient(from 0turn, hsl(0 100% 50%) 0deg, hsl(30 100% 50%) 30deg, hsl(60 100% 50%) 60deg, hsl(90 100% 50%) 90deg, hsl(120 100% 50%) 120deg, hsl(150 100% 50%) 150deg, hsl(180 100% 50%) 180deg, hsl(210 100% 50%) 210deg, hsl(240 100% 50%) 240deg, hsl(270 100% 50%) 270deg, hsl(300 100% 50%) 300deg, hsl(330 100% 50%) 330deg, hsl(360 100% 50%) 360deg)', padding: '24px', boxSizing: 'border-box' as const, cursor: 'crosshair', position: 'relative' as const, boxShadow: '0 0 0 1px rgba(255,255,255,.16), 0 12px 30px rgba(0,0,0,.22)' },
   colorField: { position: 'absolute' as const, inset: '24px', borderRadius: '50%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.96) 100%), linear-gradient(to right, #fff 0%, var(--picker-hue) 100%)', cursor: 'crosshair', overflow: 'hidden' as const, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.3), inset 0 0 18px rgba(0,0,0,.28)' },
   colorFieldPoint: { position: 'absolute' as const, width: '18px', height: '18px', transform: 'translate(-50%, -50%)', borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #000, 0 2px 5px rgba(0,0,0,.45)', pointerEvents: 'none' as const },
