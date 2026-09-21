@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Home, LifeBuoy, Settings2, Sparkles, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Home, Info, LifeBuoy, Settings2, Sparkles, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -209,6 +209,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/contact') return 'CONTACT';
   if (path === '/options') return 'OPTIONS';
   if (path === '/library') return 'LIBRARY';
+  if (path === '/about') return 'ABOUT';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -300,6 +301,14 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/settings');
     },
     active: getActivePath() === '/settings',
+  },
+  {
+    label: 'ABOUT',
+    icon: <Info size={18} />,
+    onClick: () => {
+      navigate('/about');
+    },
+    active: getActivePath() === '/about',
   },
 ];
 
