@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import api from '../api/axios';
@@ -27,44 +28,45 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   shell: {
     width: '100%',
-    maxWidth: '1320px',
+    maxWidth: '1160px',
     margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
     boxSizing: 'border-box' as const,
   },
   content: {
     display: 'grid',
-    gap: '18px',
-    marginTop: '18px',
+    gap: '14px',
+    marginTop: '10px',
   },
   card: {
     ...createHybridCardStyles(theme).card,
   },
+  portfolioBack: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
   sectionTitle: {
     margin: 0,
-    fontSize: '1.45rem',
+    fontSize: '1.15rem',
     fontWeight: 900,
     letterSpacing: '-0.02em',
     color: theme.text,
   },
   sectionText: {
-    margin: '8px 0 0',
-    fontSize: '0.92rem',
+    margin: '3px 0 0',
+    fontSize: '0.82rem',
     color: theme.textMuted,
-    lineHeight: 1.7,
+    lineHeight: 1.4,
     maxWidth: '62ch',
   },
   actionTitle: {
     margin: 0,
-    fontSize: '1.1rem',
+    fontSize: '0.96rem',
     fontWeight: 800,
     color: theme.text,
   },
   actionText: {
-    margin: '8px 0 0',
-    fontSize: '0.88rem',
+    margin: '5px 0 0',
+    fontSize: '0.82rem',
     color: theme.textMuted,
-    lineHeight: 1.55,
+    lineHeight: 1.4,
     maxWidth: '64ch',
   },
   field: {
@@ -82,21 +84,21 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '18px',
+    borderRadius: '13px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
     color: theme.text,
-    padding: '12px 14px',
+    padding: '10px 12px',
     outline: 'none',
   },
   buttonRow: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: '18px',
+    marginTop: '14px',
   },
   actionButton: {
     borderRadius: '999px',
-    padding: '12px 16px',
+    padding: '10px 14px',
     border: `1px solid ${theme.primary}`,
     cursor: 'pointer',
     fontWeight: 800,
@@ -188,6 +190,7 @@ const DangerPage = () => {
         <div style={styles.shell}>
           
           <div style={styles.content}>
+            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
             <section style={styles.card}>
               <h2 style={styles.sectionTitle}>Danger Zone</h2>
               <p style={styles.sectionText}>These actions are irreversible or highly restrictive. Read each warning carefully before continuing.</p>

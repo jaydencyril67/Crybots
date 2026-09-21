@@ -42,7 +42,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   shell: {
     width: '100%',
-    maxWidth: '1320px',
+    maxWidth: '1160px',
     margin: '0 auto',
     padding: 'clamp(14px, 3vw, 28px) clamp(8px, 1.5vw, 16px) 40px',
     boxSizing: 'border-box' as const,

@@ -51,7 +51,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   shell: {
     position: 'relative' as const,
     width: '100%',
-    maxWidth: '1320px',
+    maxWidth: '1160px',
     margin: '0 auto',
     padding: 'clamp(14px, 2.4vw, 28px) clamp(12px, 2.2vw, 20px) 32px',
     boxSizing: 'border-box' as const,

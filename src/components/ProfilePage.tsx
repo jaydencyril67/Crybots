@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { Camera, CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { ArrowLeft, Camera, CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -18,32 +18,32 @@ const baseStyles = {
   } as const,
   shell: {
     width: '100%',
-    maxWidth: '1320px',
+    maxWidth: '1160px',
     margin: '0 auto',
-    padding: 'clamp(16px, 3vw, 32px) clamp(12px, 2.5vw, 24px) 40px',
+    padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
     boxSizing: 'border-box' as const,
   },
   content: {
     paddingTop: '8px',
     display: 'grid',
-    gap: '18px',
-    marginTop: '18px',
+    gap: '14px',
+    marginTop: '14px',
   },
   grid: {
     display: 'grid',
-    gap: '18px',
+    gap: '12px',
     gridTemplateColumns: 'minmax(0, 1fr)',
   },
   infoList: {
     display: 'grid',
-    gap: '12px',
+    gap: '8px',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    marginTop: '12px',
+    marginTop: '8px',
   },
   infoRow: {
     width: '100%',
-    padding: '16px',
-    borderRadius: '18px',
+    padding: '11px',
+    borderRadius: '13px',
     boxSizing: 'border-box' as const,
     display: 'grid',
     gap: '6px',
@@ -101,25 +101,26 @@ const baseStyles = {
   },
   sectionTitle: {
     margin: 0,
-    fontSize: '1.3rem',
+    fontSize: '1.15rem',
     fontWeight: 800,
     letterSpacing: '-0.03em',
   },
   sectionSub: {
-    margin: '8px 0 0',
-    lineHeight: 1.6,
-    maxWidth: '58ch',
+    margin: '3px 0 0',
+    lineHeight: 1.4,
+    maxWidth: '62ch',
+    fontSize: '0.82rem',
   },
   infoLabel: {
     margin: 0,
-    fontSize: '0.82rem',
+    fontSize: '0.74rem',
     textTransform: 'uppercase' as const,
     letterSpacing: '0.08em',
   },
   infoValue: {
     margin: 0,
-    fontSize: '1rem',
-    fontWeight: 700,
+    fontSize: '0.94rem',
+    fontWeight: 800,
     lineHeight: 1.5,
     wordBreak: 'break-word' as const,
     overflowWrap: 'anywhere' as const,
@@ -221,6 +222,18 @@ const ProfilePage = () => {
     logoutButton: {
       ...baseStyles.logoutButton,
       color: theme.text,
+    },
+    portfolioBack: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '6px',
+      border: `1px solid ${theme.borderGlass}`,
+      borderRadius: '10px',
+      padding: '7px 10px',
+      background: theme.surfaceGlass,
+      color: theme.text,
+      cursor: 'pointer',
+      fontSize: '0.84rem',
     },
     avatarCameraButton: {
       ...baseStyles.avatarCameraButton,
@@ -378,6 +391,7 @@ const ProfilePage = () => {
           <div style={styles.shell}>
             
 
+            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
             <div style={styles.content}>
               <div style={styles.profileIdentity}>
                 <div style={styles.profileAvatarFrame}>
