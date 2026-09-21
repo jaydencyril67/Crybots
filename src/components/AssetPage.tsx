@@ -54,6 +54,7 @@ const AssetPage = () => {
     if (label === 'Deposit') navigate('/deposit');
     if (label === 'Withdraw') navigate('/withdrawals');
     if (label === 'Transfer') navigate('/transfer');
+    if (label === 'Manage') navigate('/manage');
   };
 
   return (

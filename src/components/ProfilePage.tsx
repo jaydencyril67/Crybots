@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound, Wallet } from 'lucide-react';
+import { CircleUserRound, Coins, LogOut, Mail, ShieldCheck, Upload, UserRound, Wallet } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -221,6 +221,9 @@ const ProfilePage = () => {
   const [profileLoading, setProfileLoading] = useState(true);
   const [balanceLoading, setBalanceLoading] = useState(true);
   const [balanceError, setBalanceError] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
     usdtBalance: null,
   }));
@@ -249,6 +252,7 @@ const ProfilePage = () => {
         const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
         setBalance(nextBalance);
         setLiveProfile(serverProfile);
+        setAvatarPreview(serverProfile?.profilePicture ?? null);
         setProfileLoading(false);
         setBalanceLoading(false);
         setBalanceError(null);
@@ -285,12 +289,44 @@ const ProfilePage = () => {
   }, []);
 
   const profileDetails = liveProfile;
-  const avatarPicture = profileDetails?.profilePicture ?? null;
+  const avatarPicture = avatarPreview ?? profileDetails?.profilePicture ?? null;
   const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim();
   const email = profileDetails?.email;
   const uid = profileDetails?.uid;
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : null;
 
+
+  const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setAvatarError('Please choose an image file.');
+      return;
+    }
+
+    setAvatarError(null);
+    setAvatarUploading(true);
+    try {
+      const configResponse = await api.get('/api/cloudinary/upload');
+      const cloudinaryConfig = configResponse.data as { cloudName?: string; uploadPreset?: string };
+      if (!cloudinaryConfig.cloudName || !cloudinaryConfig.uploadPreset) throw new Error('Image upload is not configured.');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, { method: 'POST', body: formData });
+      if (!uploadResponse.ok) throw new Error('Unable to upload image.');
+      const uploadedFile = await uploadResponse.json() as { secure_url?: string };
+      if (!uploadedFile.secure_url) throw new Error('Image upload did not return a usable URL.');
+      await api.patch('/api/settings/profile-picture', { profilePicture: uploadedFile.secure_url });
+      setAvatarPreview(uploadedFile.secure_url);
+      setLiveProfile((current) => current ? { ...current, profilePicture: uploadedFile.secure_url } : current);
+    } catch (error) {
+      setAvatarError(error instanceof Error ? error.message : 'Unable to upload image.');
+    } finally {
+      setAvatarUploading(false);
+      event.target.value = '';
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -327,6 +363,11 @@ const ProfilePage = () => {
                   </div>
                 )}
               </div>
+              <label style={{ ...styles.helperAction, justifySelf: 'center', cursor: 'pointer', background: theme.primary, color: theme.textInverse }}>
+                <Upload size={16} /> {avatarUploading ? <LoadingDots /> : 'Update profile picture'}
+                <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} disabled={avatarUploading} />
+              </label>
+              {avatarError ? <p style={{ ...styles.helperText, color: theme.danger }}>{avatarError}</p> : null}
 
               <div style={styles.infoList}>
                 <div style={styles.infoRow}>

@@ -201,7 +201,10 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/dashboard') return 'DASHBOARD';
   if (path === '/profile') return 'DETAILS';
   if (path === '/staking') return 'STAKING';
-  if (path === '/settings') return 'SETTINGS';
+  if (path === '/manage') return 'MANAGE';
+  if (path === '/theme-settings') return 'THEME SETTINGS';
+  if (path === '/nowbar-settings') return 'NOWBAR SETTINGS';
+  if (path === '/nowbar-color') return 'EDGE LIGHTING';
   if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/agent') return 'AGENT';
   if (path === '/exchange') return 'EXCHANGE';
@@ -294,14 +297,6 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/library');
     },
     active: getActivePath() === '/library',
-  },
-  {
-    label: 'Settings',
-    icon: <Settings2 size={18} />,
-    onClick: () => {
-      navigate('/settings');
-    },
-    active: getActivePath() === '/settings',
   },
   {
     label: 'ABOUT',
