@@ -5,6 +5,7 @@ import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
+import ReusableDatePage from './ReusableDatePage';
 import { navigate } from '../utils/navigate';
 
 const PendingDeletionPage = () => {
@@ -13,6 +14,7 @@ const PendingDeletionPage = () => {
   const [email, setEmail] = useState(() => new URLSearchParams(window.location.search).get('email') || '');
   const [name, setName] = useState('');
   const [dob, setDob] = useState('');
+  const [showDobPage, setShowDobPage] = useState(false);
   const [code, setCode] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +32,11 @@ const PendingDeletionPage = () => {
     fontSize: '15px',
   };
   const canRequestCode = Boolean(email.trim() && name.trim() && dob);
+  const maxDob = (() => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() - 18);
+    return date.toISOString().split('T')[0];
+  })();
 
   const requestCode = async () => {
     if (!canRequestCode || isLoading) return;
@@ -63,6 +70,25 @@ const PendingDeletionPage = () => {
     }
   };
 
+  if (showDobPage) {
+    return (
+      <ReusableDatePage
+        title="Date of birth"
+        description="Select the date of birth saved on your account, then confirm to continue."
+        value={dob}
+        min="1900-01-01"
+        max={maxDob}
+        cancelLabel="Back"
+        showNowBar={false}
+        onConfirm={(value) => {
+          setDob(value);
+          setShowDobPage(false);
+        }}
+        onCancel={() => setShowDobPage(false)}
+      />
+    );
+  }
+
   return (
     <>
       <Helmet><title>KingsHall Exchange | Cancel account deletion</title></Helmet>
@@ -74,7 +100,7 @@ const PendingDeletionPage = () => {
           <div style={{ display: 'grid', gap: 14, marginTop: 24 }}>
             <label style={{ color: theme.text }}>Email<input style={fieldStyle} type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" /></label>
             <label style={{ color: theme.text }}>Name on account<input style={fieldStyle} type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label>
-            <label style={{ color: theme.text }}>Date of birth<input style={fieldStyle} type="date" value={dob} onChange={(event) => setDob(event.target.value)} /></label>
+            <label style={{ color: theme.text }}>Date of birth<button type="button" style={{ ...fieldStyle, textAlign: 'left' as const, cursor: 'pointer' }} onClick={() => setShowDobPage(true)}>{dob || 'Select your date of birth'}</button></label>
             {codeSent ? <label style={{ color: theme.text }}>Email verification code<input style={fieldStyle} inputMode="numeric" maxLength={4} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" autoComplete="one-time-code" /></label> : null}
             {message ? <NotificationBanner tone={success ? 'success' : 'warning'} title={success ? 'Deletion cancelled' : 'Action required'} message={message} /> : null}
             {!success ? <button type="button" onClick={codeSent ? cancelDeletion : requestCode} disabled={isLoading || (codeSent ? code.length !== 4 : !canRequestCode)} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>{isLoading ? <InlineLoadingDots /> : codeSent ? 'Cancel deletion' : 'Email me a verification code'}</button> : <button type="button" onClick={() => navigate('/signin')} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>Return to sign in</button>}
