@@ -587,6 +587,9 @@ const SigninPage = () => {
       if (response?.data?.twoFactorRequired) {
         setTwoFactorRequired(true);
         setSubmitError('Enter the 6-digit code from your authenticator app to continue.');
+      } else if (response?.status === 423 && message.toLowerCase().includes('pending deletion')) {
+        setSubmitError(message);
+        setMethod(null);
       } else {
         setSubmitError(message);
       }
@@ -788,6 +791,11 @@ const SigninPage = () => {
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={hybridStyles.linkButton}>
                           {isResendingCode ? <InlineLoadingDots /> : 'Resend confirmation code'}
+                        </button>
+                      ) : null}
+                      {submitError.toLowerCase().includes('pending deletion') ? (
+                        <button type="button" onClick={() => navigate(`/pending-deletion?email=${encodeURIComponent(form.email.trim())}`)} style={hybridStyles.linkButton}>
+                          Cancel deletion request
                         </button>
                       ) : null}
                     </div>

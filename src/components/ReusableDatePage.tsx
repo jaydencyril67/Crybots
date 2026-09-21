@@ -78,10 +78,11 @@ const ReusableDatePage = ({
   useEffect(() => {
     const nextDate = value.split('T')[0] || toDateKey(new Date());
     setSelectedDate(nextDate);
-    if (value.includes('T')) setTime(value.split('T')[1]?.slice(0, 5) || '12:00');
+    const nextTime = value.includes('T') ? value.split('T')[1]?.slice(0, 5) : mode === 'time' ? value.slice(0, 5) : '';
+    if (nextTime) setTime(nextTime);
     const parsed = new Date(`${nextDate}T12:00:00`);
     if (!Number.isNaN(parsed.getTime())) setMonth(parsed);
-  }, [value]);
+  }, [mode, value]);
 
   const calendarDays = useMemo(() => {
     const first = new Date(month.getFullYear(), month.getMonth(), 1);
@@ -145,7 +146,7 @@ const ReusableDatePage = ({
             {resolvedMode === 'datetime-local' || resolvedMode === 'time' ? <div style={styles.field}><label style={styles.label} htmlFor="reusable-time-input">{resolvedMode === 'time' ? resolvedLabel : 'Time'}</label><input id="reusable-time-input" style={styles.input} type="time" value={time} onChange={(event) => setTime(event.target.value)} /></div> : null}
             <div style={styles.actions}>
               <button type="button" style={styles.secondary} onClick={onCancel}>{cancelLabel}</button>
-              <button type="button" style={styles.primary} onClick={() => onConfirm(outputValue)} disabled={!selectedDate}>{confirmLabel}</button>
+              <button type="button" style={styles.primary} onClick={() => onConfirm(outputValue)} disabled={!selectedDate || ((resolvedMode === 'datetime-local' || resolvedMode === 'time') && !time)}>{confirmLabel}</button>
             </div>
           </section>
         </main>
