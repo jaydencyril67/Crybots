@@ -69,7 +69,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   packageGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, minmax(240px, 1fr))',
-    gap: '12px',
+    gap: '20px',
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
     padding: '0 2px 4px',
@@ -84,7 +84,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     border: `1px solid ${theme.border}`,
     display: 'grid',
     gap: '10px',
-    minWidth: '240px',
+    minWidth: '220px',
     justifyItems: 'center',
     textAlign: 'center' as const,
   },
@@ -134,7 +134,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     shell: { maxWidth: '100%', padding: '16px 0 120px', gap: '12px' },
     hero: { padding: '16px' },
     packageGrid: {
-      gridTemplateColumns: 'repeat(3, minmax(240px, 82vw))',
+      gridTemplateColumns: 'repeat(3, minmax(220px, 72vw))',
       gap: '20px',
       columnGap: '20px',
       overflowX: 'auto' as const,
