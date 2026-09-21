@@ -12,7 +12,7 @@ const PendingDeletionPage = () => {
   const { themeMode: mode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[mode];
   const [email, setEmail] = useState(() => new URLSearchParams(window.location.search).get('email') || '');
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [dob, setDob] = useState('');
   const [showDobPage, setShowDobPage] = useState(false);
   const [code, setCode] = useState('');
@@ -31,7 +31,8 @@ const PendingDeletionPage = () => {
     color: theme.text,
     fontSize: '15px',
   };
-  const canRequestCode = Boolean(email.trim() && name.trim() && dob);
+  const normalizedFullName = fullName.trim().replace(/\s+/g, ' ');
+  const canRequestCode = Boolean(email.trim() && normalizedFullName && normalizedFullName.split(' ').length >= 2 && dob);
   const maxDob = (() => {
     const date = new Date();
     date.setFullYear(date.getFullYear() - 18);
@@ -43,7 +44,7 @@ const PendingDeletionPage = () => {
     setMessage('');
     setIsLoading(true);
     try {
-      const response = await api.post('/api/auth/pending-deletion/code', { email, name, dob });
+      const response = await api.post('/api/auth/pending-deletion/code', { email: email.trim().toLowerCase(), fullName: normalizedFullName, dob });
       setCodeSent(true);
       setMessage(response.data?.message || 'A verification code has been sent to your email.');
     } catch (error) {
@@ -59,7 +60,7 @@ const PendingDeletionPage = () => {
     setMessage('');
     setIsLoading(true);
     try {
-      const response = await api.post('/api/auth/pending-deletion/cancel', { email, name, dob, code });
+      const response = await api.post('/api/auth/pending-deletion/cancel', { email: email.trim().toLowerCase(), fullName: normalizedFullName, dob, code });
       setSuccess(true);
       setMessage(response.data?.message || 'Account deletion cancelled successfully.');
     } catch (error) {
@@ -99,7 +100,7 @@ const PendingDeletionPage = () => {
           <p style={{ color: theme.textMuted, lineHeight: 1.6, marginTop: 0 }}>Confirm the details on your account. We will send a verification code to your account email before restoring access.</p>
           <div style={{ display: 'grid', gap: 14, marginTop: 24 }}>
             <label style={{ color: theme.text }}>Email<input style={fieldStyle} type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" /></label>
-            <label style={{ color: theme.text }}>Name on account<input style={fieldStyle} type="text" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" /></label>
+            <label style={{ color: theme.text }}>Full name on account<input style={fieldStyle} type="text" value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="First name and last name" autoComplete="name" /></label>
             <label style={{ color: theme.text }}>Date of birth<button type="button" style={{ ...fieldStyle, textAlign: 'left' as const, cursor: 'pointer' }} onClick={() => setShowDobPage(true)}>{dob || 'Select your date of birth'}</button></label>
             {codeSent ? <label style={{ color: theme.text }}>Email verification code<input style={fieldStyle} inputMode="numeric" maxLength={4} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" autoComplete="one-time-code" /></label> : null}
             {message ? <NotificationBanner tone={success ? 'success' : 'warning'} title={success ? 'Deletion cancelled' : 'Action required'} message={message} /> : null}
