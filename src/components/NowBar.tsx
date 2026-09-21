@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, ArrowUpDown, Banknote, BarChart3, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Landmark, Settings2, UserRound, WalletCards } from 'lucide-react';
+import { BarChart3, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Settings2, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -203,6 +203,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/staking') return 'STAKING';
   if (path === '/settings') return 'SETTINGS';
   if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
   if (path === '/withdrawals') return 'WITHDRAW';
@@ -214,14 +215,6 @@ const getCurrentPageTitle = (path: string) => {
 };
 
 const createDefaultActions = (): NowBarAction[] => [
-  {
-    label: 'Deposit',
-    icon: <Banknote size={18} />,
-    onClick: () => {
-      navigate('/deposit');
-    },
-    active: getActivePath() === '/deposit',
-  },
   {
     label: 'Dashboard',
     icon: <Home size={18} />,
@@ -239,28 +232,20 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/portfolio',
   },
   {
+    label: 'Asset',
+    icon: <WalletCards size={18} />,
+    onClick: () => {
+      navigate('/asset');
+    },
+    active: getActivePath() === '/asset',
+  },
+  {
     label: 'Staking',
     icon: <Coins size={18} />,
     onClick: () => {
       navigate('/staking');
     },
     active: getActivePath() === '/staking',
-  },
-  {
-    label: 'Withdraw',
-    icon: <ArrowUpDown size={18} />,
-    onClick: () => {
-      navigate('/withdrawals');
-    },
-    active: getActivePath() === '/withdrawals',
-  },
-  {
-    label: 'Transfer',
-    icon: <ArrowLeftRight size={18} />,
-    onClick: () => {
-      navigate('/transfer');
-    },
-    active: getActivePath() === '/transfer',
   },
   {
     label: 'Transactions',
