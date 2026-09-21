@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { WalletCards } from 'lucide-react';
+import { ArrowLeft, WalletCards } from 'lucide-react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -19,6 +19,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
   card: { maxWidth: '720px', margin: '12px auto 0', padding: '18px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   title: { margin: 0, fontSize: '1.6rem', fontWeight: 900 },
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.6 },
   form: { display: 'grid', gap: '12px', marginTop: '18px' },
@@ -78,6 +79,7 @@ const ManagePage = () => {
       <div style={styles.page}>
         <Helmet><title>Manage | KingsHall Exchange</title></Helmet>
         <div style={styles.shell}>
+          <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
           <section style={styles.card}>
             <h1 style={{ ...styles.title, display: 'flex', alignItems: 'center', gap: '10px' }}><WalletCards size={22} /> Manage wallet</h1>
             <p style={styles.text}>Bind your TRC-20 wallet address so withdrawals can be added securely to your account.</p>
