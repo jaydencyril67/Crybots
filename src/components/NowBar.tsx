@@ -210,6 +210,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/options') return 'OPTIONS';
   if (path === '/library') return 'LIBRARY';
   if (path === '/about') return 'ABOUT';
+  if (path === '/developer') return 'DEVELOPER';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -309,6 +310,14 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/about');
     },
     active: getActivePath() === '/about',
+  },
+  {
+    label: 'DEVELOPER',
+    icon: <Sparkles size={18} />,
+    onClick: () => {
+      navigate('/developer');
+    },
+    active: getActivePath() === '/developer',
   },
 ];
 
