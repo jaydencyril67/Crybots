@@ -35,7 +35,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const pageButtons = [
-  { label: 'Edge Lighting', description: 'Customize the NowBar edge light.', path: '/nowbar-color' },
   { label: 'Theme Settings', description: 'Choose your preferred app theme.', path: '/theme-settings' },
   { label: 'Nowbar Settings', description: 'Manage the NowBar experience.', path: '/nowbar-settings' },
   { label: 'Alert Settings', description: 'Choose notification topics and delivery methods.', path: '/alert-settings' },
