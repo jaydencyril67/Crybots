@@ -56,10 +56,10 @@ const RecordsPage = () => {
                   key={label}
                   type="button"
                   style={styles.cardButton}
-                  onClick={() => label === 'Transactions' && navigate('/transactions')}
+                  onClick={() => navigate(label === 'Transactions' ? '/transactions' : '/activity-log')}
                 >
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>{label}</h3>
-                  {label === 'Transactions' ? <p style={styles.cardSubtext}>View your transaction history and status.</p> : null}
+                  <p style={styles.cardSubtext}>{label === 'Transactions' ? 'View your transaction history and status.' : 'Review actions from the last 24 hours.'}</p>
                 </button>
               ))}
             </div>
