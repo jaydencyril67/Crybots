@@ -92,7 +92,7 @@ const PendingDeletionPage = () => {
   return (
     <>
       <Helmet><title>KingsHall Exchange | Cancel account deletion</title></Helmet>
-      <main style={{ minHeight: '100vh', padding: '48px 20px', display: 'grid', placeItems: 'center' }}>
+      <main style={{ minHeight: 'calc(100vh - 80px)', padding: '20px 20px 48px', display: 'grid', alignItems: 'start', justifyItems: 'center' }}>
         <section style={{ width: 'min(100%, 520px)', padding: 'clamp(22px, 5vw, 38px)', borderRadius: '26px', background: theme.surface, border: `1px solid ${theme.border}`, boxShadow: '0 18px 60px rgba(0,0,0,.18)' }}>
           <p style={{ margin: 0, color: theme.primary, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase' }}>Account recovery</p>
           <h1 style={{ color: theme.text, margin: '12px 0 10px' }}>Cancel account deletion</h1>
