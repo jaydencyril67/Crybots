@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Bell, Check, Mail, Smartphone } from 'lucide-react';
+import { ArrowLeft, Bell, Check, Mail, Smartphone } from 'lucide-react';
 import api from '../api/axios';
 import type { AlertPreferences, AlertPreferencesResponse } from '../types/alertPreferences';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -36,7 +36,7 @@ const defaultPreferences: Preferences = {
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
-  back: { border: 0, background: 'transparent', color: theme.textMuted, padding: 0, cursor: 'pointer', fontWeight: 700 },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   heading: { margin: '20px 0 8px', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: 0, color: theme.textMuted, lineHeight: 1.6 },
   card: { marginTop: '22px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
@@ -115,7 +115,7 @@ const AlertSettingsPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => navigate('/options')}>← Back to options</button>
+          <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
           <h1 style={styles.heading}>Alert settings</h1>
           <p style={styles.intro}>Choose which updates you receive and where KingsHall Exchange should deliver them.</p>
 
