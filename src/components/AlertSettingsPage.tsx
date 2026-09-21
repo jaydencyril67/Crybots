@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, Check, Mail, Smartphone } from 'lucide-react';
+import api from '../api/axios';
+import type { AlertPreferences, AlertPreferencesResponse } from '../types/alertPreferences';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
@@ -19,7 +21,7 @@ const deliveryChannels = [
 
 type TopicKey = typeof preferenceTopics[number]['key'];
 type ChannelKey = typeof deliveryChannels[number]['key'];
-type Preferences = Record<TopicKey, boolean> & Record<ChannelKey, boolean>;
+type Preferences = AlertPreferences;
 
 const defaultPreferences: Preferences = {
   account: true,
@@ -52,6 +54,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   knobOn: { transform: 'translateX(20px)', background: theme.textInverse },
   save: { marginTop: '18px', width: '100%', border: 0, borderRadius: '14px', padding: '13px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: 'pointer' },
   saved: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px', margin: '12px 0 0', color: theme.success, fontSize: '0.82rem', fontWeight: 700 },
+  status: { margin: '12px 0 0', color: theme.textMuted, textAlign: 'center' as const, fontSize: '0.82rem' },
+  error: { margin: '12px 0 0', color: theme.danger, textAlign: 'center' as const, fontSize: '0.82rem' },
 });
 
 const AlertSettingsPage = () => {
@@ -60,14 +64,29 @@ const AlertSettingsPage = () => {
   const styles = getStyles(theme);
   const [preferences, setPreferences] = useState<Preferences>(defaultPreferences);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem('kingshall_alert_preferences');
-      if (stored) setPreferences({ ...defaultPreferences, ...JSON.parse(stored) });
-    } catch {
-      // Use the defaults when stored preferences are unavailable.
-    }
+    const loadPreferences = async () => {
+      try {
+        const response = await api.get<AlertPreferencesResponse>('/api/settings/alerts');
+        setPreferences({ ...defaultPreferences, ...response.data.preferences });
+      } catch {
+        try {
+          const stored = window.localStorage.getItem('kingshall_alert_preferences');
+          if (stored) setPreferences({ ...defaultPreferences, ...JSON.parse(stored) });
+        } catch {
+          // Use the defaults when stored preferences are unavailable.
+        }
+        setError('Unable to load saved preferences. You can still update them and try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadPreferences();
   }, []);
 
   const toggle = (key: keyof Preferences) => {
@@ -75,9 +94,21 @@ const AlertSettingsPage = () => {
     setPreferences((current) => ({ ...current, [key]: !current[key] }));
   };
 
-  const savePreferences = () => {
-    window.localStorage.setItem('kingshall_alert_preferences', JSON.stringify(preferences));
-    setSaved(true);
+  const savePreferences = async () => {
+    setSaved(false);
+    setError('');
+    setSaving(true);
+
+    try {
+      const response = await api.patch<AlertPreferencesResponse>('/api/settings/alerts', preferences);
+      setPreferences({ ...defaultPreferences, ...response.data.preferences });
+      window.localStorage.setItem('kingshall_alert_preferences', JSON.stringify(response.data.preferences));
+      setSaved(true);
+    } catch {
+      setError('Unable to save preferences. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -100,7 +131,7 @@ const AlertSettingsPage = () => {
                       <p style={styles.description}>{description}</p>
                     </div>
                   </div>
-                  <button type="button" aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label}`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
+                  <button type="button" disabled={loading || saving || key === 'security'} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label}`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
                     <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />
                   </button>
                 </div>
@@ -121,14 +152,16 @@ const AlertSettingsPage = () => {
                       <p style={styles.description}>{description}</p>
                     </div>
                   </div>
-                  <button type="button" aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label} notifications`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
+                  <button type="button" disabled={loading || saving} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label} notifications`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
                     <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />
                   </button>
                 </div>
               ))}
             </div>
-            <button type="button" style={styles.save} onClick={savePreferences}>Save preferences</button>
+            <button type="button" disabled={loading || saving} style={styles.save} onClick={() => void savePreferences()}>{saving ? 'Saving…' : 'Save preferences'}</button>
+            {loading ? <p style={styles.status}>Loading your saved preferences…</p> : null}
             {saved ? <p style={styles.saved}><Check size={16} /> Preferences saved</p> : null}
+            {error ? <p role="alert" style={styles.error}>{error}</p> : null}
           </section>
         </div>
       </main>
