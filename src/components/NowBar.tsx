@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, BarChart3, CalendarClock, ChevronDown, CircleUserRound, Coins, Home, Settings2, Sparkles, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, BarChart3, CalendarClock, ChevronDown, CircleUserRound, Home, LifeBuoy, Settings2, Sparkles, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -206,6 +206,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/agent') return 'AGENT';
   if (path === '/exchange') return 'EXCHANGE';
   if (path === '/records') return 'RECORDS';
+  if (path === '/contact') return 'CONTACT';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -267,12 +268,12 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/asset',
   },
   {
-    label: 'Staking',
-    icon: <Coins size={18} />,
+    label: 'CONTACT',
+    icon: <LifeBuoy size={18} />,
     onClick: () => {
-      navigate('/staking');
+      navigate('/contact');
     },
-    active: getActivePath() === '/staking',
+    active: getActivePath() === '/contact',
   },
   {
     label: 'Settings',
