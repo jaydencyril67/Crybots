@@ -205,6 +205,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/agent') return 'AGENT';
   if (path === '/exchange') return 'EXCHANGE';
+  if (path === '/records') return 'RECORDS';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -250,6 +251,14 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/exchange',
   },
   {
+    label: 'RECORDS',
+    icon: <CalendarClock size={18} />,
+    onClick: () => {
+      navigate('/records');
+    },
+    active: getActivePath() === '/records',
+  },
+  {
     label: 'Asset',
     icon: <WalletCards size={18} />,
     onClick: () => {
@@ -264,14 +273,6 @@ const createDefaultActions = (): NowBarAction[] => [
       navigate('/staking');
     },
     active: getActivePath() === '/staking',
-  },
-  {
-    label: 'Transactions',
-    icon: <CalendarClock size={18} />,
-    onClick: () => {
-      navigate('/transactions');
-    },
-    active: getActivePath() === '/transactions',
   },
   {
     label: 'Settings',
