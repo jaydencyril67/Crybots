@@ -535,7 +535,7 @@ const DashboardPage = () => {
       avgMove,
       topMover,
     };
-  }, []);
+  }, [liveCoins]);
 
   return (
     <HybridTheme mode={themeMode}>
@@ -547,20 +547,12 @@ const DashboardPage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
 
-          
-
-          {!(isAuthNameLoaded && isCoinsLoaded) ? (
-            <div style={{ padding: '18px 0 10px', display: 'flex', justifyContent: 'center' }}>
-              <LoadingDots />
-            </div>
-          ) : null}
-
           <div style={styles.heroGrid}>
             <section style={styles.heroCard}>
               <p style={styles.greeting}>{greeting}</p>
               <h2 style={styles.title}>
                 Welcome back,
-                <span style={styles.titleAccent}> {isAuthNameLoaded && firstName ? firstName : 'Trader'}</span>
+                <span style={styles.titleAccent}> {isAuthNameLoaded ? (firstName || 'Trader') : <LoadingDots />}</span>
               </h2>
               <p style={styles.lead}>
                 This is your market home base — live prices, market context, and a fresh hourly insight to help you stay sharp without showing personal account details.
@@ -609,7 +601,7 @@ const DashboardPage = () => {
               </div>
 
               <div style={styles.coinGrid}>
-                {liveCoins.map((coin) => (
+                {isCoinsLoaded ? liveCoins.map((coin) => (
                   <article key={coin.symbol} style={styles.coinCard}>
                     <div style={{ ...styles.coinBadge, background: theme.primarySoft }}>
                       {coin.symbol.slice(0, 1)}
@@ -625,7 +617,11 @@ const DashboardPage = () => {
                       </p>
                     </div>
                   </article>
-                ))}
+                )) : (
+                  <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', padding: '28px 0' }}>
+                    <LoadingDots />
+                  </div>
+                )}
               </div>
             </section>
           </div>
@@ -636,6 +632,12 @@ const DashboardPage = () => {
               <p style={styles.panelSub}>A simple read on breadth and momentum across the coins in view.</p>
 
               <div style={styles.featureList}>
+                {!isCoinsLoaded ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '28px 0' }}>
+                    <LoadingDots />
+                  </div>
+                ) : (
+                <>
                 <div style={styles.featureItem}>
                   <TrendingUp style={styles.icon} />
                   <p style={styles.featureText}>
@@ -660,6 +662,8 @@ const DashboardPage = () => {
                     Use this dashboard as your launchpad for market checks, then move into trade screens when you’re ready.
                   </p>
                 </div>
+                </>
+                )}
               </div>
             </section>
 
