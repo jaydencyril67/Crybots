@@ -478,7 +478,7 @@ const NowBar = ({ actions }: NowBarProps) => {
                 }}
               >
                 <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
-                {isExpanded ? <span style={styles.labelExpanded}>{action.label}</span> : null}
+                {isExpanded ? <span style={styles.labelExpanded}>{action.label.toUpperCase()}</span> : null}
               </button>
             </div>
           ))
