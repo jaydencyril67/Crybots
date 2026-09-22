@@ -90,33 +90,14 @@ const DepositPage = () => {
       const { transak, deposit } = data as {
         deposit: { reference: string };
         transak: {
-          environment: 'sandbox' | 'production';
-          apiKey: string;
-          walletAddress: string;
-          cryptoCurrency: string;
-          network: string;
-          partnerOrderId: string;
-          email?: string;
-          firstName?: string;
-          lastName?: string;
+          environment: 'staging' | 'production';
+          widgetUrl: string;
         };
       };
 
-      if (!transak.apiKey) throw new Error('Transak is not configured yet.');
+      if (!transak.widgetUrl) throw new Error('Transak is not configured yet.');
 
-      const widgetHost = transak.environment === 'production' ? 'global.transak.com' : 'global-staging.transak.com';
-      const query = new URLSearchParams({
-        apiKey: transak.apiKey,
-        walletAddress: transak.walletAddress,
-        cryptoCurrencyCode: transak.cryptoCurrency,
-        network: transak.network,
-        partnerOrderId: transak.partnerOrderId,
-        ...(transak.email ? { email: transak.email } : {}),
-        ...(transak.firstName ? { firstName: transak.firstName } : {}),
-        ...(transak.lastName ? { lastName: transak.lastName } : {}),
-      });
-
-      window.open(`https://${widgetHost}/?${query.toString()}`, '_blank', 'noopener,noreferrer');
+      window.open(transak.widgetUrl, '_blank', 'noopener,noreferrer');
       setDepositMessage(`Deposit ${deposit.reference} is pending. Complete payment in the Transak window.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to start the deposit.';
