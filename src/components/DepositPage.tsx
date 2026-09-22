@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
-import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, Check, Copy, ShieldCheck } from 'lucide-react';
 import NowBar from './NowBar';
-import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import api from '../api/axios';
 
 const DepositPage = () => {
   const { themeMode } = useAppTheme();
@@ -54,16 +55,86 @@ const DepositPage = () => {
       borderRadius: '13px',
       color: theme.textMuted,
     },
+    label: { display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700 },
+    input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '11px 12px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.95rem' },
+    primaryButton: { border: '0', borderRadius: '10px', padding: '11px 16px', background: theme.accent, color: '#fff', cursor: 'pointer', fontWeight: 700 },
+    secondaryButton: { border: `1px solid ${theme.borderGlass}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
+    address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
   }), [theme]);
 
-  const cryptoContent = useMemo(() => (
+  type DepositPayment = { id?: string; paymentId?: string; status?: string; paymentStatus?: string; amount?: number; priceAmount?: number; currency?: string; priceCurrency?: string; payCurrency: string; payAmount?: number; payAddress?: string; };
+  const [amount, setAmount] = useState('');
+  const [network, setNetwork] = useState('usdttrc20');
+  const [payment, setPayment] = useState<DepositPayment | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const paymentId = payment?.id || payment?.paymentId;
+    const status = payment?.status || payment?.paymentStatus;
+    if (!paymentId || ['confirmed', 'finished', 'failed', 'refunded', 'expired'].includes(status || '')) return undefined;
+    const timer = window.setInterval(async () => {
+      try {
+        const response = await api.get<{ payment: DepositPayment }>(`/api/deposits/${paymentId}`);
+        setPayment(response.data.payment);
+      } catch {
+        // A temporary status request failure should not interrupt the payment flow.
+      }
+    }, 10000);
+    return () => window.clearInterval(timer);
+  }, [payment]);
+
+  const createPayment = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setMessage('');
+    setCopied(false);
+    const value = Number(amount);
+    if (!Number.isFinite(value) || value < 1) {
+      setMessage('Enter a deposit amount of at least 1 USD.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await api.post<{ payment: DepositPayment }>('/api/deposits', { amount: value, payCurrency: network });
+      setPayment(response.data.payment);
+    } catch (error: any) {
+      setMessage(error?.response?.data?.message || 'Unable to create a crypto payment.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyAddress = async () => {
+    if (!payment?.payAddress) return;
+    await navigator.clipboard.writeText(payment.payAddress);
+    setCopied(true);
+  };
+
+  const cryptoContent = payment ? (
     <div style={styles.mutedCard}>
-      <strong>USDT deposits only</strong>
-      <p style={{ margin: '10px 0 0' }}>
-        This app is now USDT-only. Add your wallet address and use the crypto deposit flow to move funds in.
-      </p>
+      <strong>Send USDT to this address</strong>
+      <p style={{ margin: '8px 0 0' }}>Send exactly the requested amount on the selected network. Your balance updates after network confirmation.</p>
+      <p style={styles.address}>{payment.payAddress || 'Payment address is being prepared…'}</p>
+      <p style={{ margin: '8px 0', fontWeight: 700 }}>{payment.payAmount ?? '—'} {payment.payCurrency} · Status: {payment.status || payment.paymentStatus || 'waiting'}</p>
+      {payment.payAddress && <button type="button" style={styles.secondaryButton} onClick={copyAddress}>{copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy address</>}</button>}
     </div>
-  ), [styles.mutedCard]);
+  ) : (
+    <form onSubmit={createPayment} style={styles.mutedCard}>
+      <strong>USDT deposits only</strong>
+      <p style={{ margin: '8px 0 14px' }}>Choose a network and create a payment address. Do not send funds until an address is shown.</p>
+      <label style={styles.label} htmlFor="deposit-amount">Amount (USD)</label>
+      <input id="deposit-amount" style={styles.input} type="number" min="1" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100.00" required />
+      <label style={{ ...styles.label, marginTop: '12px' }} htmlFor="deposit-network">USDT network</label>
+      <select id="deposit-network" style={styles.input} value={network} onChange={(event) => setNetwork(event.target.value)}>
+        <option value="usdttrc20">TRON (TRC-20)</option>
+        <option value="usdterc20">Ethereum (ERC-20)</option>
+        <option value="usdtbsc">BNB Smart Chain (BEP-20)</option>
+      </select>
+      {message && <p role="alert" style={{ color: '#d96b6b', margin: '12px 0 0' }}>{message}</p>}
+      <button type="submit" style={{ ...styles.primaryButton, marginTop: '14px' }} disabled={loading}>{loading ? 'Creating payment…' : 'Create deposit address'}</button>
+    </form>
+  );
 
   return (
     <div data-shadow-free-page="deposit" style={styles.page}>
