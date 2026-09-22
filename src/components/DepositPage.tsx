@@ -31,6 +31,7 @@ const DepositPage = () => {
       color: theme.text,
       borderRadius: '16px',
       padding: 'clamp(12px, 2.5vw, 16px)',
+      marginTop: '14px',
     },
     back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
     headerRow: {
@@ -113,8 +114,8 @@ const DepositPage = () => {
     setMessage('');
     setCopied(false);
     const value = Number(amount);
-    if (!Number.isFinite(value) || value < 1) {
-      setMessage('Enter a deposit amount of at least 1 USDT.');
+    if (!Number.isFinite(value) || value < 10) {
+      setMessage('Enter a deposit amount of at least 10 USDT.');
       return;
     }
     setLoading(true);
@@ -147,7 +148,7 @@ const DepositPage = () => {
       <strong>USDT deposits only</strong>
       <p style={{ margin: '8px 0 14px' }}>Choose a network and create a payment address. Do not send funds until an address is shown.</p>
       <label style={styles.label} htmlFor="deposit-amount">Amount (USDT)</label>
-      <input id="deposit-amount" style={styles.input} type="number" min="1" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100.00" required />
+      <input id="deposit-amount" style={styles.input} type="number" min="10" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100.00" required />
       <div ref={networkMenuRef} style={{ marginTop: '12px' }}>
         <span style={styles.label}>USDT network</span>
         <button id="deposit-network" type="button" style={styles.selectTrigger} onClick={() => setIsNetworkMenuOpen((current) => !current)} aria-expanded={isNetworkMenuOpen}>
