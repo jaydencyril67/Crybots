@@ -1,9 +1,11 @@
-import React, { useMemo } from 'react';
-import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { ArrowLeft, ExternalLink, ShieldCheck } from 'lucide-react';
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import api from '../api/axios';
+import InlineLoadingDots from './InlineLoadingDots';
 
 const DepositPage = () => {
   const { themeMode } = useAppTheme();
@@ -54,16 +56,88 @@ const DepositPage = () => {
       borderRadius: '13px',
       color: theme.textMuted,
     },
+    button: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '8px',
+      marginTop: '16px',
+      border: 0,
+      borderRadius: '10px',
+      padding: '11px 15px',
+      background: theme.primary,
+      color: theme.textInverse,
+      cursor: 'pointer',
+      fontWeight: 800,
+    },
+    status: {
+      margin: '12px 0 0',
+      color: theme.textMuted,
+      fontSize: '0.82rem',
+    },
   }), [theme]);
 
-  const cryptoContent = useMemo(() => (
+  const [isStarting, setIsStarting] = useState(false);
+  const [depositMessage, setDepositMessage] = useState('');
+
+  const startDeposit = async () => {
+    if (isStarting) return;
+    setIsStarting(true);
+    setDepositMessage('');
+
+    try {
+      const { data } = await api.post('/api/transak/create');
+      const { transak, deposit } = data as {
+        deposit: { reference: string };
+        transak: {
+          environment: 'sandbox' | 'production';
+          apiKey: string;
+          walletAddress: string;
+          cryptoCurrency: string;
+          network: string;
+          partnerOrderId: string;
+          email?: string;
+          firstName?: string;
+          lastName?: string;
+        };
+      };
+
+      if (!transak.apiKey) throw new Error('Transak is not configured yet.');
+
+      const widgetHost = transak.environment === 'production' ? 'global.transak.com' : 'global-staging.transak.com';
+      const query = new URLSearchParams({
+        apiKey: transak.apiKey,
+        walletAddress: transak.walletAddress,
+        cryptoCurrencyCode: transak.cryptoCurrency,
+        network: transak.network,
+        partnerOrderId: transak.partnerOrderId,
+        ...(transak.email ? { email: transak.email } : {}),
+        ...(transak.firstName ? { firstName: transak.firstName } : {}),
+        ...(transak.lastName ? { lastName: transak.lastName } : {}),
+      });
+
+      window.open(`https://${widgetHost}/?${query.toString()}`, '_blank', 'noopener,noreferrer');
+      setDepositMessage(`Deposit ${deposit.reference} is pending. Complete payment in the Transak window.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to start the deposit.';
+      setDepositMessage(message);
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
+  const cryptoContent = (
     <div style={styles.mutedCard}>
-      <strong>USDT deposits only</strong>
+      <strong>Buy USDT with fiat</strong>
       <p style={{ margin: '10px 0 0' }}>
-        This app is now USDT-only. Add your wallet address and use the crypto deposit flow to move funds in.
+        Pay securely with Transak. Your completed USDT purchase is sent to the KingsHall platform wallet and credited to your account after confirmation.
       </p>
+      <button type="button" style={styles.button} onClick={() => void startDeposit()} disabled={isStarting}>
+        {isStarting ? <InlineLoadingDots /> : <><ExternalLink size={16} /> Continue with Transak</>}
+      </button>
+      {depositMessage ? <p style={styles.status}>{depositMessage}</p> : null}
     </div>
-  ), [styles.mutedCard]);
+  );
 
   return (
     <div data-shadow-free-page="deposit" style={styles.page}>
