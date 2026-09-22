@@ -10,7 +10,7 @@ import { navigate } from '../utils/navigate';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
-type TransactionStatus = 'all' | 'completed' | 'pending' | 'failed';
+type TransactionStatus = 'all' | 'completed' | 'pending' | 'failed' | 'cancelled';
 
 type TransactionRecord = {
   id: string;
@@ -260,9 +260,9 @@ const TransactionHistoryPage = () => {
         const { data } = await api.get<TransactionHistoryResponse>('/api/transactions/me');
         const normalizedTransactions = Array.isArray(data?.transactions)
           ? data.transactions
-              .filter((transaction): transaction is TransactionRecord => Boolean(transaction?.id && transaction.type && transaction.direction && transaction.status && transaction.title && transaction.amount && transaction.currency && transaction.date && transaction.time && transaction.reference && typeof transaction.amountValue === 'number'))
+              .filter((transaction) => Boolean(transaction?.id && transaction.type && transaction.direction && transaction.status && transaction.title && transaction.amount && transaction.currency && transaction.date && transaction.time && transaction.reference && typeof transaction.amountValue === 'number'))
               .map((transaction) => ({
-                ...transaction,
+                ...(transaction as TransactionRecord),
                 counterpart: transaction.counterpart || undefined,
               }))
           : [];
@@ -447,12 +447,12 @@ const TransactionHistoryPage = () => {
                   <div id="transaction-status-menu" style={{ ...(styles.field as React.CSSProperties), position: 'relative' }}>
                     <span style={styles.label}>Status</span>
                     <button type="button" style={styles.selectTrigger} onClick={() => setIsStatusMenuOpen((current) => !current)}>
-                      <span>{statusFilter === 'all' ? 'All statuses' : statusFilter === 'completed' ? 'Completed' : statusFilter === 'pending' ? 'Pending' : 'Failed'}</span>
+                      <span>{statusFilter === 'all' ? 'All statuses' : statusFilter === 'completed' ? 'Completed' : statusFilter === 'pending' ? 'Pending' : statusFilter === 'cancelled' ? 'Cancelled' : 'Failed'}</span>
                       <span style={{ transform: isStatusMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                     </button>
                     {isStatusMenuOpen ? (
                       <div style={styles.selectMenu}>
-                        {(['all', 'completed', 'pending', 'failed'] as const).map((option) => (
+                        {(['all', 'completed', 'pending', 'cancelled', 'failed'] as const).map((option) => (
                           <button
                             key={option}
                             type="button"
@@ -462,7 +462,7 @@ const TransactionHistoryPage = () => {
                               setIsStatusMenuOpen(false);
                             }}
                           >
-                            {option === 'all' ? 'All statuses' : option === 'completed' ? 'Completed' : option === 'pending' ? 'Pending' : 'Failed'}
+                            {option === 'all' ? 'All statuses' : option === 'completed' ? 'Completed' : option === 'pending' ? 'Pending' : option === 'cancelled' ? 'Cancelled' : 'Failed'}
                           </button>
                         ))}
                       </div>

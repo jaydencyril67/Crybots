@@ -73,10 +73,14 @@ const DepositPage = () => {
     primaryButtonDisabled: { opacity: 0.55, cursor: 'not-allowed' },
     secondaryButton: { border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
     address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
+    recentList: { display: 'grid', gap: '8px', marginTop: '10px' },
+    recentItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 12px', border: `1px solid ${theme.border}`, borderRadius: '10px', background: theme.surface, color: theme.text },
+    recentMeta: { color: theme.textMuted, fontSize: '0.76rem' },
+    status: { fontSize: '0.75rem', fontWeight: 700, textTransform: 'capitalize' as const },
     });
   }, [theme]);
 
-  type DepositPayment = { id?: string; paymentId?: string; status?: string; paymentStatus?: string; amount?: number; priceAmount?: number; currency?: string; priceCurrency?: string; payCurrency: string; payAmount?: number; payAddress?: string; };
+  type DepositPayment = { id?: string; paymentId?: string; status?: string; paymentStatus?: string; amount?: number; priceAmount?: number; currency?: string; priceCurrency?: string; payCurrency: string; payAmount?: number; payAddress?: string; createdAt?: string; };
   const [amount, setAmount] = useState('');
   const [network, setNetwork] = useState('usdttrc20');
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
@@ -85,6 +89,7 @@ const DepositPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [copied, setCopied] = useState(false);
+  const [recentDeposits, setRecentDeposits] = useState<DepositPayment[]>([]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -92,6 +97,10 @@ const DepositPage = () => {
     };
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  useEffect(() => {
+    api.get<{ deposits: DepositPayment[] }>('/api/deposits/recent').then((response) => setRecentDeposits(response.data.deposits)).catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -122,6 +131,7 @@ const DepositPage = () => {
     try {
       const response = await api.post<{ payment: DepositPayment }>('/api/deposits', { amount: value, payCurrency: network });
       setPayment(response.data.payment);
+      setRecentDeposits((current) => [response.data.payment, ...current.filter((item) => item.paymentId !== response.data.payment.paymentId)].slice(0, 5));
     } catch (error: any) {
       setMessage(error?.response?.data?.message || 'Unable to create a crypto payment.');
     } finally {
@@ -133,6 +143,12 @@ const DepositPage = () => {
     if (!payment?.payAddress) return;
     await navigator.clipboard.writeText(payment.payAddress);
     setCopied(true);
+  };
+
+  const statusLabel = (status?: string) => {
+    if (status === 'confirmed' || status === 'finished') return 'completed';
+    if (status === 'failed' || status === 'refunded' || status === 'expired') return 'cancelled';
+    return 'pending';
   };
 
   const cryptoContent = payment ? (
@@ -185,6 +201,10 @@ const DepositPage = () => {
           </p>
 
           {cryptoContent}
+          <div style={styles.mutedCard}>
+            <strong>Recent deposits</strong>
+            {recentDeposits.length === 0 ? <p style={{ margin: '8px 0 0' }}>No deposits yet.</p> : <div style={styles.recentList}>{recentDeposits.map((deposit) => { const status = statusLabel(deposit.paymentStatus || deposit.status); return <div key={deposit.paymentId} style={styles.recentItem}><div><strong>{deposit.priceAmount ?? deposit.amount ?? '—'} USDT</strong><div style={styles.recentMeta}>{deposit.payCurrency} · {deposit.createdAt ? new Date(deposit.createdAt).toLocaleDateString() : 'Recently'}</div></div><span style={styles.status}>{status}</span></div>; })}</div>}
+          </div>
         </div>
         <NowBar />
       </div>
