@@ -80,7 +80,15 @@ const DepositPage = () => {
     });
   }, [theme]);
 
-  type DepositPayment = { id?: string; paymentId?: string; status?: string; paymentStatus?: string; amount?: number; priceAmount?: number; currency?: string; priceCurrency?: string; payCurrency: string; payAmount?: number; payAddress?: string; createdAt?: string; };
+  type DepositPayment = { id?: string; paymentId?: string; status?: string; paymentStatus?: string; amount?: number; priceAmount?: number; currency?: string; priceCurrency?: string; payCurrency?: string; payAmount?: number; payAddress?: string; createdAt?: string; };
+  type DepositHistoryRecord = { id?: string; type?: string; status?: string; amountValue?: number; amount?: string; currency?: string; date?: string; time?: string; reference?: string; };
+
+  const normalizeDeposit = (deposit: DepositPayment): DepositPayment => ({
+    ...deposit,
+    id: deposit.id || deposit.paymentId,
+    paymentId: deposit.paymentId || deposit.id,
+    payCurrency: deposit.payCurrency || deposit.currency || 'USDT',
+  });
   const [amount, setAmount] = useState('');
   const [network, setNetwork] = useState('usdttrc20');
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
@@ -100,7 +108,35 @@ const DepositPage = () => {
   }, []);
 
   useEffect(() => {
-    api.get<{ deposits: DepositPayment[] }>('/api/deposits/recent').then((response) => setRecentDeposits(response.data.deposits)).catch(() => undefined);
+    const loadRecentDeposits = async () => {
+      try {
+        const response = await api.get<{ deposits?: DepositPayment[] }>('/api/deposits/recent');
+        const deposits = Array.isArray(response.data.deposits) ? response.data.deposits : [];
+        if (deposits.length > 0) {
+          setRecentDeposits(deposits.map(normalizeDeposit).slice(0, 5));
+          return;
+        }
+
+        const historyResponse = await api.get<{ transactions?: DepositHistoryRecord[] }>('/api/transactions/me');
+        const historyDeposits = (historyResponse.data.transactions || [])
+          .filter((transaction) => transaction.type === 'deposit')
+          .map((transaction) => normalizeDeposit({
+            id: transaction.reference?.replace(/^DEP-/, ''),
+            paymentId: transaction.reference?.replace(/^DEP-/, ''),
+            status: transaction.status,
+            amount: transaction.amountValue,
+            priceAmount: transaction.amountValue,
+            currency: transaction.currency,
+            payCurrency: transaction.currency,
+            createdAt: transaction.date && transaction.time ? `${transaction.date}T${transaction.time}Z` : undefined,
+          }));
+        setRecentDeposits(historyDeposits.slice(0, 5));
+      } catch {
+        setRecentDeposits([]);
+      }
+    };
+
+    void loadRecentDeposits();
   }, []);
 
   useEffect(() => {
@@ -130,8 +166,9 @@ const DepositPage = () => {
     setLoading(true);
     try {
       const response = await api.post<{ payment: DepositPayment }>('/api/deposits', { amount: value, payCurrency: network });
-      setPayment(response.data.payment);
-      setRecentDeposits((current) => [response.data.payment, ...current.filter((item) => item.paymentId !== response.data.payment.paymentId)].slice(0, 5));
+      const createdPayment = normalizeDeposit(response.data.payment);
+      setPayment(createdPayment);
+      setRecentDeposits((current) => [createdPayment, ...current.filter((item) => item.paymentId !== createdPayment.paymentId)].slice(0, 5));
     } catch (error: any) {
       setMessage(error?.response?.data?.message || 'Unable to create a crypto payment.');
     } finally {
