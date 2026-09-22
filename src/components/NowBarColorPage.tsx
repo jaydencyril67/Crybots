@@ -58,7 +58,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   input: { flex: '1 1 180px', minWidth: 0, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '12px 14px', fontSize: '0.95rem', outline: 'none' },
   rgbRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '12px' },
   rgbInput: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '12px 10px', fontSize: '0.95rem', outline: 'none' },
-  applyButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '7px', border: 0, borderRadius: '12px', background: theme.primary, color: '#fff', padding: '12px 18px', fontWeight: 800, cursor: 'pointer' },
+  applyButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '7px', border: 0, borderRadius: '12px', background: theme.primary, color: theme.textInverse, padding: '12px 18px', fontWeight: 800, cursor: 'pointer' },
   error: { margin: '8px 0 0', color: '#f87171', fontSize: '0.82rem' },
   code: { margin: '0 0 0 auto', color: theme.textMuted, fontSize: '0.85rem' },
 });
