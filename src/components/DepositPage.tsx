@@ -57,7 +57,7 @@ const DepositPage = () => {
     },
     label: { display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700 },
     input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '11px 12px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.95rem' },
-    primaryButton: { border: '0', borderRadius: '10px', padding: '11px 16px', background: theme.accent, color: '#fff', cursor: 'pointer', fontWeight: 700 },
+    primaryButton: { border: '0', borderRadius: '10px', padding: '11px 16px', background: theme.primary, color: '#fff', cursor: 'pointer', fontWeight: 700 },
     secondaryButton: { border: `1px solid ${theme.borderGlass}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
     address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
   }), [theme]);
