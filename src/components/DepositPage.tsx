@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Check, Copy, ShieldCheck } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeft, Check, ChevronDown, Copy, ShieldCheck } from 'lucide-react';
 import NowBar from './NowBar';
-import { HYBRID_CARD_STYLES, HYBRID_THEME_TOKENS } from './HybridTheme';
+import { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import api from '../api/axios';
@@ -10,7 +10,10 @@ const DepositPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
 
-  const styles = useMemo(() => ({
+  const styles = useMemo(() => {
+    const cardStyles = createHybridCardStyles(theme);
+
+    return ({
     page: {
       minHeight: '100vh',
       padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 118px',
@@ -22,7 +25,10 @@ const DepositPage = () => {
       margin: '0 auto',
     },
     card: {
-      ...HYBRID_CARD_STYLES.card,
+      ...cardStyles.card,
+      border: `1px solid ${theme.border}`,
+      background: theme.surface,
+      color: theme.text,
       borderRadius: '16px',
       padding: 'clamp(12px, 2.5vw, 16px)',
     },
@@ -50,25 +56,42 @@ const DepositPage = () => {
       maxWidth: '58ch',
     },
     mutedCard: {
-      ...HYBRID_CARD_STYLES.panel,
+      ...cardStyles.panel,
+      border: `1px solid ${theme.border}`,
+      background: theme.surfaceElevated,
       marginTop: '10px',
       borderRadius: '13px',
       color: theme.textMuted,
     },
     label: { display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700 },
-    input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '11px 12px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.95rem' },
-    primaryButton: { border: '0', borderRadius: '10px', padding: '11px 16px', background: theme.primary, color: '#fff', cursor: 'pointer', fontWeight: 700 },
-    secondaryButton: { border: `1px solid ${theme.borderGlass}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
+    input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '10px', padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.95rem' },
+    selectTrigger: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left' as const },
+    selectMenu: { display: 'grid', gap: '6px', marginTop: '6px', padding: '8px', border: `1px solid ${theme.borderStrong}`, borderRadius: '16px', background: theme.surfaceElevated, position: 'relative' as const, zIndex: 5 },
+    selectOption: { width: '100%', border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '10px 12px', background: theme.surface, color: theme.text, cursor: 'pointer', textAlign: 'left' as const },
+    primaryButton: { border: `1px solid ${theme.primary}`, borderRadius: '10px', padding: '11px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 700, opacity: 1 },
+    primaryButtonDisabled: { opacity: 0.55, cursor: 'not-allowed' },
+    secondaryButton: { border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
     address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
-  }), [theme]);
+    });
+  }, [theme]);
 
   type DepositPayment = { id?: string; paymentId?: string; status?: string; paymentStatus?: string; amount?: number; priceAmount?: number; currency?: string; priceCurrency?: string; payCurrency: string; payAmount?: number; payAddress?: string; };
   const [amount, setAmount] = useState('');
   const [network, setNetwork] = useState('usdttrc20');
+  const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
+  const networkMenuRef = useRef<HTMLDivElement | null>(null);
   const [payment, setPayment] = useState<DepositPayment | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (networkMenuRef.current && !networkMenuRef.current.contains(event.target as Node)) setIsNetworkMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   useEffect(() => {
     const paymentId = payment?.id || payment?.paymentId;
@@ -125,14 +148,20 @@ const DepositPage = () => {
       <p style={{ margin: '8px 0 14px' }}>Choose a network and create a payment address. Do not send funds until an address is shown.</p>
       <label style={styles.label} htmlFor="deposit-amount">Amount (USDT)</label>
       <input id="deposit-amount" style={styles.input} type="number" min="1" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100.00" required />
-      <label style={{ ...styles.label, marginTop: '12px' }} htmlFor="deposit-network">USDT network</label>
-      <select id="deposit-network" style={styles.input} value={network} onChange={(event) => setNetwork(event.target.value)}>
-        <option value="usdttrc20">TRON (TRC-20)</option>
-        <option value="usdterc20">Ethereum (ERC-20)</option>
-        <option value="usdtbsc">BNB Smart Chain (BEP-20)</option>
-      </select>
+      <div ref={networkMenuRef} style={{ marginTop: '12px' }}>
+        <span style={styles.label}>USDT network</span>
+        <button id="deposit-network" type="button" style={styles.selectTrigger} onClick={() => setIsNetworkMenuOpen((current) => !current)} aria-expanded={isNetworkMenuOpen}>
+          <span>{network === 'usdttrc20' ? 'TRON (TRC-20)' : network === 'usdterc20' ? 'Ethereum (ERC-20)' : 'BNB Smart Chain (BEP-20)'}</span>
+          <ChevronDown size={17} />
+        </button>
+        {isNetworkMenuOpen && <div style={styles.selectMenu}>
+          {[['usdttrc20', 'TRON (TRC-20)'], ['usdterc20', 'Ethereum (ERC-20)'], ['usdtbsc', 'BNB Smart Chain (BEP-20)']].map(([value, label]) => (
+            <button key={value} type="button" style={styles.selectOption} onClick={() => { setNetwork(value); setIsNetworkMenuOpen(false); }}>{label}</button>
+          ))}
+        </div>}
+      </div>
       {message && <p role="alert" style={{ color: '#d96b6b', margin: '12px 0 0' }}>{message}</p>}
-      <button type="submit" style={{ ...styles.primaryButton, marginTop: '14px' }} disabled={loading}>{loading ? 'Creating payment…' : 'Create deposit address'}</button>
+      <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '14px' }} disabled={loading}>{loading ? 'Creating payment…' : 'Create deposit address'}</button>
     </form>
   );
 
