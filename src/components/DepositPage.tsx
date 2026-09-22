@@ -31,6 +31,7 @@ const DepositPage = () => {
       color: theme.text,
       borderRadius: '16px',
       padding: 'clamp(12px, 2.5vw, 16px)',
+      marginTop: '14px',
     },
     back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
     headerRow: {
