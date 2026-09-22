@@ -91,7 +91,7 @@ const DepositPage = () => {
     setCopied(false);
     const value = Number(amount);
     if (!Number.isFinite(value) || value < 1) {
-      setMessage('Enter a deposit amount of at least 1 USD.');
+      setMessage('Enter a deposit amount of at least 1 USDT.');
       return;
     }
     setLoading(true);
@@ -123,7 +123,7 @@ const DepositPage = () => {
     <form onSubmit={createPayment} style={styles.mutedCard}>
       <strong>USDT deposits only</strong>
       <p style={{ margin: '8px 0 14px' }}>Choose a network and create a payment address. Do not send funds until an address is shown.</p>
-      <label style={styles.label} htmlFor="deposit-amount">Amount (USD)</label>
+      <label style={styles.label} htmlFor="deposit-amount">Amount (USDT)</label>
       <input id="deposit-amount" style={styles.input} type="number" min="1" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100.00" required />
       <label style={{ ...styles.label, marginTop: '12px' }} htmlFor="deposit-network">USDT network</label>
       <select id="deposit-network" style={styles.input} value={network} onChange={(event) => setNetwork(event.target.value)}>
