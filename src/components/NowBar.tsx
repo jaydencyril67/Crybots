@@ -16,7 +16,20 @@ type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'puls
 type EdgeLightSettings = { enabled: boolean; color: string; mode: EdgeLightMode };
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
+const BUTTON_COLOR_STORAGE_KEY = 'nowbar_button_color';
+const DEFAULT_BUTTON_COLOR = '#38bdf8';
 const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable-light', 'stable', 'blink-light', 'blink', 'pulse-light', 'pulse', 'color-light', 'color'];
+
+const getButtonColor = () => {
+  if (typeof window === 'undefined') return DEFAULT_BUTTON_COLOR;
+
+  try {
+    const stored = window.localStorage.getItem(BUTTON_COLOR_STORAGE_KEY);
+    return stored && /^#[0-9a-f]{6}$/i.test(stored) ? stored : DEFAULT_BUTTON_COLOR;
+  } catch {
+    return DEFAULT_BUTTON_COLOR;
+  }
+};
 
 const getEdgeLightSettings = (): EdgeLightSettings => {
   if (typeof window === 'undefined') {
@@ -122,7 +135,7 @@ const styles = {
     width: '100%',
     minHeight: '44px',
     padding: '10px',
-    border: '2px solid rgba(255,255,255,0.78)',
+    border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '12px',
     background: '#000000',
     color: '#e5eefc',
@@ -205,6 +218,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/theme-settings') return 'THEME SETTINGS';
   if (path === '/nowbar-settings') return 'NOWBAR SETTINGS';
   if (path === '/nowbar-color') return 'EDGE LIGHTING';
+  if (path === '/nowbar-button-color') return 'BUTTON COLOR';
   if (path === '/portfolio/statistics') return 'ACCOUNT STATISTICS';
   if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/agent') return 'AGENT';
@@ -327,7 +341,9 @@ const createDefaultActions = (): NowBarAction[] => [
 
 const NowBar = ({ actions }: NowBarProps) => {
   const [edgeLightVersion, setEdgeLightVersion] = useState(0);
+  const [buttonColorVersion, setButtonColorVersion] = useState(0);
   const edgeLight = useMemo(() => getEdgeLightSettings(), [edgeLightVersion]);
+  const buttonColor = useMemo(() => getButtonColor(), [buttonColorVersion]);
   const edgeLightColor = edgeLight.color;
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
@@ -352,11 +368,17 @@ const NowBar = ({ actions }: NowBarProps) => {
       setEdgeLightVersion((current) => current + 1);
     };
 
+    const syncButtonColor = () => {
+      setButtonColorVersion((current) => current + 1);
+    };
+
     window.addEventListener('popstate', syncPath);
     window.addEventListener('hashchange', syncPath);
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
     window.addEventListener('storage', syncEdgeLight);
+    window.addEventListener('storage', syncButtonColor);
     window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
+    window.addEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
 
 
     return () => {
@@ -364,7 +386,9 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.removeEventListener('hashchange', syncPath);
       window.removeEventListener('ke:navigation-start', syncPath as EventListener);
       window.removeEventListener('storage', syncEdgeLight);
+      window.removeEventListener('storage', syncButtonColor);
       window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
+      window.removeEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
 
     };
   }, []);
@@ -483,6 +507,7 @@ const NowBar = ({ actions }: NowBarProps) => {
                 onClick={action.onClick}
                 style={{
                   ...styles.button,
+                  borderColor: buttonColor,
                   ...(isExpanded ? styles.buttonExpanded : {}),
                 }}
               >

@@ -16,6 +16,7 @@ import ManagePage from './components/ManagePage';
 import ThemeSettingsPage from './components/ThemeSettingsPage';
 import NowBarSettingsPage from './components/NowBarSettingsPage';
 import NowBarColorPage from './components/NowBarColorPage';
+import NowBarButtonColorPage from './components/NowBarButtonColorPage';
 import DepositPage from './components/DepositPage';
 import PortfolioPage from './components/PortfolioPage';
 import PortfolioStatisticsPage from './components/PortfolioStatisticsPage';
@@ -285,6 +286,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'theme-settings') return <ProtectedRoute><ThemeSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-settings') return <ProtectedRoute><NowBarSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-color') return <ProtectedRoute><NowBarColorPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'nowbar-button-color') return <ProtectedRoute><NowBarButtonColorPage /></ProtectedRoute>;
     if (displayedRouteKey === 'portfolio') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
     if (displayedRouteKey === 'portfolio-statistics') return <ProtectedRoute><PortfolioStatisticsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'agent') return <ProtectedRoute><AgentPage /></ProtectedRoute>;
