@@ -24,13 +24,21 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  title: { margin: '20px 0 0', fontSize: '1.15rem', fontWeight: 900 },
-  text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.6 },
-  card: { marginTop: '24px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
-  row: { display: 'flex', alignItems: 'center', flexWrap: 'wrap' as const, gap: '10px', marginTop: '18px' },
-  button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '10px 14px', fontWeight: 700, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer' },
+  title: { margin: '20px 0 8px', fontSize: '1.15rem', fontWeight: 900 },
+  text: { margin: 0, color: theme.textMuted, lineHeight: 1.6 },
+  card: { marginTop: '22px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  cardHeading: { margin: 0, fontSize: '1.05rem', fontWeight: 850 },
+  cardText: { margin: '6px 0 16px', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
+  list: { display: 'grid', gap: '10px' },
+  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  rowContent: { minWidth: 0 },
+  label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
+  description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
+  button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', flexShrink: 0 },
   active: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
-  modes: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px', marginTop: '16px' },
+  modes: { display: 'grid', gap: '10px', marginTop: '10px' },
+  modeRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '11px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  modeLabel: { margin: 0, fontWeight: 750, fontSize: '0.88rem' },
 });
 
 const NowBarSettingsPage = () => {
@@ -93,23 +101,54 @@ const NowBarSettingsPage = () => {
           <h1 style={styles.title}>NowBar Settings</h1>
           <p style={styles.text}>Manage the NowBar experience, including its edge lighting and visual behavior.</p>
           <section style={styles.card}>
-            <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>⚡ Edge lighting</h2>
-            <div style={styles.row}>
-              <button type="button" style={{ ...styles.button, ...(enabled ? styles.active : {}) }} onClick={toggle}>{enabled ? 'On' : 'Off'}</button>
-              <button type="button" style={styles.button} onClick={() => navigate('/nowbar-color')}>Choose color</button>
-            </div>
-            <div style={styles.modes}>
-              {EDGE_LIGHT_MODES.map((option) => (
-                <button key={option.key} type="button" style={{ ...styles.button, borderRadius: '14px', textAlign: 'left', ...(mode === option.key ? styles.active : {}) }} onClick={() => selectMode(option.key)}>{option.label}</button>
-              ))}
+            <h2 style={styles.cardHeading}>⚡ Edge lighting</h2>
+            <p style={styles.cardText}>Control the animated edge effect and choose how it behaves around the NowBar.</p>
+            <div style={styles.list}>
+              <div style={styles.row}>
+                <div style={styles.rowContent}>
+                  <p style={styles.label}>Edge lighting</p>
+                  <p style={styles.description}>Show the selected lighting effect around the NowBar.</p>
+                </div>
+                <button type="button" style={{ ...styles.button, ...(enabled ? styles.active : {}) }} onClick={toggle} aria-pressed={enabled}>{enabled ? 'Enabled' : 'Enable'}</button>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.rowContent}>
+                  <p style={styles.label}>Edge-light color</p>
+                  <p style={styles.description}>Choose the color used by the edge lighting effect.</p>
+                </div>
+                <button type="button" style={styles.button} onClick={() => navigate('/nowbar-color')}>Choose color</button>
+              </div>
+              <div>
+                <p style={{ ...styles.label, margin: '4px 0 10px' }}>Lighting behavior</p>
+                <div style={styles.modes}>
+                  {EDGE_LIGHT_MODES.map((option) => (
+                    <div key={option.key} style={styles.modeRow}>
+                      <p style={styles.modeLabel}>{option.label}</p>
+                      <button type="button" style={{ ...styles.button, ...(mode === option.key ? styles.active : {}) }} onClick={() => selectMode(option.key)} aria-pressed={mode === option.key}>{mode === option.key ? 'Enabled' : 'Enable'}</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
           <section style={styles.card}>
-            <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>🎨 Button color</h2>
-            <p style={styles.text}>Replace the bold white button borders with a color that matches your NowBar style.</p>
-            <div style={styles.row}>
-              <button type="button" style={{ ...styles.button, ...(buttonColorEnabled ? styles.active : {}) }} onClick={toggleButtonColor}>{buttonColorEnabled ? 'On' : 'Off'}</button>
-              <button type="button" style={styles.button} onClick={() => navigate('/nowbar-button-color')}>Choose color</button>
+            <h2 style={styles.cardHeading}>🎨 Button color</h2>
+            <p style={styles.cardText}>Replace the bold white button borders with a color that matches your NowBar style.</p>
+            <div style={styles.list}>
+              <div style={styles.row}>
+                <div style={styles.rowContent}>
+                  <p style={styles.label}>Button color</p>
+                  <p style={styles.description}>Use your selected color on NowBar buttons.</p>
+                </div>
+                <button type="button" style={{ ...styles.button, ...(buttonColorEnabled ? styles.active : {}) }} onClick={toggleButtonColor} aria-pressed={buttonColorEnabled}>{buttonColorEnabled ? 'Enabled' : 'Enable'}</button>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.rowContent}>
+                  <p style={styles.label}>Button-color selection</p>
+                  <p style={styles.description}>Choose the color applied to the NowBar button borders.</p>
+                </div>
+                <button type="button" style={styles.button} onClick={() => navigate('/nowbar-button-color')}>Choose color</button>
+              </div>
             </div>
           </section>
         </div>
