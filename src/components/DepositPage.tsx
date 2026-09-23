@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, ChevronDown, Copy, ShieldCheck } from 'lucide-react';
+import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -98,6 +99,7 @@ const DepositPage = () => {
   const [message, setMessage] = useState('');
   const [copied, setCopied] = useState(false);
   const [recentDeposits, setRecentDeposits] = useState<DepositPayment[]>([]);
+  const [recentLoading, setRecentLoading] = useState(true);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -109,6 +111,7 @@ const DepositPage = () => {
 
   useEffect(() => {
     const loadRecentDeposits = async () => {
+      setRecentLoading(true);
       try {
         const response = await api.get<{ deposits?: DepositPayment[] }>('/api/deposits/recent');
         const deposits = Array.isArray(response.data.deposits) ? response.data.deposits : [];
@@ -133,6 +136,8 @@ const DepositPage = () => {
         setRecentDeposits(historyDeposits.slice(0, 5));
       } catch {
         setRecentDeposits([]);
+      } finally {
+        setRecentLoading(false);
       }
     };
 
@@ -240,7 +245,30 @@ const DepositPage = () => {
           {cryptoContent}
           <div style={styles.mutedCard}>
             <strong>Recent deposits</strong>
-            {recentDeposits.length === 0 ? <p style={{ margin: '8px 0 0' }}>No deposits yet.</p> : <div style={styles.recentList}>{recentDeposits.map((deposit) => { const status = statusLabel(deposit.paymentStatus || deposit.status); return <div key={deposit.paymentId} style={styles.recentItem}><div><strong>{deposit.priceAmount ?? deposit.amount ?? '—'} USDT</strong><div style={styles.recentMeta}>{deposit.payCurrency} · {deposit.createdAt ? new Date(deposit.createdAt).toLocaleDateString() : 'Recently'}</div></div><span style={styles.status}>{status}</span></div>; })}</div>}
+            {recentLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
+                <LoadingDots />
+              </div>
+            ) : recentDeposits.length === 0 ? (
+              <p style={{ margin: '8px 0 0' }}>No deposits yet.</p>
+            ) : (
+              <div style={styles.recentList}>
+                {recentDeposits.map((deposit) => {
+                  const status = statusLabel(deposit.paymentStatus || deposit.status);
+                  return (
+                    <div key={deposit.paymentId} style={styles.recentItem}>
+                      <div>
+                        <strong>{deposit.priceAmount ?? deposit.amount ?? '—'} USDT</strong>
+                        <div style={styles.recentMeta}>
+                          {deposit.payCurrency} · {deposit.createdAt ? new Date(deposit.createdAt).toLocaleDateString() : 'Recently'}
+                        </div>
+                      </div>
+                      <span style={styles.status}>{status}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
         <NowBar />
