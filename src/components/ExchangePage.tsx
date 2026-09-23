@@ -1,5 +1,4 @@
 import React from 'react';
-import { Bitcoin, Cloud, Copy } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
@@ -27,19 +26,18 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   sectionText: { margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7, maxWidth: '62ch' },
   buttonList: { display: 'grid', gap: '10px', marginTop: '6px' },
   cardButton: {
-    display: 'flex', alignItems: 'center', gap: '14px', width: '100%', padding: '16px 18px', borderRadius: '18px',
+    display: 'flex', alignItems: 'center', width: '100%', padding: '16px 18px', borderRadius: '18px',
     border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text,
     textAlign: 'left' as const, boxSizing: 'border-box' as const, cursor: 'pointer',
     backdropFilter: 'blur(24px) saturate(1.15)', WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
   },
-  icon: { width: '20px', height: '20px', flexShrink: 0 },
   cardSubtext: { margin: '3px 0 0', fontSize: '0.86rem', color: theme.textMuted, lineHeight: 1.5 },
 });
 
 const pageButtons = [
-  { label: 'Coin Staking', description: 'Put your coins to work with staking plans.', icon: Bitcoin },
-  { label: 'Cloud Mining', description: 'Explore cloud mining opportunities.', icon: Cloud },
-  { label: 'Copy Trading', description: 'Follow and copy experienced traders.', icon: Copy },
+  { label: 'Coin Staking', description: 'Put your coins to work with staking plans.' },
+  { label: 'Cloud Mining', description: 'Explore cloud mining opportunities.' },
+  { label: 'Copy Trading', description: 'Follow and copy experienced traders.' },
 ];
 
 const ExchangePage = () => {
@@ -63,9 +61,8 @@ const ExchangePage = () => {
               <p style={styles.sectionText}>Choose an exchange service to continue.</p>
             </section>
             <div style={styles.buttonList}>
-              {pageButtons.map(({ label, description, icon: Icon }) => (
+              {pageButtons.map(({ label, description }) => (
                 <button key={label} type="button" style={styles.cardButton} onClick={() => handleButtonClick(label)}>
-                  <Icon style={styles.icon} />
                   <span>
                     <strong style={{ display: 'block', fontSize: '1rem' }}>{label}</strong>
                     <span style={styles.cardSubtext}>{description}</span>
