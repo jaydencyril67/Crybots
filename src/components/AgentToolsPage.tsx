@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Check, Copy, Share2 } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Share2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
+import { navigate } from '../utils/navigate';
 
 type Dashboard = { agent: { code: string | null; link: string | null } };
 
@@ -31,12 +32,13 @@ const AgentToolsPage = () => {
     else await copy(data.agent.link, 'link');
   };
 
-  return <HybridTheme><div style={styles.page(theme)}><main style={styles.shell}><section style={styles.section}><h1 style={styles.title}>Agent tools</h1><p style={styles.text(theme)}>Share your referral code and invite link with your community.</p></section>{error && <p style={{ ...styles.text(theme), color: '#f87171' }}>{error}</p>}{!data ? <div style={styles.loading}><LoadingDots /></div> : <section style={styles.card(theme)}><div style={styles.codeRow}><div><span style={styles.label(theme)}>Referral code</span><strong style={styles.code}>{data.agent.code || '—'}</strong><button type="button" style={styles.secondary(theme)} onClick={() => void copy(data.agent.code || '', 'code')}><Copy size={16} /> {copied === 'code' ? 'Copied' : 'Copy code'}</button></div>{data.agent.link && <QRCodeSVG value={data.agent.link} size={150} bgColor="transparent" fgColor={theme.text} />}</div><span style={styles.label(theme)}>Referral link</span><p style={styles.link(theme)}>{data.agent.link || '—'}</p><div style={styles.actions}>{data.agent.link && <button type="button" style={styles.primary(theme)} onClick={() => void copy(data.agent.link || '', 'link')}>{copied === 'link' ? <Check size={16} /> : <Copy size={16} />} {copied === 'link' ? 'Copied' : 'Copy link'}</button>}<button type="button" style={styles.secondary(theme)} onClick={() => void share()}><Share2 size={16} /> Share invite</button></div></section>}</main></div></HybridTheme>;
+  return <HybridTheme><div style={styles.page(theme)}><main style={styles.shell}><button type="button" style={styles.back(theme)} onClick={() => navigate('/agent')}><ArrowLeft size={16} /> Agent</button><section style={styles.section}><h1 style={styles.title}>Agent tools</h1><p style={styles.text(theme)}>Share your referral code and invite link with your community.</p></section>{error && <p style={{ ...styles.text(theme), color: '#f87171' }}>{error}</p>}{!data ? <div style={styles.loading}><LoadingDots /></div> : <section style={styles.card(theme)}><div style={styles.codeRow}><div><span style={styles.label(theme)}>Referral code</span><strong style={styles.code}>{data.agent.code || '—'}</strong><button type="button" style={styles.secondary(theme)} onClick={() => void copy(data.agent.code || '', 'code')}><Copy size={16} /> {copied === 'code' ? 'Copied' : 'Copy code'}</button></div>{data.agent.link && <QRCodeSVG value={data.agent.link} size={150} bgColor="transparent" fgColor={theme.text} />}</div><span style={styles.label(theme)}>Referral link</span><p style={styles.link(theme)}>{data.agent.link || '—'}</p><div style={styles.actions}>{data.agent.link && <button type="button" style={styles.primary(theme)} onClick={() => void copy(data.agent.link || '', 'link')}>{copied === 'link' ? <Check size={16} /> : <Copy size={16} />} {copied === 'link' ? 'Copied' : 'Copy link'}</button>}<button type="button" style={styles.secondary(theme)} onClick={() => void share()}><Share2 size={16} /> Share invite</button></div></section>}</main></div></HybridTheme>;
 };
 
 const styles = {
   page: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ minHeight: '100vh', paddingBottom: 132, background: theme.background, color: theme.text }),
   shell: { width: '100%', maxWidth: 1160, margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
+  back: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '8px 12px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.86rem', cursor: 'pointer', fontWeight: 700 }),
   section: { display: 'grid', gap: 10, marginTop: 18 },
   title: { margin: 0, fontSize: '1.45rem', fontWeight: 900 },
   text: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, maxWidth: '62ch', color: theme.textMuted, fontSize: '0.92rem', lineHeight: 1.7 }),
