@@ -69,7 +69,8 @@ const getToneStyles = (theme: typeof HYBRID_THEME_TOKENS.dark): Record<Notificat
 const NotificationBanner = ({ tone = 'info', title, message }: NotificationBannerProps) => {
   const { themeMode } = useAppTheme();
   const [isVisible, setIsVisible] = useState(true);
-  const theme = getToneStyles(HYBRID_THEME_TOKENS[themeMode])[tone];
+  const appTheme = HYBRID_THEME_TOKENS[themeMode];
+  const toneStyles = getToneStyles(appTheme)[tone];
 
   useEffect(() => {
     setIsVisible(true);
@@ -81,11 +82,11 @@ const NotificationBanner = ({ tone = 'info', title, message }: NotificationBanne
   if (!isVisible) return null;
 
   return (
-    <div style={{ ...styles.banner, border: theme.border, background: theme.background, color: theme.color }} role="alert" aria-live="polite">
-      <span style={styles.icon}>{theme.icon}</span>
+    <div style={{ ...styles.banner, border: toneStyles.border, background: toneStyles.background, color: toneStyles.color }} role="alert" aria-live="polite">
+      <span style={styles.icon}>{toneStyles.icon}</span>
       <div>
         <strong style={styles.title}>{title}</strong>
-        <p style={{ ...styles.message, color: theme.color }}>{message}</p>
+        <p style={{ ...styles.message, color: toneStyles.color }}>{message}</p>
       </div>
     </div>
   );
