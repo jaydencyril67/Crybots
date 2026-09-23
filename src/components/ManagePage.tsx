@@ -10,9 +10,9 @@ import NowBar from './NowBar';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 import { navigate } from '../utils/navigate';
 
-const trc20WalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
-
-type MeResponse = { user?: { walletAddress?: string } };
+type WalletNetwork = 'TRC-20' | 'BEP-20' | 'TRX';
+type Wallet = { id?: string; network: WalletNetwork; address: string; description?: string };
+type MeResponse = { user?: { wallets?: Wallet[]; walletAddress?: string } };
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -33,7 +33,10 @@ const ManagePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
+  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [network, setNetwork] = useState<WalletNetwork>('TRC-20');
   const [walletAddress, setWalletAddress] = useState('');
+  const [description, setDescription] = useState('');
   const [walletValid, setWalletValid] = useState(false);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'idle', message: '' });
@@ -41,10 +44,8 @@ const ManagePage = () => {
   useEffect(() => {
     const loadWallet = async () => {
       try {
-        const { data } = await api.get<MeResponse>('/api/auth/me');
-        const address = data.user?.walletAddress ?? '';
-        setWalletAddress(address);
-        setWalletValid(trc20WalletPattern.test(address));
+        const { data } = await api.get<MeResponse>('/api/settings/me');
+        setWallets(data.user?.wallets ?? []);
       } catch {
         navigate('/signin');
       }
@@ -54,20 +55,20 @@ const ManagePage = () => {
 
   const handleSave = async () => {
     const address = walletAddress.trim();
-    if (!trc20WalletPattern.test(address)) {
-      setWalletValid(false);
-      setStatus({ kind: 'error', message: 'Enter a valid TRC-20 wallet address before saving.' });
+    if (!walletValid) {
+      setStatus({ kind: 'error', message: `Enter a valid ${network} wallet address before saving.` });
       return;
     }
 
     setSaving(true);
     try {
-      await api.patch('/api/settings/wallet', { walletAddress: address });
-      setWalletAddress(address);
-      setWalletValid(true);
-      setStatus({ kind: 'success', message: 'Wallet address saved successfully.' });
-    } catch (error: any) {
+      const { data } = await api.post('/api/settings/wallets', { network, address, description });
+      setWallets(data.wallets || []);
+      setWalletAddress('');
+      setDescription('');
       setWalletValid(false);
+      setStatus({ kind: 'success', message: 'Wallet saved successfully.' });
+    } catch (error: any) {
       setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to save your wallet address. Please try again.') });
     } finally {
       setSaving(false);
@@ -82,16 +83,24 @@ const ManagePage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
           <section style={styles.card}>
             <h1 style={{ ...styles.title, display: 'flex', alignItems: 'center', gap: '10px' }}><WalletCards size={22} /> Manage wallet</h1>
-            <p style={styles.text}>Bind your TRC-20 wallet address so withdrawals can be added securely to your account.</p>
+            <p style={styles.text}>Bind up to 10 validated TRC-20, BEP-20, or TRX wallets for secure withdrawals.</p>
             {status.kind !== 'idle' ? <div style={{ marginTop: '16px' }}><NotificationBanner tone={status.kind === 'success' ? 'success' : 'error'} title={status.kind === 'success' ? 'Wallet updated' : 'Check your details'} message={status.message} /></div> : null}
             <div style={styles.form}>
               <label style={styles.label}>
-                <span>TRC-20 wallet address</span>
-                <input style={styles.input} value={walletAddress} onChange={(event) => { const value = event.target.value.trim(); setWalletAddress(value); setWalletValid(trc20WalletPattern.test(value)); }} placeholder="TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" autoCapitalize="off" autoCorrect="off" spellCheck={false} />
-                <span style={styles.helper}>{walletValid ? 'TRC-20 wallet format looks valid.' : 'Enter a valid TRC-20 address starting with T.'}</span>
+                <span>Wallet network</span>
+                <select style={styles.input} value={network} onChange={(event) => { setNetwork(event.target.value as WalletNetwork); setWalletValid(false); }}>
+                  <option value="TRC-20">TRC-20</option><option value="BEP-20">BEP-20</option><option value="TRX">TRX</option>
+                </select>
               </label>
-              <button style={styles.button} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid}>{saving ? <InlineLoadingDots /> : 'Save wallet'}</button>
+              <label style={styles.label}>
+                <span>Wallet address</span>
+                <input style={styles.input} value={walletAddress} onChange={(event) => { const value = event.target.value.trim(); setWalletAddress(value); setWalletValid(network === 'BEP-20' ? /^0x[a-fA-F0-9]{40}$/.test(value) : /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(value)); }} placeholder={network === 'BEP-20' ? '0x…' : 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'} autoCapitalize="off" autoCorrect="off" spellCheck={false} />
+                <span style={styles.helper}>{walletValid ? `${network} wallet format looks valid.` : `Enter a valid ${network} address.`}</span>
+              </label>
+              <label style={styles.label}><span>Description (optional)</span><input style={styles.input} value={description} onChange={(event) => setDescription(event.target.value.slice(0, 100))} placeholder="e.g. Main trading wallet" /></label>
+              <button style={styles.button} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || wallets.length >= 10}>{saving ? <InlineLoadingDots /> : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
             </div>
+            {wallets.length ? <div style={{ ...styles.form, marginTop: '22px' }}><strong>Bound wallets ({wallets.length}/10)</strong>{wallets.map((wallet) => <div key={wallet.id} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'center' }}><span><b>{wallet.description || wallet.network}</b><br /><small>{wallet.network} · {wallet.address}</small></span><button type="button" style={styles.button} onClick={() => void (async () => { try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`); setWallets(data.wallets || []); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Remove</button></div>)}</div> : null}
           </section>
         </div>
         <NowBar />

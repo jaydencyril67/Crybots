@@ -12,9 +12,11 @@ import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
+type WithdrawalWallet = { id?: string; network: 'TRC-20' | 'BEP-20' | 'TRX'; address: string; description?: string };
 type WithdrawalDetailsResponse = {
   user?: {
     walletAddress?: string;
+    wallets?: WithdrawalWallet[];
     securityCodeSet?: boolean;
   };
   balances?: {
@@ -120,6 +122,8 @@ const WithdrawPage = () => {
   const methodMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
   const [destinationValue, setDestinationValue] = useState('');
+  const [wallets, setWallets] = useState<WithdrawalWallet[]>([]);
+  const [selectedWalletId, setSelectedWalletId] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
   const [showSchedulePage, setShowSchedulePage] = useState(false);
   const [securityCode, setSecurityCode] = useState('');
@@ -146,11 +150,13 @@ const WithdrawPage = () => {
     const loadDetails = async () => {
       try {
         const { data } = await api.get<WithdrawalDetailsResponse>('/api/withdrawals/me');
-        setCurrentWallet(data.user?.walletAddress ?? '');
-
+        const availableWallets = data.user?.wallets ?? [];
+        setWallets(availableWallets);
+        setCurrentWallet(data.user?.walletAddress ?? availableWallets[0]?.address ?? '');
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
         setBalances({ usdtBalance: data.balances?.usdtBalance ?? 0 });
-        if (data.user?.walletAddress) setDestinationValue(data.user.walletAddress);
+        if (availableWallets[0]?.id) setSelectedWalletId(availableWallets[0].id);
+        else if (data.user?.walletAddress) setDestinationValue(data.user.walletAddress);
       } catch {
         navigate('/signin');
       } finally {
@@ -164,8 +170,9 @@ const WithdrawPage = () => {
   }, []);
 
   useEffect(() => {
-    setDestinationValue(currentWallet);
-  }, [currentWallet]);
+    const selectedWallet = wallets.find((wallet) => wallet.id === selectedWalletId);
+    setDestinationValue(selectedWallet?.address ?? (wallets.length ? '' : currentWallet));
+  }, [currentWallet, selectedWalletId, wallets]);
 
   useEffect(() => {
     if (method !== 'scheduled') {
@@ -195,6 +202,7 @@ const WithdrawPage = () => {
         assetType: 'crypto',
         amount: Number(amount),
         currency: 'USDT',
+        walletId: selectedWalletId || undefined,
         destinationValue: availableDestination,
         method,
         scheduledFor: method === 'scheduled' ? scheduledFor : undefined,
@@ -259,9 +267,11 @@ const WithdrawPage = () => {
               <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
             </div>
             <div style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Bound wallet</span>
-              <input style={styles.input} value={availableDestination} readOnly />
-              <span style={styles.helper}>Use your bound TRC-20 wallet.</span>
+              <span style={styles.label}>Withdrawal wallet</span>
+              {wallets.length ? <select style={styles.input} value={selectedWalletId} onChange={(event) => setSelectedWalletId(event.target.value)}>
+                {wallets.map((wallet) => <option key={wallet.id} value={wallet.id}>{wallet.description || wallet.network} · {wallet.address.slice(0, 8)}…{wallet.address.slice(-6)}</option>)}
+              </select> : <input style={styles.input} value={availableDestination} readOnly />}
+              <span style={styles.helper}>{wallets.length ? 'Select one of your validated wallets.' : 'Bind a wallet in Manage before withdrawing.'}</span>
             </div>
             {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
             <div style={styles.field as React.CSSProperties}>
@@ -269,7 +279,7 @@ const WithdrawPage = () => {
               <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
             </div>
             <div style={styles.buttonRow}>
-              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || !securityCodeSet || !securityCode}>
+              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || (wallets.length > 0 && !selectedWalletId) || !securityCodeSet || !securityCode}>
                 {withdrawing ? <InlineLoadingDots /> : 'Submit withdrawal'}
               </button>
             </div>
