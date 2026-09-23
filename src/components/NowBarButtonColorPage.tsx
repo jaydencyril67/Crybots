@@ -5,6 +5,7 @@ import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
 const BUTTON_COLOR_STORAGE_KEY = 'nowbar_button_color';
+const BUTTON_COLOR_ENABLED_STORAGE_KEY = 'nowbar_button_color_enabled';
 const isHexColor = (value: string) => /^#[0-9a-f]{6}$/i.test(value);
 
 const hexToRgb = (hex: string) => ({
@@ -59,6 +60,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   rgbRow: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '12px' },
   rgbInput: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '12px 10px', fontSize: '0.95rem', outline: 'none' },
   applyButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '7px', border: 0, borderRadius: '12px', background: theme.primary, color: theme.textInverse, padding: '12px 18px', fontWeight: 800, cursor: 'pointer' },
+  toggleRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '18px' },
+  toggleText: { margin: 0, color: theme.textMuted, lineHeight: 1.4 },
+  toggle: { minWidth: '72px', border: 0, borderRadius: '999px', padding: '9px 14px', fontWeight: 800, cursor: 'pointer' },
   error: { margin: '8px 0 0', color: '#f87171', fontSize: '0.82rem' },
   code: { margin: '0 0 0 auto', color: theme.textMuted, fontSize: '0.85rem' },
 });
@@ -74,6 +78,16 @@ const NowBarButtonColorPage = () => {
   const [saturation, setSaturation] = useState(0.77);
   const [value, setValue] = useState(0.97);
   const [error, setError] = useState('');
+  const [enabled, setEnabled] = useState(true);
+
+  useEffect(() => {
+    try {
+      const storedEnabled = window.localStorage.getItem(BUTTON_COLOR_ENABLED_STORAGE_KEY);
+      if (storedEnabled !== null) setEnabled(storedEnabled === 'true');
+    } catch {
+      // Keep the default enabled state when saved data is unavailable.
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -94,6 +108,13 @@ const NowBarButtonColorPage = () => {
       // Keep the default color when saved data is invalid.
     }
   }, []);
+
+  const toggleEnabled = () => {
+    const nextEnabled = !enabled;
+    setEnabled(nextEnabled);
+    window.localStorage.setItem(BUTTON_COLOR_ENABLED_STORAGE_KEY, String(nextEnabled));
+    window.dispatchEvent(new Event('nowbar-button-color-changed'));
+  };
 
   const selectColor = (nextColor: string) => {
     const normalizedColor = nextColor.toLowerCase();
@@ -163,7 +184,14 @@ const NowBarButtonColorPage = () => {
           <p style={styles.intro}>Choose the color used by your NowBar navigation buttons. Your selection is saved immediately.</p>
 
           <section style={styles.card}>
-            <div style={styles.preview}>
+            <div style={styles.toggleRow}>
+              <div>
+                <strong>Custom button color</strong>
+                <p style={styles.toggleText}>Turn this off to use the default NowBar button border.</p>
+              </div>
+              <button type="button" aria-pressed={enabled} style={{ ...styles.toggle, background: enabled ? theme.primary : theme.surfaceMuted, color: enabled ? theme.textInverse : theme.text }} onClick={toggleEnabled}>{enabled ? 'On' : 'Off'}</button>
+            </div>
+            <div style={{ ...styles.preview, opacity: enabled ? 1 : 0.55, marginTop: '18px' }}>
               <span style={{ ...styles.previewColor, background: color, boxShadow: `0 0 24px ${color}` }} />
               <strong>Selected color</strong>
               <code style={styles.code}>{color.toUpperCase()}</code>

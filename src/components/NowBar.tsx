@@ -17,6 +17,7 @@ type EdgeLightSettings = { enabled: boolean; color: string; mode: EdgeLightMode 
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 const BUTTON_COLOR_STORAGE_KEY = 'nowbar_button_color';
+const BUTTON_COLOR_ENABLED_STORAGE_KEY = 'nowbar_button_color_enabled';
 const DEFAULT_BUTTON_COLOR = '#38bdf8';
 const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable-light', 'stable', 'blink-light', 'blink', 'pulse-light', 'pulse', 'color-light', 'color'];
 
@@ -28,6 +29,17 @@ const getButtonColor = () => {
     return stored && /^#[0-9a-f]{6}$/i.test(stored) ? stored : DEFAULT_BUTTON_COLOR;
   } catch {
     return DEFAULT_BUTTON_COLOR;
+  }
+};
+
+const getButtonColorEnabled = () => {
+  if (typeof window === 'undefined') return true;
+
+  try {
+    const stored = window.localStorage.getItem(BUTTON_COLOR_ENABLED_STORAGE_KEY);
+    return stored === null ? true : stored === 'true';
+  } catch {
+    return true;
   }
 };
 
@@ -344,6 +356,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   const [buttonColorVersion, setButtonColorVersion] = useState(0);
   const edgeLight = useMemo(() => getEdgeLightSettings(), [edgeLightVersion]);
   const buttonColor = useMemo(() => getButtonColor(), [buttonColorVersion]);
+  const buttonColorEnabled = useMemo(() => getButtonColorEnabled(), [buttonColorVersion]);
   const edgeLightColor = edgeLight.color;
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
@@ -507,7 +520,7 @@ const NowBar = ({ actions }: NowBarProps) => {
                 onClick={action.onClick}
                 style={{
                   ...styles.button,
-                  borderColor: buttonColor,
+                  ...(buttonColorEnabled ? { borderColor: buttonColor } : {}),
                   ...(isExpanded ? styles.buttonExpanded : {}),
                 }}
               >
