@@ -110,6 +110,11 @@ const PortfolioPage = () => {
         <div style={styles.shell}>
           
           <div style={styles.content}>
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle}>Portfolio</h2>
+              <p style={styles.sectionText}>Explore your account sections from focused pages with the controls and details you need.</p>
+            </section>
+
             <div style={styles.cardGrid}>
               {pageButtons.map(({ label, description, route }) => (
                 <article key={label} style={styles.card}>
