@@ -10,6 +10,7 @@ import { navigate } from '../utils/navigate';
 
 type Dashboard = { agent: { code: string | null; link: string | null; availableEarnings: number }; stats: { totalEarned: number } };
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
+type CodeAvailability = { state: 'idle' | 'checking' | 'available' | 'unavailable' | 'error'; message: string };
 
 const AgentMenuPage = () => {
   const { themeMode } = useAppTheme();
@@ -21,6 +22,7 @@ const AgentMenuPage = () => {
   const [saving, setSaving] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'idle', message: '' });
+  const [codeAvailability, setCodeAvailability] = useState<CodeAvailability>({ state: 'idle', message: '' });
 
   const loadDashboard = async () => {
     setLoading(true);
@@ -40,10 +42,42 @@ const AgentMenuPage = () => {
     void loadDashboard();
   }, []);
 
+  useEffect(() => {
+    const normalizedCode = code.trim();
+    if (!/^\d{6}$/.test(normalizedCode)) {
+      setCodeAvailability({ state: 'idle', message: '' });
+      return;
+    }
+
+    let active = true;
+    setCodeAvailability({ state: 'checking', message: 'Checking whether this referral code is available.' });
+    const timeout = window.setTimeout(() => {
+      api.get<{ available: boolean }>('/api/referrals/settings/availability', { params: { code: normalizedCode } })
+        .then(({ data: response }) => {
+          if (!active) return;
+          setCodeAvailability(response.available
+            ? { state: 'available', message: 'This referral code is available.' }
+            : { state: 'unavailable', message: 'That referral code is already in use.' });
+        })
+        .catch(() => {
+          if (active) setCodeAvailability({ state: 'error', message: 'Unable to check referral code availability.' });
+        });
+    }, 350);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
+  }, [code]);
+
   const saveCode = async () => {
     const nextCode = code.trim();
     if (!/^\d{6}$/.test(nextCode)) {
       setStatus({ kind: 'error', message: 'Referral code must be exactly 6 digits.' });
+      return;
+    }
+    if (codeAvailability.state !== 'available') {
+      setStatus({ kind: 'error', message: codeAvailability.state === 'unavailable' ? 'That referral code is already in use.' : 'Wait for the referral code availability check to finish.' });
       return;
     }
     setSaving(true);
@@ -87,7 +121,7 @@ const AgentMenuPage = () => {
     <section style={styles.header}><h1 style={styles.title}>Agent menu</h1><p style={styles.text(theme)}>Manage your referral identity and move earned commissions to your main balance.</p></section>
     {status.kind !== 'idle' ? <NotificationBanner tone={status.kind === 'success' ? 'success' : 'error'} title={status.kind === 'success' ? 'Agent settings updated' : 'Check your details'} message={status.message} /> : null}
     <div style={styles.content}>
-      <section style={styles.card(theme)}><h2 style={styles.cardTitle}><Save size={18} /> Referral settings</h2><p style={styles.text(theme)}>Choose a memorable six-digit code. Your referral link updates automatically.</p><label style={styles.label(theme)}>Referral code<input style={styles.input(theme)} value={code} inputMode="numeric" maxLength={6} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /></label>{loading ? <LoadingDots /> : <p style={styles.link(theme)}>{data.agent.link || 'Your referral link will appear here.'}</p>}<button type="button" style={styles.primary(theme)} disabled={saving || loading} onClick={() => void saveCode()}>{saving ? <InlineLoadingDots /> : <><Save size={16} /> Save referral code</>}</button></section>
+      <section style={styles.card(theme)}><h2 style={styles.cardTitle}><Save size={18} /> Referral settings</h2><p style={styles.text(theme)}>Choose a memorable six-digit code. Your referral link updates automatically.</p><label style={styles.label(theme)}>Referral code<input style={styles.input(theme)} value={code} inputMode="numeric" maxLength={6} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /></label>{codeAvailability.state !== 'idle' ? <NotificationBanner tone={codeAvailability.state === 'available' ? 'success' : codeAvailability.state === 'unavailable' || codeAvailability.state === 'error' ? 'error' : 'info'} title={codeAvailability.state === 'available' ? 'Referral code available' : codeAvailability.state === 'checking' ? 'Checking referral code' : 'Referral code unavailable'} message={codeAvailability.message} /> : null}{loading ? <LoadingDots /> : <p style={styles.link(theme)}>{data.agent.link || 'Your referral link will appear here.'}</p>}<button type="button" style={styles.primary(theme)} disabled={saving || loading || codeAvailability.state !== 'available'} onClick={() => void saveCode()}>{saving ? <InlineLoadingDots /> : <><Save size={16} /> Save referral code</>}</button></section>
       <section style={styles.card(theme)}><h2 style={styles.cardTitle}><Wallet size={18} /> Withdraw earnings</h2><div style={styles.balance(theme)}><span>Available earnings</span>{loading ? <LoadingDots /> : <strong>{data.agent.availableEarnings.toFixed(2)} USDT</strong>}</div><p style={styles.text(theme)}>Withdraw all or part of your earned referral commissions into your main USDT balance.</p><label style={styles.label(theme)}>Amount (USDT)<input style={styles.input(theme)} value={amount} type="number" min="0.01" max={data.agent.availableEarnings} step="0.01" inputMode="decimal" onChange={(event) => setAmount(event.target.value)} placeholder="0.00" /></label><button type="button" style={styles.primary(theme)} disabled={withdrawing || loading || data.agent.availableEarnings <= 0} onClick={() => void withdraw()}>{withdrawing ? <InlineLoadingDots /> : <><Coins size={16} /> Withdraw to main balance</>}</button><button type="button" style={styles.secondary(theme)} disabled={data.agent.availableEarnings <= 0} onClick={() => setAmount(data.agent.availableEarnings.toFixed(2))}>Use available balance</button></section>
     </div>
     </main></div></HybridTheme>;
