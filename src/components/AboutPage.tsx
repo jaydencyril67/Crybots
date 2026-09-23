@@ -35,7 +35,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const pageButtons = [
-  { label: 'Information', description: 'Learn more about KingsHall Exchange and its services.', path: '/about' },
+  { label: 'Information', description: 'Learn more about KingsHall Exchange and its services.', path: '/information' },
   { label: 'Privacy Policy', description: 'Review how account and platform information is handled.', path: '/privacy-policy' },
   { label: 'Community Standards', description: 'Explore the standards that help keep our community safe.', path: '/community-standards' },
 ];
