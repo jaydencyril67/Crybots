@@ -8,20 +8,21 @@ import NowBar from './NowBar';
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
-  card: { marginTop: '24px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   title: { margin: '20px 0 0', fontSize: '1.15rem', fontWeight: 900 },
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.6 },
-  themeGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px', marginTop: '22px' },
-  themeCard: { display: 'grid', gap: '14px', padding: '16px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, textAlign: 'left' as const },
-  themeCardActive: { border: `1px solid ${theme.primary}`, boxShadow: `0 0 0 1px ${theme.primarySoft}` },
-  themePreview: { height: '76px', borderRadius: '14px', padding: '12px', display: 'flex', flexDirection: 'column' as const, justifyContent: 'space-between', boxSizing: 'border-box' as const },
-  previewLine: { height: '7px', borderRadius: '999px', width: '58%' },
-  previewPanel: { height: '24px', borderRadius: '8px', width: '78%' },
-  themeCardTitle: { margin: 0, fontSize: '1rem', fontWeight: 850 },
-  themeCardText: { margin: 0, color: theme.textMuted, fontSize: '0.8rem', lineHeight: 1.45, minHeight: '46px' },
-  enableButton: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'start' },
+  card: { marginTop: '22px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  cardHeading: { margin: 0, fontSize: '1.05rem', fontWeight: 850 },
+  cardText: { margin: '6px 0 16px', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
+  list: { display: 'grid', gap: '10px' },
+  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  rowContent: { minWidth: 0 },
+  label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
+  description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
+  enableButton: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', flexShrink: 0 },
   enabledButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
+  preview: { width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0 },
+  rowContentWithPreview: { display: 'flex', alignItems: 'center', gap: '11px', minWidth: 0 },
 });
 
 const ThemeSettingsPage = () => {
@@ -42,28 +43,31 @@ const ThemeSettingsPage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
           <h1 style={styles.title}>Theme Settings</h1>
           <p style={styles.text}>Choose how KingsHall Exchange should look. System follows your device theme; Shift uses Light from 6 AM to 6 PM and Dark overnight.</p>
-          <div style={styles.themeGrid}>
-            {themeOptions.map((option) => {
-              const previewTheme = HYBRID_THEME_TOKENS[option.preview];
-              const isEnabled = themePreference === option.key;
+          <section style={styles.card}>
+            <h2 style={styles.cardHeading}>Appearance theme</h2>
+            <p style={styles.cardText}>Choose how KingsHall Exchange should look. Your selected theme is applied immediately.</p>
+            <div style={styles.list}>
+              {themeOptions.map((option) => {
+                const previewTheme = HYBRID_THEME_TOKENS[option.preview];
+                const isEnabled = themePreference === option.key;
 
-              return (
-                <article key={option.key} style={{ ...styles.themeCard, ...(isEnabled ? styles.themeCardActive : {}) }}>
-                  <div style={{ ...styles.themePreview, background: previewTheme.background, border: `1px solid ${previewTheme.borderGlass}` }}>
-                    <span style={{ ...styles.previewLine, background: previewTheme.primary }} />
-                    <span style={{ ...styles.previewPanel, background: previewTheme.surfaceElevated, border: `1px solid ${previewTheme.border}` }} />
+                return (
+                  <div key={option.key} style={styles.row}>
+                    <div style={styles.rowContentWithPreview}>
+                      <div style={{ ...styles.preview, background: previewTheme.background, border: `1px solid ${previewTheme.borderGlass}` }} />
+                      <div style={styles.rowContent}>
+                        <p style={styles.label}>{option.name}</p>
+                        <p style={styles.description}>{option.description}</p>
+                      </div>
+                    </div>
+                    <button type="button" style={{ ...styles.enableButton, ...(isEnabled ? styles.enabledButton : {}) }} onClick={() => setThemePreference(option.key)} aria-pressed={isEnabled}>
+                      {isEnabled ? 'Enabled' : 'Enable'}
+                    </button>
                   </div>
-                  <div>
-                    <h2 style={{ ...styles.themeCardTitle, color: theme.text }}>{option.name}</h2>
-                    <p style={styles.themeCardText}>{option.description}</p>
-                  </div>
-                  <button type="button" style={{ ...styles.enableButton, ...(isEnabled ? styles.enabledButton : {}) }} onClick={() => setThemePreference(option.key)}>
-                    {isEnabled ? 'Enabled' : 'Enable'}
-                  </button>
-                </article>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </section>
         </div>
         <NowBar />
       </main>
