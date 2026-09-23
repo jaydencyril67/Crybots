@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, ChevronDown, Copy, ShieldCheck } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
+import NotificationBanner from './NotificationBanner';
 import { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
@@ -260,7 +261,7 @@ const DepositPage = () => {
           ))}
         </div>}
       </div>
-      {message && <p role="alert" style={{ color: '#d96b6b', margin: '12px 0 0' }}>{message}</p>}
+      {message ? <NotificationBanner tone="error" title="Deposit unavailable" message={message} /> : null}
       <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '14px' }} disabled={loading}>{loading ? 'Creating payment…' : 'Create deposit address'}</button>
     </form>
   );
