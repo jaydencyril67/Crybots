@@ -12,9 +12,11 @@ import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 
+type WithdrawalWallet = { id?: string; network: 'TRC-20' | 'BEP-20' | 'TRX'; address: string; description?: string };
 type WithdrawalDetailsResponse = {
   user?: {
     walletAddress?: string;
+    wallets?: WithdrawalWallet[];
     securityCodeSet?: boolean;
   };
   balances?: {
@@ -115,15 +117,13 @@ const WithdrawPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
-  const [assetType, setAssetType] = useState<'crypto'>('crypto');
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
-  const [isAssetMenuOpen, setIsAssetMenuOpen] = useState(false);
   const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
-  const assetMenuRef = useRef<HTMLDivElement | null>(null);
   const methodMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState('USDT');
   const [destinationValue, setDestinationValue] = useState('');
+  const [wallets, setWallets] = useState<WithdrawalWallet[]>([]);
+  const [selectedWalletId, setSelectedWalletId] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
   const [showSchedulePage, setShowSchedulePage] = useState(false);
   const [securityCode, setSecurityCode] = useState('');
@@ -140,9 +140,6 @@ const WithdrawPage = () => {
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
-      if (assetMenuRef.current && !assetMenuRef.current.contains(event.target as Node)) {
-        setIsAssetMenuOpen(false);
-      }
       if (methodMenuRef.current && !methodMenuRef.current.contains(event.target as Node)) {
         setIsMethodMenuOpen(false);
       }
@@ -153,11 +150,13 @@ const WithdrawPage = () => {
     const loadDetails = async () => {
       try {
         const { data } = await api.get<WithdrawalDetailsResponse>('/api/withdrawals/me');
-        setCurrentWallet(data.user?.walletAddress ?? '');
-
+        const availableWallets = data.user?.wallets ?? [];
+        setWallets(availableWallets);
+        setCurrentWallet(data.user?.walletAddress ?? availableWallets[0]?.address ?? '');
         setSecurityCodeSet(Boolean(data.user?.securityCodeSet));
         setBalances({ usdtBalance: data.balances?.usdtBalance ?? 0 });
-        if (data.user?.walletAddress) setDestinationValue(data.user.walletAddress);
+        if (availableWallets[0]?.id) setSelectedWalletId(availableWallets[0].id);
+        else if (data.user?.walletAddress) setDestinationValue(data.user.walletAddress);
       } catch {
         navigate('/signin');
       } finally {
@@ -171,8 +170,9 @@ const WithdrawPage = () => {
   }, []);
 
   useEffect(() => {
-    setDestinationValue(currentWallet);
-  }, [currentWallet]);
+    const selectedWallet = wallets.find((wallet) => wallet.id === selectedWalletId);
+    setDestinationValue(selectedWallet?.address ?? (wallets.length ? '' : currentWallet));
+  }, [currentWallet, selectedWalletId, wallets]);
 
   useEffect(() => {
     if (method !== 'scheduled') {
@@ -199,9 +199,10 @@ const WithdrawPage = () => {
     setWithdrawing(true);
     try {
       const { data } = await api.post('/api/withdrawals', {
-        assetType,
+        assetType: 'crypto',
         amount: Number(amount),
-        currency,
+        currency: 'USDT',
+        walletId: selectedWalletId || undefined,
         destinationValue: availableDestination,
         method,
         scheduledFor: method === 'scheduled' ? scheduledFor : undefined,
@@ -245,22 +246,6 @@ const WithdrawPage = () => {
             {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
             <h2 style={styles.sectionTitle}><Coins size={18} /> Withdraw USDT</h2>
             <p style={styles.sectionText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
-            <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Asset type</span>
-              <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
-                <span>Crypto</span>
-                <span style={{ transform: isAssetMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
-              </button>
-              {isAssetMenuOpen ? (
-                <div style={styles.selectMenu}>
-                  {(['crypto'] as const).map((option) => (
-                    <button key={option} type="button" style={styles.selectOption} onClick={() => { setAssetType(option); setIsAssetMenuOpen(false); }}>
-                      Crypto
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
             <div ref={methodMenuRef} style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Withdrawal method</span>
               <button type="button" style={styles.selectTrigger} onClick={() => setIsMethodMenuOpen((current) => !current)}>
@@ -279,16 +264,14 @@ const WithdrawPage = () => {
             </div>
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Amount</span>
-              <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder={assetType === 'crypto' ? '0.00 USDT' : '0.00'} />
+              <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
             </div>
             <div style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Currency</span>
-              <input style={styles.input} value={currency} onChange={(event) => setCurrency(event.target.value.toUpperCase())} placeholder="USDT" />
-            </div>
-            <div style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Bound wallet</span>
-              <input style={styles.input} value={availableDestination} readOnly />
-              <span style={styles.helper}>Use your bound TRC-20 wallet.</span>
+              <span style={styles.label}>Withdrawal wallet</span>
+              {wallets.length ? <select style={styles.input} value={selectedWalletId} onChange={(event) => setSelectedWalletId(event.target.value)}>
+                {wallets.map((wallet) => <option key={wallet.id} value={wallet.id}>{wallet.description || wallet.network} · {wallet.address.slice(0, 8)}…{wallet.address.slice(-6)}</option>)}
+              </select> : <input style={styles.input} value={availableDestination} readOnly />}
+              <span style={styles.helper}>{wallets.length ? 'Select one of your validated wallets.' : 'Bind a wallet in Manage before withdrawing.'}</span>
             </div>
             {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
             <div style={styles.field as React.CSSProperties}>
@@ -296,7 +279,7 @@ const WithdrawPage = () => {
               <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
             </div>
             <div style={styles.buttonRow}>
-              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || !securityCodeSet || !securityCode}>
+              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || (wallets.length > 0 && !selectedWalletId) || !securityCodeSet || !securityCode}>
                 {withdrawing ? <InlineLoadingDots /> : 'Submit withdrawal'}
               </button>
             </div>
