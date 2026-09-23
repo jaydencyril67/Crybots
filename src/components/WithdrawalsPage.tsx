@@ -115,14 +115,10 @@ const WithdrawPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
-  const [assetType, setAssetType] = useState<'crypto'>('crypto');
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
-  const [isAssetMenuOpen, setIsAssetMenuOpen] = useState(false);
   const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
-  const assetMenuRef = useRef<HTMLDivElement | null>(null);
   const methodMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState('USDT');
   const [destinationValue, setDestinationValue] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
   const [showSchedulePage, setShowSchedulePage] = useState(false);
@@ -140,9 +136,6 @@ const WithdrawPage = () => {
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
-      if (assetMenuRef.current && !assetMenuRef.current.contains(event.target as Node)) {
-        setIsAssetMenuOpen(false);
-      }
       if (methodMenuRef.current && !methodMenuRef.current.contains(event.target as Node)) {
         setIsMethodMenuOpen(false);
       }
@@ -199,9 +192,9 @@ const WithdrawPage = () => {
     setWithdrawing(true);
     try {
       const { data } = await api.post('/api/withdrawals', {
-        assetType,
+        assetType: 'crypto',
         amount: Number(amount),
-        currency,
+        currency: 'USDT',
         destinationValue: availableDestination,
         method,
         scheduledFor: method === 'scheduled' ? scheduledFor : undefined,
@@ -245,22 +238,6 @@ const WithdrawPage = () => {
             {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
             <h2 style={styles.sectionTitle}><Coins size={18} /> Withdraw USDT</h2>
             <p style={styles.sectionText}>Choose instant or scheduled processing and send funds to your bound wallet.</p>
-            <div ref={assetMenuRef} style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Asset type</span>
-              <button type="button" style={styles.selectTrigger} onClick={() => setIsAssetMenuOpen((current) => !current)}>
-                <span>Crypto</span>
-                <span style={{ transform: isAssetMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
-              </button>
-              {isAssetMenuOpen ? (
-                <div style={styles.selectMenu}>
-                  {(['crypto'] as const).map((option) => (
-                    <button key={option} type="button" style={styles.selectOption} onClick={() => { setAssetType(option); setIsAssetMenuOpen(false); }}>
-                      Crypto
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
             <div ref={methodMenuRef} style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Withdrawal method</span>
               <button type="button" style={styles.selectTrigger} onClick={() => setIsMethodMenuOpen((current) => !current)}>
@@ -279,11 +256,7 @@ const WithdrawPage = () => {
             </div>
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Amount</span>
-              <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder={assetType === 'crypto' ? '0.00 USDT' : '0.00'} />
-            </div>
-            <div style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Currency</span>
-              <input style={styles.input} value={currency} onChange={(event) => setCurrency(event.target.value.toUpperCase())} placeholder="USDT" />
+              <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
             </div>
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Bound wallet</span>
