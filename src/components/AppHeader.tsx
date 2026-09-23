@@ -4,7 +4,7 @@ import api, { API_BASE_URL } from '../api/axios';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import KHLogo from './KHLogo';
-import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
+import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
 
 const styles = {
   header: {
@@ -170,6 +170,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
           previousCount.current = nextCount;
           hasLoadedCount.current = true;
           setUnreadCount(nextCount);
+          notifyNotificationsChanged();
         } catch {
           // Ignore malformed stream events and keep the header available.
         }
