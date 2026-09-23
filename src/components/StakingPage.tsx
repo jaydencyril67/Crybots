@@ -160,6 +160,7 @@ const StakingPage = () => {
   const [selectedPackageId, setSelectedPackageId] = useState<StakingPackage['id']>('STK 01');
   const [amount, setAmount] = useState('');
   const [stakes, setStakes] = useState<Stake[]>([]);
+  const [packages, setPackages] = useState<StakingPackage[]>(stakingPackages);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
@@ -169,7 +170,7 @@ const StakingPage = () => {
   const [isPackageMenuOpen, setIsPackageMenuOpen] = useState(false);
   const [stakeHistoryPage, setStakeHistoryPage] = useState(1);
   const packageMenuRef = useRef<HTMLDivElement | null>(null);
-  const selectedPackage = useMemo(() => stakingPackages.find((stakingPackage) => stakingPackage.id === selectedPackageId) || stakingPackages[0], [selectedPackageId]);
+  const selectedPackage = useMemo(() => packages.find((stakingPackage) => stakingPackage.id === selectedPackageId) || packages[0] || stakingPackages[0], [packages, selectedPackageId]);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -191,6 +192,8 @@ const StakingPage = () => {
 
         if (!cancelled) {
           if (packagesResponse.data.packages?.length) {
+            setPackages(packagesResponse.data.packages);
+            setSelectedPackageId((current) => packagesResponse.data.packages?.some((stakingPackage) => stakingPackage.id === current) ? current : packagesResponse.data.packages?.[0]?.id || current);
             setPackagesError('');
           }
           setError('');
@@ -294,7 +297,7 @@ const StakingPage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
           <section style={styles.packageGrid}>
             {packagesError ? <NotificationBanner tone="error" title="Package load issue" message={packagesError} /> : null}
-            {isLoading ? <div style={styles.panel}><LoadingDots /></div> : stakingPackages.map((stakingPackage) => (
+            {isLoading ? <div style={styles.panel}><LoadingDots /></div> : packages.map((stakingPackage) => (
               <article key={stakingPackage.id} style={styles.packageCard}>
                 <span style={styles.packageBadge}>{stakingPackage.id}</span>
                 <h2 style={styles.packageTitle}>{stakingPackage.dailyProfitPercent}% / day</h2>
@@ -315,7 +318,7 @@ const StakingPage = () => {
                   </button>
                   {isPackageMenuOpen ? (
                     <div style={styles.selectMenu}>
-                      {stakingPackages.map((stakingPackage) => (
+                      {packages.map((stakingPackage) => (
                         <button
                           key={stakingPackage.id}
                           type="button"
