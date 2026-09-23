@@ -76,6 +76,7 @@ const DepositPage = () => {
     address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
     recentList: { display: 'grid', gap: '8px', marginTop: '10px' },
     recentItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 12px', border: `1px solid ${theme.border}`, borderRadius: '10px', background: theme.surface, color: theme.text },
+    recentItemClickable: { cursor: 'pointer', transition: 'border-color 0.15s ease, background 0.15s ease' },
     recentMeta: { color: theme.textMuted, fontSize: '0.76rem' },
     status: { fontSize: '0.75rem', fontWeight: 700, textTransform: 'capitalize' as const },
     });
@@ -95,6 +96,7 @@ const DepositPage = () => {
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
   const networkMenuRef = useRef<HTMLDivElement | null>(null);
   const [payment, setPayment] = useState<DepositPayment | null>(null);
+  const [resumingPaymentId, setResumingPaymentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [copied, setCopied] = useState(false);
@@ -187,18 +189,50 @@ const DepositPage = () => {
     setCopied(true);
   };
 
-  const statusLabel = (status?: string) => {
-    if (status === 'confirmed' || status === 'finished') return 'completed';
-    if (status === 'failed' || status === 'refunded' || status === 'expired') return 'cancelled';
-    return 'pending';
+  const isPendingStatus = (status?: string) => {
+    return statusLabel(status) === 'pending';
+  };
+
+  const resumePendingDeposit = async (deposit: DepositPayment) => {
+    const paymentId = deposit.paymentId || deposit.id;
+    if (!paymentId || !isPendingStatus(deposit.paymentStatus || deposit.status)) return;
+    setMessage('');
+    setCopied(false);
+    if (deposit.payAddress) {
+      setPayment(deposit);
+      return;
+    }
+    setResumingPaymentId(paymentId);
+    try {
+      const response = await api.get<{ payment: DepositPayment }>(`/api/deposits/${paymentId}`);
+      if (response.data?.payment) {
+        setPayment(normalizeDeposit(response.data.payment));
+      }
+    } catch {
+      setPayment(deposit);
+    } finally {
+      setResumingPaymentId(null);
+    }
   };
 
   const cryptoContent = payment ? (
     <div style={styles.mutedCard}>
-      <strong>Send USDT to this address</strong>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+        <strong>Send USDT to this address</strong>
+        <button
+          type="button"
+          style={styles.secondaryButton}
+          onClick={() => {
+            setPayment(null);
+            setMessage('');
+          }}
+        >
+          New deposit
+        </button>
+      </div>
       <p style={{ margin: '8px 0 0' }}>Send exactly the requested amount on the selected network. Your balance updates after network confirmation.</p>
       <p style={styles.address}>{payment.payAddress || 'Payment address is being prepared…'}</p>
-      <p style={{ margin: '8px 0', fontWeight: 700 }}>{payment.payAmount ?? '—'} {payment.payCurrency} · Status: {payment.status || payment.paymentStatus || 'waiting'}</p>
+      <p style={{ margin: '8px 0', fontWeight: 700 }}>{payment.payAmount ?? payment.priceAmount ?? '—'} {payment.payCurrency} · Status: {payment.status || payment.paymentStatus || 'waiting'}</p>
       {payment.payAddress && <button type="button" style={styles.secondaryButton} onClick={copyAddress}>{copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy address</>}</button>}
     </div>
   ) : (
@@ -255,15 +289,31 @@ const DepositPage = () => {
               <div style={styles.recentList}>
                 {recentDeposits.map((deposit) => {
                   const status = statusLabel(deposit.paymentStatus || deposit.status);
+                  const isPending = isPendingStatus(deposit.paymentStatus || deposit.status);
+                  const isResumingThis = resumingPaymentId === (deposit.paymentId || deposit.id);
                   return (
-                    <div key={deposit.paymentId} style={styles.recentItem}>
+                    <div
+                      key={deposit.paymentId || deposit.id}
+                      style={{
+                        ...styles.recentItem,
+                        ...(isPending ? styles.recentItemClickable : {}),
+                      }}
+                      onClick={isPending ? () => void resumePendingDeposit(deposit) : undefined}
+                      role={isPending ? 'button' : undefined}
+                      tabIndex={isPending ? 0 : undefined}
+                      onKeyDown={isPending ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); void resumePendingDeposit(deposit); } } : undefined}
+                      title={isPending ? 'Click to resume payment' : undefined}
+                    >
                       <div>
                         <strong>{deposit.priceAmount ?? deposit.amount ?? '—'} USDT</strong>
                         <div style={styles.recentMeta}>
                           {deposit.payCurrency} · {deposit.createdAt ? new Date(deposit.createdAt).toLocaleDateString() : 'Recently'}
+                          {isPending ? ' · Click to resume' : ''}
                         </div>
                       </div>
-                      <span style={styles.status}>{status}</span>
+                      <span style={styles.status}>
+                        {isResumingThis ? <LoadingDots /> : status}
+                      </span>
                     </div>
                   );
                 })}
