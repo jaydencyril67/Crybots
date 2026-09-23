@@ -29,7 +29,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
   selectOption: { width: '100%', borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.highlightSoft, color: theme.text, padding: '10px 12px', textAlign: 'left' as const, cursor: 'pointer' },
   helper: { color: theme.textMuted, fontSize: '0.85rem', fontWeight: 400 },
-  button: { borderRadius: '999px', border: `1px solid ${theme.primary}`, padding: '11px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer', justifySelf: 'start' },
+  button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '10px 14px', background: theme.surfaceGlass, color: theme.text, fontWeight: 700, cursor: 'pointer', justifySelf: 'start', fontSize: '0.92rem' },
+  primaryButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}`, width: '100%', maxWidth: '100%' },
 });
 
 const ManagePage = () => {
@@ -130,7 +131,7 @@ const ManagePage = () => {
               <label style={styles.label}><span>Description (optional)</span><input style={styles.input} value={description} onChange={(event) => setDescription(event.target.value.slice(0, 100))} placeholder="e.g. Main trading wallet" /></label>
               <label style={styles.label}><span>Security code</span><input style={styles.input} type="password" inputMode="numeric" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" /><span style={styles.helper}>Required when binding or editing a wallet.</span></label>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <button style={styles.button} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || (!editingWalletId && wallets.length >= 10)}>{saving ? <InlineLoadingDots /> : editingWalletId ? 'Update wallet' : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
+                <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || (!editingWalletId && wallets.length >= 10)}>{saving ? <InlineLoadingDots /> : editingWalletId ? 'Update wallet' : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
                 {editingWalletId ? <button style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} type="button" onClick={resetWalletForm}>Cancel edit</button> : null}
               </div>
             </div>
