@@ -334,6 +334,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   const [holdTimer, setHoldTimer] = useState<number | null>(null);
   const [idleTimer, setIdleTimer] = useState<number | null>(null);
   const [pressing, setPressing] = useState(false);
+  const holdTriggeredRef = React.useRef(false);
   const barRef = React.useRef<HTMLDivElement | null>(null);
   const [currentPath, setCurrentPath] = useState(getActivePath());
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
@@ -390,9 +391,11 @@ const NowBar = ({ actions }: NowBarProps) => {
   };
 
   const startHold = () => {
+    holdTriggeredRef.current = false;
     setPressing(true);
     resetIdleTimer();
     const timer = window.setTimeout(() => {
+      holdTriggeredRef.current = true;
       setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
     }, 700);
     setHoldTimer(timer);
@@ -444,10 +447,11 @@ const NowBar = ({ actions }: NowBarProps) => {
         tabIndex={0}
         aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
         onClick={() => {
-          if (!pressing) {
+          if (!pressing && !holdTriggeredRef.current) {
             handleInteraction();
             setView(view === 'title' ? 'actions' : 'title');
           }
+          holdTriggeredRef.current = false;
         }}
         onMouseDown={startHold}
         onMouseUp={stopHold}
@@ -480,7 +484,6 @@ const NowBar = ({ actions }: NowBarProps) => {
                 style={{
                   ...styles.button,
                   ...(isExpanded ? styles.buttonExpanded : {}),
-                  ...(action.active ? { background: 'rgba(125,211,252,0.12)', border: '1px solid rgba(125,211,252,0.18)' } : styles.buttonEmpty),
                 }}
               >
                 <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
