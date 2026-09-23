@@ -8,6 +8,14 @@ import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const supportedEmailDomains = new Set([
+  'gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'msn.com',
+  'yahoo.com', 'yahoo.co.uk', 'icloud.com', 'me.com', 'mac.com', 'proton.me',
+  'protonmail.com', 'aol.com', 'zoho.com', 'gmx.com', 'gmx.net', 'yandex.com',
+  'mail.com', 'fastmail.com', 'tuta.com', 'tutanota.com',
+]);
 import { authenticateWithPasskey, isWebAuthnAvailable } from '../utils/webauthn';
 
 const signInMethods = [
@@ -435,32 +443,42 @@ const SigninPage = () => {
     setResendStatus('');
   };
 
-  const emailInputStyle =
-    form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
-      ? {
-          ...hybridStyles.input,
-          borderColor: theme.danger,
+  const emailInputStyle = hybridStyles.input;
 
-          background: theme.surfaceMuted,
-        }
-      : hybridStyles.input;
+  /* Email checks intentionally run only when Continue is clicked. */
+  const emailValidationMessage = (email: string) => {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) return 'Enter your email address to continue.';
+    if (!emailPattern.test(normalizedEmail)) return 'Enter a valid email address.';
+    const domain = normalizedEmail.split('@')[1];
+    if (!supportedEmailDomains.has(domain)) return 'Use an email address from a supported provider.';
+    return '';
+  };
 
   const signInDisabled = isSubmitting || !canContinue || (step === 'code' && (!form.code.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6))) || (step === 'password' && (!form.password.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6)));
 
   const handleNext = async () => {
-    if (!canContinue) return;
+    const email = form.email.trim().toLowerCase();
+    const validationMessage = emailValidationMessage(email);
+    if (validationMessage) {
+      setSubmitError(validationMessage);
+      return;
+    }
+
     setSubmitError('');
     setIsSubmitting(true);
     try {
-      const { data: options } = await api.post('/api/webauthn/authenticate/options', { email: form.email.trim().toLowerCase() });
+      await api.post('/api/auth/signin/check-email', { email });
+      const { data: options } = await api.post('/api/webauthn/authenticate/options', { email });
       const hasPasskey = Array.isArray(options.allowCredentials) && options.allowCredentials.length > 0;
       setPasskeyAvailable(hasPasskey);
       setPasskeyOptions(hasPasskey ? options : null);
       setStep('method');
-    } catch {
+    } catch (error) {
+      const response = (error as { response?: { data?: { message?: string } } })?.response;
       setPasskeyAvailable(false);
       setPasskeyOptions(null);
-      setStep('method');
+      setSubmitError(response?.data?.message || 'Unable to check this email right now. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -794,7 +812,7 @@ const SigninPage = () => {
 
                   {submitError || resendStatus ? (
                     <div>
-                      {submitError ? <NotificationBanner tone="warning" title="Action required" message={submitError} /> : null}
+                      {submitError ? <NotificationBanner tone="error" title="Action required" message={submitError} /> : null}
                       {resendStatus ? <NotificationBanner tone="success" title="Update received" message={resendStatus} /> : null}
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={hybridStyles.linkButton}>
@@ -818,7 +836,7 @@ const SigninPage = () => {
                 <div style={styles.navRow}>
                   <button type="button" onClick={handleBack} style={{ ...styles.button, ...hybridStyles.buttonGhost }}>Back</button>
                   {step === 'email' ? (
-                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={isSubmitting || !canContinue}>{isSubmitting ? <InlineLoadingDots /> : 'Continue'}</button>
+                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={isSubmitting}>{isSubmitting ? <InlineLoadingDots /> : 'Continue'}</button>
                   ) : step === 'password' ? (
                     <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Sign in'}</button>
                   ) : step === 'code' ? (

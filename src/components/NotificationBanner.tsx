@@ -42,25 +42,25 @@ const styles = {
 const getToneStyles = (theme: typeof HYBRID_THEME_TOKENS.dark): Record<NotificationTone, { border: string; background: string; color: string; icon: React.ReactNode }> => ({
   error: {
     border: `1px solid ${theme.danger}`,
-    background: theme.primarySoft,
+    background: 'rgba(185, 28, 28, 0.12)',
     color: theme.danger,
     icon: <AlertTriangle />,
   },
   success: {
     border: `1px solid ${theme.success}`,
-    background: theme.highlightSoft,
+    background: 'rgba(22, 101, 52, 0.12)',
     color: theme.success,
     icon: <CheckCircle2 />,
   },
   info: {
     border: `1px solid ${theme.primary}`,
-    background: theme.primarySoft,
+    background: 'rgba(37, 99, 235, 0.12)',
     color: theme.primary,
     icon: <Info />,
   },
   warning: {
     border: `1px solid ${theme.warning}`,
-    background: theme.highlightSoft,
+    background: 'rgba(180, 83, 9, 0.14)',
     color: theme.warning,
     icon: <ShieldCheck />,
   },
