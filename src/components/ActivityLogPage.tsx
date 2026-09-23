@@ -32,10 +32,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   title: { margin: 0, fontSize: '0.98rem', fontWeight: 800 },
   description: { margin: '4px 0 8px', color: theme.textMuted, lineHeight: 1.5, fontSize: '0.9rem' },
   date: { display: 'flex', alignItems: 'center', gap: '5px', margin: 0, color: theme.textMuted, fontSize: '0.78rem' },
+  badge: { display: 'inline-flex', alignItems: 'center', marginBottom: '6px', padding: '3px 8px', borderRadius: '999px', background: theme.surfaceMuted, color: theme.primary, fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' as const, letterSpacing: '0.05em' },
   empty: { display: 'grid', placeItems: 'center', gap: '8px', padding: '42px 18px', border: `1px solid ${theme.borderGlass}`, borderRadius: '18px', color: theme.textMuted, textAlign: 'center' as const },
 });
 
 const formatAction = (action: string) => action.charAt(0).toUpperCase() + action.slice(1);
+const formatDate = (createdAt: string) => {
+  const date = new Date(createdAt);
+  return Number.isNaN(date.getTime()) ? 'Date unavailable' : date.toLocaleString();
+};
 
 const ActivityLogPage = () => {
   const { themeMode } = useAppTheme();
@@ -71,16 +76,17 @@ const ActivityLogPage = () => {
           <h1 style={styles.heading}>Activity Log</h1>
           <p style={styles.intro}>Review actions from the last 24 hours. Older activity is automatically removed.</p>
           {error ? <NotificationBanner tone="error" title="Activity log unavailable" message={error} /> : null}
-          <div style={styles.list}>
-            {loading ? <div style={styles.empty}><LoadingDots /></div> : null}
-            {!loading && !activities.length ? <div style={styles.empty}><History size={25} /><span>No activity recorded in the last 24 hours.</span></div> : null}
+          <div style={styles.list} aria-live="polite">
+            {loading ? <div style={styles.empty} role="status" aria-label="Loading activity"><LoadingDots /></div> : null}
+            {!loading && !activities.length ? <div style={styles.empty}><History size={25} /><span>No major activity recorded in the last 24 hours.</span></div> : null}
             {activities.map((activity) => (
               <article key={activity.id} style={styles.item}>
-                <Clock3 size={19} style={styles.icon} />
+                <Clock3 size={19} style={styles.icon} aria-hidden="true" />
                 <div>
+                  <span style={styles.badge}>{formatAction(activity.action)}</span>
                   <h2 style={styles.title}>{activity.title || formatAction(activity.action)}</h2>
                   <p style={styles.description}>{activity.description}</p>
-                  <p style={styles.date}>{new Date(activity.createdAt).toLocaleString()}</p>
+                  <p style={styles.date}><Clock3 size={13} aria-hidden="true" /> {formatDate(activity.createdAt)}</p>
                 </div>
               </article>
             ))}

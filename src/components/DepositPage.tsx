@@ -7,6 +7,13 @@ import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import api from '../api/axios';
 
+const statusLabel = (status?: string) => {
+  const normalizedStatus = (status || 'waiting').toLowerCase();
+  if (['confirmed', 'finished', 'completed'].includes(normalizedStatus)) return 'completed';
+  if (['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(normalizedStatus)) return normalizedStatus;
+  return 'pending';
+};
+
 const DepositPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];

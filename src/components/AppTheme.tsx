@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { logClientActivity } from '../utils/activity';
 
 export type AppThemeMode = 'light' | 'dark';
 export type AppThemePreference = 'light' | 'dark' | 'system' | 'shift';
@@ -77,6 +78,10 @@ export const AppThemeProvider = ({ children }: { children: React.ReactNode }) =>
   }, [mode, themePreference]);
 
   const handlePreferenceChange = (preference: AppThemePreference) => {
+    if (preference === themePreference) {
+      return;
+    }
+
     setThemePreference(preference);
     if (preference === 'system') {
       setMode(getSystemTheme());
@@ -85,6 +90,12 @@ export const AppThemeProvider = ({ children }: { children: React.ReactNode }) =>
     } else {
       setMode(preference);
     }
+
+    logClientActivity({
+      action: 'update',
+      title: 'Changed theme',
+      description: `You changed your theme preference to ${preference}.`,
+    });
   };
 
   const value = useMemo(() => ({
