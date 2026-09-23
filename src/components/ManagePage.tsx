@@ -17,8 +17,8 @@ type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
-  shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
-  card: { maxWidth: '720px', margin: '12px auto 0', padding: '18px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
+  card: { maxWidth: '720px', margin: '22px auto 0', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   title: { margin: 0, fontSize: '1.08rem', fontWeight: 800 },
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.55, fontSize: '0.95rem' },
