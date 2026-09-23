@@ -6,6 +6,7 @@ import { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import api from '../api/axios';
+import NotificationBanner from './NotificationBanner';
 
 const statusLabel = (status?: string) => {
   const normalizedStatus = (status || 'waiting').toLowerCase();
@@ -260,8 +261,8 @@ const DepositPage = () => {
           ))}
         </div>}
       </div>
-      {message && <p role="alert" style={{ color: '#d96b6b', margin: '12px 0 0' }}>{message}</p>}
-      <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '14px' }} disabled={loading}>{loading ? 'Creating payment…' : 'Create deposit address'}</button>
+      {message ? <NotificationBanner tone="error" title="Deposit update" message={message} /> : null}
+      <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '14px' }} disabled={loading}>{loading ? <><LoadingDots /> Creating payment…</> : 'Create deposit address'}</button>
     </form>
   );
 
@@ -283,6 +284,9 @@ const DepositPage = () => {
             Deposit USDT straight to your wallet address and keep everything on-chain.
           </p>
 
+          {payment && statusLabel(payment.paymentStatus || payment.status) === 'completed' ? <NotificationBanner tone="success" title="Deposit confirmed" message="Your USDT deposit has been confirmed and your balance will reflect it shortly." /> : null}
+          {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
+          {payment && statusLabel(payment.paymentStatus || payment.status) === 'pending' ? <NotificationBanner tone="info" title="Deposit awaiting confirmation" message="Send the requested amount to the address above. We will update this page when the network confirms it." /> : null}
           {cryptoContent}
           <div style={styles.mutedCard}>
             <strong>Recent deposits</strong>

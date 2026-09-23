@@ -6,6 +6,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NotificationBanner from './NotificationBanner';
+import InlineLoadingDots from './InlineLoadingDots';
 
 const preferenceTopics = [
   { key: 'account', label: 'Account activity', description: 'Profile changes, sign-ins and account updates.' },
@@ -65,6 +66,7 @@ const AlertSettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [pushPermission, setPushPermission] = useState<NotificationPermission | 'unsupported'>(() => ('Notification' in window ? Notification.permission : 'unsupported'));
 
   useEffect(() => {
     const loadPreferences = async () => {
@@ -87,6 +89,20 @@ const AlertSettingsPage = () => {
     void loadPreferences();
   }, []);
 
+  const requestPushPermission = async () => {
+    if (!('Notification' in window)) {
+      setPushPermission('unsupported');
+      setError('Push notifications are not supported by this browser.');
+      return false;
+    }
+    const permission = await Notification.requestPermission();
+    setPushPermission(permission);
+    if (permission !== 'granted') {
+      setError('Allow browser notifications to receive push alerts on this device.');
+    }
+    return permission === 'granted';
+  };
+
   const toggle = (key: keyof Preferences) => {
     setSaved(false);
     setPreferences((current) => ({ ...current, [key]: !current[key] }));
@@ -96,6 +112,14 @@ const AlertSettingsPage = () => {
     setSaved(false);
     setError('');
     setSaving(true);
+
+    if (preferences.push && pushPermission !== 'granted') {
+      const granted = await requestPushPermission();
+      if (!granted) {
+        setSaving(false);
+        return;
+      }
+    }
 
     try {
       const response = await api.patch<AlertPreferencesResponse>('/api/settings/alerts', preferences);
@@ -133,7 +157,7 @@ const AlertSettingsPage = () => {
                     </div>
                   </div>
                   <button type="button" disabled={loading || saving || key === 'security'} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label}`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
-                    <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />
+                    {loading || saving ? <InlineLoadingDots /> : <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />}
                   </button>
                 </div>
               ))}
@@ -142,7 +166,7 @@ const AlertSettingsPage = () => {
 
           <section style={styles.card}>
             <h2 style={styles.cardHeading}>How should we notify you?</h2>
-            <p style={styles.cardText}>You can choose more than one delivery method.</p>
+            <p style={styles.cardText}>You can choose more than one delivery method. Push alerts require browser permission{pushPermission === 'granted' ? ' and are enabled on this device.' : '.'}</p>
             <div style={styles.list}>
               {deliveryChannels.map(({ key, label, description, icon: Icon }) => (
                 <div key={key} style={styles.row}>
@@ -154,12 +178,12 @@ const AlertSettingsPage = () => {
                     </div>
                   </div>
                   <button type="button" disabled={loading || saving} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label} notifications`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
-                    <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />
+                    {loading || saving ? <InlineLoadingDots /> : <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />}
                   </button>
                 </div>
               ))}
             </div>
-            <button type="button" disabled={loading || saving} style={styles.save} onClick={() => void savePreferences()}>{saving ? 'Saving…' : 'Save preferences'}</button>
+            <button type="button" disabled={loading || saving} style={styles.save} onClick={() => void savePreferences()}>{saving ? <><InlineLoadingDots /> Saving…</> : 'Save preferences'}</button>
           </section>
         </div>
       </main>
