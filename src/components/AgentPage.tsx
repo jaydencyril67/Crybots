@@ -2,67 +2,56 @@ import React, { useEffect, useState } from 'react';
 import { BarChart3, Check, Copy, Gift, Medal, Share2, Trophy, Users, Wallet } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import api from '../api/axios';
-import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
-import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 
 type Challenge = { title: string; description: string; progress: number; target: number; percentage: number; reward?: number };
-type Commission = { event: string; amount: number; baseAmount?: number; createdAt: string };
-type Dashboard = {
-  agent: { enabled: boolean; code: string | null; link: string | null };
-  stats: { referrals: number; totalEarned: number; firstDeposits: number; investments: number };
-  commissions: Commission[];
-  referrals?: Array<{ firstName?: string; lastName?: string; createdAt: string }>;
-  challenges: Challenge[];
-};
-type Analytics = { byEvent: Array<{ _id: string; count: number; earned: number; volume: number }>; byMonth: Array<{ _id: string; count: number; earned: number }> };
-type Ranking = { rank: number; code: string; name?: string; referrals: number; earned: number };
+type Commission = { event: string; amount: number; createdAt: string };
+type Dashboard = { agent: { enabled: boolean; code: string | null; link: string | null }; stats: { referrals: number; totalEarned: number; firstDeposits: number; investments: number }; commissions: Commission[]; challenges: Challenge[] };
+type Analytics = { byEvent: Array<{ _id: string; earned: number }> };
+type Ranking = { rank: number; code: string; name?: string; earned: number };
+type Section = 'Stats' | 'Tools' | 'Menu';
+
+const sectionButtons: Array<{ label: Section; description: string }> = [
+  { label: 'Stats', description: 'Review your referrals, earnings, performance, and agent rankings.' },
+  { label: 'Tools', description: 'Share your referral code, invite link, and QR code.' },
+  { label: 'Menu', description: 'View challenges, recent commissions, and agent resources.' },
+];
 
 const AgentPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const [section, setSection] = useState<Section>('Stats');
   const [data, setData] = useState<Dashboard | null>(null);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [rankings, setRankings] = useState<Ranking[]>([]);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState('');
   const [loading, setLoading] = useState(true);
-  const [enabling, setEnabling] = useState(false);
 
-  const load = async () => {
-    setLoading(true);
-    try {
-      const [dashboard, stats, rankingData] = await Promise.all([
-        api.get<Dashboard>('/api/referrals/dashboard'),
-        api.get<Analytics>('/api/referrals/analytics'),
-        api.get<{ rankings: Ranking[] }>('/api/referrals/rankings'),
-      ]);
-      setData(dashboard.data);
-      setAnalytics(stats.data);
-      setRankings(rankingData.data.rankings || []);
-      setError('');
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'Unable to load your agent dashboard.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { void load(); }, []);
-
-  const enable = async () => {
-    setEnabling(true);
-    try {
-      await api.post('/api/referrals/enable');
-      await load();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || 'Unable to enable the agent system.');
-    } finally {
-      setEnabling(false);
-    }
-  };
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [dashboard, stats, rankingData] = await Promise.all([
+          api.get<Dashboard>('/api/referrals/dashboard'),
+          api.get<Analytics>('/api/referrals/analytics'),
+          api.get<{ rankings: Ranking[] }>('/api/referrals/rankings'),
+        ]);
+        setData(dashboard.data);
+        setAnalytics(stats.data);
+        setRankings(rankingData.data.rankings || []);
+        setError('');
+      } catch (err: any) {
+        setError(err?.response?.data?.message || 'Unable to load your agent dashboard.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    void load();
+  }, []);
 
   const copy = async (value: string, label: string) => {
     await navigator.clipboard.writeText(value);
@@ -72,47 +61,71 @@ const AgentPage = () => {
 
   const share = async () => {
     if (!data?.agent.link) return;
-    if (navigator.share) {
-      await navigator.share({ title: 'Join KingsHall Exchange', text: 'Join me on KingsHall Exchange.', url: data.agent.link });
-    } else {
-      await copy(data.agent.link, 'link');
-    }
+    if (navigator.share) await navigator.share({ title: 'Join KingsHall Exchange', text: 'Join me on KingsHall Exchange.', url: data.agent.link });
+    else await copy(data.agent.link, 'link');
   };
 
-  return <HybridTheme><div style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}><main style={{ maxWidth: 1160, margin: '0 auto', padding: '28px 18px' }}>
-    <h1 style={pageStyles.heading}>Agent hub</h1>
-    <p style={{ ...pageStyles.intro, color: theme.textMuted }}>Build your community, track performance, and earn automatic USDT commissions.</p>
-    {error && <p style={{ ...pageStyles.body, color: '#f87171' }}>{error}</p>}
-    {loading && !data ? <div style={{ ...pageStyles.loading, color: theme.textMuted }} role="status" aria-label="Loading agent workspace"><LoadingDots /></div> : !data?.agent.enabled ? <section style={{ ...card(theme), ...pageStyles.activation, textAlign: 'center' }}><Users size={28} color={theme.primary} /><h2 style={pageStyles.sectionTitle}>Become an agent</h2><p style={pageStyles.sectionText}>The agent system is optional. Enable it when you are ready to invite your community.</p><button type="button" style={activationButton(theme)} onClick={() => void enable()} disabled={enabling}>{enabling ? <InlineLoadingDots /> : 'Enable agent system'}</button></section> : <>
-      <div style={grid}><Metric theme={theme} icon={<Users />} label="Referrals" value={data.stats.referrals} /><Metric theme={theme} icon={<Wallet />} label="Earned USDT" value={data.stats.totalEarned.toFixed(2)} /><Metric theme={theme} icon={<Gift />} label="First deposits" value={data.stats.firstDeposits} /><Metric theme={theme} icon={<BarChart3 />} label="Investments" value={data.stats.investments} /></div>
-      <section style={card(theme)}><h2 style={pageStyles.cardHeading}>Invite kit</h2><p style={{ ...pageStyles.body, color: theme.textMuted }}>Share your personal code or scan the QR code to invite a new member.</p><div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}><div><strong style={pageStyles.code}>{data.agent.code}</strong><div><button style={smallButton(theme)} onClick={() => void copy(data.agent.code || '', 'code')}><Copy size={15} /> {copied === 'code' ? 'Copied' : 'Copy code'}</button></div></div>{data.agent.link && <QRCodeSVG value={data.agent.link} size={142} bgColor="transparent" fgColor={theme.text} />}</div><p style={{ ...pageStyles.body, wordBreak: 'break-all', color: theme.textMuted }}>{data.agent.link}</p><div style={inviteActions}>{data.agent.link && <button style={{ ...button(theme), width: '100%' }} onClick={() => void copy(data.agent.link || '', 'link')}>{copied === 'link' ? <Check size={16} /> : <Copy size={16} />} {copied === 'link' ? 'Copied' : 'Copy link'}</button>}<button style={{ ...secondaryButton(theme), width: '100%' }} onClick={() => void share()}><Share2 size={16} /> Share invite</button></div></section>
-      <section style={card(theme)}><h2 style={pageStyles.cardHeading}><Trophy size={19} /> Challenges</h2>{data.challenges?.length ? data.challenges.map((challenge) => <div key={challenge.title} style={{ marginBottom: 18 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><strong>{challenge.title}</strong><span style={{ color: theme.primary }}>{challenge.percentage}%</span></div><p style={{ ...pageStyles.body, color: theme.textMuted, margin: '6px 0' }}>{challenge.description}</p><div style={{ height: 8, background: theme.surfaceMuted, borderRadius: 8 }}><div style={{ width: `${Math.min(100, challenge.percentage)}%`, height: '100%', background: theme.primary, borderRadius: 8 }} /></div><small style={pageStyles.meta}>{challenge.progress} / {challenge.target}{challenge.reward ? ` · ${challenge.reward} USDT reward` : ''}</small></div>) : <p style={{ ...pageStyles.body, color: theme.textMuted }}>New challenges will appear here soon.</p>}</section>
-      <div style={twoColumn}><section style={card(theme)}><h2 style={pageStyles.cardHeading}><BarChart3 size={19} /> Performance</h2>{analytics?.byEvent?.length ? analytics.byEvent.map((item) => <div key={item._id} style={row(theme)}><span>{item._id.replace('_', ' ')}</span><strong>{item.earned.toFixed(2)} USDT</strong></div>) : <p style={{ ...pageStyles.body, color: theme.textMuted }}>No commission activity yet.</p>}</section><section style={card(theme)}><h2 style={pageStyles.cardHeading}><Medal size={19} /> Top agents</h2>{rankings.slice(0, 5).map((item) => <div key={item.code} style={row(theme)}><span>#{item.rank} {item.name || item.code}</span><strong>{item.earned.toFixed(2)} USDT</strong></div>)}</section></div>
-      <section style={card(theme)}><h2 style={pageStyles.cardHeading}>Recent commissions</h2>{data.commissions.length === 0 ? <p style={{ ...pageStyles.body, color: theme.textMuted }}>Your first commission will appear here after a referred user completes an eligible action.</p> : data.commissions.slice(0, 20).map((item, index) => <div key={`${item.createdAt}-${index}`} style={row(theme)}><span>{item.event.replace('_', ' ')}<small style={{ display: 'block', color: theme.textMuted }}>{new Date(item.createdAt).toLocaleDateString()}</small></span><strong>+{item.amount.toFixed(2)} USDT</strong></div>)}</section>
-    </>}
-  </main><NowBar /></div></HybridTheme>;
+  return (
+    <HybridTheme>
+      <div style={styles.page(theme)}>
+        <main style={styles.shell}>
+          <div style={styles.content}>
+            <section style={styles.section}>
+              <h2 style={styles.sectionTitle(theme)}>Agent</h2>
+              <p style={styles.sectionText(theme)}>Manage your agent performance, referral tools, and rewards.</p>
+            </section>
+            {error && <p style={{ ...styles.sectionText(theme), color: '#f87171' }}>{error}</p>}
+            <div style={styles.buttonList}>
+              {sectionButtons.map(({ label, description }) => (
+                <button key={label} type="button" style={{ ...styles.cardButton(theme), ...(section === label ? styles.activeCard(theme) : {}) }} onClick={() => setSection(label)}>
+                  <h3 style={styles.cardTitle}>{label}</h3>
+                  <p style={styles.cardSubtext(theme)}>{description}</p>
+                </button>
+              ))}
+            </div>
+            {loading ? <div style={styles.loading} role="status" aria-label="Loading agent workspace"><LoadingDots /></div> : data ? <AgentSection section={section} data={data} analytics={analytics} rankings={rankings} copied={copied} copy={copy} share={share} theme={theme} /> : null}
+          </div>
+        </main>
+        <NowBar />
+      </div>
+    </HybridTheme>
+  );
 };
 
-const pageStyles = {
-  heading: { margin: '18px 0 6px', fontSize: 'clamp(1.35rem, 2.8vw, 2rem)', fontWeight: 900, letterSpacing: '-0.02em' },
-  intro: { margin: 0, fontSize: '0.92rem', color: 'inherit', lineHeight: 1.6 },
-  body: { margin: '10px 0', fontSize: '0.88rem', lineHeight: 1.5 },
-  loading: { display: 'flex', justifyContent: 'center', padding: '24px 0' },
-  cardHeading: { display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1.05rem', fontWeight: 800 },
-  code: { fontSize: 'clamp(1.25rem, 3vw, 1.5rem)', letterSpacing: '0.04em' },
-  meta: { fontSize: '0.78rem', color: 'inherit' },
-  activation: { display: 'grid', placeItems: 'center', gap: 0, padding: '24px 18px' },
-  sectionTitle: { margin: '12px 0 6px', fontSize: '1.05rem', fontWeight: 800 },
-  sectionText: { margin: '0 auto 18px', maxWidth: '62ch', lineHeight: 1.5 },
+const AgentSection = ({ section, data, analytics, rankings, copied, copy, share, theme }: { section: Section; data: Dashboard; analytics: Analytics | null; rankings: Ranking[]; copied: string; copy: (value: string, label: string) => Promise<void>; share: () => Promise<void>; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
+  if (section === 'Stats') return <div style={styles.content}><div style={styles.metricGrid}><Metric theme={theme} icon={<Users />} label="Referrals" value={data.stats.referrals} /><Metric theme={theme} icon={<Wallet />} label="Earned USDT" value={data.stats.totalEarned.toFixed(2)} /><Metric theme={theme} icon={<Gift />} label="First deposits" value={data.stats.firstDeposits} /><Metric theme={theme} icon={<BarChart3 />} label="Investments" value={data.stats.investments} /></div><section style={styles.panel(theme)}><h3 style={styles.panelTitle}><BarChart3 size={18} /> Performance</h3>{analytics?.byEvent?.length ? analytics.byEvent.map((item) => <div key={item._id} style={styles.row(theme)}><span>{item._id.replace('_', ' ')}</span><strong>{item.earned.toFixed(2)} USDT</strong></div>) : <p style={styles.cardSubtext(theme)}>No commission activity yet.</p>}</section><section style={styles.panel(theme)}><h3 style={styles.panelTitle}><Medal size={18} /> Top agents</h3>{rankings.slice(0, 5).map((item) => <div key={item.code} style={styles.row(theme)}><span>#{item.rank} {item.name || item.code}</span><strong>{item.earned.toFixed(2)} USDT</strong></div>)}</section></div>;
+  if (section === 'Tools') return <section style={styles.panel(theme)}><h3 style={styles.panelTitle}>Invite tools</h3><p style={styles.cardSubtext(theme)}>Share your personal code or scan the QR code to invite a new member.</p><div style={styles.invite}><div><strong style={styles.code}>{data.agent.code}</strong><button style={styles.smallButton(theme)} onClick={() => void copy(data.agent.code || '', 'code')}><Copy size={15} /> {copied === 'code' ? 'Copied' : 'Copy code'}</button></div>{data.agent.link && <QRCodeSVG value={data.agent.link} size={142} bgColor="transparent" fgColor={theme.text} />}</div><p style={styles.link(theme)}>{data.agent.link}</p><div style={styles.actions}>{data.agent.link && <button style={styles.primaryButton(theme)} onClick={() => void copy(data.agent.link || '', 'link')}>{copied === 'link' ? <Check size={16} /> : <Copy size={16} />} {copied === 'link' ? 'Copied' : 'Copy link'}</button>}<button style={styles.secondaryButton(theme)} onClick={() => void share()}><Share2 size={16} /> Share invite</button></div></section>;
+  return <div style={styles.content}><section style={styles.panel(theme)}><h3 style={styles.panelTitle}><Trophy size={18} /> Challenges</h3>{data.challenges?.length ? data.challenges.map((challenge) => <div key={challenge.title} style={{ marginBottom: 16 }}><div style={styles.row(theme)}><strong>{challenge.title}</strong><span>{challenge.percentage}%</span></div><p style={styles.cardSubtext(theme)}>{challenge.description}</p><small>{challenge.progress} / {challenge.target}{challenge.reward ? ` · ${challenge.reward} USDT reward` : ''}</small></div>) : <p style={styles.cardSubtext(theme)}>New challenges will appear here soon.</p>}</section><section style={styles.panel(theme)}><h3 style={styles.panelTitle}>Recent commissions</h3>{data.commissions.length === 0 ? <p style={styles.cardSubtext(theme)}>Your first commission will appear here after a referred user completes an eligible action.</p> : data.commissions.slice(0, 20).map((item, index) => <div key={`${item.createdAt}-${index}`} style={styles.row(theme)}><span>{item.event.replace('_', ' ')}<small style={{ display: 'block', color: theme.textMuted }}>{new Date(item.createdAt).toLocaleDateString()}</small></span><strong>+{item.amount.toFixed(2)} USDT</strong></div>)}</section></div>;
 };
-const card = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ ...createHybridCardStyles(theme).card, marginTop: 18 });
-const button = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 40, padding: '10px 14px', border: `1px solid ${theme.primary}`, borderRadius: 999, background: theme.primary, color: theme.textInverse, fontSize: '0.92rem', fontWeight: 700, cursor: 'pointer', boxSizing: 'border-box' as const });
-const activationButton = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ ...button(theme), minWidth: 190, boxShadow: `0 8px 20px ${theme.mode === 'dark' ? 'rgba(255,255,255,0.18)' : 'rgba(21,21,21,0.16)'}` });
-const secondaryButton = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ ...button(theme), background: theme.surfaceMuted, color: theme.text, borderColor: theme.borderGlass });
-const smallButton = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ ...secondaryButton(theme), minHeight: 34, padding: '7px 10px', marginTop: 8, fontSize: '0.84rem' });
-const grid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px, 1fr))', gap: 8, marginTop: 16 };
-const twoColumn = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 };
-const inviteActions = { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10, width: '100%' };
-const row = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderBottom: `1px solid ${theme.borderGlass}`, textTransform: 'capitalize' as const });
-const Metric = ({ theme, icon, label, value }: { theme: typeof HYBRID_THEME_TOKENS.dark; icon: React.ReactNode; label: string; value: string | number }) => <div style={card(theme)}><div>{icon}</div><strong style={{ display: 'block', fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', marginTop: 6 }}>{value}</strong><span style={{ color: theme.textMuted, fontSize: '0.74rem' }}>{label}</span></div>;
+
+const Metric = ({ theme, icon, label, value }: { theme: typeof HYBRID_THEME_TOKENS.dark; icon: React.ReactNode; label: string; value: string | number }) => <div style={styles.panel(theme)}><div>{icon}</div><strong style={styles.metricValue}>{value}</strong><span style={styles.muted(theme)}>{label}</span></div>;
+
+const styles = {
+  page: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ minHeight: '100vh', overflowX: 'hidden' as const, paddingBottom: 132, background: theme.background, color: theme.text }),
+  shell: { width: '100%', maxWidth: 1160, margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
+  content: { display: 'grid', gap: 18, marginTop: 18 },
+  section: { display: 'grid', gap: 10 },
+  sectionTitle: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, fontSize: '1.45rem', fontWeight: 900, color: theme.text }),
+  sectionText: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7 }),
+  buttonList: { display: 'grid', gap: 10, marginTop: 6 },
+  cardButton: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 6, width: '100%', padding: '16px 18px', borderRadius: 18, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, textAlign: 'left' as const, boxSizing: 'border-box' as const, cursor: 'pointer' }),
+  activeCard: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ borderColor: theme.primary, boxShadow: `0 0 0 1px ${theme.primary}` }),
+  cardTitle: { margin: 0, fontSize: '1rem', fontWeight: 800 },
+  cardSubtext: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, fontSize: '0.86rem', color: theme.textMuted, lineHeight: 1.6 }),
+  loading: { display: 'flex', justifyContent: 'center', padding: 24 },
+  panel: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 10, padding: 18, borderRadius: 18, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }),
+  panelTitle: { display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1.05rem', fontWeight: 800 },
+  metricGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px, 1fr))', gap: 10 },
+  metricValue: { display: 'block', fontSize: '1.12rem' },
+  muted: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ color: theme.textMuted, fontSize: '0.74rem' }),
+  row: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderBottom: `1px solid ${theme.borderGlass}`, textTransform: 'capitalize' as const }),
+  invite: { display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' as const },
+  code: { fontSize: '1.5rem', letterSpacing: '0.04em' },
+  link: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, wordBreak: 'break-all' as const, color: theme.textMuted }),
+  actions: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 },
+  primaryButton: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 40, border: `1px solid ${theme.primary}`, borderRadius: 999, background: theme.primary, color: theme.textInverse, fontWeight: 700, cursor: 'pointer' }),
+  secondaryButton: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 40, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, background: theme.surfaceMuted, color: theme.text, fontWeight: 700, cursor: 'pointer' }),
+  smallButton: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 10, padding: '8px 10px', border: `1px solid ${theme.borderGlass}`, borderRadius: 999, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }),
+};
+
 export default AgentPage;
