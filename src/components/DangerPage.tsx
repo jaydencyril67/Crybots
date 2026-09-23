@@ -195,11 +195,6 @@ const DangerPage = () => {
           <div style={styles.content}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
             <section style={styles.card}>
-              <h2 style={styles.sectionTitle}>Danger Zone</h2>
-              <p style={styles.sectionText}>These actions are irreversible or highly restrictive. Read each warning carefully before continuing.</p>
-            </section>
-
-            <section style={styles.card}>
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
               <div style={styles.field}>
