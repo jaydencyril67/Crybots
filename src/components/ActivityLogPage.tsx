@@ -53,10 +53,17 @@ const formatAction = (action: string) => {
 };
 
 const getReadableActivity = (activity: Activity) => {
+  if (/^\/api\/webauthn\/register\/verify$/.test(activity.path)) {
+    return {
+      title: 'Biometric security enabled',
+      description: 'You enabled biometric security for your account.',
+    };
+  }
+
   if (/^\/api\/webauthn\/credentials(?:\/|$)/.test(activity.path)) {
     return {
-      title: 'Passkey removed',
-      description: 'You removed a passkey used to secure your account.',
+      title: 'Biometric security disabled',
+      description: 'You disabled biometric security for your account.',
     };
   }
 

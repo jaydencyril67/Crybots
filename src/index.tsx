@@ -26,6 +26,8 @@ import ContactPage from './components/ContactPage';
 import OptionsPage from './components/OptionsPage';
 import LibraryPage from './components/LibraryPage';
 import AboutPage from './components/AboutPage';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import CommunityStandardsPage from './components/CommunityStandardsPage';
 import DeveloperPage from './components/DeveloperPage';
 import AssetPage from './components/AssetPage';
 import DangerPage from './components/DangerPage';
@@ -86,6 +88,8 @@ const getRouteKey = () => {
   if (pathname === '/options' || hash === '#/options') return 'options';
   if (pathname === '/library' || hash === '#/library') return 'library';
   if (pathname === '/about' || hash === '#/about') return 'about';
+  if (pathname === '/privacy-policy' || hash === '#/privacy-policy') return 'privacy-policy';
+  if (pathname === '/community-standards' || hash === '#/community-standards') return 'community-standards';
   if (pathname === '/developer' || hash === '#/developer') return 'developer';
   if (pathname === '/asset' || hash === '#/asset') return 'asset';
   if (pathname === '/danger' || hash === '#/danger') return 'danger';
@@ -125,6 +129,8 @@ const routeToKey = (path: string) => {
   if (path === '/options' || path === '#/options') return 'options';
   if (path === '/library' || path === '#/library') return 'library';
   if (path === '/about' || path === '#/about') return 'about';
+  if (path === '/privacy-policy' || path === '#/privacy-policy') return 'privacy-policy';
+  if (path === '/community-standards' || path === '#/community-standards') return 'community-standards';
   if (path === '/developer' || path === '#/developer') return 'developer';
   if (path === '/asset' || path === '#/asset') return 'asset';
   if (path === '/danger' || path === '#/danger') return 'danger';
@@ -276,6 +282,8 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'options') return <ProtectedRoute><OptionsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'library') return <ProtectedRoute><LibraryPage /></ProtectedRoute>;
     if (displayedRouteKey === 'about') return <ProtectedRoute><AboutPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'privacy-policy') return <PrivacyPolicyPage />;
+    if (displayedRouteKey === 'community-standards') return <CommunityStandardsPage />;
     if (displayedRouteKey === 'developer') return <ProtectedRoute><DeveloperPage /></ProtectedRoute>;
     if (displayedRouteKey === 'asset') return <ProtectedRoute><AssetPage /></ProtectedRoute>;
     if (displayedRouteKey === 'danger') return <ProtectedRoute><DangerPage /></ProtectedRoute>;

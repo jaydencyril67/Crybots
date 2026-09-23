@@ -225,6 +225,8 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/notifications') return 'NOTIFICATIONS';
   if (path === '/alert-settings') return 'ALERT SETTINGS';
   if (path === '/activity-log') return 'ACTIVITY LOG';
+  if (path === '/privacy-policy') return 'PRIVACY POLICY';
+  if (path === '/community-standards') return 'COMMUNITY STANDARDS';
   return 'NOWBAR';
 };
 
