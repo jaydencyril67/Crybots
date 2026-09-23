@@ -110,6 +110,7 @@ const DepositPage = () => {
   const [copied, setCopied] = useState(false);
   const [recentDeposits, setRecentDeposits] = useState<DepositPayment[]>([]);
   const [recentLoading, setRecentLoading] = useState(true);
+  const [depositNotice, setDepositNotice] = useState<{ tone: 'info' | 'success' | 'error'; title: string; message: string } | null>(null);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -161,7 +162,14 @@ const DepositPage = () => {
     const timer = window.setInterval(async () => {
       try {
         const response = await api.get<{ payment: DepositPayment }>(`/api/deposits/${paymentId}`);
-        setPayment(response.data.payment);
+        const nextPayment = normalizeDeposit(response.data.payment);
+        setPayment(nextPayment);
+        const nextStatus = statusLabel(nextPayment.paymentStatus || nextPayment.status);
+        if (nextStatus === 'completed') {
+          setDepositNotice({ tone: 'success', title: 'Deposit confirmed', message: 'Your USDT deposit has been confirmed and your balance will reflect it shortly.' });
+        } else if (['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(nextStatus)) {
+          setDepositNotice({ tone: 'error', title: 'Deposit not completed', message: 'This deposit could not be completed. Please start a new deposit or contact support.' });
+        }
       } catch {
         // A temporary status request failure should not interrupt the payment flow.
       }
@@ -183,6 +191,7 @@ const DepositPage = () => {
       const response = await api.post<{ payment: DepositPayment }>('/api/deposits', { amount: value, payCurrency: network });
       const createdPayment = normalizeDeposit(response.data.payment);
       setPayment(createdPayment);
+      setDepositNotice({ tone: 'info', title: 'Deposit address ready', message: 'Send the requested amount to the address below. We will notify you when it is confirmed.' });
       setRecentDeposits((current) => [createdPayment, ...current.filter((item) => item.paymentId !== createdPayment.paymentId)].slice(0, 5));
     } catch (error: any) {
       setMessage(error?.response?.data?.message || 'Unable to create a crypto payment.');
@@ -214,7 +223,9 @@ const DepositPage = () => {
     try {
       const response = await api.get<{ payment: DepositPayment }>(`/api/deposits/${paymentId}`);
       if (response.data?.payment) {
-        setPayment(normalizeDeposit(response.data.payment));
+        const nextPayment = normalizeDeposit(response.data.payment);
+        setPayment(nextPayment);
+        setDepositNotice({ tone: 'info', title: 'Deposit resumed', message: 'This deposit is ready. Send the requested amount to continue.' });
       }
     } catch {
       setPayment(deposit);
@@ -232,6 +243,7 @@ const DepositPage = () => {
           style={styles.secondaryButton}
           onClick={() => {
             setPayment(null);
+            setDepositNotice(null);
             setMessage('');
           }}
         >
@@ -284,6 +296,7 @@ const DepositPage = () => {
             Deposit USDT straight to your wallet address and keep everything on-chain.
           </p>
 
+          {depositNotice ? <NotificationBanner tone={depositNotice.tone} title={depositNotice.title} message={depositNotice.message} /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'completed' ? <NotificationBanner tone="success" title="Deposit confirmed" message="Your USDT deposit has been confirmed and your balance will reflect it shortly." /> : null}
           {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'pending' ? <NotificationBanner tone="info" title="Deposit awaiting confirmation" message="Send the requested amount to the address above. We will update this page when the network confirms it." /> : null}

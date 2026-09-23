@@ -52,9 +52,13 @@ const NotificationsPage = () => {
 
   const loadNotifications = useCallback(async (showLoader = false) => {
     if (showLoader) setRefreshing(true);
+    if (!localStorage.getItem('token')) {
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
     try {
       const response = await api.get('/api/notifications');
-      if (!localStorage.getItem('token')) return;
       const nextNotifications = response.data.notifications || [];
       setNotifications(nextNotifications);
       setError('');
