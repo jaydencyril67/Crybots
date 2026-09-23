@@ -2,6 +2,7 @@ import React from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
+import { navigate } from '../utils/navigate';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
@@ -34,9 +35,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const pageButtons = [
-  { label: 'Information', description: 'Learn more about KingsHall Exchange and its services.' },
-  { label: 'Privacy Policy', description: 'Review how account and platform information is handled.' },
-  { label: 'Community Standards', description: 'Explore the standards that help keep our community safe.' },
+  { label: 'Information', description: 'Learn more about KingsHall Exchange and its services.', path: '/about' },
+  { label: 'Privacy Policy', description: 'Review how account and platform information is handled.', path: '/privacy-policy' },
+  { label: 'Community Standards', description: 'Explore the standards that help keep our community safe.', path: '/community-standards' },
 ];
 
 const AboutPage = () => {
@@ -54,8 +55,8 @@ const AboutPage = () => {
               <p style={styles.sectionText}>Learn more about KingsHall Exchange, our policies, and the standards that guide our community.</p>
             </section>
             <div style={styles.buttonList}>
-              {pageButtons.map(({ label, description }) => (
-                <button key={label} type="button" style={styles.cardButton}>
+              {pageButtons.map(({ label, description, path }) => (
+                <button key={label} type="button" style={styles.cardButton} onClick={() => navigate(path)}>
                   <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800 }}>{label}</h3>
                   <p style={styles.cardSubtext}>{description}</p>
                 </button>
