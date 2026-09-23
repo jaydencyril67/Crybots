@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { ArrowLeft, Check, Coins, Save, Wallet } from 'lucide-react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
-import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
@@ -91,7 +90,7 @@ const AgentMenuPage = () => {
       <section style={styles.card(theme)}><h2 style={styles.cardTitle}><Wallet size={18} /> Withdraw earnings</h2><div style={styles.balance(theme)}><span>Available earnings</span><strong>{data.agent.availableEarnings.toFixed(2)} USDT</strong></div><p style={styles.text(theme)}>Withdraw all or part of your earned referral commissions into your main USDT balance.</p><label style={styles.label(theme)}>Amount (USDT)<input style={styles.input(theme)} value={amount} type="number" min="0.01" max={data.agent.availableEarnings} step="0.01" inputMode="decimal" onChange={(event) => setAmount(event.target.value)} placeholder="0.00" /></label><button type="button" style={styles.primary(theme)} disabled={withdrawing || data.agent.availableEarnings <= 0} onClick={() => void withdraw()}>{withdrawing ? <InlineLoadingDots /> : <><Coins size={16} /> Withdraw to main balance</>}</button><button type="button" style={styles.secondary(theme)} disabled={data.agent.availableEarnings <= 0} onClick={() => setAmount(data.agent.availableEarnings.toFixed(2))}>Use available balance</button></section>
       <section style={styles.card(theme)}><h2 style={styles.cardTitle}>Agent shortcuts</h2><div style={styles.shortcuts}><button type="button" style={styles.secondary(theme)} onClick={() => navigate('/agent/tools')}>Referral tools</button><button type="button" style={styles.secondary(theme)} onClick={() => navigate('/agent/stats')}>View statistics</button></div></section>
     </div> : null}
-    </main><NowBar /></div></HybridTheme>;
+    </main></div></HybridTheme>;
 };
 
 const styles = {

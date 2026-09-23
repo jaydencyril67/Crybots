@@ -3,7 +3,6 @@ import { Check, Copy, Share2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
-import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 
@@ -32,7 +31,7 @@ const AgentToolsPage = () => {
     else await copy(data.agent.link, 'link');
   };
 
-  return <HybridTheme><div style={styles.page(theme)}><main style={styles.shell}><section style={styles.section}><h1 style={styles.title}>Agent tools</h1><p style={styles.text(theme)}>Share your referral code and invite link with your community.</p></section>{error && <p style={{ ...styles.text(theme), color: '#f87171' }}>{error}</p>}{!data ? <div style={styles.loading}><LoadingDots /></div> : <section style={styles.card(theme)}><div style={styles.codeRow}><div><span style={styles.label(theme)}>Referral code</span><strong style={styles.code}>{data.agent.code || '—'}</strong><button type="button" style={styles.secondary(theme)} onClick={() => void copy(data.agent.code || '', 'code')}><Copy size={16} /> {copied === 'code' ? 'Copied' : 'Copy code'}</button></div>{data.agent.link && <QRCodeSVG value={data.agent.link} size={150} bgColor="transparent" fgColor={theme.text} />}</div><span style={styles.label(theme)}>Referral link</span><p style={styles.link(theme)}>{data.agent.link || '—'}</p><div style={styles.actions}>{data.agent.link && <button type="button" style={styles.primary(theme)} onClick={() => void copy(data.agent.link || '', 'link')}>{copied === 'link' ? <Check size={16} /> : <Copy size={16} />} {copied === 'link' ? 'Copied' : 'Copy link'}</button>}<button type="button" style={styles.secondary(theme)} onClick={() => void share()}><Share2 size={16} /> Share invite</button></div></section>}</main><NowBar /></div></HybridTheme>;
+  return <HybridTheme><div style={styles.page(theme)}><main style={styles.shell}><section style={styles.section}><h1 style={styles.title}>Agent tools</h1><p style={styles.text(theme)}>Share your referral code and invite link with your community.</p></section>{error && <p style={{ ...styles.text(theme), color: '#f87171' }}>{error}</p>}{!data ? <div style={styles.loading}><LoadingDots /></div> : <section style={styles.card(theme)}><div style={styles.codeRow}><div><span style={styles.label(theme)}>Referral code</span><strong style={styles.code}>{data.agent.code || '—'}</strong><button type="button" style={styles.secondary(theme)} onClick={() => void copy(data.agent.code || '', 'code')}><Copy size={16} /> {copied === 'code' ? 'Copied' : 'Copy code'}</button></div>{data.agent.link && <QRCodeSVG value={data.agent.link} size={150} bgColor="transparent" fgColor={theme.text} />}</div><span style={styles.label(theme)}>Referral link</span><p style={styles.link(theme)}>{data.agent.link || '—'}</p><div style={styles.actions}>{data.agent.link && <button type="button" style={styles.primary(theme)} onClick={() => void copy(data.agent.link || '', 'link')}>{copied === 'link' ? <Check size={16} /> : <Copy size={16} />} {copied === 'link' ? 'Copied' : 'Copy link'}</button>}<button type="button" style={styles.secondary(theme)} onClick={() => void share()}><Share2 size={16} /> Share invite</button></div></section>}</main></div></HybridTheme>;
 };
 
 const styles = {
