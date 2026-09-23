@@ -128,6 +128,8 @@ const TransferPage = () => {
   const [securityCodeBound, setSecurityCodeBound] = useState(false);
   const [usdtBalance, setUsdtBalance] = useState(0);
   const [transferring, setTransferring] = useState(false);
+  const transferAmount = Number(amount);
+  const amountIsValid = Number.isFinite(transferAmount) && transferAmount >= 1 && transferAmount <= 10000;
 
   const recipientDisplay = useMemo(() => {
     if (!recipientDetails) return '';
@@ -192,7 +194,10 @@ const TransferPage = () => {
   }, [recipientMethod, recipientValue]);
 
   const handleTransfer = async () => {
-    if (!recipientValid) return;
+    if (!recipientValid || !amountIsValid) {
+      setMessage({ kind: 'error', text: 'Enter a transfer amount between 1 and 10,000 USDT.' });
+      return;
+    }
 
     setTransferring(true);
     try {
@@ -264,14 +269,15 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Amount</span>
-                  <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
+                  <input style={styles.input} type="number" min="1" max="10000" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="1.00 USDT" />
+                  <span style={styles.helper}>Minimum 1 USDT · Maximum 10,000 USDT per transaction</span>
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
                   <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeBound} />
                 </div>
                 <div style={styles.buttonRow}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !securityCodeBound || !securityCode}>
+                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !amountIsValid || !securityCodeBound || !securityCode}>
                     {transferring ? <InlineLoadingDots /> : 'Send USDT'}
                   </button>
                 </div>
