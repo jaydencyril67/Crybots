@@ -1,5 +1,4 @@
 import React from 'react';
-import { BarChart3, Settings, Wrench } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
@@ -7,14 +6,13 @@ import { navigate } from '../utils/navigate';
 type AgentDestination = {
   label: string;
   description: string;
-  icon: React.ReactNode;
   path: string;
 };
 
 const destinations: AgentDestination[] = [
-  { label: 'Stats', description: 'Review your referrals, earnings, rankings, and progress.', icon: <BarChart3 size={22} />, path: '/agent/stats' },
-  { label: 'Tools', description: 'Manage your referral code, invite link, and QR code.', icon: <Wrench size={22} />, path: '/agent/tools' },
-  { label: 'Menu', description: 'Change referral settings and manage your agent earnings.', icon: <Settings size={22} />, path: '/agent/menu' },
+  { label: 'Stats', description: 'Review your referrals, earnings, rankings, and progress.', path: '/agent/stats' },
+  { label: 'Tools', description: 'Manage your referral code, invite link, and QR code.', path: '/agent/tools' },
+  { label: 'Menu', description: 'Change referral settings and manage your agent earnings.', path: '/agent/menu' },
 ];
 
 const AgentPage = () => {
@@ -32,7 +30,6 @@ const AgentPage = () => {
           <section style={styles.list} aria-label="Agent pages">
             {destinations.map((destination) => (
               <button key={destination.path} type="button" style={styles.card(theme)} onClick={() => navigate(destination.path)}>
-                <span style={styles.icon(theme)}>{destination.icon}</span>
                 <span style={styles.cardCopy}>
                   <strong style={styles.cardTitle}>{destination.label}</strong>
                   <span style={styles.cardDescription(theme)}>{destination.description}</span>
@@ -53,8 +50,7 @@ const styles = {
   title: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, color: theme.text, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em' }),
   description: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, color: theme.textMuted, fontSize: '0.92rem', lineHeight: 1.7 }),
   list: { display: 'grid', gap: 10, marginTop: 22 },
-  card: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', alignItems: 'center', gap: 14, width: '100%', padding: '16px 18px', border: `1px solid ${theme.borderGlass}`, borderRadius: 18, background: theme.surfaceGlass, color: theme.text, textAlign: 'left' as const, cursor: 'pointer', boxSizing: 'border-box' as const }),
-  icon: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', placeItems: 'center', flexShrink: 0, width: 42, height: 42, borderRadius: 14, color: theme.primary, background: theme.surfaceMuted }),
+  card: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 6, width: '100%', padding: '16px 18px', border: `1px solid ${theme.borderGlass}`, borderRadius: 18, background: theme.surfaceGlass, color: theme.text, textAlign: 'left' as const, cursor: 'pointer', boxSizing: 'border-box' as const }),
   cardCopy: { display: 'grid', gap: 5 },
   cardTitle: { fontSize: '1rem', fontWeight: 800 },
   cardDescription: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.6 }),
