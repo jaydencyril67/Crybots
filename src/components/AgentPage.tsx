@@ -57,7 +57,7 @@ const AgentPage = () => {
   const openSection = (nextSection: Section) => {
     if (nextSection === 'Stats') navigate('/agent/stats');
     if (nextSection === 'Tools') navigate('/agent/tools');
-    if (nextSection === 'Menu') setSection(nextSection);
+    if (nextSection === 'Menu') navigate('/agent/menu');
   };
 
   const copy = async (value: string, label: string) => {
