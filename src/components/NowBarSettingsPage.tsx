@@ -93,6 +93,13 @@ const NowBarSettingsPage = () => {
               ))}
             </div>
           </section>
+          <section style={styles.card}>
+            <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>🎨 Button color</h2>
+            <p style={styles.text}>Replace the bold white button borders with a color that matches your NowBar style.</p>
+            <div style={styles.row}>
+              <button type="button" style={styles.button} onClick={() => navigate('/nowbar-button-color')}>Choose color</button>
+            </div>
+          </section>
         </div>
         <NowBar />
       </main>
