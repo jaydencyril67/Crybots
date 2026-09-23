@@ -83,7 +83,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(1.6 * 72px)',
+    height: 'calc(3 * 72px)',
     boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
   },
   bar: {
@@ -94,7 +94,7 @@ const styles = {
     borderRadius: '20px',
     border: '2.5px solid rgba(255,255,255,0.88)',
     position: 'relative' as const,
-    background: '#000000',
+    background: 'linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(8,14,26,0.92) 100%)',
     boxShadow: '0 0 0 1px rgba(255,255,255,0.12), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.82), inset 0 1px 0 rgba(255,255,255,0.12)',
     backdropFilter: 'blur(18px) saturate(120%)',
     WebkitBackdropFilter: 'blur(18px) saturate(120%)',
@@ -108,7 +108,7 @@ const styles = {
   },
   barExpanded: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     alignSelf: 'flex-end',
@@ -149,7 +149,7 @@ const styles = {
     padding: '10px',
     border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '12px',
-    background: '#000000',
+    background: 'linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(8,14,26,0.92) 100%)',
     color: '#e5eefc',
     cursor: 'pointer',
     display: 'inline-flex',
@@ -175,14 +175,25 @@ const styles = {
     placeItems: 'center',
   },
   labelExpanded: {
+    minWidth: 0,
     fontSize: '0.92rem',
     fontWeight: 700,
     letterSpacing: '0.01em',
     textAlign: 'left' as const,
-    whiteSpace: 'normal' as const,
+    whiteSpace: 'nowrap' as const,
     lineHeight: 1.1,
     overflow: 'hidden' as const,
-    textOverflow: 'ellipsis' as const,
+  },
+  marqueeViewport: {
+    minWidth: 0,
+    overflow: 'hidden' as const,
+    flex: 1,
+  },
+  marqueeTrack: {
+    display: 'inline-flex',
+    whiteSpace: 'nowrap' as const,
+    animation: 'nowbar-label-marquee 7s ease-in-out infinite',
+    willChange: 'transform',
   },
   iconWrap: {
     width: '18px',
@@ -462,7 +473,8 @@ const NowBar = ({ actions }: NowBarProps) => {
 
   return (
     <>
-      <style>{`@keyframes nowbar-edge-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      <style>{`@keyframes nowbar-label-marquee { 0%, 15% { transform: translateX(0); } 45%, 70% { transform: translateX(calc(-100% + 145px)); } 100% { transform: translateX(0); } }
+@keyframes nowbar-edge-orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 @keyframes nowbar-edge-blink-light { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 18px 50px rgba(0,0,0,.82); } }
 @keyframes nowbar-edge-blink { 0%, 42%, 100% { border-color: var(--edge-light); box-shadow: 0 0 0 1px var(--edge-light), 0 0 26px var(--edge-light), 0 18px 50px rgba(0,0,0,.82); } 48%, 94% { border-color: rgba(255,255,255,.88); box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 0 2px transparent, 0 18px 50px rgba(0,0,0,.82); } }
@@ -535,7 +547,15 @@ const NowBar = ({ actions }: NowBarProps) => {
                 }}
               >
                 <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
-                {isExpanded ? <span style={styles.labelExpanded}>{action.label.toUpperCase()}</span> : null}
+                {isExpanded ? (
+                  action.label.length > 12 ? (
+                    <span style={{ ...styles.labelExpanded, ...styles.marqueeViewport }}>
+                      <span style={styles.marqueeTrack}>{action.label.toUpperCase()}&nbsp;&nbsp;•&nbsp;&nbsp;{action.label.toUpperCase()}</span>
+                    </span>
+                  ) : (
+                    <span style={styles.labelExpanded}>{action.label.toUpperCase()}</span>
+                  )
+                ) : null}
               </button>
             </div>
           ))
