@@ -1,6 +1,5 @@
 import React from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
-import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -54,7 +53,6 @@ const ParentPageLayout = ({ title, description, cards }: ParentPageLayoutProps) 
             </div>
           </div>
         </div>
-        <NowBar />
       </div>
     </HybridTheme>
   );
