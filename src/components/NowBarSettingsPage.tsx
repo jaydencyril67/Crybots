@@ -8,6 +8,7 @@ import { navigate } from '../utils/navigate';
 type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse-light' | 'pulse' | 'color-light' | 'color';
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
+const BUTTON_COLOR_ENABLED_STORAGE_KEY = 'nowbar_button_color_enabled';
 const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
   { key: 'stable-light', label: 'Stable Light' },
   { key: 'stable', label: 'Stable glow' },
@@ -37,12 +38,15 @@ const NowBarSettingsPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [enabled, setEnabled] = useState(false);
+  const [buttonColorEnabled, setButtonColorEnabled] = useState(true);
   const [mode, setMode] = useState<EdgeLightMode>('stable');
 
   useEffect(() => {
     try {
       const saved = JSON.parse(window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY) ?? '{}') as { enabled?: boolean; mode?: EdgeLightMode };
+      const savedButtonColorEnabled = window.localStorage.getItem(BUTTON_COLOR_ENABLED_STORAGE_KEY);
       setEnabled(Boolean(saved.enabled));
+      if (savedButtonColorEnabled !== null) setButtonColorEnabled(savedButtonColorEnabled === 'true');
       if (saved.mode && EDGE_LIGHT_MODES.some((option) => option.key === saved.mode)) setMode(saved.mode);
     } catch {
       // Keep defaults when saved settings are invalid.
@@ -61,6 +65,13 @@ const NowBarSettingsPage = () => {
     }
     window.localStorage.setItem(EDGE_LIGHT_STORAGE_KEY, JSON.stringify({ enabled: nextEnabled, color, mode: nextMode }));
     window.dispatchEvent(new Event('nowbar-edge-light-changed'));
+  };
+
+  const toggleButtonColor = () => {
+    const nextEnabled = !buttonColorEnabled;
+    setButtonColorEnabled(nextEnabled);
+    window.localStorage.setItem(BUTTON_COLOR_ENABLED_STORAGE_KEY, String(nextEnabled));
+    window.dispatchEvent(new Event('nowbar-button-color-changed'));
   };
 
   const toggle = () => {
@@ -97,6 +108,7 @@ const NowBarSettingsPage = () => {
             <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>🎨 Button color</h2>
             <p style={styles.text}>Replace the bold white button borders with a color that matches your NowBar style.</p>
             <div style={styles.row}>
+              <button type="button" style={{ ...styles.button, ...(buttonColorEnabled ? styles.active : {}) }} onClick={toggleButtonColor}>{buttonColorEnabled ? 'On' : 'Off'}</button>
               <button type="button" style={styles.button} onClick={() => navigate('/nowbar-button-color')}>Choose color</button>
             </div>
           </section>
