@@ -47,7 +47,7 @@ const ParentPageLayout = ({ title, description, cards }: ParentPageLayoutProps) 
                 <article key={card.label} style={styles.card}>
                   <h3 style={styles.cardTitle}>{card.label}</h3>
                   <p style={styles.cardSubtext}>{card.description}</p>
-                  {card.route ? <button type="button" style={styles.viewButton} onClick={() => navigate(card.route as string)}>View</button> : <span />}
+                  <button type="button" style={styles.viewButton} onClick={card.route ? () => navigate(card.route as string) : undefined} disabled={!card.route}>View</button>
                 </article>
               ))}
             </div>
