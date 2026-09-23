@@ -78,7 +78,7 @@ const DepositPage = () => {
     selectTrigger: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left' as const },
     selectMenu: { display: 'grid', gap: '6px', marginTop: '6px', padding: '8px', border: `1px solid ${theme.borderStrong}`, borderRadius: '16px', background: theme.surfaceElevated, position: 'relative' as const, zIndex: 5 },
     selectOption: { width: '100%', border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '10px 12px', background: theme.surface, color: theme.text, cursor: 'pointer', textAlign: 'left' as const },
-    primaryButton: { border: `1px solid ${theme.primary}`, borderRadius: '10px', padding: '11px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 700, opacity: 1 },
+    primaryButton: { border: `1px solid ${theme.primary}`, borderRadius: '999px', padding: '12px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 700, width: '100%', maxWidth: '100%', opacity: 1 },
     primaryButtonDisabled: { opacity: 0.55, cursor: 'not-allowed' },
     secondaryButton: { border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
     address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
@@ -274,7 +274,7 @@ const DepositPage = () => {
         </div>}
       </div>
       {message ? <NotificationBanner tone="error" title="Deposit update" message={message} /> : null}
-      <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '14px' }} disabled={loading}>{loading ? <><LoadingDots /> Creating payment…</> : 'Create deposit address'}</button>
+      <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '8px' }} disabled={loading}>{loading ? <><LoadingDots /> Creating payment…</> : 'Create deposit address'}</button>
     </form>
   );
 
