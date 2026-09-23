@@ -38,6 +38,8 @@ const ManagePage = () => {
   const [walletAddress, setWalletAddress] = useState('');
   const [description, setDescription] = useState('');
   const [walletValid, setWalletValid] = useState(false);
+  const [securityCode, setSecurityCode] = useState('');
+  const [editingWalletId, setEditingWalletId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'idle', message: '' });
 
@@ -53,21 +55,35 @@ const ManagePage = () => {
     void loadWallet();
   }, []);
 
+  const resetWalletForm = () => {
+    setWalletAddress('');
+    setDescription('');
+    setWalletValid(false);
+    setEditingWalletId(null);
+  };
+
   const handleSave = async () => {
     const address = walletAddress.trim();
+    const normalizedSecurityCode = securityCode.replace(/\D/g, '').slice(0, 6);
     if (!walletValid) {
       setStatus({ kind: 'error', message: `Enter a valid ${network} wallet address before saving.` });
+      return;
+    }
+    if (normalizedSecurityCode.length !== 6) {
+      setStatus({ kind: 'error', message: 'Enter your 6-digit security code to continue.' });
       return;
     }
 
     setSaving(true);
     try {
-      const { data } = await api.post('/api/settings/wallets', { network, address, description });
+      const request = { network, address, description, securityCode: normalizedSecurityCode };
+      const { data } = editingWalletId
+        ? await api.patch(`/api/settings/wallets/${editingWalletId}`, request)
+        : await api.post('/api/settings/wallets', request);
+      const wasEditing = Boolean(editingWalletId);
       setWallets(data.wallets || []);
-      setWalletAddress('');
-      setDescription('');
-      setWalletValid(false);
-      setStatus({ kind: 'success', message: 'Wallet saved successfully.' });
+      resetWalletForm();
+      setStatus({ kind: 'success', message: wasEditing ? 'Wallet updated successfully.' : 'Wallet saved successfully.' });
     } catch (error: any) {
       setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to save your wallet address. Please try again.') });
     } finally {
@@ -98,9 +114,13 @@ const ManagePage = () => {
                 <span style={styles.helper}>{walletValid ? `${network} wallet format looks valid.` : `Enter a valid ${network} address.`}</span>
               </label>
               <label style={styles.label}><span>Description (optional)</span><input style={styles.input} value={description} onChange={(event) => setDescription(event.target.value.slice(0, 100))} placeholder="e.g. Main trading wallet" /></label>
-              <button style={styles.button} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || wallets.length >= 10}>{saving ? <InlineLoadingDots /> : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
+              <label style={styles.label}><span>Security code</span><input style={styles.input} type="password" inputMode="numeric" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" /><span style={styles.helper}>Required when binding or editing a wallet.</span></label>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button style={styles.button} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || (!editingWalletId && wallets.length >= 10)}>{saving ? <InlineLoadingDots /> : editingWalletId ? 'Update wallet' : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
+                {editingWalletId ? <button style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} type="button" onClick={resetWalletForm}>Cancel edit</button> : null}
+              </div>
             </div>
-            {wallets.length ? <div style={{ ...styles.form, marginTop: '22px' }}><strong>Bound wallets ({wallets.length}/10)</strong>{wallets.map((wallet) => <div key={wallet.id} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'center' }}><span><b>{wallet.description || wallet.network}</b><br /><small>{wallet.network} · {wallet.address}</small></span><button type="button" style={styles.button} onClick={() => void (async () => { try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`); setWallets(data.wallets || []); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Remove</button></div>)}</div> : null}
+            {wallets.length ? <div style={{ ...styles.form, marginTop: '22px' }}><strong>Bound wallets ({wallets.length}/10)</strong>{wallets.map((wallet) => <div key={wallet.id} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}><span><b>{wallet.description || wallet.network}</b><br /><small>{wallet.network} · {wallet.address}</small></span><div style={{ display: 'flex', gap: '8px' }}><button type="button" style={styles.button} onClick={() => { setEditingWalletId(wallet.id || null); setNetwork(wallet.network); setWalletAddress(wallet.address); setDescription(wallet.description || ''); setWalletValid(true); }}>Edit</button><button type="button" style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} onClick={() => void (async () => { if (securityCode.replace(/\D/g, '').length !== 6) { setStatus({ kind: 'error', message: 'Enter your 6-digit security code before unbinding a wallet.' }); return; } try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`, { data: { securityCode: securityCode.replace(/\D/g, '').slice(0, 6) } }); setWallets(data.wallets || []); if (editingWalletId === wallet.id) resetWalletForm(); setStatus({ kind: 'success', message: 'Wallet unbound successfully.' }); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Unbind</button></div></div>)}</div> : null}
           </section>
         </div>
         <NowBar />
