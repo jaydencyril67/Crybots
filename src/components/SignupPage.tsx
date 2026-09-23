@@ -479,6 +479,7 @@ const SignupPage = () => {
         dob: form.dob,
         email: form.email,
         password: form.password,
+        referralCode: new URLSearchParams(window.location.search).get('ref') || undefined,
       });
 
       if (response.data?.token) {

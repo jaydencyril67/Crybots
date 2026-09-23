@@ -1,77 +1,30 @@
-import React from 'react';
-import { BarChart3, Menu, Wrench } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Copy, Trophy, Users, Wallet } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
+import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
 
-const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: {
-    minHeight: '100vh',
-    overflowX: 'hidden' as const,
-    overflowY: 'auto' as const,
-    paddingBottom: '132px',
-    background: theme.background,
-    color: theme.text,
-  },
-  shell: {
-    width: '100%',
-    maxWidth: '1160px',
-    margin: '0 auto',
-    padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
-    boxSizing: 'border-box' as const,
-  },
-  content: { display: 'grid', gap: '18px', marginTop: '18px' },
-  section: { display: 'grid', gap: '10px' },
-  sectionTitle: { margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em', color: theme.text },
-  sectionText: { margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7, maxWidth: '62ch' },
-  buttonList: { display: 'grid', gap: '10px', marginTop: '6px' },
-  cardButton: {
-    display: 'flex', alignItems: 'center', gap: '14px', width: '100%', padding: '16px 18px', borderRadius: '18px',
-    border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text,
-    textAlign: 'left' as const, boxSizing: 'border-box' as const, cursor: 'pointer',
-    backdropFilter: 'blur(24px) saturate(1.15)', WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
-  },
-  icon: { width: '20px', height: '20px', flexShrink: 0 },
-  cardSubtext: { margin: '3px 0 0', fontSize: '0.86rem', color: theme.textMuted, lineHeight: 1.5 },
-});
-
-const pageButtons = [
-  { label: 'Stats', description: 'Review agent performance and activity.', icon: BarChart3 },
-  { label: 'Tools', description: 'Access tools for managing your agent workspace.', icon: Wrench },
-  { label: 'Menu', description: 'Open agent settings and additional options.', icon: Menu },
-];
+type Dashboard = { agent: { enabled: boolean; code: string | null; link: string | null }; stats: { referrals: number; totalEarned: number; firstDeposits: number; investments: number }; commissions: Array<{ event: string; amount: number; createdAt: string }> };
 
 const AgentPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const styles = getStyles(theme);
+  const [data, setData] = useState<Dashboard | null>(null);
+  const [error, setError] = useState('');
+  const load = async () => {
+    try { setData((await api.get('/api/referrals/dashboard')).data); } catch (err: any) { setError(err?.response?.data?.message || 'Unable to load your agent dashboard.'); }
+  };
+  useEffect(() => { void load(); }, []);
+  const enable = async () => { try { await api.post('/api/referrals/enable'); await load(); } catch (err: any) { setError(err?.response?.data?.message || 'Unable to enable the agent system.'); } };
+  const copy = async () => { if (data?.agent.link) await navigator.clipboard.writeText(data.agent.link); };
 
-  return (
-    <HybridTheme>
-      <div style={styles.page}>
-        <div style={styles.shell}>
-          <div style={styles.content}>
-            <section style={styles.section}>
-              <h2 style={styles.sectionTitle}>Agent</h2>
-              <p style={styles.sectionText}>Manage your agent workspace and choose an area to continue.</p>
-            </section>
-            <div style={styles.buttonList}>
-              {pageButtons.map(({ label, description, icon: Icon }) => (
-                <button key={label} type="button" style={styles.cardButton}>
-                  <Icon style={styles.icon} />
-                  <span>
-                    <strong style={{ display: 'block', fontSize: '1rem' }}>{label}</strong>
-                    <span style={styles.cardSubtext}>{description}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-        <NowBar />
-      </div>
-    </HybridTheme>
-  );
+  return <HybridTheme><div style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}><main style={{ maxWidth: 1160, margin: '0 auto', padding: '28px 18px' }}><h1 style={{ marginBottom: 8 }}>Agent hub</h1><p style={{ color: theme.textMuted }}>Invite people, track their activity, and earn automatic USDT commissions.</p>{error && <p style={{ color: '#f87171' }}>{error}</p>}{!data?.agent.enabled ? <section style={{ ...card(theme), textAlign: 'center' }}><Users size={40} /><h2>Become an agent</h2><p style={{ color: theme.textMuted }}>This is optional. Enable it when you are ready to build your referral community.</p><button style={button(theme)} onClick={() => void enable()}>Enable agent system</button></section> : <><div style={grid}><Metric theme={theme} icon={<Users />} label="Referrals" value={data.stats.referrals} /><Metric theme={theme} icon={<Wallet />} label="Earned USDT" value={data.stats.totalEarned.toFixed(2)} /><Metric theme={theme} icon={<Trophy />} label="First deposits" value={data.stats.firstDeposits} /></div><section style={card(theme)}><h2>Your invite kit</h2><p>Code: <strong>{data.agent.code}</strong> <button style={iconButton(theme)} onClick={() => void navigator.clipboard.writeText(data.agent.code || '')}><Copy size={16} /></button></p><p style={{ wordBreak: 'break-all', color: theme.textMuted }}>{data.agent.link}</p><button style={button(theme)} onClick={() => void copy()}><Copy size={16} /> Copy referral link</button>{data.agent.link && <div style={{ marginTop: 18 }}><QRCodeSVG value={data.agent.link} size={150} /></div>}</section><section style={card(theme)}><h2>Commission activity</h2>{data.commissions.length === 0 ? <p style={{ color: theme.textMuted }}>Your first commission will appear here after a referred user completes an eligible action.</p> : data.commissions.map((item, index) => <div key={`${item.createdAt}-${index}`} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: `1px solid ${theme.borderGlass}` }}><span>{item.event.replace('_', ' ')}</span><strong>+{item.amount.toFixed(2)} USDT</strong></div>)}</section></>}</main><NowBar /></div></HybridTheme>;
 };
-
+const card = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ padding: 22, borderRadius: 18, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, marginTop: 18 });
+const button = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 16px', border: 0, borderRadius: 10, background: theme.primary, color: '#fff', cursor: 'pointer' });
+const iconButton = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ ...button(theme), padding: 6 });
+const grid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginTop: 22 };
+const Metric = ({ theme, icon, label, value }: { theme: typeof HYBRID_THEME_TOKENS.dark; icon: React.ReactNode; label: string; value: string | number }) => <div style={card(theme)}><div>{icon}</div><strong style={{ display: 'block', fontSize: 24, marginTop: 8 }}>{value}</strong><span style={{ color: theme.textMuted }}>{label}</span></div>;
 export default AgentPage;
