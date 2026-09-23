@@ -47,7 +47,7 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
     highlight: 'rgba(255,255,255,0.04)',
     highlightSoft: 'rgba(255,255,255,0.03)',
     success: '#166534',
-    warning: '#4b5563',
+    warning: '#b45309',
     danger: '#b91c1c',
   },
   dark: {
@@ -70,7 +70,7 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
     highlight: 'rgba(255,255,255,0.02)',
     highlightSoft: 'rgba(255,255,255,0.02)',
     success: '#4ade80',
-    warning: '#d4d4d4',
+    warning: '#fbbf24',
     danger: '#fb7185',
   },
 };
