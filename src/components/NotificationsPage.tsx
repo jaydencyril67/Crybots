@@ -13,6 +13,7 @@ type NotificationItem = {
   title: string;
   message: string;
   type: 'system' | 'transaction' | 'security' | 'account';
+  channels?: ('push' | 'inApp')[];
   readAt: string | null;
   createdAt: string;
 };
@@ -47,11 +48,17 @@ const NotificationsPage = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const loadNotifications = useCallback(async () => {
+  const loadNotifications = useCallback(async (showLoader = false) => {
+    if (showLoader) setRefreshing(true);
+    if (!localStorage.getItem('token')) {
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
     try {
       const response = await api.get('/api/notifications');
-      if (!localStorage.getItem('token')) return;
       const nextNotifications = response.data.notifications || [];
       setNotifications(nextNotifications);
       setError('');
@@ -74,6 +81,7 @@ const NotificationsPage = () => {
       }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -83,7 +91,7 @@ const NotificationsPage = () => {
       setLoading(false);
       setError('');
     };
-    const refreshNotifications = () => { void loadNotifications(); };
+    const refreshNotifications = () => { void loadNotifications(true); };
 
     void loadNotifications();
     const interval = window.setInterval(() => { void loadNotifications(); }, 10000);
@@ -103,6 +111,7 @@ const NotificationsPage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
+          {refreshing ? <NotificationBanner tone="info" title="Updating notifications" message="Checking for new in-app alerts." /> : null}
           {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}
           <div style={styles.list}>
             {loading ? <div style={styles.empty}><LoadingDots /></div> : null}

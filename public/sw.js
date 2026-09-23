@@ -25,6 +25,29 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { title: 'KingsHall alert', message: event.data?.text() || 'You have a new notification.' };
+  }
+
+  const title = payload.title || payload.notification?.title || 'KingsHall alert';
+  const options = {
+    body: payload.message || payload.notification?.message || 'You have a new notification.',
+    icon: '/icons/ke-icon.svg',
+    badge: '/icons/ke-icon.svg',
+    data: { url: '/notifications' },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(event.notification.data?.url || '/notifications'));
+});
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
     return;
