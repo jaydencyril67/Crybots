@@ -301,9 +301,9 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'options') return <ProtectedRoute><OptionsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'library') return <ProtectedRoute><LibraryPage /></ProtectedRoute>;
     if (displayedRouteKey === 'about') return <ProtectedRoute><AboutPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'information') return <InformationPage />;
-    if (displayedRouteKey === 'privacy-policy') return <PrivacyPolicyPage />;
-    if (displayedRouteKey === 'community-standards') return <CommunityStandardsPage />;
+    if (displayedRouteKey === 'information') return <ProtectedRoute><InformationPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'privacy-policy') return <ProtectedRoute><PrivacyPolicyPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'community-standards') return <ProtectedRoute><CommunityStandardsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'developer') return <ProtectedRoute><DeveloperPage /></ProtectedRoute>;
     if (displayedRouteKey === 'asset') return <ProtectedRoute><AssetPage /></ProtectedRoute>;
     if (displayedRouteKey === 'danger') return <ProtectedRoute><DangerPage /></ProtectedRoute>;
