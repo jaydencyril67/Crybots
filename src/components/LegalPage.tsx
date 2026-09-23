@@ -46,7 +46,7 @@ const LegalPage = ({ title, eyebrow, summary, updated, sections }: LegalPageProp
       <Helmet><title>{title} | KingsHall Exchange</title><meta name="description" content={summary} /></Helmet>
       <div style={styles.page}>
         <main style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => navigate('/about')}><ArrowLeft size={16} aria-hidden="true" /> About KingsHall</button>
+          <button type="button" style={styles.back} onClick={() => navigate('/about')}><ArrowLeft size={16} aria-hidden="true" /> About</button>
           <header style={styles.hero}>
             <p style={styles.eyebrow}>{eyebrow}</p>
             <h1 style={styles.title}>{title}</h1>
