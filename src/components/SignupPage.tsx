@@ -347,8 +347,10 @@ const SignupPage = () => {
   const [form, setForm] = useState<FormState>(initialState);
   const [dobError, setDobError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [showDobPage, setShowDobPage] = useState(false);
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
@@ -376,6 +378,9 @@ const SignupPage = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (field === 'dob') {
       setDobError('');
+    }
+    if (field === 'email') {
+      setEmailError('');
     }
     setSubmitError('');
   };
@@ -413,7 +418,29 @@ const SignupPage = () => {
 
   const dobMeetsRequirement = current.field === 'dob' ? isAtLeast18(form.dob) : true;
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (current.field === 'email') {
+      const email = form.email.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setEmailError('Enter a valid email address to continue.');
+        return;
+      }
+
+      setEmailError('');
+      setIsCheckingEmail(true);
+      try {
+        await api.post('/api/auth/signup/check-email', { email });
+      } catch (error) {
+        const message =
+          (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+          'Unable to verify this email right now. Please try again.';
+        setEmailError(message);
+        return;
+      } finally {
+        setIsCheckingEmail(false);
+      }
+    }
+
     if (current.field === 'dob' && !isAtLeast18(form.dob)) {
       setDobError('You must be at least 18 years old to continue.');
       return;
@@ -554,6 +581,7 @@ const SignupPage = () => {
                 ))}
               </ul>
             ) : null}
+            {current.field === 'email' && emailError ? <NotificationBanner tone="error" title="Check your email" message={emailError} /> : null}
             {current.field === 'password' && passwordErrorMessage ? <p style={styles.inlineError}>{passwordErrorMessage}</p> : null}
           </div>
         );
@@ -697,15 +725,15 @@ const SignupPage = () => {
                     <button
                       type="button"
                       onClick={handleNext}
-                      disabled={!canContinue}
+                      disabled={!canContinue || isCheckingEmail}
                       style={{
                         ...styles.button,
                         ...styles.buttonPrimary,
-                        opacity: canContinue ? 1 : 0.55,
-                        cursor: canContinue ? 'pointer' : 'not-allowed',
+                        opacity: canContinue && !isCheckingEmail ? 1 : 0.55,
+                        cursor: canContinue && !isCheckingEmail ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      Next
+                      {isCheckingEmail ? <InlineLoadingDots /> : <>Next <ArrowRight style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} /></>}
                     </button>
                   ) : (
                     <button
