@@ -420,8 +420,15 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.clearTimeout(idleTimer);
     }
 
+    if (getActivePath() === '/nowbar-button-color') {
+      setIdleTimer(null);
+      return;
+    }
+
     const timer = window.setTimeout(() => {
-      setView('title');
+      if (getActivePath() !== '/nowbar-button-color') {
+        setView('title');
+      }
     }, 10000);
 
     setIdleTimer(timer);
@@ -433,6 +440,9 @@ const NowBar = ({ actions }: NowBarProps) => {
     resetIdleTimer();
     const timer = window.setTimeout(() => {
       holdTriggeredRef.current = true;
+      if (view === 'title') {
+        setView('actions');
+      }
       setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
     }, 700);
     setHoldTimer(timer);
