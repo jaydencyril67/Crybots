@@ -50,11 +50,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   icon: { color: theme.primary, flexShrink: 0 },
   label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
   description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
-  toggle: { width: '48px', height: '28px', border: 0, borderRadius: '999px', padding: '3px', cursor: 'pointer', flexShrink: 0, background: theme.borderGlass },
-  toggleOn: { background: theme.primary },
-  knob: { display: 'block', width: '22px', height: '22px', borderRadius: '50%', background: theme.textMuted, transition: 'transform 160ms ease, background 160ms ease' },
-  knobOn: { transform: 'translateX(20px)', background: theme.textInverse },
-  save: { marginTop: '18px', width: '100%', border: 0, borderRadius: '14px', padding: '13px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: 'pointer' },
+  enableButton: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', flexShrink: 0 },
+  enabledButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
+  disabledButton: { opacity: 0.6, cursor: 'not-allowed' },
+
 });
 
 const AlertSettingsPage = () => {
@@ -64,7 +63,7 @@ const AlertSettingsPage = () => {
   const [preferences, setPreferences] = useState<Preferences>(defaultPreferences);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [savingKey, setSavingKey] = useState<keyof Preferences | null>(null);
   const [error, setError] = useState('');
   const [pushPermission, setPushPermission] = useState<NotificationPermission | 'unsupported'>(() => ('Notification' in window ? Notification.permission : 'unsupported'));
 
@@ -103,33 +102,31 @@ const AlertSettingsPage = () => {
     return permission === 'granted';
   };
 
-  const toggle = (key: keyof Preferences) => {
-    setSaved(false);
-    setPreferences((current) => ({ ...current, [key]: !current[key] }));
-  };
+  const savePreference = async (key: keyof Preferences) => {
+    if (key === 'security' || savingKey) return;
 
-  const savePreferences = async () => {
     setSaved(false);
     setError('');
-    setSaving(true);
+    const nextPreferences = { ...preferences, [key]: !preferences[key] };
+    setSavingKey(key);
 
-    if (preferences.push && pushPermission !== 'granted') {
+    if (key === 'push' && nextPreferences.push && pushPermission !== 'granted') {
       const granted = await requestPushPermission();
       if (!granted) {
-        setSaving(false);
+        setSavingKey(null);
         return;
       }
     }
 
     try {
-      const response = await api.patch<AlertPreferencesResponse>('/api/settings/alerts', preferences);
+      const response = await api.patch<AlertPreferencesResponse>('/api/settings/alerts', nextPreferences);
       setPreferences({ ...defaultPreferences, ...response.data.preferences });
       window.localStorage.setItem('kingshall_alert_preferences', JSON.stringify(response.data.preferences));
       setSaved(true);
     } catch {
       setError('Unable to save preferences. Please try again.');
     } finally {
-      setSaving(false);
+      setSavingKey(null);
     }
   };
 
@@ -156,8 +153,8 @@ const AlertSettingsPage = () => {
                       <p style={styles.description}>{description}</p>
                     </div>
                   </div>
-                  <button type="button" disabled={loading || saving || key === 'security'} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label}`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
-                    {loading || saving ? <InlineLoadingDots /> : <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />}
+                  <button type="button" disabled={loading || savingKey !== null || key === 'security'} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label}`} aria-pressed={preferences[key]} style={{ ...styles.enableButton, ...(preferences[key] ? styles.enabledButton : {}), ...(loading || savingKey !== null || key === 'security' ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>
+                    {savingKey === key ? <InlineLoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
                   </button>
                 </div>
               ))}
@@ -177,13 +174,12 @@ const AlertSettingsPage = () => {
                       <p style={styles.description}>{description}</p>
                     </div>
                   </div>
-                  <button type="button" disabled={loading || saving} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label} notifications`} aria-pressed={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}) }} onClick={() => toggle(key)}>
-                    {loading || saving ? <InlineLoadingDots /> : <span style={{ ...styles.knob, ...(preferences[key] ? styles.knobOn : {}) }} />}
+                  <button type="button" disabled={loading || savingKey !== null} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label} notifications`} aria-pressed={preferences[key]} style={{ ...styles.enableButton, ...(preferences[key] ? styles.enabledButton : {}), ...(loading || savingKey !== null ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>
+                    {savingKey === key ? <InlineLoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
                   </button>
                 </div>
               ))}
             </div>
-            <button type="button" disabled={loading || saving} style={styles.save} onClick={() => void savePreferences()}>{saving ? <><InlineLoadingDots /> Saving…</> : 'Save preferences'}</button>
           </section>
         </div>
       </main>
