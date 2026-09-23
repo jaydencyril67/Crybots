@@ -6,6 +6,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NotificationBanner from './NotificationBanner';
+import LoadingDots from './LoadingDots';
 
 const preferenceTopics = [
   { key: 'account', label: 'Account activity', description: 'Profile changes, sign-ins and account updates.' },
@@ -53,7 +54,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   toggleOn: { background: theme.primary },
   knob: { display: 'block', width: '22px', height: '22px', borderRadius: '50%', background: theme.textMuted, transition: 'transform 160ms ease, background 160ms ease' },
   knobOn: { transform: 'translateX(20px)', background: theme.textInverse },
-  save: { marginTop: '18px', width: '100%', border: 0, borderRadius: '14px', padding: '13px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: 'pointer' },
+  save: { marginTop: '18px', width: '100%', border: 0, borderRadius: '14px', padding: '13px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '48px' },
 });
 
 const AlertSettingsPage = () => {
@@ -120,7 +121,7 @@ const AlertSettingsPage = () => {
           {saved ? <NotificationBanner tone="success" title="Preferences saved" message="Your alert settings have been updated." /> : null}
           {error ? <NotificationBanner tone="error" title="Unable to update preferences" message={error} /> : null}
 
-          <section style={styles.card}>
+          <section style={styles.card} aria-busy={loading || saving}>
             <h2 style={styles.cardHeading}>What would you like to hear about?</h2>
             <p style={styles.cardText}>Security alerts remain enabled to help protect your account.</p>
             <div style={styles.list}>
@@ -159,7 +160,7 @@ const AlertSettingsPage = () => {
                 </div>
               ))}
             </div>
-            <button type="button" disabled={loading || saving} style={styles.save} onClick={() => void savePreferences()}>{saving ? 'Saving…' : 'Save preferences'}</button>
+            <button type="button" disabled={loading || saving} aria-busy={saving} style={styles.save} onClick={() => void savePreferences()}>{saving ? <LoadingDots /> : 'Save preferences'}</button>
           </section>
         </div>
       </main>
