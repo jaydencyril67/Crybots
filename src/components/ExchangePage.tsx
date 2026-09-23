@@ -26,7 +26,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   sectionText: { margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7, maxWidth: '62ch' },
   buttonList: { display: 'grid', gap: '10px', marginTop: '6px' },
   cardButton: {
-    display: 'flex', alignItems: 'center', width: '100%', padding: '16px 18px', borderRadius: '18px',
+    display: 'grid', gridTemplateColumns: 'minmax(110px, 0.35fr) minmax(0, 1fr) auto', alignItems: 'center', gap: '14px', width: '100%', padding: '12px 14px', borderRadius: '14px',
     border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text,
     textAlign: 'left' as const, boxSizing: 'border-box' as const, cursor: 'pointer',
     backdropFilter: 'blur(24px) saturate(1.15)', WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
