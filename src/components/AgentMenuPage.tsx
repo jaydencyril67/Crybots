@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Check, Coins, Save, Wallet } from 'lucide-react';
+import { ArrowLeft, Coins, Save, Wallet } from 'lucide-react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import NotificationBanner from './NotificationBanner';
 
 type Dashboard = { agent: { code: string | null; link: string | null; availableEarnings: number }; stats: { totalEarned: number } };
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
@@ -15,6 +16,7 @@ const AgentMenuPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [data, setData] = useState<Dashboard>({ agent: { code: '', link: '', availableEarnings: 0 }, stats: { totalEarned: 0 } });
   const [code, setCode] = useState('');
+  const [codeAvailability, setCodeAvailability] = useState<'idle' | 'checking' | 'available' | 'unavailable'>('idle');
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,10 +41,30 @@ const AgentMenuPage = () => {
     void loadDashboard();
   }, []);
 
+  useEffect(() => {
+    const nextCode = code.trim();
+    if (!/^\d{6}$/.test(nextCode) || nextCode === data.agent.code) {
+      setCodeAvailability(nextCode === data.agent.code ? 'available' : 'idle');
+      return;
+    }
+
+    setCodeAvailability('checking');
+    const timer = window.setTimeout(() => {
+      void api.get<{ available: boolean }>('/api/referrals/settings/availability', { params: { code: nextCode } })
+        .then((response) => setCodeAvailability(response.data.available ? 'available' : 'unavailable'))
+        .catch(() => setCodeAvailability('idle'));
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [code, data.agent.code]);
+
   const saveCode = async () => {
     const nextCode = code.trim();
     if (!/^\d{6}$/.test(nextCode)) {
       setStatus({ kind: 'error', message: 'Referral code must be exactly 6 digits.' });
+      return;
+    }
+    if (codeAvailability !== 'available') {
+      setStatus({ kind: 'error', message: codeAvailability === 'checking' ? 'Checking referral code availability.' : 'That referral code is already in use.' });
       return;
     }
     setSaving(true);
@@ -84,9 +106,9 @@ const AgentMenuPage = () => {
   return <HybridTheme mode={themeMode}><div style={styles.page(theme)}><main style={styles.shell}>
     <button type="button" style={styles.back(theme)} onClick={() => navigate('/agent')}><ArrowLeft size={16} /> Agent</button>
     <section style={styles.header}><h1 style={styles.title}>Agent menu</h1><p style={styles.text(theme)}>Manage your referral identity and move earned commissions to your main balance.</p></section>
-    {status.kind !== 'idle' ? <div style={{ ...styles.notice(theme), color: status.kind === 'success' ? '#34d399' : '#f87171' }}>{status.kind === 'success' ? <Check size={17} /> : null}{status.message}</div> : null}
+    {status.kind !== 'idle' ? <NotificationBanner tone={status.kind === 'success' ? 'success' : 'error'} title={status.kind === 'success' ? 'Success' : 'Action failed'} message={status.message} /> : null}
     <div style={styles.content}>
-      <section style={styles.card(theme)}><h2 style={styles.cardTitle}><Save size={18} /> Referral settings</h2><p style={styles.text(theme)}>Choose a memorable six-digit code. Your referral link updates automatically.</p><label style={styles.label(theme)}>Referral code<input style={styles.input(theme)} value={code} inputMode="numeric" maxLength={6} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /></label>{loading ? <LoadingDots /> : <p style={styles.link(theme)}>{data.agent.link || 'Your referral link will appear here.'}</p>}<button type="button" style={styles.primary(theme)} disabled={saving || loading} onClick={() => void saveCode()}>{saving ? <InlineLoadingDots /> : <><Save size={16} /> Save referral code</>}</button></section>
+      <section style={styles.card(theme)}><h2 style={styles.cardTitle}><Save size={18} /> Referral settings</h2><p style={styles.text(theme)}>Choose a memorable six-digit code. Your referral link updates automatically.</p><label style={styles.label(theme)}>Referral code<input style={styles.input(theme)} value={code} inputMode="numeric" maxLength={6} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} /></label>{codeAvailability === 'checking' ? <p style={styles.validation(theme)}>Checking availability...</p> : codeAvailability === 'available' && code !== data.agent.code ? <p style={{ ...styles.validation(theme), color: '#34d399' }}>Referral code is available.</p> : codeAvailability === 'unavailable' ? <p style={{ ...styles.validation(theme), color: '#f87171' }}>Referral code is already in use.</p> : null}{loading ? <LoadingDots /> : <p style={styles.link(theme)}>{data.agent.link || 'Your referral link will appear here.'}</p>}<button type="button" style={styles.primary(theme)} disabled={saving || loading || codeAvailability === 'checking' || codeAvailability === 'unavailable'} onClick={() => void saveCode()}>{saving ? <InlineLoadingDots /> : <><Save size={16} /> Save referral code</>}</button></section>
       <section style={styles.card(theme)}><h2 style={styles.cardTitle}><Wallet size={18} /> Withdraw earnings</h2><div style={styles.balance(theme)}><span>Available earnings</span>{loading ? <LoadingDots /> : <strong>{data.agent.availableEarnings.toFixed(2)} USDT</strong>}</div><p style={styles.text(theme)}>Withdraw all or part of your earned referral commissions into your main USDT balance.</p><label style={styles.label(theme)}>Amount (USDT)<input style={styles.input(theme)} value={amount} type="number" min="0.01" max={data.agent.availableEarnings} step="0.01" inputMode="decimal" onChange={(event) => setAmount(event.target.value)} placeholder="0.00" /></label><button type="button" style={styles.primary(theme)} disabled={withdrawing || loading || data.agent.availableEarnings <= 0} onClick={() => void withdraw()}>{withdrawing ? <InlineLoadingDots /> : <><Coins size={16} /> Withdraw to main balance</>}</button><button type="button" style={styles.secondary(theme)} disabled={data.agent.availableEarnings <= 0} onClick={() => setAmount(data.agent.availableEarnings.toFixed(2))}>Use available balance</button></section>
     </div>
     </main></div></HybridTheme>;
@@ -105,6 +127,7 @@ const styles = {
   label: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 7, color: theme.textMuted, fontSize: '0.85rem', fontWeight: 700 }),
   input: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ width: '100%', boxSizing: 'border-box' as const, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '1rem', outline: 'none' }),
   link: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, color: theme.textMuted, wordBreak: 'break-all' as const, fontSize: '0.86rem' }),
+  validation: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }),
   balance: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', gap: 12, padding: 14, borderRadius: 14, background: theme.surfaceMuted, color: theme.textMuted }),
   primary: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 42, border: `1px solid ${theme.primary}`, borderRadius: 999, background: theme.primary, color: theme.textInverse, fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer' }),
   secondary: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 40, padding: '9px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: 999, background: theme.surfaceMuted, color: theme.text, fontSize: '0.86rem', fontWeight: 700, cursor: 'pointer' }),
