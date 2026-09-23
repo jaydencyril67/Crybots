@@ -433,6 +433,9 @@ const NowBar = ({ actions }: NowBarProps) => {
     resetIdleTimer();
     const timer = window.setTimeout(() => {
       holdTriggeredRef.current = true;
+      if (view === 'title') {
+        setView('actions');
+      }
       setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
     }, 700);
     setHoldTimer(timer);
