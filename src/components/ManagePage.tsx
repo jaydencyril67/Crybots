@@ -20,13 +20,17 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
   card: { maxWidth: '720px', margin: '12px auto 0', padding: '18px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  title: { margin: 0, fontSize: '1.6rem', fontWeight: 900 },
-  text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.6 },
-  form: { display: 'grid', gap: '12px', marginTop: '18px' },
-  label: { display: 'grid', gap: '8px', fontWeight: 700 },
-  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '13px 14px', outline: 'none' },
+  title: { margin: 0, fontSize: '1.08rem', fontWeight: 800 },
+  text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.55, fontSize: '0.95rem' },
+  form: { display: 'grid', gap: '10px', marginTop: '18px' },
+  label: { display: 'grid', gap: '6px', color: theme.textMuted, fontSize: '0.88rem', fontWeight: 600 },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '0.95rem', outline: 'none' },
+  selectTrigger: { width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '0.95rem', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
+  selectOption: { width: '100%', borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.highlightSoft, color: theme.text, padding: '10px 12px', textAlign: 'left' as const, cursor: 'pointer' },
   helper: { color: theme.textMuted, fontSize: '0.85rem', fontWeight: 400 },
-  button: { borderRadius: '999px', border: `1px solid ${theme.primary}`, padding: '11px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer', justifySelf: 'start' },
+  button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '10px 14px', background: theme.surfaceGlass, color: theme.text, fontWeight: 700, cursor: 'pointer', justifySelf: 'start', fontSize: '0.92rem' },
+  primaryButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}`, width: '100%', maxWidth: '100%' },
 });
 
 const ManagePage = () => {
@@ -35,6 +39,7 @@ const ManagePage = () => {
   const styles = getStyles(theme);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [network, setNetwork] = useState<WalletNetwork>('TRC-20');
+  const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
   const [description, setDescription] = useState('');
   const [walletValid, setWalletValid] = useState(false);
@@ -102,12 +107,22 @@ const ManagePage = () => {
             <p style={styles.text}>Bind up to 10 validated TRC-20, BEP-20, or TRX wallets for secure withdrawals.</p>
             {status.kind !== 'idle' ? <div style={{ marginTop: '16px' }}><NotificationBanner tone={status.kind === 'success' ? 'success' : 'error'} title={status.kind === 'success' ? 'Wallet updated' : 'Check your details'} message={status.message} /></div> : null}
             <div style={styles.form}>
-              <label style={styles.label}>
+              <div style={styles.label}>
                 <span>Wallet network</span>
-                <select style={styles.input} value={network} onChange={(event) => { setNetwork(event.target.value as WalletNetwork); setWalletValid(false); }}>
-                  <option value="TRC-20">TRC-20</option><option value="BEP-20">BEP-20</option><option value="TRX">TRX</option>
-                </select>
-              </label>
+                <button type="button" style={styles.selectTrigger} onClick={() => setIsNetworkMenuOpen((current) => !current)} aria-expanded={isNetworkMenuOpen}>
+                  <span>{network}</span>
+                  <span>▾</span>
+                </button>
+                {isNetworkMenuOpen ? (
+                  <div style={styles.selectMenu}>
+                    {(['TRC-20', 'BEP-20', 'TRX'] as WalletNetwork[]).map((option) => (
+                      <button key={option} type="button" style={styles.selectOption} onClick={() => { setNetwork(option); setWalletValid(false); setIsNetworkMenuOpen(false); }}>
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
               <label style={styles.label}>
                 <span>Wallet address</span>
                 <input style={styles.input} value={walletAddress} onChange={(event) => { const value = event.target.value.trim(); setWalletAddress(value); setWalletValid(network === 'BEP-20' ? /^0x[a-fA-F0-9]{40}$/.test(value) : /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(value)); }} placeholder={network === 'BEP-20' ? '0x…' : 'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'} autoCapitalize="off" autoCorrect="off" spellCheck={false} />
@@ -116,7 +131,7 @@ const ManagePage = () => {
               <label style={styles.label}><span>Description (optional)</span><input style={styles.input} value={description} onChange={(event) => setDescription(event.target.value.slice(0, 100))} placeholder="e.g. Main trading wallet" /></label>
               <label style={styles.label}><span>Security code</span><input style={styles.input} type="password" inputMode="numeric" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" /><span style={styles.helper}>Required when binding or editing a wallet.</span></label>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <button style={styles.button} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || (!editingWalletId && wallets.length >= 10)}>{saving ? <InlineLoadingDots /> : editingWalletId ? 'Update wallet' : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
+                <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || (!editingWalletId && wallets.length >= 10)}>{saving ? <InlineLoadingDots /> : editingWalletId ? 'Update wallet' : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
                 {editingWalletId ? <button style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} type="button" onClick={resetWalletForm}>Cancel edit</button> : null}
               </div>
             </div>
