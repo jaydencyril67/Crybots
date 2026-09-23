@@ -108,7 +108,7 @@ const styles = {
   },
   barExpanded: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     alignSelf: 'flex-end',
@@ -534,7 +534,7 @@ const NowBar = ({ actions }: NowBarProps) => {
                   ...(isExpanded ? styles.buttonExpanded : {}),
                 }}
               >
-                <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+                {!isExpanded ? <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span> : null}
                 {isExpanded ? <span style={styles.labelExpanded}>{action.label.toUpperCase()}</span> : null}
               </button>
             </div>
