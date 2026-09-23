@@ -42,7 +42,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '118px' },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 3vw, 20px) clamp(12px, 2.5vw, 24px) 28px', boxSizing: 'border-box' as const },
   backButton: { display: 'inline-flex', alignItems: 'center', gap: '8px', border: 0, background: 'transparent', color: theme.textMuted, padding: 0, cursor: 'pointer', fontSize: '0.92rem', fontWeight: 700 },
-  heading: { margin: '18px 0 6px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
+  heading: { margin: '18px 0 6px', fontSize: '1.15rem', fontWeight: 900 },
   intro: { margin: 0, color: theme.textMuted, lineHeight: 1.5 },
   card: { marginTop: '18px', padding: '14px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   preview: { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '14px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },

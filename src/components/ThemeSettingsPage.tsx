@@ -10,7 +10,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
   card: { marginTop: '24px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  title: { margin: '20px 0 0', fontSize: '1.6rem', fontWeight: 900 },
+  title: { margin: '20px 0 0', fontSize: '1.15rem', fontWeight: 900 },
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.6 },
   toggleRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'center', gap: '8px', marginTop: '18px' },
   toggle: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '10px 14px', fontWeight: 700, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer' },
