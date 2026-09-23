@@ -45,15 +45,16 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   cardGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
-    gap: '14px',
+    gap: '10px',
     marginTop: '6px',
   },
   card: {
     display: 'grid',
+    gridTemplateColumns: 'minmax(110px, 0.35fr) minmax(0, 1fr) auto',
+    alignItems: 'center',
     gap: '14px',
-    padding: '18px',
-    borderRadius: '18px',
+    padding: '12px 14px',
+    borderRadius: '14px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
     color: theme.text,
@@ -64,33 +65,37 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   cardTitle: {
     margin: 0,
-    fontSize: '1rem',
+    fontSize: '0.95rem',
     fontWeight: 850,
+    whiteSpace: 'nowrap' as const,
   },
   cardSubtext: {
     margin: 0,
     color: theme.textMuted,
-    fontSize: '0.86rem',
-    lineHeight: 1.6,
-    minHeight: '66px',
+    fontSize: '0.84rem',
+    lineHeight: 1.4,
+    whiteSpace: 'nowrap' as const,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   viewButton: {
     borderRadius: '999px',
     border: `1px solid ${theme.borderGlass}`,
-    padding: '9px 13px',
+    padding: '7px 12px',
+    fontSize: '0.82rem',
     fontWeight: 800,
     color: theme.text,
     background: theme.surfaceMuted,
     cursor: 'pointer',
-    justifySelf: 'start',
+    justifySelf: 'end',
   },
 });
 
 const pageButtons = [
-  { label: 'Details', description: 'View and manage your personal profile information.', route: '/profile' },
-  { label: 'Statistics', description: 'Review your deposits, withdrawals, transfers, activity, and account totals.', route: '/portfolio/statistics' },
-  { label: 'Security', description: 'Manage your password, two-factor authentication, sessions, and security controls.', route: '/security' },
-  { label: 'Danger', description: 'Access account recovery and irreversible account actions.', route: '/danger' },
+  { label: 'Details', description: 'Manage your profile information.', route: '/profile' },
+  { label: 'Statistics', description: 'Review your account activity and totals.', route: '/portfolio/statistics' },
+  { label: 'Security', description: 'Manage your password and security controls.', route: '/security' },
+  { label: 'Danger', description: 'Access recovery and account actions.', route: '/danger' },
 ];
 
 const PortfolioPage = () => {
