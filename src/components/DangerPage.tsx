@@ -28,9 +28,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   shell: {
     width: '100%',
-    maxWidth: '1160px',
+    maxWidth: '920px',
     margin: '0 auto',
-    padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
+    padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px',
     boxSizing: 'border-box' as const,
   },
   content: {
@@ -194,11 +194,6 @@ const DangerPage = () => {
           
           <div style={styles.content}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
-            <section style={styles.card}>
-              <h2 style={styles.sectionTitle}>Danger Zone</h2>
-              <p style={styles.sectionText}>These actions are irreversible or highly restrictive. Read each warning carefully before continuing.</p>
-            </section>
-
             <section style={styles.card}>
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>

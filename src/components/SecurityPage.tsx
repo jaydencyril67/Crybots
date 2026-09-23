@@ -733,12 +733,6 @@ const SecurityPage = () => {
           
           <div style={styles.content}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
-            <section style={styles.card}>
-              <h1 style={styles.sectionTitle}>Security</h1>
-              <p style={styles.sectionText}>Manage identity, sign-in protection, device access, and future security tooling from one flat, direct page.</p>
-              {renderStatus('security')}
-            </section>
-
             <div style={styles.rowList}>
               <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>

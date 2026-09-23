@@ -18,9 +18,9 @@ const baseStyles = {
   } as const,
   shell: {
     width: '100%',
-    maxWidth: '1160px',
+    maxWidth: '920px',
     margin: '0 auto',
-    padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
+    padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px',
     boxSizing: 'border-box' as const,
   },
   content: {
@@ -42,8 +42,8 @@ const baseStyles = {
   },
   infoRow: {
     width: '100%',
-    padding: '11px',
-    borderRadius: '13px',
+    padding: '13px 14px',
+    borderRadius: '15px',
     boxSizing: 'border-box' as const,
     display: 'grid',
     gap: '6px',
