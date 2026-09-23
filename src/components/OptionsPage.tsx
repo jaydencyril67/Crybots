@@ -26,12 +26,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   sectionText: { margin: 0, fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4, maxWidth: '62ch' },
   buttonList: { display: 'grid', gap: '10px', marginTop: '6px' },
   cardButton: {
-    display: 'grid', gap: '5px', width: '100%', padding: '11px', borderRadius: '13px',
+    display: 'grid', gridTemplateColumns: 'minmax(110px, 0.35fr) minmax(0, 1fr) auto', alignItems: 'center', gap: '14px', width: '100%', padding: '12px 14px', borderRadius: '14px',
     border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text,
     textAlign: 'left' as const, boxSizing: 'border-box' as const, cursor: 'pointer',
     backdropFilter: 'blur(24px) saturate(1.15)', WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
   },
-  cardSubtext: { margin: 0, fontSize: '0.74rem', color: theme.textMuted, lineHeight: 1.35 },
+  cardSubtext: { margin: 0, fontSize: '0.84rem', color: theme.textMuted, lineHeight: 1.4, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
 });
 
 const pageButtons = [
