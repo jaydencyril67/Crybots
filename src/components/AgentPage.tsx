@@ -6,6 +6,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
+import { navigate } from '../utils/navigate';
 
 type Challenge = { title: string; description: string; progress: number; target: number; percentage: number; reward?: number };
 type Commission = { event: string; amount: number; createdAt: string };
@@ -53,6 +54,12 @@ const AgentPage = () => {
     void load();
   }, []);
 
+  const openSection = (nextSection: Section) => {
+    if (nextSection === 'Stats') navigate('/agent/stats');
+    if (nextSection === 'Tools') navigate('/agent/tools');
+    if (nextSection === 'Menu') setSection(nextSection);
+  };
+
   const copy = async (value: string, label: string) => {
     await navigator.clipboard.writeText(value);
     setCopied(label);
@@ -77,7 +84,7 @@ const AgentPage = () => {
             {error && <p style={{ ...styles.sectionText(theme), color: '#f87171' }}>{error}</p>}
             <div style={styles.buttonList}>
               {sectionButtons.map(({ label, description }) => (
-                <button key={label} type="button" style={{ ...styles.cardButton(theme), ...(section === label ? styles.activeCard(theme) : {}) }} onClick={() => setSection(label)}>
+                <button key={label} type="button" style={{ ...styles.cardButton(theme), ...(section === label ? styles.activeCard(theme) : {}) }} onClick={() => openSection(label)}>
                   <h3 style={styles.cardTitle}>{label}</h3>
                   <p style={styles.cardSubtext(theme)}>{description}</p>
                 </button>

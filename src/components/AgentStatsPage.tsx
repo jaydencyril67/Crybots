@@ -1,0 +1,50 @@
+import { useEffect, useState, type ReactNode } from 'react';
+import { BarChart3, Medal, Trophy, Users, Wallet } from 'lucide-react';
+import api from '../api/axios';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import NowBar from './NowBar';
+import LoadingDots from './LoadingDots';
+import { useAppTheme } from './AppTheme';
+
+type Challenge = { title: string; description: string; progress: number; target: number; percentage: number; reward?: number };
+type Dashboard = { stats: { referrals: number; totalEarned: number; firstDeposits: number; investments: number }; challenges: Challenge[] };
+type Analytics = { byEvent: Array<{ _id: string; count: number; earned: number }> };
+type Ranking = { rank: number; code: string; name?: string; referrals: number; earned: number };
+
+const AgentStatsPage = () => {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  const [data, setData] = useState<Dashboard | null>(null);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [rankings, setRankings] = useState<Ranking[]>([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    Promise.all([api.get<Dashboard>('/api/referrals/dashboard'), api.get<Analytics>('/api/referrals/analytics'), api.get<{ rankings: Ranking[] }>('/api/referrals/rankings')]).then(([dashboard, stats, rankingData]) => { setData(dashboard.data); setAnalytics(stats.data); setRankings(rankingData.data.rankings || []); }).catch((err: any) => setError(err?.response?.data?.message || 'Unable to load your agent statistics.'));
+  }, []);
+
+  return <HybridTheme><div style={styles.page(theme)}><main style={styles.shell}><section style={styles.section}><h1 style={styles.title}>Agent stats</h1><p style={styles.text(theme)}>Track referral activity, earnings, rankings, progress, and achievements.</p></section>{error && <p style={{ ...styles.text(theme), color: '#f87171' }}>{error}</p>}{!data ? <div style={styles.loading}><LoadingDots /></div> : <div style={styles.content}><div style={styles.metrics}><Metric theme={theme} icon={<Users />} label="Referrals" value={data.stats.referrals} /><Metric theme={theme} icon={<Wallet />} label="Earnings" value={`${data.stats.totalEarned.toFixed(2)} USDT`} /><Metric theme={theme} icon={<BarChart3 />} label="First deposits" value={data.stats.firstDeposits} /><Metric theme={theme} icon={<Trophy />} label="Investments" value={data.stats.investments} /></div><section style={styles.card(theme)}><h2 style={styles.cardTitle}><BarChart3 size={18} /> Referral records</h2>{analytics?.byEvent?.length ? analytics.byEvent.map((item) => <div key={item._id} style={styles.row(theme)}><span>{item._id.replace('_', ' ')}<small style={styles.muted(theme)}>{item.count} record{item.count === 1 ? '' : 's'}</small></span><strong>{item.earned.toFixed(2)} USDT</strong></div>) : <p style={styles.text(theme)}>No referral activity yet.</p>}</section><section style={styles.card(theme)}><h2 style={styles.cardTitle}><Medal size={18} /> Agent ranking</h2>{rankings.slice(0, 10).map((item) => <div key={item.code} style={styles.row(theme)}><span>#{item.rank} {item.name || item.code}<small style={styles.muted(theme)}>{item.referrals} referrals</small></span><strong>{item.earned.toFixed(2)} USDT</strong></div>)}</section><section style={styles.card(theme)}><h2 style={styles.cardTitle}><Trophy size={18} /> Progress and achievements</h2>{data.challenges.length ? data.challenges.map((challenge) => <div key={challenge.title} style={styles.challenge}><div style={styles.row(theme)}><strong>{challenge.title}</strong><span>{challenge.percentage}%</span></div><p style={styles.text(theme)}>{challenge.description}</p><div style={styles.track(theme)}><div style={{ ...styles.fill(theme), width: `${Math.min(100, challenge.percentage)}%` }} /></div><small style={styles.muted(theme)}>{challenge.progress} / {challenge.target}{challenge.reward ? ` · ${challenge.reward} USDT reward` : ''}</small></div>) : <p style={styles.text(theme)}>New achievements will appear here soon.</p>}</section></div>}</main><NowBar /></div></HybridTheme>;
+};
+
+const Metric = ({ theme, icon, label, value }: { theme: typeof HYBRID_THEME_TOKENS.dark; icon: ReactNode; label: string; value: string | number }) => <div style={styles.card(theme)}><div>{icon}</div><strong style={styles.value}>{value}</strong><span style={styles.muted(theme)}>{label}</span></div>;
+
+const styles = {
+  page: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ minHeight: '100vh', paddingBottom: 132, background: theme.background, color: theme.text }),
+  shell: { width: '100%', maxWidth: 1160, margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
+  section: { display: 'grid', gap: 10, marginTop: 18 },
+  title: { margin: 0, fontSize: '1.45rem', fontWeight: 900 },
+  text: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, color: theme.textMuted, lineHeight: 1.6 }),
+  content: { display: 'grid', gap: 14, marginTop: 22 },
+  metrics: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(155px, 1fr))', gap: 10 },
+  card: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 10, padding: 18, borderRadius: 18, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }),
+  cardTitle: { display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1.05rem' },
+  value: { fontSize: '1.12rem' },
+  row: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderBottom: `1px solid ${theme.borderGlass}`, textTransform: 'capitalize' as const }),
+  muted: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'block', color: theme.textMuted, fontSize: '0.78rem' }),
+  challenge: { display: 'grid', gap: 6 },
+  track: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ height: 8, overflow: 'hidden' as const, borderRadius: 8, background: theme.surfaceMuted }),
+  fill: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ height: '100%', borderRadius: 8, background: theme.primary }),
+  loading: { display: 'flex', justifyContent: 'center', padding: 32 },
+};
+
+export default AgentStatsPage;
