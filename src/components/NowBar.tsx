@@ -208,6 +208,9 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/portfolio/statistics') return 'ACCOUNT STATISTICS';
   if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/agent') return 'AGENT';
+  if (path === '/agent/stats') return 'AGENT STATS';
+  if (path === '/agent/tools') return 'AGENT TOOLS';
+  if (path === '/agent/menu') return 'AGENT MENU';
   if (path === '/exchange') return 'EXCHANGE';
   if (path === '/records') return 'RECORDS';
   if (path === '/contact') return 'CONTACT';
