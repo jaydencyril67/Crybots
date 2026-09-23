@@ -4,6 +4,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 
 type Challenge = { title: string; description: string; progress: number; target: number; percentage: number; reward?: number };
@@ -27,6 +29,7 @@ const AgentPage = () => {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState('');
   const [loading, setLoading] = useState(true);
+  const [enabling, setEnabling] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -50,11 +53,14 @@ const AgentPage = () => {
   useEffect(() => { void load(); }, []);
 
   const enable = async () => {
+    setEnabling(true);
     try {
       await api.post('/api/referrals/enable');
       await load();
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Unable to enable the agent system.');
+    } finally {
+      setEnabling(false);
     }
   };
 
@@ -77,7 +83,7 @@ const AgentPage = () => {
     <h1 style={pageStyles.heading}>Agent hub</h1>
     <p style={{ ...pageStyles.intro, color: theme.textMuted }}>Build your community, track performance, and earn automatic USDT commissions.</p>
     {error && <p style={{ ...pageStyles.body, color: '#f87171' }}>{error}</p>}
-    {loading && !data ? <p style={{ ...pageStyles.body, color: theme.textMuted }}>Loading your agent workspace…</p> : !data?.agent.enabled ? <section style={{ ...card(theme), ...pageStyles.activation, textAlign: 'center' }}><Users size={28} color={theme.primary} /><h2 style={pageStyles.sectionTitle}>Become an agent</h2><p style={pageStyles.sectionText}>The agent system is optional. Enable it when you are ready to invite your community.</p><button type="button" style={activationButton(theme)} onClick={() => void enable()}>Enable agent system</button></section> : <>
+    {loading && !data ? <div style={{ ...pageStyles.loading, color: theme.textMuted }} role="status" aria-label="Loading agent workspace"><LoadingDots /></div> : !data?.agent.enabled ? <section style={{ ...card(theme), ...pageStyles.activation, textAlign: 'center' }}><Users size={28} color={theme.primary} /><h2 style={pageStyles.sectionTitle}>Become an agent</h2><p style={pageStyles.sectionText}>The agent system is optional. Enable it when you are ready to invite your community.</p><button type="button" style={activationButton(theme)} onClick={() => void enable()} disabled={enabling}>{enabling ? <InlineLoadingDots /> : 'Enable agent system'}</button></section> : <>
       <div style={grid}><Metric theme={theme} icon={<Users />} label="Referrals" value={data.stats.referrals} /><Metric theme={theme} icon={<Wallet />} label="Earned USDT" value={data.stats.totalEarned.toFixed(2)} /><Metric theme={theme} icon={<Gift />} label="First deposits" value={data.stats.firstDeposits} /><Metric theme={theme} icon={<BarChart3 />} label="Investments" value={data.stats.investments} /></div>
       <section style={card(theme)}><h2 style={pageStyles.cardHeading}>Invite kit</h2><p style={{ ...pageStyles.body, color: theme.textMuted }}>Share your personal code or scan the QR code to invite a new member.</p><div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}><div><strong style={pageStyles.code}>{data.agent.code}</strong><div><button style={smallButton(theme)} onClick={() => void copy(data.agent.code || '', 'code')}><Copy size={15} /> {copied === 'code' ? 'Copied' : 'Copy code'}</button></div></div>{data.agent.link && <QRCodeSVG value={data.agent.link} size={142} bgColor="transparent" fgColor={theme.text} />}</div><p style={{ ...pageStyles.body, wordBreak: 'break-all', color: theme.textMuted }}>{data.agent.link}</p><div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>{data.agent.link && <button style={button(theme)} onClick={() => void copy(data.agent.link || '', 'link')}>{copied === 'link' ? <Check size={16} /> : <Copy size={16} />} {copied === 'link' ? 'Copied' : 'Copy link'}</button>}<button style={secondaryButton(theme)} onClick={() => void share()}><Share2 size={16} /> Share invite</button></div></section>
       <section style={card(theme)}><h2 style={pageStyles.cardHeading}><Trophy size={19} /> Challenges</h2>{data.challenges?.length ? data.challenges.map((challenge) => <div key={challenge.title} style={{ marginBottom: 18 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><strong>{challenge.title}</strong><span style={{ color: theme.primary }}>{challenge.percentage}%</span></div><p style={{ ...pageStyles.body, color: theme.textMuted, margin: '6px 0' }}>{challenge.description}</p><div style={{ height: 8, background: theme.surfaceMuted, borderRadius: 8 }}><div style={{ width: `${Math.min(100, challenge.percentage)}%`, height: '100%', background: theme.primary, borderRadius: 8 }} /></div><small style={pageStyles.meta}>{challenge.progress} / {challenge.target}{challenge.reward ? ` · ${challenge.reward} USDT reward` : ''}</small></div>) : <p style={{ ...pageStyles.body, color: theme.textMuted }}>New challenges will appear here soon.</p>}</section>
@@ -91,6 +97,7 @@ const pageStyles = {
   heading: { margin: '18px 0 6px', fontSize: 'clamp(1.35rem, 2.8vw, 2rem)', fontWeight: 900, letterSpacing: '-0.02em' },
   intro: { margin: 0, fontSize: '0.92rem', color: 'inherit', lineHeight: 1.6 },
   body: { margin: '10px 0', fontSize: '0.88rem', lineHeight: 1.5 },
+  loading: { display: 'flex', justifyContent: 'center', padding: '24px 0' },
   cardHeading: { display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1.05rem', fontWeight: 800 },
   code: { fontSize: 'clamp(1.25rem, 3vw, 1.5rem)', letterSpacing: '0.04em' },
   meta: { fontSize: '0.78rem', color: 'inherit' },
