@@ -36,7 +36,36 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   empty: { display: 'grid', placeItems: 'center', gap: '8px', padding: '42px 18px', border: `1px solid ${theme.borderGlass}`, borderRadius: '18px', color: theme.textMuted, textAlign: 'center' as const },
 });
 
-const formatAction = (action: string) => action.charAt(0).toUpperCase() + action.slice(1);
+const formatAction = (action: string) => {
+  const labels: Record<string, string> = {
+    create: 'Created',
+    update: 'Updated',
+    delete: 'Removed',
+    submit: 'Submitted',
+    enable: 'Enabled',
+    disable: 'Disabled',
+    login: 'Signed in',
+    logout: 'Signed out',
+    other: 'Completed',
+  };
+
+  return labels[action] || 'Completed';
+};
+
+const getReadableActivity = (activity: Activity) => {
+  if (/^\/api\/webauthn\/credentials(?:\/|$)/.test(activity.path)) {
+    return {
+      title: 'Passkey removed',
+      description: 'You removed a passkey used to secure your account.',
+    };
+  }
+
+  return {
+    title: activity.title || formatAction(activity.action),
+    description: activity.description,
+  };
+};
+
 const formatDate = (createdAt: string) => {
   const date = new Date(createdAt);
   return Number.isNaN(date.getTime()) ? 'Date unavailable' : date.toLocaleString();
@@ -79,17 +108,21 @@ const ActivityLogPage = () => {
           <div style={styles.list} aria-live="polite">
             {loading ? <div style={styles.empty} role="status" aria-label="Loading activity"><LoadingDots /></div> : null}
             {!loading && !activities.length ? <div style={styles.empty}><History size={25} /><span>No major activity recorded in the last 24 hours.</span></div> : null}
-            {activities.map((activity) => (
-              <article key={activity.id} style={styles.item}>
-                <Clock3 size={19} style={styles.icon} aria-hidden="true" />
-                <div>
-                  <span style={styles.badge}>{formatAction(activity.action)}</span>
-                  <h2 style={styles.title}>{activity.title || formatAction(activity.action)}</h2>
-                  <p style={styles.description}>{activity.description}</p>
-                  <p style={styles.date}><Clock3 size={13} aria-hidden="true" /> {formatDate(activity.createdAt)}</p>
-                </div>
-              </article>
-            ))}
+            {activities.map((activity) => {
+              const readableActivity = getReadableActivity(activity);
+
+              return (
+                <article key={activity.id} style={styles.item}>
+                  <Clock3 size={19} style={styles.icon} aria-hidden="true" />
+                  <div>
+                    <span style={styles.badge}>{formatAction(activity.action)}</span>
+                    <h2 style={styles.title}>{readableActivity.title}</h2>
+                    <p style={styles.description}>{readableActivity.description}</p>
+                    <p style={styles.date}><Clock3 size={13} aria-hidden="true" /> {formatDate(activity.createdAt)}</p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
         <NowBar />
