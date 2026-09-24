@@ -195,11 +195,13 @@ const styles = {
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '18px',
-    border: '1px solid transparent',
-    padding: '13px 14px',
-    fontSize: '16px',
+    borderRadius: '12px',
+    border: `1px solid ${theme.border}`,
+    background: theme.surface,
+    color: theme.text,
+    padding: '10px 12px',
     outline: 'none',
+    fontSize: '0.9rem',
   },
   optionGrid: {
     display: 'grid',
@@ -359,10 +361,9 @@ const SigninPage = () => {
     },
     input: {
       ...styles.input,
-      borderColor: theme.borderGlass,
-      background: theme.surfaceElevated,
+      border: `1px solid ${theme.border}`,
+      background: theme.surface,
       color: theme.text,
-
     },
     optionCard: {
       ...styles.optionCard,

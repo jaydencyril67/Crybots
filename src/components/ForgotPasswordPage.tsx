@@ -274,13 +274,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '18px',
+    borderRadius: '12px',
     border: `1px solid ${theme.border}`,
     background: theme.surface,
     color: theme.text,
-    padding: '13px 14px',
-    fontSize: '16px',
+    padding: '10px 12px',
     outline: 'none',
+    fontSize: '0.9rem',
   },
   navRow: {
     display: 'flex',
@@ -421,8 +421,8 @@ const ForgotPasswordPage = () => {
     },
     input: {
       ...styles.input,
-      borderColor: theme.borderGlass,
-      background: theme.surfaceElevated,
+      border: `1px solid ${theme.border}`,
+      background: theme.surface,
       color: theme.text,
     },
     hint: {

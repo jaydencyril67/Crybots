@@ -102,7 +102,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   form: { display: 'grid', gap: '10px', width: '100%' },
   field: { display: 'grid', gap: '6px', width: '100%' },
   label: { color: theme.textMuted, fontSize: '0.88rem', fontWeight: 600 },
-  input: { border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem' },
   selectTrigger: { border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
   selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.border}` },
   selectOption: { border: `1px solid ${theme.border}`, background: theme.highlightSoft, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
