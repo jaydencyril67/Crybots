@@ -68,7 +68,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   metricValue: { margin: 0, fontSize: '1rem', fontWeight: 700 },
   packageGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(180px, 220px))',
     gap: '10px',
     padding: '18px',
     borderRadius: '22px',
@@ -81,23 +81,26 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     WebkitOverflowScrolling: 'touch' as const,
   },
   packageCard: {
-    padding: '12px 14px',
-    borderRadius: '16px',
+    padding: '16px 14px',
+    borderRadius: '15px',
     background: theme.surfaceMuted,
     border: `1px solid ${theme.borderGlass}`,
     display: 'grid',
     gap: '10px',
-    minWidth: '220px',
-    gridTemplateColumns: 'minmax(90px, auto) 1fr auto auto',
+    width: '100%',
+    minWidth: 0,
+    aspectRatio: '1 / 1',
+    gridTemplateColumns: '1fr',
+    alignContent: 'center',
     alignItems: 'center',
-    justifyItems: 'start',
-    textAlign: 'left' as const,
+    justifyItems: 'center',
+    textAlign: 'center' as const,
   },
   packageBadge: { display: 'inline-flex', alignItems: 'center', gap: '8px', width: 'fit-content', padding: '6px 10px', borderRadius: '999px', background: theme.primarySoft, color: theme.text, fontWeight: 700 },
   packageTitle: { margin: 0, fontSize: '1.08rem' },
-  packageText: { margin: 0, color: theme.textMuted, lineHeight: 1.45, textAlign: 'left' as const, fontSize: '0.92rem' },
+  packageText: { margin: 0, color: theme.textMuted, lineHeight: 1.45, textAlign: 'center' as const, fontSize: '0.92rem' },
   packageList: { margin: 0, paddingLeft: '18px', color: theme.textMuted, display: 'grid', gap: '6px' },
-  stakeSection: { display: 'grid', gap: '12px', gridTemplateColumns: '1fr' },
+  stakeSection: { display: 'grid', gap: '12px', gridTemplateColumns: '1fr', padding: '18px', borderRadius: '22px', background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` },
   panel: { padding: 'clamp(16px, 3.2vw, 24px)', borderRadius: '28px', background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)' },
   form: { display: 'grid', gap: '10px', width: '100%' },
   field: { display: 'grid', gap: '6px', width: '100%' },
@@ -140,7 +143,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     shell: { maxWidth: '100%', padding: '16px 0 120px', gap: '12px' },
     hero: { padding: '16px' },
     packageGrid: {
-      gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
+      gridTemplateColumns: 'repeat(3, minmax(180px, 220px))',
       gap: '10px',
       columnGap: '10px',
       overflowX: 'auto' as const,
@@ -151,8 +154,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     },
     stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '16px 14px', width: '100%', minWidth: 0 },
-    packageCard: { gridTemplateColumns: '1fr', justifyItems: 'start', textAlign: 'left' as const },
-    packageText: { textAlign: 'left' as const },
+    packageCard: { width: '100%', minWidth: 0, aspectRatio: '1 / 1', gridTemplateColumns: '1fr', justifyItems: 'center', textAlign: 'center' as const },
+    packageText: { textAlign: 'center' as const },
     stakesTableWrap: { margin: '0 -14px' },
     stakesTable: { minWidth: '680px' },
     stakesTableFooter: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const, marginTop: '10px' },
@@ -315,9 +318,9 @@ const StakingPage = () => {
             ))}
           </section>
           <section style={styles.stakeSection}>
-            <div>
+            <div style={styles.innerPanel}>
               <h2 style={styles.packageTitle}>Create stake</h2>
-              <div style={styles.innerPanel}>
+              <div>
                 <form style={styles.form} onSubmit={handleCreateStake}>
                 <div ref={packageMenuRef} style={styles.field}>
                   <span style={styles.label}>Package</span>
