@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronDown, Info, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Info } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -83,13 +83,12 @@ const ControlCenterPage = () => {
       </div>
     </section>
 
-    <section style={styles.card}>
+    <section style={{ ...styles.card, position: 'relative', zIndex: 2 }}>
       <div style={styles.inner}>
         <h2 style={styles.sectionTitle}>Risk controls</h2>
         <p style={styles.sectionText}>Set a loss threshold and decide whether your pool funds should automatically return to your main USDT balance.</p>
         <div style={styles.field}><span style={styles.label}>Stop-loss percentage</span>{renderPicker('loss', lossPercentage, ['5%', '10%', '15%', '20%', '25%'], setLossPercentage)}</div>
         <div style={styles.settingRow}><div style={styles.settingText}><p style={styles.settingLabel}>Enable auto-withdraw</p><p style={styles.settingNote}>Automatically move your available pool funds to your main USDT balance if the selected loss level is reached.</p></div><input type="checkbox" aria-label="Enable auto-withdraw" checked={autoWithdraw} onChange={(event) => setAutoWithdraw(event.target.checked)} style={styles.checkbox} /></div>
-        <p style={styles.notice}><ShieldCheck size={16} /><span>These controls are currently UI-only. Changes will be connected to pool execution and confirmations in a later update.</span></p>
       </div>
     </section>
 
