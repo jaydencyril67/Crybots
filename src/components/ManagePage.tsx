@@ -27,7 +27,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   label: { display: 'grid', gap: '6px', color: theme.textMuted, fontSize: '0.88rem', fontWeight: 600 },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', fontSize: '0.9rem', outline: 'none' },
   selectTrigger: { width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '0.95rem', cursor: 'pointer' },
-  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
+  selectMenu: { position: 'absolute' as const, zIndex: 10, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
   selectOption: { width: '100%', borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.highlightSoft, color: theme.text, padding: '10px 12px', textAlign: 'left' as const, cursor: 'pointer' },
   helper: { color: theme.textMuted, fontSize: '0.85rem', fontWeight: 400 },
   button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '10px 14px', background: theme.surfaceGlass, color: theme.text, fontWeight: 700, cursor: 'pointer', justifySelf: 'start', fontSize: '0.92rem' },
@@ -111,7 +111,7 @@ const ManagePage = () => {
             {status.kind !== 'idle' ? <div style={{ marginTop: '16px' }}><NotificationBanner tone={status.kind === 'success' ? 'success' : 'error'} title={status.kind === 'success' ? 'Wallet updated' : 'Check your details'} message={status.message} /></div> : null}
             <div style={styles.innerCard}>
               <div style={styles.form}>
-                <div style={styles.label}>
+                <div style={{ ...styles.label, position: 'relative' as const }}>
                 <span>Wallet network</span>
                 <button type="button" style={styles.selectTrigger} onClick={() => setIsNetworkMenuOpen((current) => !current)} aria-expanded={isNetworkMenuOpen}>
                   <span>{network}</span>

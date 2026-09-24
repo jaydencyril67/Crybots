@@ -89,7 +89,7 @@ const DepositPage = () => {
     label: { display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700 },
     input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '10px 12px', background: theme.surface, color: theme.text, fontSize: '0.9rem', outline: 'none' },
     selectTrigger: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left' as const },
-    selectMenu: { display: 'grid', gap: '6px', marginTop: '6px', padding: '8px', border: `1px solid ${theme.borderStrong}`, borderRadius: '16px', background: theme.surfaceElevated, position: 'relative' as const, zIndex: 5 },
+    selectMenu: { display: 'grid', gap: '6px', padding: '8px', border: `1px solid ${theme.borderStrong}`, borderRadius: '16px', background: theme.surfaceElevated, position: 'absolute' as const, top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 10 },
     selectOption: { width: '100%', border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '10px 12px', background: theme.surface, color: theme.text, cursor: 'pointer', textAlign: 'left' as const },
     primaryButton: { border: `1px solid ${theme.primary}`, borderRadius: '999px', padding: '12px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 700, width: '100%', maxWidth: '100%', opacity: 1 },
     primaryButtonDisabled: { opacity: 0.55, cursor: 'not-allowed' },
@@ -274,7 +274,7 @@ const DepositPage = () => {
       <p style={{ margin: '8px 0 14px' }}>Choose a network and create a payment address. Do not send funds until an address is shown.</p>
       <label style={styles.label} htmlFor="deposit-amount">Amount (USDT)</label>
       <input id="deposit-amount" style={styles.input} type="number" min="10" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100.00" required />
-      <div ref={networkMenuRef} style={{ marginTop: '12px' }}>
+      <div ref={networkMenuRef} style={{ marginTop: '12px', position: 'relative' }}>
         <span style={styles.label}>USDT network</span>
         <button id="deposit-network" type="button" style={styles.selectTrigger} onClick={() => setIsNetworkMenuOpen((current) => !current)} aria-expanded={isNetworkMenuOpen}>
           <span>{network === 'usdttrc20' ? 'TRON (TRC-20)' : network === 'usdterc20' ? 'Ethereum (ERC-20)' : 'BNB Smart Chain (BEP-20)'}</span>
