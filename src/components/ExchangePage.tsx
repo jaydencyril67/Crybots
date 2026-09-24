@@ -2,9 +2,9 @@ import React from 'react';
 import ParentPageLayout, { ParentPageCard } from './ParentPageLayout';
 
 const destinations: ParentPageCard[] = [
-  { label: 'Coin Staking', description: 'Put your coins to work with staking plans.', route: '/staking' },
-  { label: 'Cloud Mining', description: 'Explore cloud mining opportunities.' },
-  { label: 'Copy Trading', description: 'Follow and copy experienced traders.' },
+  { label: 'KingsPool', description: 'Follow KingsHall trading through the shared funds pool.' },
+  { label: 'My Space', description: 'View your personal investment balance and performance.' },
+  { label: 'Control Center', description: 'Manage your investment settings and account controls.' },
 ];
 
 const ExchangePage = () => <ParentPageLayout title="Exchange" description="Choose an exchange service to continue." cards={destinations} />;
