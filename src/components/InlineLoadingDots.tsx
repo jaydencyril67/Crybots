@@ -19,6 +19,7 @@ const styles = {
   },
 } as const;
 
+// Compact loading indicator for inline actions.
 const InlineLoadingDots = () => {
   return (
     <>
