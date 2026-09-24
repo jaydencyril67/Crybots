@@ -241,6 +241,17 @@ const ProfilePage = () => {
       ...baseStyles.helperAction,
       color: theme.text,
     },
+    logoutRow: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      padding: '8px 10px',
+      minHeight: 'auto',
+      borderRadius: '15px',
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceMuted,
+      boxSizing: 'border-box' as const,
+    },
     logoutButton: {
       ...baseStyles.logoutButton,
       color: theme.text,
@@ -476,7 +487,7 @@ const ProfilePage = () => {
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
 
               <div style={styles.rowList}>
-                <div style={{ ...styles.row, ...styles.helper }}>
+                <div style={styles.logoutRow}>
                   <button type="button" onClick={handleLogout} style={styles.helperAction}>
                   <LogOut size={16} /> Logout
                   </button>
