@@ -17,18 +17,28 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   listCard: { display: 'grid', gap: '8px', minWidth: 0, padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
   listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, padding: '12px 13px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
   listItemContent: { minWidth: 0 },
+  movementHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
+  selectWrap: { position: 'relative' as const, minWidth: '150px' },
+  selectTrigger: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '10px 12px', fontSize: '0.78rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
+  selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
+  selectOption: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
+  movementGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' },
+  movementCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '9px' },
+  movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
+  movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
   label: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.3 },
   value: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem', lineHeight: 1.35 },
   icon: { display: 'inline-flex', flexShrink: 0, color: theme.primary },
   section: { display: 'grid', gap: '10px', marginTop: '16px' },
   sectionTitle: { margin: 0, fontSize: '0.96rem', fontWeight: 900 },
-  steps: { display: 'grid', gap: '9px', margin: 0, paddingLeft: '20px', color: theme.textMuted, fontSize: '0.84rem', lineHeight: 1.5 },
   disclaimer: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.5 },
 });
 
 const KingsPoolPage = () => {
   const { themeMode } = useAppTheme();
+  const [movementPeriod, setMovementPeriod] = React.useState<'week' | 'month' | 'year'>('week');
+  const [isMovementMenuOpen, setIsMovementMenuOpen] = React.useState(false);
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
 
   return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
@@ -41,7 +51,36 @@ const KingsPoolPage = () => {
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>—</p></div>
     </div></section>
 
-    <section style={styles.section}><h2 style={styles.sectionTitle}>What is happening in the pool?</h2><div style={styles.card}><p style={styles.disclaimer}>KingsHall manages one shared trading strategy for participating users. Pool gains and losses will be reflected proportionally in each user’s position.</p><ul style={styles.steps}><li>Users deposit supported crypto.</li><li>Deposited funds are allocated to KingsPool.</li><li>KingsHall trades the pooled assets.</li><li>Each user’s value changes with the pool’s performance.</li></ul></div></section>
+    <section style={styles.section}>
+      <div style={styles.movementHeader}>
+        <h2 style={styles.sectionTitle}>Biggest market moves</h2>
+        <div style={styles.selectWrap}>
+          <button type="button" aria-label="Select market move period" style={styles.selectTrigger} onClick={() => setIsMovementMenuOpen((current) => !current)}>
+            <span>{movementPeriod === 'week' ? 'This week' : movementPeriod === 'month' ? 'This month' : 'This year'}</span>
+            <span style={{ transform: isMovementMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
+          </button>
+          {isMovementMenuOpen ? <div style={styles.selectMenu}>
+            {(['week', 'month', 'year'] as const).map((period) => (
+              <button key={period} type="button" style={styles.selectOption} onClick={() => { setMovementPeriod(period); setIsMovementMenuOpen(false); }}>
+                {period === 'week' ? 'This week' : period === 'month' ? 'This month' : 'This year'}
+              </button>
+            ))}
+          </div> : null}
+        </div>
+      </div>
+      <div style={styles.movementGrid}>
+        <div style={styles.movementCard}>
+          <p style={styles.movementLabel}><TrendingUp size={17} /> Biggest rise</p>
+          <p style={styles.movementValue}>—</p>
+          <p style={styles.note}>Highest move in the selected {movementPeriod}</p>
+        </div>
+        <div style={styles.movementCard}>
+          <p style={styles.movementLabel}><TrendingDown size={17} /> Biggest fall</p>
+          <p style={styles.movementValue}>—</p>
+          <p style={styles.note}>Largest drop in the selected {movementPeriod}</p>
+        </div>
+      </div>
+    </section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Risk notice</h2><div style={styles.card}><p style={styles.disclaimer}><TrendingDown size={16} /> Investment value can rise or fall. Returns are not guaranteed, and users may lose part or all of their invested funds.</p></div></section>
   </div><NowBar /></div></HybridTheme>;
