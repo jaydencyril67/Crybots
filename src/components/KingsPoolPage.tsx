@@ -9,10 +9,7 @@ import { useAppTheme } from './AppTheme';
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
-  header: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' },
-  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  heading: { margin: 0, fontSize: 'clamp(1.2rem, 3vw, 1.7rem)', fontWeight: 900 },
-  subtitle: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.4 },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' },
   card: { minWidth: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', padding: '14px', background: theme.surfaceGlass, backdropFilter: 'blur(20px)' },
   label: { margin: 0, color: theme.textMuted, fontSize: '0.78rem' },
@@ -35,10 +32,7 @@ const KingsPoolPage = () => {
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
 
   return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
-    <div style={styles.header}>
-      <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
-      <div><h1 style={styles.heading}>KingsPool</h1><p style={styles.subtitle}>A live overview of the shared KingsHall trading pool.</p></div>
-    </div>
+    <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <div style={styles.grid}>
       <div style={styles.card}><span style={styles.icon}><Coins size={19} /></span><p style={styles.label}>Total in pool</p><p style={styles.value}>— USDT</p><p style={styles.note}>Awaiting live pool data</p></div>
@@ -57,7 +51,7 @@ const KingsPoolPage = () => {
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>What is happening in the pool?</h2><div style={styles.card}><p style={styles.disclaimer}>KingsHall manages one shared trading strategy for participating users. Pool gains and losses will be reflected proportionally in each user’s position.</p><ul style={styles.steps}><li>Users deposit supported crypto.</li><li>Deposited funds are allocated to KingsPool.</li><li>KingsHall trades the pooled assets.</li><li>Each user’s value changes with the pool’s performance.</li></ul></div></section>
 
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Risk notice</h2><div style={styles.card}><p style={styles.disclaimer}><TrendingDown size={16} /> Investment value can rise or fall. Returns are not guaranteed, and users may lose part or all of their invested funds. This overview is a UI draft and does not yet display live pool data.</p></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Risk notice</h2><div style={styles.card}><p style={styles.disclaimer}><TrendingDown size={16} /> Investment value can rise or fall. Returns are not guaranteed, and users may lose part or all of their invested funds.</p></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
 
