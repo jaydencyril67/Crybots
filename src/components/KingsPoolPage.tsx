@@ -24,6 +24,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   selectOption: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   movementGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' },
   movementCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '9px' },
+  movementInner: { display: 'grid', gap: '9px', padding: '12px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
   activityList: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
@@ -77,14 +78,18 @@ const KingsPoolPage = () => {
       </div>
       <div style={styles.movementGrid}>
         <div style={styles.movementCard}>
-          <p style={styles.movementLabel}><TrendingUp size={17} /> Biggest rise</p>
-          <p style={styles.movementValue}>—</p>
-          <p style={styles.note}>Highest move in the selected {movementPeriod}</p>
+          <div style={styles.movementInner}>
+            <p style={styles.movementLabel}><TrendingUp size={17} /> Biggest rise</p>
+            <p style={styles.movementValue}>—</p>
+            <p style={styles.note}>Highest move in the selected {movementPeriod}</p>
+          </div>
         </div>
         <div style={styles.movementCard}>
-          <p style={styles.movementLabel}><TrendingDown size={17} /> Biggest fall</p>
-          <p style={styles.movementValue}>—</p>
-          <p style={styles.note}>Largest drop in the selected {movementPeriod}</p>
+          <div style={styles.movementInner}>
+            <p style={styles.movementLabel}><TrendingDown size={17} /> Biggest fall</p>
+            <p style={styles.movementValue}>—</p>
+            <p style={styles.note}>Largest drop in the selected {movementPeriod}</p>
+          </div>
         </div>
       </div>
     </section>
@@ -110,7 +115,7 @@ const KingsPoolPage = () => {
       </div>
     </section>
 
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Risk notice</h2><div style={styles.card}><p style={styles.disclaimer}><TrendingDown size={16} /> Investment value can rise or fall. Returns are not guaranteed, and users may lose part or all of their invested funds.</p></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Risk notice</h2><div style={styles.card}><div style={styles.movementInner}><p style={styles.disclaimer}><TrendingDown size={16} /> Investment value can rise or fall. Returns are not guaranteed, and users may lose part or all of their invested funds.</p></div></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
 
