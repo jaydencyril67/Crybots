@@ -28,15 +28,22 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   card: {
     width: '100%',
     maxWidth: '760px',
-    borderRadius: '20px',
+    borderRadius: '22px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
-    padding: 'clamp(18px, 3.5vw, 26px)',
-    textAlign: 'center' as const,
+    padding: '18px',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
+    boxSizing: 'border-box' as const,
     position: 'relative' as const,
     zIndex: 1,
+  },
+  innerCard: {
+    borderRadius: '15px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
+    padding: 'clamp(18px, 3.5vw, 26px)',
+    textAlign: 'center' as const,
   },
   button: {
     marginTop: '20px',
@@ -143,7 +150,8 @@ const VerifyEmailPage = () => {
       <main style={styles.page}>
         <div style={styles.backdrop} />
         <section style={styles.card}>
-          <div style={{ ...styles.iconWrap, background: iconBackground, color: iconColor }}>{icon}</div>
+          <div style={styles.innerCard}>
+            <div style={{ ...styles.iconWrap, background: iconBackground, color: iconColor }}>{icon}</div>
           <h2 style={styles.title}>{status === 'success' ? 'Account confirmed' : status === 'error' ? 'Verification failed' : 'Verifying account'}</h2>
           <p style={styles.text}>{message}</p>
           {status === 'loading' ? (
@@ -165,6 +173,7 @@ const VerifyEmailPage = () => {
               </a>
             </>
           ) : null}
+          </div>
         </section>
       </main>
     </HybridTheme>

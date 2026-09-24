@@ -141,6 +141,17 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     fontSize: '0.78rem',
     fontWeight: 600,
   },
+  dashboardFrame: {
+    position: 'relative' as const,
+    zIndex: 1,
+    display: 'grid',
+    gap: '14px',
+    padding: '18px',
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+    boxSizing: 'border-box' as const,
+  },
   heroGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
@@ -150,9 +161,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     zIndex: 1,
   },
   heroCard: {
-    borderRadius: '16px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
+    borderRadius: '15px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
     padding: 'clamp(12px, 2.5vw, 16px)',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -208,9 +219,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     fontWeight: 800,
   },
   panel: {
-    borderRadius: '32px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
+    borderRadius: '15px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
     padding: 'clamp(12px, 2.5vw, 16px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
@@ -547,7 +558,8 @@ const DashboardPage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
 
-          <div style={styles.heroGrid}>
+          <div style={styles.dashboardFrame}>
+            <div style={styles.heroGrid}>
             <section style={styles.heroCard}>
               <p style={styles.greeting}>{greeting}</p>
               <h2 style={styles.title}>
@@ -624,9 +636,9 @@ const DashboardPage = () => {
                 )}
               </div>
             </section>
-          </div>
+            </div>
 
-          <div style={styles.sectionGrid}>
+            <div style={styles.sectionGrid}>
             <section style={styles.panel}>
               <p style={styles.panelTitle}>Market pulse</p>
               <p style={styles.panelSub}>A simple read on breadth and momentum across the coins in view.</p>
@@ -693,6 +705,7 @@ const DashboardPage = () => {
               </div>
             </section>
 
+            </div>
           </div>
         </div>
         <NowBar />

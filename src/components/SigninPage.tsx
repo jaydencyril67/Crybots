@@ -39,9 +39,9 @@ const initialState: FormState = {
   password: '',
   code: '',
   twoFactorCode: '',
-  };
+};
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflow: 'hidden',
@@ -106,6 +106,10 @@ const styles = {
     alignItems: 'stretch',
     position: 'relative' as const,
     zIndex: 1,
+    padding: '18px',
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
   },
   heroCard: {
     borderRadius: '24px',
@@ -191,11 +195,13 @@ const styles = {
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '18px',
-    border: '1px solid transparent',
-    padding: '13px 14px',
-    fontSize: '16px',
+    borderRadius: '12px',
+    border: `1px solid ${theme.border}`,
+    background: theme.surface,
+    color: theme.text,
+    padding: '10px 12px',
     outline: 'none',
+    fontSize: '0.9rem',
   },
   optionGrid: {
     display: 'grid',
@@ -276,11 +282,12 @@ const styles = {
     height: '24px',
     flexShrink: 0,
   },
-};
+});
 
 const SigninPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const hybridStyles = {
     page: {
       ...styles.page,
@@ -312,7 +319,7 @@ const SigninPage = () => {
     heroCard: {
       ...styles.heroCard,
       border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
+      background: theme.surfaceMuted,
       color: theme.text,
 
     },
@@ -330,7 +337,7 @@ const SigninPage = () => {
     panel: {
       ...styles.panel,
       border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
+      background: theme.surfaceMuted,
       color: theme.text,
     },
     progressBar: {
@@ -355,10 +362,9 @@ const SigninPage = () => {
     },
     input: {
       ...styles.input,
-      borderColor: theme.borderGlass,
-      background: theme.surfaceElevated,
+      border: `1px solid ${theme.border}`,
+      background: theme.surface,
       color: theme.text,
-
     },
     optionCard: {
       ...styles.optionCard,

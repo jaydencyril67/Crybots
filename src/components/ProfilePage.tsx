@@ -78,7 +78,12 @@ const baseStyles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '4px 0 6px',
+    width: 'fit-content',
+    aspectRatio: '1 / 1',
+    margin: '0 auto',
+    padding: '18px',
+    borderRadius: '15px',
+    boxSizing: 'border-box' as const,
   },
   profileAvatarFrame: {
     position: 'relative' as const,
@@ -111,7 +116,7 @@ const baseStyles = {
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
     card: {},
-    profileIdentity: { gap: '12px' },
+    profileIdentity: { width: 'fit-content', padding: '14px', gap: '12px' },
     profileAvatarFrame: { width: '88px', height: '88px' },
     profileAvatar: { width: '88px', height: '88px', borderRadius: '20px' },
     profileAvatarFallback: { width: '88px', height: '88px', borderRadius: '20px' },
@@ -240,6 +245,17 @@ const ProfilePage = () => {
     helperAction: {
       ...baseStyles.helperAction,
       color: theme.text,
+    },
+    logoutRow: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      padding: '8px 10px',
+      minHeight: 'auto',
+      borderRadius: '15px',
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceMuted,
+      boxSizing: 'border-box' as const,
     },
     logoutButton: {
       ...baseStyles.logoutButton,
@@ -476,7 +492,7 @@ const ProfilePage = () => {
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
 
               <div style={styles.rowList}>
-                <div style={{ ...styles.row, ...styles.helper }}>
+                <div style={styles.logoutRow}>
                   <button type="button" onClick={handleLogout} style={styles.helperAction}>
                   <LogOut size={16} /> Logout
                   </button>

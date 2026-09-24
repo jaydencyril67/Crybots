@@ -237,13 +237,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   input: {
     width: '100%',
-    border: 'none',
-    borderBottom: `1px solid ${theme.borderStrong}`,
-    background: 'transparent',
+    boxSizing: 'border-box' as const,
+    borderRadius: '12px',
+    border: `1px solid ${theme.border}`,
+    background: theme.surface,
     color: theme.text,
-    padding: '12px 0',
+    padding: '10px 12px',
     outline: 'none',
-    fontSize: '1rem',
+    fontSize: '0.9rem',
   },
   buttonRow: {
     display: 'flex',
@@ -481,9 +482,9 @@ const SecurityPage = () => {
     { label: 'One symbol', met: passwordHasSymbol },
   ];
   const passwordErrorMessage = newPassword && !passwordMeetsRequirement ? passwordNotice : '';
-  const passwordInputStyle = passwordErrorMessage ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input;
+  const passwordInputStyle = passwordErrorMessage ? { ...styles.input, borderColor: theme.danger, background: theme.surface } : styles.input;
   const confirmPasswordMismatch = confirmPassword && newPassword !== confirmPassword;
-  const confirmPasswordInputStyle = confirmPasswordMismatch ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input;
+  const confirmPasswordInputStyle = confirmPasswordMismatch ? { ...styles.input, borderColor: theme.danger, background: theme.surface } : styles.input;
 
   const handlePasswordSave = async () => {
     if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
@@ -885,7 +886,7 @@ const SecurityPage = () => {
                         </div>
                       </div>
                     ) : null}
-                    <input style={twoFactorCodeError ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => { setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setTwoFactorCodeError(''); }} placeholder="6-digit authenticator code" autoComplete="one-time-code" aria-invalid={Boolean(twoFactorCodeError)} />
+                    <input style={twoFactorCodeError ? { ...styles.input, borderColor: theme.danger, background: theme.surface } : styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => { setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setTwoFactorCodeError(''); }} placeholder="6-digit authenticator code" autoComplete="one-time-code" aria-invalid={Boolean(twoFactorCodeError)} />
                     {twoFactorCodeError ? <p style={styles.inlineError}>{twoFactorCodeError}</p> : null}
                     <div style={styles.buttonRow}>
                       <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? 'Enabling...' : 'Enable 2FA'}</button>

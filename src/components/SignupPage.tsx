@@ -104,11 +104,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     alignItems: 'stretch',
     position: 'relative' as const,
     zIndex: 1,
+    padding: '18px',
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
   },
   heroCard: {
     borderRadius: '24px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
     padding: '18px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -190,9 +194,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     flexShrink: 0,
   },
   panel: {
-    borderRadius: '32px',
+    borderRadius: '16px',
     border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
+    background: theme.surfaceMuted,
     padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'blur(22px)',
     WebkitBackdropFilter: 'blur(22px)',
@@ -253,13 +257,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   input: {
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '18px',
+    borderRadius: '12px',
     border: `1px solid ${theme.border}`,
     background: theme.surface,
     color: theme.text,
-    padding: '13px 14px',
-    fontSize: '16px',
+    padding: '10px 12px',
     outline: 'none',
+    fontSize: '0.9rem',
   },
   radioRow: {
     display: 'grid',
@@ -387,7 +391,7 @@ const SignupPage = () => {
 
   const emailInputStyle =
     form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
-      ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted }
+      ? { ...styles.input, borderColor: theme.danger, background: theme.surface }
       : styles.input;
 
   const passwordHasLetter = /[A-Za-z]/.test(form.password);
@@ -401,7 +405,7 @@ const SignupPage = () => {
   const passwordErrorMessage = form.password && !passwordMeetsRequirement ? passwordNotice : '';
   const passwordInputStyle =
     passwordErrorMessage
-      ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted }
+      ? { ...styles.input, borderColor: theme.danger, background: theme.surface }
       : styles.input;
 
   const isAtLeast18 = (value: string) => {
@@ -625,7 +629,7 @@ const SignupPage = () => {
                 textAlign: 'left',
                 cursor: 'pointer',
                 ...(form.dob && !dobMeetsRequirement
-                  ? { borderColor: theme.danger, background: theme.surfaceMuted }
+                  ? { borderColor: theme.danger, background: theme.surface }
                   : null),
               }}
             >
