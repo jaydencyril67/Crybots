@@ -107,7 +107,7 @@ const WithdrawPage = () => {
     section: { ...baseStyles.section, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
     sectionText: { ...baseStyles.sectionText, color: theme.textMuted },
     label: { ...baseStyles.label, color: theme.textMuted },
-    input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
+    input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text },
     selectTrigger: { ...baseStyles.selectTrigger, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
     selectMenu: { ...baseStyles.selectMenu, border: `1px solid ${theme.border}`, background: theme.surfaceMuted },
     selectOption: { ...baseStyles.selectOption, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
