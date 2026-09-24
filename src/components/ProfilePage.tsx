@@ -213,6 +213,7 @@ type ProfileDetails = {
   email?: string;
   uid?: string;
   usdtBalance?: number;
+  poolBalance?: number;
   profilePicture?: string;
 };
 
@@ -310,8 +311,9 @@ const ProfilePage = () => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
-  const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
+  const [balance, setBalance] = useState<{ usdtBalance: number | null; poolBalance: number | null } | null>(() => ({
     usdtBalance: null,
+    poolBalance: null,
   }));
 
   useEffect(() => {
@@ -335,7 +337,7 @@ const ProfilePage = () => {
 
         const serverProfile = meResponse.data.user ?? null;
 
-        const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null };
+        const nextBalance = typeof liveBalance?.usdtBalance === 'number' ? liveBalance : { usdtBalance: null, poolBalance: null };
         setBalance(nextBalance);
         setLiveProfile(serverProfile);
         setAvatarPreview(serverProfile?.profilePicture ?? null);
@@ -347,7 +349,7 @@ const ProfilePage = () => {
           return;
         }
 
-        setBalance({ usdtBalance: null });
+        setBalance({ usdtBalance: null, poolBalance: null });
         setLiveProfile(null);
         setProfileLoading(false);
         setBalanceLoading(false);

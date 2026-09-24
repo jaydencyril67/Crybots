@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from './balance';
-
-type BalanceState = { usdtBalance: number | null } | null;
+import { getCachedBalance, getCachedPoolBalance, subscribeBalance, syncBalanceFromBackend, type BalanceState } from './balance';
 
 const useBalance = () => {
-  const [balance, setBalance] = useState<BalanceState>(() => ({ usdtBalance: getCachedBalance() }));
+  const [balance, setBalance] = useState<BalanceState>(() => ({ usdtBalance: getCachedBalance(), poolBalance: getCachedPoolBalance() }));
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

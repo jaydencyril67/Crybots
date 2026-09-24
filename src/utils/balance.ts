@@ -1,12 +1,15 @@
 import api from '../api/axios';
 
-type BalanceListener = (balance: { usdtBalance: number | null } | null) => void;
+export type BalanceState = { usdtBalance: number | null; poolBalance: number | null } | null;
 
 const STORAGE_KEYS = ['kingshall_user', 'user'];
 const BALANCE_EVENT = 'kingshall:balance-updated';
 const BALANCE_REFRESH_ENDPOINT = '/api/auth/me';
 
+type BalanceListener = (balance: BalanceState) => void;
+
 let cachedBalance: number | null = null;
+let cachedPoolBalance: number | null = null;
 const listeners = new Set<BalanceListener>();
 
 const readStoredBalance = () => {
@@ -17,7 +20,10 @@ const readStoredBalance = () => {
         continue;
       }
 
-      const parsed = JSON.parse(raw) as { usdtBalance?: number };
+      const parsed = JSON.parse(raw) as { usdtBalance?: number; poolBalance?: number };
+      if (typeof parsed.poolBalance === 'number') {
+        cachedPoolBalance = parsed.poolBalance;
+      }
       if (typeof parsed.usdtBalance === 'number') {
         return parsed.usdtBalance;
       }
@@ -29,7 +35,7 @@ const readStoredBalance = () => {
   return null;
 };
 
-const writeStoredBalance = (balance: number) => {
+const writeStoredBalance = (balance: number, poolBalance: number | null = cachedPoolBalance) => {
   for (const key of STORAGE_KEYS) {
     const raw = window.localStorage.getItem(key);
     if (!raw) {
@@ -38,7 +44,7 @@ const writeStoredBalance = (balance: number) => {
 
     try {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
-      const nextProfile = { ...parsed, usdtBalance: balance };
+      const nextProfile = { ...parsed, usdtBalance: balance, ...(typeof poolBalance === 'number' ? { poolBalance } : {}) };
       window.localStorage.setItem(key, JSON.stringify(nextProfile));
     } catch {
       // Ignore malformed cached auth payloads.
@@ -46,7 +52,7 @@ const writeStoredBalance = (balance: number) => {
   }
 };
 
-const notifyListeners = (balance: { usdtBalance: number | null } | null) => {
+const notifyListeners = (balance: BalanceState) => {
   listeners.forEach((listener) => listener(balance));
 };
 
@@ -63,27 +69,45 @@ export const getCachedBalance = () => {
   return cachedBalance;
 };
 
-export const setCachedBalance = (balance: number | null) => {
-  cachedBalance = balance;
-
-  if (typeof window !== 'undefined' && typeof balance === 'number') {
-    writeStoredBalance(balance);
-    window.dispatchEvent(new CustomEvent(BALANCE_EVENT, { detail: balance }));
+export const getCachedPoolBalance = () => {
+  if (typeof cachedPoolBalance === 'number') {
+    return cachedPoolBalance;
   }
 
-  notifyListeners({ usdtBalance: balance });
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  readStoredBalance();
+  return cachedPoolBalance;
+};
+
+export const setCachedBalance = (balance: number | null, poolBalance: number | null = cachedPoolBalance) => {
+  cachedBalance = balance;
+  cachedPoolBalance = poolBalance;
+
+  if (typeof window !== 'undefined' && typeof balance === 'number') {
+    writeStoredBalance(balance, poolBalance);
+    window.dispatchEvent(new CustomEvent(BALANCE_EVENT, { detail: { usdtBalance: balance, poolBalance } }));
+  }
+
+  notifyListeners({ usdtBalance: balance, poolBalance });
 };
 
 export const syncBalanceFromBackend = async () => {
   const response = await api.get(BALANCE_REFRESH_ENDPOINT);
   const nextProfile = response.data?.user ?? response.data;
 
+  const nextPoolBalance = typeof nextProfile?.poolBalance === 'number' ? nextProfile.poolBalance : null;
   if (typeof nextProfile?.usdtBalance === 'number') {
-    setCachedBalance(nextProfile.usdtBalance);
+    setCachedBalance(nextProfile.usdtBalance, nextPoolBalance);
+  } else if (typeof nextPoolBalance === 'number') {
+    cachedPoolBalance = nextPoolBalance;
   }
 
   return {
     usdtBalance: typeof nextProfile?.usdtBalance === 'number' ? nextProfile.usdtBalance : null,
+    poolBalance: nextPoolBalance,
 
   };
 };
