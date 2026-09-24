@@ -24,8 +24,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(14px, 3vw, 28px) clamp(8px, 1.5vw, 16px) 40px', boxSizing: 'border-box' as const },
   back: { alignSelf: 'start', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  list: { display: 'grid', gap: 0, marginTop: '22px', border: `1px solid ${theme.borderGlass}`, borderRadius: '22px', overflow: 'hidden', background: theme.surfaceGlass },
-  item: { display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '12px', padding: '18px 16px', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent' },
+  list: { display: 'grid', gap: '10px', marginTop: '22px', padding: '18px', border: `1px solid ${theme.borderGlass}`, borderRadius: '22px', background: theme.surfaceGlass },
+  item: { display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '12px', padding: '18px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', background: theme.surfaceMuted },
   icon: { color: theme.primary, marginTop: '2px' },
   title: { margin: 0, fontSize: '0.98rem', fontWeight: 800 },
   description: { margin: '4px 0 8px', color: theme.textMuted, lineHeight: 1.5, fontSize: '0.9rem' },
@@ -115,7 +115,7 @@ const ActivityLogPage = () => {
               const readableActivity = getReadableActivity(activity);
 
               return (
-                <article key={activity.id} style={{ ...styles.item, ...(activity.id === activities[activities.length - 1]?.id ? { borderBottom: 'none' } : {}) }}>
+                <article key={activity.id} style={styles.item}>
                   <Clock3 size={19} style={styles.icon} aria-hidden="true" />
                   <div>
                     <span style={styles.badge}>{formatAction(activity.action)}</span>

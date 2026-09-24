@@ -25,7 +25,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.55, fontSize: '0.95rem' },
   form: { display: 'grid', gap: '10px', marginTop: 0 },
   label: { display: 'grid', gap: '6px', color: theme.textMuted, fontSize: '0.88rem', fontWeight: 600 },
-  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '0.95rem', outline: 'none' },
+  input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', fontSize: '0.9rem', outline: 'none' },
   selectTrigger: { width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '0.95rem', cursor: 'pointer' },
   selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
   selectOption: { width: '100%', borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.highlightSoft, color: theme.text, padding: '10px 12px', textAlign: 'left' as const, cursor: 'pointer' },

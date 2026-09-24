@@ -68,11 +68,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   metricValue: { margin: 0, fontSize: '1rem', fontWeight: 700 },
   packageGrid: {
     display: 'grid',
-    gridTemplateColumns: '1fr',
+    gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
     gap: '10px',
+    padding: '18px',
+    borderRadius: '22px',
+    background: theme.surfaceGlass,
+    border: `1px solid ${theme.borderGlass}`,
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
-    padding: '0 2px 4px',
     scrollPaddingLeft: '2px',
     scrollPaddingRight: '2px',
     WebkitOverflowScrolling: 'touch' as const,
@@ -80,8 +83,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   packageCard: {
     padding: '12px 14px',
     borderRadius: '16px',
-    background: theme.surfaceGlass,
-    border: `1px solid ${theme.border}`,
+    background: theme.surfaceMuted,
+    border: `1px solid ${theme.borderGlass}`,
     display: 'grid',
     gap: '10px',
     minWidth: '220px',
@@ -104,7 +107,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   selectMenu: { display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.border}` },
   selectOption: { border: `1px solid ${theme.border}`, background: theme.highlightSoft, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
   button: { border: 'none', borderRadius: '999px', padding: '11px 14px', fontWeight: 700, color: theme.textInverse, background: theme.primary, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
-  stakesTableWrap: { overflowX: 'auto' as const, overflowY: 'hidden' as const, borderRadius: '20px', border: `1px solid ${theme.border}`, background: theme.highlightSoft },
+  innerPanel: { padding: '14px', borderRadius: '15px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
+  stakesTableWrap: { overflowX: 'auto' as const, overflowY: 'hidden' as const, borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
   stakesTableFooter: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', flexWrap: 'wrap' as const, marginTop: '10px' },
   stakesTableToggle: { border: `1px solid ${theme.border}`, background: theme.highlightSoft, color: theme.text, borderRadius: '999px', padding: '8px 12px', fontWeight: 600, cursor: 'pointer' },
   stakesPageButtonActive: { background: theme.primary, color: theme.textInverse },
@@ -118,7 +122,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   statusActive: { background: theme.primarySoft, color: theme.success },
   statusCompleted: { background: theme.primarySoft, color: theme.primary },
   statusCancelled: { background: theme.primarySoft, color: theme.danger },
-  stakesSection: { display: 'grid', gap: '12px' },
+  stakesSection: { display: 'grid', gap: '12px', padding: '18px', borderRadius: '22px', background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` },
   stakesHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   helper: { color: theme.textMuted, margin: 0, fontSize: '0.85rem', lineHeight: 1.45 },
   previewCard: { display: 'grid', gap: '5px', padding: '12px', borderRadius: '18px', background: theme.highlightSoft, border: `1px solid ${theme.border}` },
@@ -136,7 +140,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     shell: { maxWidth: '100%', padding: '16px 0 120px', gap: '12px' },
     hero: { padding: '16px' },
     packageGrid: {
-      gridTemplateColumns: '1fr',
+      gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
       gap: '10px',
       columnGap: '10px',
       overflowX: 'auto' as const,
@@ -311,9 +315,10 @@ const StakingPage = () => {
             ))}
           </section>
           <section style={styles.stakeSection}>
-            <div style={styles.panel}>
+            <div>
               <h2 style={styles.packageTitle}>Create stake</h2>
-              <form style={styles.form} onSubmit={handleCreateStake}>
+              <div style={styles.innerPanel}>
+                <form style={styles.form} onSubmit={handleCreateStake}>
                 <div ref={packageMenuRef} style={styles.field}>
                   <span style={styles.label}>Package</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsPackageMenuOpen((current) => !current)}>
@@ -355,7 +360,8 @@ const StakingPage = () => {
                 {error ? <NotificationBanner tone="error" title="Check your details" message={error} /> : null}
                 {message ? <NotificationBanner tone="success" title="Stake created" message={message} /> : null}
                 <button type="submit" style={styles.button} disabled={isSubmitting}>{isSubmitting ? <InlineLoadingDots /> : 'Stake now'} {!isSubmitting ? <ArrowRight size={16} /> : null}</button>
-              </form>
+                </form>
+              </div>
             </div>
           </section>
 

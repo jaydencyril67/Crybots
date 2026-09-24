@@ -124,7 +124,7 @@ const styles = {
   card: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 10, padding: 14, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }),
   cardTitle: { display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1rem', fontWeight: 800 },
   label: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 7, color: theme.textMuted, fontSize: '0.85rem', fontWeight: 700 }),
-  input: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ width: '100%', boxSizing: 'border-box' as const, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '1rem', outline: 'none' }),
+  input: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ width: '100%', boxSizing: 'border-box' as const, borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '11px 12px', fontSize: '1rem', outline: 'none' }),
   link: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, color: theme.textMuted, wordBreak: 'break-all' as const, fontSize: '0.86rem' }),
   validation: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }),
   balance: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', gap: 12, padding: 14, borderRadius: 14, background: theme.surfaceMuted, color: theme.textMuted }),
