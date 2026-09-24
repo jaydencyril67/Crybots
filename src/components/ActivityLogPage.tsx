@@ -24,10 +24,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(14px, 3vw, 28px) clamp(8px, 1.5vw, 16px) 40px', boxSizing: 'border-box' as const },
   back: { alignSelf: 'start', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  heading: { margin: '16px 0 6px', fontSize: 'clamp(1.35rem, 2.8vw, 2rem)', fontWeight: 900, letterSpacing: '-0.02em' },
-  intro: { margin: 0, color: theme.textMuted, lineHeight: 1.6 },
-  list: { display: 'grid', gap: '10px', marginTop: '22px' },
-  item: { display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '12px', padding: '15px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '16px', background: theme.surfaceGlass },
+  list: { display: 'grid', gap: 0, marginTop: '22px', border: `1px solid ${theme.borderGlass}`, borderRadius: '22px', overflow: 'hidden', background: theme.surfaceGlass },
+  item: { display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '12px', padding: '18px 16px', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent' },
   icon: { color: theme.primary, marginTop: '2px' },
   title: { margin: 0, fontSize: '0.98rem', fontWeight: 800 },
   description: { margin: '4px 0 8px', color: theme.textMuted, lineHeight: 1.5, fontSize: '0.9rem' },
@@ -109,8 +107,6 @@ const ActivityLogPage = () => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
-          <h1 style={styles.heading}>Activity Log</h1>
-          <p style={styles.intro}>Review actions from the last 24 hours. Older activity is automatically removed.</p>
           {error ? <NotificationBanner tone="error" title="Activity log unavailable" message={error} /> : null}
           <div style={styles.list} aria-live="polite">
             {loading ? <div style={styles.empty} role="status" aria-label="Loading activity"><LoadingDots /></div> : null}
@@ -119,7 +115,7 @@ const ActivityLogPage = () => {
               const readableActivity = getReadableActivity(activity);
 
               return (
-                <article key={activity.id} style={styles.item}>
+                <article key={activity.id} style={{ ...styles.item, ...(activity.id === activities[activities.length - 1]?.id ? { borderBottom: 'none' } : {}) }}>
                   <Clock3 size={19} style={styles.icon} aria-hidden="true" />
                   <div>
                     <span style={styles.badge}>{formatAction(activity.action)}</span>
