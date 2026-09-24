@@ -40,14 +40,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.text,
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    paddingBottom: '118px',
+    paddingBottom: '132px',
   },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   shell: {
     width: '100%',
-    maxWidth: '1160px',
+    maxWidth: '920px',
     margin: '0 auto',
-    padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
+    padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px',
     boxSizing: 'border-box' as const,
   },
   panel: {
@@ -72,8 +72,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
     boxSizing: 'border-box' as const,
     gap: '14px',
-    padding: 'clamp(12px, 2.5vw, 16px)',
-    borderRadius: '16px',
+    padding: '18px',
+    borderRadius: '22px',
     border: `1px solid ${theme.border}`,
     background: theme.surfaceGlass,
     backdropFilter: 'blur(18px)',
@@ -221,12 +221,12 @@ const TransferPage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <div style={styles.page}>
-      <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
-      <div style={styles.shell}>
-        <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
-        <div style={styles.panel}>
-          <div style={styles.body}>
-            <div style={styles.grid}>
+        <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
+        <div style={styles.shell}>
+          <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
+          <div style={styles.panel}>
+            <div style={styles.body}>
+              <div style={styles.grid}>
               <section style={styles.card}>
                 {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
                 <h2 style={styles.cardTitle}><ArrowRightLeft size={18} /> Send USDT to another user</h2>
@@ -297,9 +297,9 @@ const TransferPage = () => {
                 <p style={styles.cardText}>Set a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
                 <p style={styles.cardText}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
               </section>
+              </div>
             </div>
           </div>
-        </div>
         </div>
         <NowBar />
       </div>

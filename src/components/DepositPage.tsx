@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, ChevronDown, Copy } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
-import { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import api from '../api/axios';
@@ -25,21 +25,26 @@ const DepositPage = () => {
     return ({
     page: {
       minHeight: '100vh',
-      padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 118px',
+      overflowX: 'hidden' as const,
+      overflowY: 'auto' as const,
+      paddingBottom: '132px',
       background: theme.background,
       color: theme.text,
     },
     shell: {
-      width: 'min(1160px, 100%)',
+      width: '100%',
+      maxWidth: '920px',
       margin: '0 auto',
+      padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px',
+      boxSizing: 'border-box' as const,
     },
     card: {
       ...cardStyles.card,
       border: `1px solid ${theme.border}`,
       background: theme.surface,
       color: theme.text,
-      borderRadius: '16px',
-      padding: 'clamp(12px, 2.5vw, 16px)',
+      borderRadius: '22px',
+      padding: '18px',
       marginTop: '14px',
       display: 'grid',
       gap: '12px',
@@ -72,7 +77,7 @@ const DepositPage = () => {
       border: `1px solid ${theme.border}`,
       background: theme.surfaceElevated,
       marginTop: 0,
-      borderRadius: '13px',
+      borderRadius: '15px',
       color: theme.textMuted,
     },
     label: { display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700 },
@@ -281,9 +286,10 @@ const DepositPage = () => {
   );
 
   return (
-    <div data-shadow-free-page="deposit" style={styles.page}>
-      <style>{'[data-shadow-free-page="deposit"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
-      <div style={styles.shell}>
+    <HybridTheme mode={themeMode}>
+      <div data-shadow-free-page="deposit" style={styles.page}>
+        <style>{'[data-shadow-free-page="deposit"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
+        <div style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
         <div style={styles.card}>
           {depositNotice ? <NotificationBanner tone={depositNotice.tone} title={depositNotice.title} message={depositNotice.message} /> : null}
@@ -337,7 +343,8 @@ const DepositPage = () => {
         </div>
         <NowBar />
       </div>
-    </div>
+      </div>
+    </HybridTheme>
   );
 };
 
