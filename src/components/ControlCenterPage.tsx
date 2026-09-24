@@ -50,14 +50,44 @@ const ControlCenterPage = () => {
   const [lossPercentage, setLossPercentage] = useState('10%');
   const [autoWithdraw, setAutoWithdraw] = useState(false);
   const [poolBalance, setPoolBalance] = useState<number | null>(null);
+  const [usdtBalance, setUsdtBalance] = useState<number | null>(null);
+  const [amount, setAmount] = useState('');
+  const [transferMessage, setTransferMessage] = useState('');
+  const [isTransferring, setIsTransferring] = useState(false);
 
   React.useEffect(() => {
     let active = true;
-    api.get<{ poolBalance: number }>('/api/pool/balance')
-      .then(({ data }) => { if (active) setPoolBalance(data.poolBalance); })
+    api.get<{ poolBalance: number; usdtBalance: number }>('/api/pool/balance')
+      .then(({ data }) => { if (active) { setPoolBalance(data.poolBalance); setUsdtBalance(data.usdtBalance); } })
       .catch(() => { if (active) setPoolBalance(null); });
     return () => { active = false; };
   }, []);
+
+  const handleTransfer = async () => {
+    const normalizedAmount = Number(amount);
+    if (!Number.isFinite(normalizedAmount) || normalizedAmount < 1) {
+      setTransferMessage('Enter at least 1.00 USDT.');
+      return;
+    }
+
+    setIsTransferring(true);
+    setTransferMessage('');
+    try {
+      const endpoint = action === 'deposit' ? '/api/pool/deposit' : '/api/pool/withdraw';
+      const { data } = await api.post<{ poolBalance: number; usdtBalance: number }>(endpoint, { amount: normalizedAmount });
+      setPoolBalance(data.poolBalance);
+      setUsdtBalance(data.usdtBalance);
+      setAmount('');
+      setTransferMessage(action === 'deposit' ? 'USDT deposited into KingsPool.' : 'USDT withdrawn to your main balance.');
+    } catch (error: unknown) {
+      const message = error && typeof error === 'object' && 'response' in error
+        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+        : undefined;
+      setTransferMessage(message || 'Unable to complete this transfer.');
+    } finally {
+      setIsTransferring(false);
+    }
+  };
 
   const renderPicker = (name: PickerName, value: string, options: string[], setValue: (next: string) => void) => (
     <div style={styles.picker}>
@@ -76,6 +106,7 @@ const ControlCenterPage = () => {
         <h1 style={styles.sectionTitle}>Pool control center</h1>
         <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool, and configure how your investment should be protected.</p>
         <div style={styles.balance}><div><p style={styles.balanceLabel}>Your KingsPool balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? '—' : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
+        <div style={styles.balance}><div><p style={styles.balanceLabel}>Main USDT balance</p><p style={styles.sectionText}>Available for pool deposits</p></div><p style={styles.balanceValue}>{usdtBalance === null ? '—' : `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
       </div>
     </section>
 
@@ -88,8 +119,9 @@ const ControlCenterPage = () => {
           <button type="button" style={action === 'withdraw' ? styles.button : styles.secondaryButton} onClick={() => setAction('withdraw')}>Withdraw from pool</button>
         </div>
         {action === 'deposit' ? <div style={styles.field}><span style={styles.label}>Deposit source</span>{renderPicker('deposit', depositSource, ['Main USDT balance'], setDepositSource)}</div> : <div style={styles.field}><span style={styles.label}>Withdrawal destination</span>{renderPicker('withdraw', withdrawDestination, ['Main USDT balance'], setWithdrawDestination)}</div>}
-        <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="0.01" placeholder="0.00 USDT" style={styles.input} /></div>
-        <button type="button" style={styles.button}>{action === 'deposit' ? 'Review pool deposit' : 'Review pool withdrawal'}</button>
+        <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="0.01" placeholder="0.00 USDT" value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} /></div>
+        <button type="button" style={{ ...styles.button, opacity: isTransferring ? 0.65 : 1 }} disabled={isTransferring} onClick={() => { void handleTransfer(); }}>{isTransferring ? 'Processing…' : action === 'deposit' ? 'Deposit into pool' : 'Withdraw to main balance'}</button>
+        {transferMessage ? <p style={styles.sectionText}>{transferMessage}</p> : null}
       </div>
     </section>
 
