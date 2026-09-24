@@ -24,14 +24,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   heading: { margin: '20px 0 8px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
-  list: { display: 'grid', gap: '10px' },
-  item: { display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '16px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, textAlign: 'left' as const, cursor: 'pointer', width: '100%', boxSizing: 'border-box' as const },
+  list: { display: 'grid', gap: '10px', padding: '10px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  item: { display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '14px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, textAlign: 'left' as const, cursor: 'pointer', width: '100%', boxSizing: 'border-box' as const },
   unread: { border: `1px solid ${theme.primary}`, background: theme.primarySoft },
   icon: { width: '20px', height: '20px', color: theme.primary, flexShrink: 0, marginTop: '2px' },
   title: { margin: 0, fontSize: '0.98rem', fontWeight: 800 },
   message: { margin: '5px 0 7px', color: theme.textMuted, lineHeight: 1.55, fontSize: '0.9rem' },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
-  empty: { padding: '28px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '18px', color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceGlass },
+  empty: { padding: '28px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceMuted },
 });
 
 const iconForType = (type: NotificationItem['type']) => {

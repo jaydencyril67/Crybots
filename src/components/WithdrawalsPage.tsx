@@ -42,7 +42,7 @@ const baseStyles = {
   content: {
     display: 'grid',
     gap: '12px',
-    padding: 'clamp(0px, 2vw, 30px) 0 0',
+    padding: '0',
     width: '100%',
     boxSizing: 'border-box' as const,
   },

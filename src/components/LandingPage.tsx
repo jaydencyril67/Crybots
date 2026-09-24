@@ -130,7 +130,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   heroGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+    gridTemplateColumns: 'minmax(0, 1fr)',
     gap: 'clamp(20px, 4vw, 44px)',
     alignItems: 'center',
     padding: 'clamp(28px, 5vw, 56px) 0 clamp(28px, 4vw, 44px)',
@@ -285,7 +285,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   cardGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+    gridTemplateColumns: 'minmax(0, 1fr)',
     gap: '16px',
     marginTop: '24px',
   },
@@ -330,7 +330,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   sectionGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gridTemplateColumns: 'minmax(0, 1fr)',
     gap: '16px',
     position: 'relative' as const,
     zIndex: 1,
@@ -369,7 +369,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   howGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gridTemplateColumns: 'minmax(0, 1fr)',
     gap: '32px',
     alignItems: 'start',
   },

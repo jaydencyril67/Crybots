@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CalendarDays, ChevronDown, Filter, History, ListFilter, Search, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Filter, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
@@ -60,28 +60,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
     boxSizing: 'border-box' as const,
   },
-  header: {
-    display: 'grid',
-    gap: '10px',
-  },
   back: { alignSelf: 'start', justifySelf: 'start', width: 'fit-content', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  title: {
-    margin: 0,
-    fontSize: 'clamp(1.35rem, 2.8vw, 2rem)',
-    fontWeight: 900,
-    letterSpacing: '-0.02em',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    flexWrap: 'wrap' as const,
-  },
-  subtitle: {
-    margin: 0,
-    color: theme.textMuted,
-    lineHeight: 1.6,
-    fontSize: '0.94rem',
-    maxWidth: '72ch',
-  },
   topGrid: {
     display: 'grid',
     gap: '18px',
@@ -93,8 +72,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     boxSizing: 'border-box' as const,
     gap: '20px',
     padding: 'clamp(18px, 4vw, 28px)',
-    borderRadius: '28px',
-    border: `1px solid ${theme.border}`,
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -132,8 +111,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     overflowY: 'hidden' as const,
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '28px',
-    border: `1px solid ${theme.border}`,
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -384,7 +363,7 @@ const TransactionHistoryPage = () => {
         <div style={styles.panel}>
           <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
           <div style={styles.body}>
-            <section style={styles.topGrid}>
+            <section style={{ ...styles.topGrid, marginTop: 0 }}>
               <div style={styles.card}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
                 <p style={styles.cardText}>Use the filters below to narrow your activity log.</p>

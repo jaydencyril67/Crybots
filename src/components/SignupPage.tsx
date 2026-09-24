@@ -99,7 +99,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+    gridTemplateColumns: 'minmax(0, 1fr)',
     gap: 'clamp(20px, 4vw, 32px)',
     alignItems: 'stretch',
     position: 'relative' as const,

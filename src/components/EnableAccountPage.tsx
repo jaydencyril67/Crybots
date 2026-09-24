@@ -93,7 +93,7 @@ const EnableAccountPage = () => {
   return (
     <>
       <Helmet><title>KingsHall Exchange | Enable account</title></Helmet>
-      <main style={{ minHeight: 'calc(100vh - 80px)', padding: '20px clamp(12px, 2.5vw, 24px) 48px', boxSizing: 'border-box', display: 'grid', alignItems: 'start', justifyItems: 'center' }}>
+      <main style={{ minHeight: '100vh', padding: 'clamp(14px, 2.5vw, 24px) clamp(12px, 2vw, 18px) 32px', boxSizing: 'border-box', display: 'grid', alignItems: 'start', justifyItems: 'center' }}>
         <section style={{ width: '100%', maxWidth: '520px', boxSizing: 'border-box', padding: 'clamp(22px, 5vw, 38px)', borderRadius: '26px', background: theme.surface, border: `1px solid ${theme.border}`, boxShadow: '0 18px 60px rgba(0,0,0,.18)' }}>
           <p style={{ margin: 0, color: theme.primary, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase' }}>Account recovery</p>
           <h1 style={{ color: theme.text, margin: '12px 0 10px' }}>Enable account</h1>

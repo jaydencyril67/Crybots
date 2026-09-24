@@ -40,11 +40,11 @@ const hueFromHex = (hex: string) => {
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '118px' },
-  shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 3vw, 20px) clamp(12px, 2.5vw, 24px) 28px', boxSizing: 'border-box' as const },
+  shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 3vw, 20px) clamp(12px, 2.5vw, 24px) 28px', boxSizing: 'border-box' as const, display: 'grid', gap: '12px' },
   backButton: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   heading: { margin: '18px 0 6px', fontSize: '1.15rem', fontWeight: 900 },
   intro: { margin: 0, color: theme.textMuted, lineHeight: 1.5 },
-  card: { marginTop: '18px', padding: '14px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  card: { marginTop: 0, padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, display: 'grid', gap: '12px' },
   preview: { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '14px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
   previewColor: { width: '44px', height: '44px', borderRadius: '14px', flexShrink: 0 },
   sectionTitle: { margin: '0 0 14px', fontSize: '1rem', fontWeight: 800 },

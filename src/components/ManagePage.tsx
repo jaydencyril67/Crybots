@@ -18,11 +18,11 @@ type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
-  card: { maxWidth: '720px', margin: '22px auto 0', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  card: { maxWidth: '720px', margin: '14px auto 0', padding: 'clamp(12px, 2.5vw, 18px)', borderRadius: '16px', border: `1px solid ${theme.border}`, background: theme.surfaceGlass, display: 'grid', gap: '12px' },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   title: { margin: 0, fontSize: '1.08rem', fontWeight: 800 },
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.55, fontSize: '0.95rem' },
-  form: { display: 'grid', gap: '10px', marginTop: '18px' },
+  form: { display: 'grid', gap: '10px', marginTop: 0 },
   label: { display: 'grid', gap: '6px', color: theme.textMuted, fontSize: '0.88rem', fontWeight: 600 },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '0.95rem', outline: 'none' },
   selectTrigger: { width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '11px 12px', fontSize: '0.95rem', cursor: 'pointer' },
@@ -31,6 +31,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   helper: { color: theme.textMuted, fontSize: '0.85rem', fontWeight: 400 },
   button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '10px 14px', background: theme.surfaceGlass, color: theme.text, fontWeight: 700, cursor: 'pointer', justifySelf: 'start', fontSize: '0.92rem' },
   primaryButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}`, width: '100%', maxWidth: '100%' },
+  walletList: { display: 'grid', gap: '10px', marginTop: '10px' },
+  walletRow: { display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'center', flexWrap: 'wrap' as const, padding: '12px', border: `1px solid ${theme.border}`, borderRadius: '12px', background: theme.surface },
 });
 
 const ManagePage = () => {
@@ -103,7 +105,7 @@ const ManagePage = () => {
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
           <section style={styles.card}>
-            <h1 style={{ ...styles.title, display: 'flex', alignItems: 'center', gap: '10px' }}><WalletCards size={22} /> Manage wallet</h1>
+            <h2 style={{ ...styles.title, display: 'flex', alignItems: 'center', gap: '10px' }}><WalletCards size={22} /> Manage wallet</h2>
             <p style={styles.text}>Bind up to 10 validated TRC-20, BEP-20, or TRX wallets for secure withdrawals.</p>
             {status.kind !== 'idle' ? <div style={{ marginTop: '16px' }}><NotificationBanner tone={status.kind === 'success' ? 'success' : 'error'} title={status.kind === 'success' ? 'Wallet updated' : 'Check your details'} message={status.message} /></div> : null}
             <div style={styles.form}>
@@ -135,7 +137,7 @@ const ManagePage = () => {
                 {editingWalletId ? <button style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} type="button" onClick={resetWalletForm}>Cancel edit</button> : null}
               </div>
             </div>
-            {wallets.length ? <div style={{ ...styles.form, marginTop: '22px' }}><strong>Bound wallets ({wallets.length}/10)</strong>{wallets.map((wallet) => <div key={wallet.id} style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}><span><b>{wallet.description || wallet.network}</b><br /><small>{wallet.network} · {wallet.address}</small></span><div style={{ display: 'flex', gap: '8px' }}><button type="button" style={styles.button} onClick={() => { setEditingWalletId(wallet.id || null); setNetwork(wallet.network); setWalletAddress(wallet.address); setDescription(wallet.description || ''); setWalletValid(true); }}>Edit</button><button type="button" style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} onClick={() => void (async () => { if (securityCode.replace(/\D/g, '').length !== 6) { setStatus({ kind: 'error', message: 'Enter your 6-digit security code before unbinding a wallet.' }); return; } try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`, { data: { securityCode: securityCode.replace(/\D/g, '').slice(0, 6) } }); setWallets(data.wallets || []); if (editingWalletId === wallet.id) resetWalletForm(); setStatus({ kind: 'success', message: 'Wallet unbound successfully.' }); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Unbind</button></div></div>)}</div> : null}
+            {wallets.length ? <div style={styles.walletList}><strong>Bound wallets ({wallets.length}/10)</strong>{wallets.map((wallet) => <div key={wallet.id} style={styles.walletRow}><span><b>{wallet.description || wallet.network}</b><br /><small>{wallet.network} · {wallet.address}</small></span><div style={{ display: 'flex', gap: '8px' }}><button type="button" style={styles.button} onClick={() => { setEditingWalletId(wallet.id || null); setNetwork(wallet.network); setWalletAddress(wallet.address); setDescription(wallet.description || ''); setWalletValid(true); }}>Edit</button><button type="button" style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} onClick={() => void (async () => { if (securityCode.replace(/\D/g, '').length !== 6) { setStatus({ kind: 'error', message: 'Enter your 6-digit security code before unbinding a wallet.' }); return; } try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`, { data: { securityCode: securityCode.replace(/\D/g, '').slice(0, 6) } }); setWallets(data.wallets || []); if (editingWalletId === wallet.id) resetWalletForm(); setStatus({ kind: 'success', message: 'Wallet unbound successfully.' }); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Unbind</button></div></div>)}</div> : null}
           </section>
         </div>
         <NowBar />
