@@ -83,7 +83,7 @@ const ControlCenterPage = () => {
       </div>
     </section>
 
-    <section style={styles.card}>
+    <section style={{ ...styles.card, position: 'relative', zIndex: 2 }}>
       <div style={styles.inner}>
         <h2 style={styles.sectionTitle}>Risk controls</h2>
         <p style={styles.sectionText}>Set a loss threshold and decide whether your pool funds should automatically return to your main USDT balance.</p>
