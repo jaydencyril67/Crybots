@@ -50,7 +50,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 type PoolPoint = { date: string; value: number; dailyChangePercent: number };
-type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[] };
+type PoolActivity = { type: 'deposit' | 'withdrawal'; amount: number; date: string };
+type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[]; overview: { poolCapital: number; totalHolders: number }; activities: PoolActivity[] };
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
@@ -124,8 +125,8 @@ const KingsPoolPage = () => {
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Pool performance index</p><p style={styles.note}>Current persisted pool value</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData ? formatPoolValue(poolData.current.value) : '—'}</p></div>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>—</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData ? formatPoolValue(poolData.overview.poolCapital) : '—'}</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData ? poolData.overview.totalHolders.toLocaleString() : '—'}</p></div>
     </div></section>
 
     <section style={styles.section}>
@@ -166,21 +167,11 @@ const KingsPoolPage = () => {
     <section style={styles.section}>
       <h2 style={styles.sectionTitle}>Recent pool activity</h2>
       <div style={styles.activityList}>
-        <div style={styles.activityItem}>
-          <span style={styles.activityIcon}><ArrowDownLeft size={17} /></span>
-          <div style={styles.activityContent}><p style={styles.activityLabel}>New deposits</p><p style={styles.activityNote}>Recent pool deposits will appear here</p></div>
-          <p style={styles.activityValue}>—</p>
-        </div>
-        <div style={styles.activityItem}>
-          <span style={styles.activityIcon}><ArrowUpRight size={17} /></span>
-          <div style={styles.activityContent}><p style={styles.activityLabel}>New withdrawals</p><p style={styles.activityNote}>Recent pool withdrawals will appear here</p></div>
-          <p style={styles.activityValue}>—</p>
-        </div>
-        <div style={styles.activityItem}>
-          <span style={styles.activityIcon}><UserPlus size={17} /></span>
-          <div style={styles.activityContent}><p style={styles.activityLabel}>New pool joins</p><p style={styles.activityNote}>New KingsPool holders will appear here</p></div>
-          <p style={styles.activityValue}>—</p>
-        </div>
+        {poolData?.activities.length ? poolData.activities.map((activity) => <div style={styles.activityItem} key={`${activity.date}-${activity.type}-${activity.amount}`}>
+          <span style={styles.activityIcon}>{activity.type === 'deposit' ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}</span>
+          <div style={styles.activityContent}><p style={styles.activityLabel}>{activity.type === 'deposit' ? 'Pool deposit' : 'Pool withdrawal'}</p><p style={styles.activityNote}>{new Date(activity.date).toLocaleString()}</p></div>
+          <p style={styles.activityValue}>{activity.type === 'deposit' ? '+' : '-'}{formatPoolValue(activity.amount)}</p>
+        </div>) : <div style={styles.activityItem}><span style={styles.activityIcon}><UserPlus size={17} /></span><div style={styles.activityContent}><p style={styles.activityLabel}>No pool activity yet</p><p style={styles.activityNote}>Deposits and withdrawals will appear here.</p></div></div>}
       </div>
     </section>
 
