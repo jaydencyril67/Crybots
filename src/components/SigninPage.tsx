@@ -106,6 +106,10 @@ const styles = {
     alignItems: 'stretch',
     position: 'relative' as const,
     zIndex: 1,
+    padding: '18px',
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
   },
   heroCard: {
     borderRadius: '24px',
@@ -312,7 +316,7 @@ const SigninPage = () => {
     heroCard: {
       ...styles.heroCard,
       border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
+      background: theme.surfaceMuted,
       color: theme.text,
 
     },
@@ -330,7 +334,7 @@ const SigninPage = () => {
     panel: {
       ...styles.panel,
       border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
+      background: theme.surfaceMuted,
       color: theme.text,
     },
     progressBar: {
