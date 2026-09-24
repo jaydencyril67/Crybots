@@ -16,9 +16,9 @@ type MeResponse = { user?: { wallets?: Wallet[]; walletAddress?: string } };
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
+  page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '132px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
-  card: { maxWidth: '720px', margin: '14px auto 0', padding: 'clamp(12px, 2.5vw, 18px)', borderRadius: '16px', border: `1px solid ${theme.border}`, background: theme.surfaceGlass, display: 'grid', gap: '12px' },
+  card: { width: '100%', boxSizing: 'border-box' as const, margin: '14px auto 0', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, display: 'grid', gap: '12px' },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   title: { margin: 0, fontSize: '1.08rem', fontWeight: 800 },
   text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.55, fontSize: '0.95rem' },
