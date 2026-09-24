@@ -5,6 +5,7 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
+import api from '../api/axios';
 
 type PickerName = 'deposit' | 'withdraw' | 'loss';
 type PoolAction = 'deposit' | 'withdraw';
@@ -48,6 +49,15 @@ const ControlCenterPage = () => {
   const [withdrawDestination, setWithdrawDestination] = useState('Main USDT balance');
   const [lossPercentage, setLossPercentage] = useState('10%');
   const [autoWithdraw, setAutoWithdraw] = useState(false);
+  const [poolBalance, setPoolBalance] = useState<number | null>(null);
+
+  React.useEffect(() => {
+    let active = true;
+    api.get<{ poolBalance: number }>('/api/pool/balance')
+      .then(({ data }) => { if (active) setPoolBalance(data.poolBalance); })
+      .catch(() => { if (active) setPoolBalance(null); });
+    return () => { active = false; };
+  }, []);
 
   const renderPicker = (name: PickerName, value: string, options: string[], setValue: (next: string) => void) => (
     <div style={styles.picker}>
@@ -65,7 +75,7 @@ const ControlCenterPage = () => {
       <div style={styles.inner}>
         <h1 style={styles.sectionTitle}>Pool control center</h1>
         <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool, and configure how your investment should be protected.</p>
-        <div style={styles.balance}><div><p style={styles.balanceLabel}>Available main USDT balance</p><p style={styles.sectionText}>Ready to allocate</p></div><p style={styles.balanceValue}>— USDT</p></div>
+        <div style={styles.balance}><div><p style={styles.balanceLabel}>Your KingsPool balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? '—' : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
       </div>
     </section>
 
