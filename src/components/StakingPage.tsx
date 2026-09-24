@@ -85,7 +85,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     border: `1px solid ${theme.borderGlass}`,
     display: 'grid',
     gap: '10px',
-    width: '100%',
     minWidth: 0,
     aspectRatio: '1 / 1',
     gridTemplateColumns: '1fr',
