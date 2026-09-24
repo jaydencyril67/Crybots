@@ -52,18 +52,20 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 type PoolPoint = { date: string; value: number; dailyChangePercent: number };
 type PoolActivity = { type: 'deposit' | 'withdrawal'; amount: number; date: string };
 type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[]; overview: { poolCapital: number; totalHolders: number }; activities: PoolActivity[] };
+type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'] };
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
 const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
-  if (history.length < 2) return null;
+  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string');
+  if (safeHistory.length < 2) return null;
 
-  const values = history.map((point) => point.value);
+  const values = safeHistory.map((point) => point.value);
   const minimum = Math.min(...values);
   const maximum = Math.max(...values);
   const range = maximum - minimum || 1;
-  const points = history.map((point, index) => {
-    const x = (index / (history.length - 1)) * 800;
+  const points = safeHistory.map((point, index) => {
+    const x = (index / (safeHistory.length - 1)) * 800;
     const y = 270 - ((point.value - minimum) / range) * 230;
     return { x, y };
   });
@@ -74,7 +76,7 @@ const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYB
     return `${path} C ${midpoint.toFixed(2)} ${previous.y.toFixed(2)}, ${midpoint.toFixed(2)} ${point.y.toFixed(2)}, ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
   }, '');
   const areaPath = `${wormPath} L 800 300 L 0 300 Z`;
-  const labelIndexes = [0, Math.floor((history.length - 1) / 2), history.length - 1];
+  const labelIndexes = [0, Math.floor((safeHistory.length - 1) / 2), safeHistory.length - 1];
 
   return <svg viewBox="0 0 800 320" role="img" aria-label="KingsPool performance line chart" style={getStyles(theme).chartCanvas} preserveAspectRatio="none">
     <defs><linearGradient id="poolChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.28" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
@@ -82,8 +84,8 @@ const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYB
     <path d={areaPath} fill="url(#poolChartFill)" />
     <path d={wormPath} fill="none" stroke={theme.primary} strokeOpacity="0.18" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     <path d={wormPath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-    {points.map((point, index) => <circle key={history[index].date} cx={point.x} cy={point.y} r="4" fill={theme.surfaceMuted} stroke={theme.primary} strokeWidth="3" vectorEffect="non-scaling-stroke" />)}
-    {labelIndexes.map((index) => <text key={history[index].date} x={(index / (history.length - 1)) * 800} y="316" fill={theme.textMuted} fontSize="13" textAnchor={index === 0 ? 'start' : index === history.length - 1 ? 'end' : 'middle'}>{history[index].date.slice(5)}</text>)}
+    {points.map((point, index) => <circle key={`${safeHistory[index].date}-${index}`} cx={point.x} cy={point.y} r="4" fill={theme.surfaceMuted} stroke={theme.primary} strokeWidth="3" vectorEffect="non-scaling-stroke" />)}
+    {labelIndexes.map((index) => <text key={`${safeHistory[index].date}-${index}`} x={(index / (safeHistory.length - 1)) * 800} y="316" fill={theme.textMuted} fontSize="13" textAnchor={index === 0 ? 'start' : index === safeHistory.length - 1 ? 'end' : 'middle'}>{safeHistory[index].date.slice(5)}</text>)}
   </svg>;
 };
 
@@ -100,9 +102,14 @@ const KingsPoolPage = () => {
     let active = true;
     const loadPoolPerformance = async () => {
       try {
-        const { data } = await api.get<PoolResponse>('/api/pool');
+        const { data } = await api.get<PoolApiResponse>('/api/pool');
         if (active) {
-          setPoolData(data);
+          setPoolData({
+            ...data,
+            history: Array.isArray(data.history) ? data.history : [],
+            overview: data.overview || { poolCapital: data.current?.value || 0, totalHolders: 0 },
+            activities: Array.isArray(data.activities) ? data.activities : [],
+          });
           setPoolError('');
         }
       } catch {
@@ -121,12 +128,12 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? null : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={{ ...styles.chartChange, color: poolData.current.dailyChangePercent >= 0 ? theme.primary : theme.danger }}><TrendingUp size={15} /> {poolData.current.dailyChangePercent >= 0 ? '+' : ''}{poolData.current.dailyChangePercent.toFixed(2)}% target today</p></div><PoolChart history={poolData.history} theme={theme} /></> : null}
+      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={{ ...styles.chartChange, color: poolData.current.dailyChangePercent >= 0 ? theme.primary : theme.danger }}><TrendingUp size={15} /> {poolData.current.dailyChangePercent >= 0 ? '+' : ''}{poolData.current.dailyChangePercent.toFixed(2)}% target today</p></div><PoolChart history={poolData.history} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData ? formatPoolValue(poolData.overview.poolCapital) : '—'}</p></div>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData ? poolData.overview.totalHolders.toLocaleString() : '—'}</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? formatPoolValue(poolData.overview.poolCapital) : '—'}</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? poolData.overview.totalHolders.toLocaleString() : '—'}</p></div>
     </div></section>
 
     <section style={styles.section}>
@@ -167,7 +174,7 @@ const KingsPoolPage = () => {
     <section style={styles.section}>
       <h2 style={styles.sectionTitle}>Recent pool activity</h2>
       <div style={styles.activityList}>
-        {poolData?.activities.length ? poolData.activities.map((activity) => <div style={styles.activityItem} key={`${activity.date}-${activity.type}-${activity.amount}`}>
+        {poolData?.activities?.length ? poolData.activities.map((activity) => <div style={styles.activityItem} key={`${activity.date}-${activity.type}-${activity.amount}`}>
           <span style={styles.activityIcon}>{activity.type === 'deposit' ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}</span>
           <div style={styles.activityContent}><p style={styles.activityLabel}>{activity.type === 'deposit' ? 'Pool deposit' : 'Pool withdrawal'}</p><p style={styles.activityNote}>{new Date(activity.date).toLocaleString()}</p></div>
           <p style={styles.activityValue}>{activity.type === 'deposit' ? '+' : '-'}{formatPoolValue(activity.amount)}</p>
