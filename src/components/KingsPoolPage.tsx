@@ -5,6 +5,7 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
+import api from '../api/axios';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
@@ -12,7 +13,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   card: { ...createHybridCardStyles(theme).card },
   performanceCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
-  chart: { height: 'clamp(260px, 58vw, 440px)', display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', gap: '10px', borderRadius: '16px', border: `1px dashed ${theme.borderGlass}`, color: theme.textMuted, fontSize: '0.82rem', textAlign: 'center' as const },
+  chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
+  chartHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
+  chartValue: { margin: '3px 0 0', color: theme.text, fontSize: 'clamp(1.35rem, 4vw, 1.8rem)', fontWeight: 900 },
+  chartChange: { margin: 0, color: theme.primary, fontSize: '0.8rem', fontWeight: 850 },
+  chartCanvas: { width: '100%', minWidth: 0, height: 'clamp(210px, 42vw, 340px)', overflow: 'visible' },
+  chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
   chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
   listCard: { display: 'grid', gap: '8px', minWidth: 0, padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
   listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, padding: '12px 13px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
@@ -43,19 +49,61 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   disclaimer: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.5 },
 });
 
+type PoolPoint = { date: string; value: number; dailyChangePercent: number };
+type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[] };
+
+const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
+
+const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
+  if (history.length < 2) return <div style={getStyles(theme).chartMessage}>Pool performance chart will appear after more daily data is recorded.</div>;
+
+  const values = history.map((point) => point.value);
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const range = maximum - minimum || 1;
+  const points = history.map((point, index) => {
+    const x = (index / (history.length - 1)) * 800;
+    const y = 270 - ((point.value - minimum) / range) * 230;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  });
+  const areaPoints = `0,300 ${points.join(' ')} 800,300`;
+  const labelIndexes = [0, Math.floor((history.length - 1) / 2), history.length - 1];
+
+  return <svg viewBox="0 0 800 320" role="img" aria-label="KingsPool performance line chart" style={getStyles(theme).chartCanvas} preserveAspectRatio="none">
+    <defs><linearGradient id="poolChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.28" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
+    {[50, 105, 160, 215, 270].map((y) => <line key={y} x1="0" x2="800" y1={y} y2={y} stroke={theme.borderGlass} strokeDasharray="5 8" />)}
+    <polygon points={areaPoints} fill="url(#poolChartFill)" />
+    <polyline points={points.join(' ')} fill="none" stroke={theme.primary} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    {labelIndexes.map((index) => <text key={history[index].date} x={(index / (history.length - 1)) * 800} y="316" fill={theme.textMuted} fontSize="13" textAnchor={index === 0 ? 'start' : index === history.length - 1 ? 'end' : 'middle'}>{history[index].date.slice(5)}</text>)}
+  </svg>;
+};
+
 const KingsPoolPage = () => {
   const { themeMode } = useAppTheme();
   const [movementPeriod, setMovementPeriod] = React.useState<'week' | 'month' | 'year'>('week');
   const [isMovementMenuOpen, setIsMovementMenuOpen] = React.useState(false);
+  const [poolData, setPoolData] = React.useState<PoolResponse | null>(null);
+  const [poolError, setPoolError] = React.useState('');
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+
+  React.useEffect(() => {
+    let active = true;
+    api.get<PoolResponse>('/api/pool')
+      .then(({ data }) => { if (active) setPoolData(data); })
+      .catch(() => { if (active) setPoolError('Unable to load pool performance right now.'); });
+    return () => { active = false; };
+  }, []);
 
   return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}><TrendingUp size={28} /><p style={styles.chartTitle}>KingsPool performance</p><span>Performance chart will appear when pool data is connected.</span></div></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
+      {poolError ? <div style={styles.chartMessage}>{poolError}</div> : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={styles.chartChange}><TrendingUp size={15} /> +{poolData.current.dailyChangePercent.toFixed(2)}% today</p></div><PoolChart history={poolData.history} theme={theme} /></> : <div style={styles.chartMessage}><TrendingUp size={28} /><span>Loading pool performance…</span></div>}
+    </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total funds in the pool</p><p style={styles.note}>Combined value of participating assets</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>— USDT</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Pool performance index</p><p style={styles.note}>Current persisted pool value</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData ? formatPoolValue(poolData.current.value) : '—'}</p></div>
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>—</p></div>
     </div></section>
 
