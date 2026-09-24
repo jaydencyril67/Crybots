@@ -39,9 +39,9 @@ const initialState: FormState = {
   password: '',
   code: '',
   twoFactorCode: '',
-  };
+};
 
-const styles = {
+const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflow: 'hidden',
@@ -282,11 +282,12 @@ const styles = {
     height: '24px',
     flexShrink: 0,
   },
-};
+});
 
 const SigninPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
   const hybridStyles = {
     page: {
       ...styles.page,
