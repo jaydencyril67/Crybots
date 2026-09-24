@@ -7,7 +7,7 @@ import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
@@ -67,9 +67,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   metricLabel: { margin: 0, color: theme.textMuted, fontSize: '0.85rem' },
   metricValue: { margin: 0, fontSize: '1rem', fontWeight: 700 },
   packageGrid: {
+    ...createHybridCardStyles(theme).card,
     display: 'flex',
     gap: '10px',
-    padding: '0 2px 4px',
+    padding: '12px',
     overflowX: 'auto' as const,
     overflowY: 'hidden' as const,
     scrollPaddingLeft: '2px',
@@ -77,16 +78,16 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     WebkitOverflowScrolling: 'touch' as const,
   },
   packageCard: {
-    flex: '0 0 220px',
-    width: '220px',
-    padding: '16px 14px',
+    flex: '0 0 170px',
+    width: '170px',
+    padding: '12px',
     borderRadius: '15px',
     background: theme.surfaceMuted,
     border: `1px solid ${theme.borderGlass}`,
     display: 'grid',
     gap: '10px',
     minWidth: 0,
-    aspectRatio: '1 / 1',
+    boxSizing: 'border-box' as const,
     gridTemplateColumns: '1fr',
     alignContent: 'center',
     alignItems: 'center',
@@ -141,15 +142,16 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     hero: { padding: '16px' },
     packageGrid: {
       gap: '10px',
+      padding: '10px',
+      borderRadius: '18px',
       overflowX: 'auto' as const,
       overflowY: 'hidden' as const,
-      padding: '0 4px 4px',
       scrollPaddingLeft: '4px',
       scrollPaddingRight: '4px',
     },
     stakeSection: { width: '100%' },
     panel: { borderRadius: '0', padding: '16px 14px', width: '100%', minWidth: 0 },
-    packageCard: { flex: '0 0 180px', width: '180px', minWidth: 0, aspectRatio: '1 / 1', gridTemplateColumns: '1fr', justifyItems: 'center', textAlign: 'center' as const },
+    packageCard: { flex: '0 0 148px', width: '148px', minWidth: 0, padding: '11px 10px', gridTemplateColumns: '1fr', justifyItems: 'center', textAlign: 'center' as const },
     packageText: { textAlign: 'center' as const },
     stakesTableWrap: { margin: '0 -14px' },
     stakesTable: { minWidth: '680px' },
