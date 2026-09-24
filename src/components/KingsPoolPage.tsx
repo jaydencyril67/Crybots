@@ -89,17 +89,30 @@ const KingsPoolPage = () => {
 
   React.useEffect(() => {
     let active = true;
-    api.get<PoolResponse>('/api/pool')
-      .then(({ data }) => { if (active) setPoolData(data); })
-      .catch(() => { if (active) setPoolError('Unable to load pool performance right now.'); });
-    return () => { active = false; };
+    const loadPoolPerformance = async () => {
+      try {
+        const { data } = await api.get<PoolResponse>('/api/pool');
+        if (active) {
+          setPoolData(data);
+          setPoolError('');
+        }
+      } catch {
+        if (active) setPoolError('Unable to load pool performance right now.');
+      }
+    };
+    void loadPoolPerformance();
+    const refreshTimer = window.setInterval(() => { void loadPoolPerformance(); }, 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(refreshTimer);
+    };
   }, []);
 
   return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <div style={styles.chartMessage}>{poolError}</div> : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={styles.chartChange}><TrendingUp size={15} /> +{poolData.current.dailyChangePercent.toFixed(2)}% today</p></div><PoolChart history={poolData.history} theme={theme} /></> : <div style={styles.chartMessage}><TrendingUp size={28} /><span>Loading pool performance…</span></div>}
+      {poolError ? <div style={styles.chartMessage}>{poolError}</div> : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={{ ...styles.chartChange, color: poolData.current.dailyChangePercent >= 0 ? theme.primary : theme.danger }}><TrendingUp size={15} /> {poolData.current.dailyChangePercent >= 0 ? '+' : ''}{poolData.current.dailyChangePercent.toFixed(2)}% target today</p></div><PoolChart history={poolData.history} theme={theme} /></> : <div style={styles.chartMessage}><TrendingUp size={28} /><span>Loading pool performance…</span></div>}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
