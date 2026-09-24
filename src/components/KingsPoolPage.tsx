@@ -1,6 +1,7 @@
 import React from 'react';
-import { Activity, Coins, TrendingDown, TrendingUp, Users } from 'lucide-react';
+import { Activity, ArrowLeft, Coins, TrendingDown, TrendingUp, Users } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
@@ -8,6 +9,7 @@ import { useAppTheme } from './AppTheme';
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px' },
   card: { minWidth: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', padding: '14px', background: theme.surfaceGlass, backdropFilter: 'blur(20px)' },
   label: { margin: 0, color: theme.textMuted, fontSize: '0.78rem' },
@@ -30,6 +32,8 @@ const KingsPoolPage = () => {
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
 
   return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
+    <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
+
     <div style={styles.grid}>
       <div style={styles.card}><span style={styles.icon}><Coins size={19} /></span><p style={styles.label}>Total in pool</p><p style={styles.value}>— USDT</p><p style={styles.note}>Awaiting live pool data</p></div>
       <div style={styles.card}><span style={styles.icon}><Users size={19} /></span><p style={styles.label}>Total users</p><p style={styles.value}>—</p><p style={styles.note}>Active pool participants</p></div>
