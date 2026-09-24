@@ -64,16 +64,24 @@ const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYB
   const points = history.map((point, index) => {
     const x = (index / (history.length - 1)) * 800;
     const y = 270 - ((point.value - minimum) / range) * 230;
-    return `${x.toFixed(2)},${y.toFixed(2)}`;
+    return { x, y };
   });
-  const areaPoints = `0,300 ${points.join(' ')} 800,300`;
+  const wormPath = points.reduce((path, point, index) => {
+    if (index === 0) return `M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+    const previous = points[index - 1];
+    const midpoint = (previous.x + point.x) / 2;
+    return `${path} C ${midpoint.toFixed(2)} ${previous.y.toFixed(2)}, ${midpoint.toFixed(2)} ${point.y.toFixed(2)}, ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+  }, '');
+  const areaPath = `${wormPath} L 800 300 L 0 300 Z`;
   const labelIndexes = [0, Math.floor((history.length - 1) / 2), history.length - 1];
 
   return <svg viewBox="0 0 800 320" role="img" aria-label="KingsPool performance line chart" style={getStyles(theme).chartCanvas} preserveAspectRatio="none">
     <defs><linearGradient id="poolChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.28" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
     {[50, 105, 160, 215, 270].map((y) => <line key={y} x1="0" x2="800" y1={y} y2={y} stroke={theme.borderGlass} strokeDasharray="5 8" />)}
-    <polygon points={areaPoints} fill="url(#poolChartFill)" />
-    <polyline points={points.join(' ')} fill="none" stroke={theme.primary} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    <path d={areaPath} fill="url(#poolChartFill)" />
+    <path d={wormPath} fill="none" stroke={theme.primary} strokeOpacity="0.18" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    <path d={wormPath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    {points.map((point, index) => <circle key={history[index].date} cx={point.x} cy={point.y} r="4" fill={theme.surfaceMuted} stroke={theme.primary} strokeWidth="3" vectorEffect="non-scaling-stroke" />)}
     {labelIndexes.map((index) => <text key={history[index].date} x={(index / (history.length - 1)) * 800} y="316" fill={theme.textMuted} fontSize="13" textAnchor={index === 0 ? 'start' : index === history.length - 1 ? 'end' : 'middle'}>{history[index].date.slice(5)}</text>)}
   </svg>;
 };
