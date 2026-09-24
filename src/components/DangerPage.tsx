@@ -41,6 +41,30 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   card: {
     ...createHybridCardStyles(theme).card,
   },
+  rowList: {
+    display: 'grid',
+    gap: '10px',
+    width: '100%',
+    minWidth: 0,
+    padding: '18px',
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+    boxSizing: 'border-box' as const,
+  },
+  dangerRow: {
+    width: '100%',
+    maxWidth: '100%',
+    background: theme.surfaceMuted,
+    border: `1px solid ${theme.borderGlass}`,
+    borderRadius: '15px',
+    padding: '13px 14px',
+    display: 'grid',
+    gap: '6px',
+    textAlign: 'left' as const,
+    minWidth: 0,
+    boxSizing: 'border-box' as const,
+  },
   portfolioBack: { display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
   sectionTitle: {
     margin: 0,
@@ -194,7 +218,8 @@ const DangerPage = () => {
           
           <div style={styles.content}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
-            <section style={styles.card}>
+            <div style={styles.rowList}>
+              <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
               <div style={styles.field}>
@@ -213,9 +238,9 @@ const DangerPage = () => {
                 <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>Disable Account</button>
               </div>
               {disable.status ? <div style={styles.status}>{disable.status}</div> : null}
-            </section>
+              </section>
 
-            <section style={styles.card}>
+              <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Self Exclude</h3>
               <p style={styles.actionText}>This places your account into a self-exclusion state to prevent further use according to your request.</p>
               <div style={styles.field}>
@@ -238,9 +263,9 @@ const DangerPage = () => {
                 <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null || !selfExclude.durationDays}>Self Exclude Account</button>
               </div>
               {selfExclude.status ? <div style={styles.status}>{selfExclude.status}</div> : null}
-            </section>
+              </section>
 
-            <section style={styles.card}>
+              <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Delete Account</h3>
               <p style={styles.actionText}>This starts a 30-day deletion countdown. Sign-in will be blocked while your account is pending deletion.</p>
               <div style={styles.field}>
@@ -259,7 +284,8 @@ const DangerPage = () => {
                 <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? 'Deleting…' : 'Delete Account'}</button>
               </div>
               {remove.status ? <div style={styles.status}>{remove.status}</div> : null}
-            </section>
+              </section>
+            </div>
           </div>
         </div>
         <NowBar />
