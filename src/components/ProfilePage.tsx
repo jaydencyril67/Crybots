@@ -29,6 +29,28 @@ const baseStyles = {
     gap: '14px',
     marginTop: '14px',
   },
+  rowList: {
+    display: 'grid',
+    gap: '10px',
+    width: '100%',
+    minWidth: 0,
+    padding: '18px',
+    borderRadius: '22px',
+    border: '1px solid transparent',
+    boxSizing: 'border-box' as const,
+  },
+  row: {
+    width: '100%',
+    maxWidth: '100%',
+    border: '1px solid transparent',
+    borderRadius: '15px',
+    padding: '13px 14px',
+    display: 'grid',
+    gap: '6px',
+    textAlign: 'left' as const,
+    minWidth: 0,
+    boxSizing: 'border-box' as const,
+  },
   grid: {
     display: 'grid',
     gap: '12px',
@@ -246,6 +268,16 @@ const ProfilePage = () => {
       color: theme.text,
     },
     card: createHybridCardStyles(theme).card,
+    rowList: {
+      ...baseStyles.rowList,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+    },
+    row: {
+      ...baseStyles.row,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceMuted,
+    },
     infoRow: {
       ...baseStyles.infoRow,
       border: `1px solid ${theme.borderGlass}`,
@@ -393,45 +425,47 @@ const ProfilePage = () => {
 
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
             <div style={styles.content}>
-              <div style={styles.profileIdentity}>
-                <div style={styles.profileAvatarFrame}>
-                  {avatarPicture ? (
-                    <img src={avatarPicture} alt={`${fullName || 'User'} profile`} style={styles.profileAvatar} />
-                  ) : (
-                    <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder">
-                      <CircleUserRound size={58} strokeWidth={1.6} />
-                    </div>
-                  )}
-                  <label
-                    style={styles.avatarCameraButton}
-                    aria-label={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
-                    title={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
-                  >
-                    {avatarUploading ? <LoadingDots /> : <Camera size={17} strokeWidth={2.2} />}
-                    <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} disabled={avatarUploading} />
-                  </label>
+              <div style={styles.rowList}>
+                <div style={{ ...styles.row, ...styles.profileIdentity }}>
+                  <div style={styles.profileAvatarFrame}>
+                    {avatarPicture ? (
+                      <img src={avatarPicture} alt={`${fullName || 'User'} profile`} style={styles.profileAvatar} />
+                    ) : (
+                      <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder">
+                        <CircleUserRound size={58} strokeWidth={1.6} />
+                      </div>
+                    )}
+                    <label
+                      style={styles.avatarCameraButton}
+                      aria-label={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
+                      title={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
+                    >
+                      {avatarUploading ? <LoadingDots /> : <Camera size={17} strokeWidth={2.2} />}
+                      <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} disabled={avatarUploading} />
+                    </label>
+                  </div>
                 </div>
               </div>
               {avatarError ? <p style={{ ...styles.helperText, color: theme.danger }}>{avatarError}</p> : null}
 
-              <div style={styles.infoList}>
-                <div style={styles.infoRow}>
+              <div style={styles.rowList}>
+                <div style={styles.row}>
                   <p style={styles.infoLabel}><UserRound size={16} /> Display name</p>
                   <div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : fullName}</div>
                 </div>
-                <div style={styles.infoRow}>
+                <div style={styles.row}>
                   <p style={styles.infoLabel}><Mail size={16} /> Email</p>
                   <div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : email}</div>
                 </div>
-                <div style={styles.infoRow}>
+                <div style={styles.row}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> Account status</p>
                   <p style={styles.infoValue}>Protected</p>
                 </div>
-                <div style={styles.infoRow}>
+                <div style={styles.row}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> UID</p>
                   <div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : uid}</div>
                 </div>
-                <div style={styles.infoRow}>
+                <div style={styles.row}>
                   <p style={styles.infoLabel}><Coins size={16} /> USDT Balance</p>
                   <div style={styles.infoValue}>
                     {balanceLoading ? <LoadingDots /> : typeof usdtBalance === 'number' ? `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT` : null}
@@ -441,10 +475,12 @@ const ProfilePage = () => {
 
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
 
-              <div style={styles.helper}>
-                <button type="button" onClick={handleLogout} style={styles.helperAction}>
+              <div style={styles.rowList}>
+                <div style={{ ...styles.row, ...styles.helper }}>
+                  <button type="button" onClick={handleLogout} style={styles.helperAction}>
                   <LogOut size={16} /> Logout
-                </button>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
