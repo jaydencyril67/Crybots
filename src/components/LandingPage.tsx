@@ -199,16 +199,24 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     font: 'inherit',
     color: theme.text,
   },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-    gap: '12px',
+  statsGroup: {
     marginTop: '26px',
-  },
-  statCard: {
+    display: 'grid',
+    gap: '10px',
+    padding: '10px',
     borderRadius: '22px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
+  },
+  statsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+    gap: '10px',
+  },
+  statCard: {
+    borderRadius: '15px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
     padding: '14px',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
@@ -328,18 +336,26 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     padding: '14px 16px',
     flexWrap: 'wrap' as const,
   },
+  sectionGroup: {
+    display: 'grid',
+    gap: '10px',
+    padding: '10px',
+    borderRadius: '28px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+  },
   sectionGrid: {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
-    gap: '16px',
+    gap: '10px',
     position: 'relative' as const,
     zIndex: 1,
     paddingBottom: '32px',
   },
   featureCard: {
-    borderRadius: '28px',
+    borderRadius: '18px',
     border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
+    background: theme.surfaceMuted,
     padding: '24px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
@@ -357,10 +373,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.textMuted,
   },
   howSection: {
-    borderRadius: '32px',
-    border: `1px solid ${theme.border}`,
+    borderRadius: '28px',
+    border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
-    padding: '24px',
+    padding: '10px',
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
     position: 'relative' as const,
@@ -371,6 +387,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
     gap: '32px',
+    borderRadius: '20px',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceMuted,
+    padding: '24px',
     alignItems: 'start',
   },
   howHeading: {
@@ -484,13 +504,15 @@ const LandingPage = () => {
                 </button>
               </div>
 
-              <div style={styles.statsGrid}>
+              <div style={styles.statsGroup}>
+                <div style={styles.statsGrid}>
                 {stats.map((stat) => (
                   <div key={stat.label} style={styles.statCard}>
                     <div style={styles.statValue}>{stat.value}</div>
                     <div style={styles.statLabel}>{stat.label}</div>
                   </div>
                 ))}
+                </div>
               </div>
             </div>
 
@@ -535,7 +557,8 @@ const LandingPage = () => {
             </div>
           </div>
 
-          <section style={styles.sectionGrid}>
+          <section style={styles.sectionGroup}>
+            <div style={styles.sectionGrid}>
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
@@ -546,6 +569,7 @@ const LandingPage = () => {
                 </article>
               );
             })}
+            </div>
           </section>
 
           <section style={styles.howSection}>

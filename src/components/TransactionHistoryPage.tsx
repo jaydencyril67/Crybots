@@ -369,10 +369,9 @@ const TransactionHistoryPage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
           <div style={styles.body}>
             <section style={{ ...styles.topGrid, marginTop: 0 }}>
-              <div style={styles.card}>
+              <div style={{ ...styles.card, gap: '12px' }}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
-                <p style={styles.cardText}>Use the filters below to narrow your activity log.</p>
-                <div className="transaction-history-filters" style={styles.filters}>
+                <div className="transaction-history-filters" style={{ ...styles.filters, marginTop: 0 }}>
                   <div style={styles.field as React.CSSProperties}>
                     <span style={styles.label}>Search</span>
                     <div style={{ position: 'relative' }}>
