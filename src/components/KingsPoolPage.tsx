@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Coins, TrendingDown, TrendingUp, Users } from 'lucide-react';
+import { ArrowDownLeft, ArrowLeft, ArrowUpRight, Coins, TrendingDown, TrendingUp, UserPlus, Users } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -26,6 +26,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   movementCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '9px' },
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
+  activityList: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  activityItem: { display: 'flex', alignItems: 'center', gap: '11px', minWidth: 0, padding: '12px 13px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  activityIcon: { display: 'inline-flex', flexShrink: 0, padding: '8px', borderRadius: '10px', color: theme.primary, background: theme.surfaceGlass },
+  activityContent: { minWidth: 0, flex: 1 },
+  activityLabel: { margin: 0, fontSize: '0.8rem', fontWeight: 800 },
+  activityNote: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem' },
+  activityValue: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800 },
   label: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.3 },
   value: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem', lineHeight: 1.35 },
@@ -78,6 +85,27 @@ const KingsPoolPage = () => {
           <p style={styles.movementLabel}><TrendingDown size={17} /> Biggest fall</p>
           <p style={styles.movementValue}>—</p>
           <p style={styles.note}>Largest drop in the selected {movementPeriod}</p>
+        </div>
+      </div>
+    </section>
+
+    <section style={styles.section}>
+      <h2 style={styles.sectionTitle}>Recent pool activity</h2>
+      <div style={styles.activityList}>
+        <div style={styles.activityItem}>
+          <span style={styles.activityIcon}><ArrowDownLeft size={17} /></span>
+          <div style={styles.activityContent}><p style={styles.activityLabel}>New deposits</p><p style={styles.activityNote}>Recent pool deposits will appear here</p></div>
+          <p style={styles.activityValue}>—</p>
+        </div>
+        <div style={styles.activityItem}>
+          <span style={styles.activityIcon}><ArrowUpRight size={17} /></span>
+          <div style={styles.activityContent}><p style={styles.activityLabel}>New withdrawals</p><p style={styles.activityNote}>Recent pool withdrawals will appear here</p></div>
+          <p style={styles.activityValue}>—</p>
+        </div>
+        <div style={styles.activityItem}>
+          <span style={styles.activityIcon}><UserPlus size={17} /></span>
+          <div style={styles.activityContent}><p style={styles.activityLabel}>New pool joins</p><p style={styles.activityNote}>New KingsPool holders will appear here</p></div>
+          <p style={styles.activityValue}>—</p>
         </div>
       </div>
     </section>
