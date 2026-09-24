@@ -56,7 +56,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     width: '100%',
   },
   body: {
-    padding: 'clamp(0px, 2vw, 30px) 0 0',
+    padding: '0',
     display: 'grid',
     gap: '16px',
     width: '100%',

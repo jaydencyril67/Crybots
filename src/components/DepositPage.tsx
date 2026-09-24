@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Check, ChevronDown, Copy, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Copy } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
@@ -41,6 +41,8 @@ const DepositPage = () => {
       borderRadius: '16px',
       padding: 'clamp(12px, 2.5vw, 16px)',
       marginTop: '14px',
+      display: 'grid',
+      gap: '12px',
     },
     back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
     headerRow: {
@@ -69,7 +71,7 @@ const DepositPage = () => {
       ...cardStyles.panel,
       border: `1px solid ${theme.border}`,
       background: theme.surfaceElevated,
-      marginTop: '10px',
+      marginTop: 0,
       borderRadius: '13px',
       color: theme.textMuted,
     },
@@ -284,18 +286,6 @@ const DepositPage = () => {
       <div style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
         <div style={styles.card}>
-          <div style={styles.headerRow}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', fontSize: '0.92rem', color: theme.textMuted }}>
-              <ShieldCheck size={18} />
-              <span>Secure deposits</span>
-            </div>
-          </div>
-
-          <h1 style={styles.title}>Deposit funds</h1>
-          <p style={styles.subtitle}>
-            Deposit USDT straight to your wallet address and keep everything on-chain.
-          </p>
-
           {depositNotice ? <NotificationBanner tone={depositNotice.tone} title={depositNotice.title} message={depositNotice.message} /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'completed' ? <NotificationBanner tone="success" title="Deposit confirmed" message="Your USDT deposit has been confirmed and your balance will reflect it shortly." /> : null}
           {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
