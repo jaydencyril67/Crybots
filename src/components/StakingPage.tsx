@@ -68,7 +68,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   metricValue: { margin: 0, fontSize: '1rem', fontWeight: 700 },
   packageGrid: {
     display: 'grid',
-    gridTemplateColumns: '1fr',
+    gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
     gap: '10px',
     padding: '18px',
     borderRadius: '22px',
@@ -140,7 +140,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     shell: { maxWidth: '100%', padding: '16px 0 120px', gap: '12px' },
     hero: { padding: '16px' },
     packageGrid: {
-      gridTemplateColumns: '1fr',
+      gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
       gap: '10px',
       columnGap: '10px',
       overflowX: 'auto' as const,
