@@ -50,7 +50,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 type PoolPoint = { date: string; value: number; dailyChangePercent: number };
-type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[] };
+type PoolActivity = { type: 'deposit' | 'withdrawal'; amount: number; date: string };
+type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[]; overview: { poolCapital: number; totalHolders: number }; activities: PoolActivity[] };
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
@@ -64,16 +65,24 @@ const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYB
   const points = history.map((point, index) => {
     const x = (index / (history.length - 1)) * 800;
     const y = 270 - ((point.value - minimum) / range) * 230;
-    return `${x.toFixed(2)},${y.toFixed(2)}`;
+    return { x, y };
   });
-  const areaPoints = `0,300 ${points.join(' ')} 800,300`;
+  const wormPath = points.reduce((path, point, index) => {
+    if (index === 0) return `M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+    const previous = points[index - 1];
+    const midpoint = (previous.x + point.x) / 2;
+    return `${path} C ${midpoint.toFixed(2)} ${previous.y.toFixed(2)}, ${midpoint.toFixed(2)} ${point.y.toFixed(2)}, ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+  }, '');
+  const areaPath = `${wormPath} L 800 300 L 0 300 Z`;
   const labelIndexes = [0, Math.floor((history.length - 1) / 2), history.length - 1];
 
   return <svg viewBox="0 0 800 320" role="img" aria-label="KingsPool performance line chart" style={getStyles(theme).chartCanvas} preserveAspectRatio="none">
     <defs><linearGradient id="poolChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.28" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
     {[50, 105, 160, 215, 270].map((y) => <line key={y} x1="0" x2="800" y1={y} y2={y} stroke={theme.borderGlass} strokeDasharray="5 8" />)}
-    <polygon points={areaPoints} fill="url(#poolChartFill)" />
-    <polyline points={points.join(' ')} fill="none" stroke={theme.primary} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    <path d={areaPath} fill="url(#poolChartFill)" />
+    <path d={wormPath} fill="none" stroke={theme.primary} strokeOpacity="0.18" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    <path d={wormPath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    {points.map((point, index) => <circle key={history[index].date} cx={point.x} cy={point.y} r="4" fill={theme.surfaceMuted} stroke={theme.primary} strokeWidth="3" vectorEffect="non-scaling-stroke" />)}
     {labelIndexes.map((index) => <text key={history[index].date} x={(index / (history.length - 1)) * 800} y="316" fill={theme.textMuted} fontSize="13" textAnchor={index === 0 ? 'start' : index === history.length - 1 ? 'end' : 'middle'}>{history[index].date.slice(5)}</text>)}
   </svg>;
 };
@@ -116,8 +125,8 @@ const KingsPoolPage = () => {
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Pool performance index</p><p style={styles.note}>Current persisted pool value</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData ? formatPoolValue(poolData.current.value) : '—'}</p></div>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>—</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData ? formatPoolValue(poolData.overview.poolCapital) : '—'}</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData ? poolData.overview.totalHolders.toLocaleString() : '—'}</p></div>
     </div></section>
 
     <section style={styles.section}>
@@ -158,21 +167,11 @@ const KingsPoolPage = () => {
     <section style={styles.section}>
       <h2 style={styles.sectionTitle}>Recent pool activity</h2>
       <div style={styles.activityList}>
-        <div style={styles.activityItem}>
-          <span style={styles.activityIcon}><ArrowDownLeft size={17} /></span>
-          <div style={styles.activityContent}><p style={styles.activityLabel}>New deposits</p><p style={styles.activityNote}>Recent pool deposits will appear here</p></div>
-          <p style={styles.activityValue}>—</p>
-        </div>
-        <div style={styles.activityItem}>
-          <span style={styles.activityIcon}><ArrowUpRight size={17} /></span>
-          <div style={styles.activityContent}><p style={styles.activityLabel}>New withdrawals</p><p style={styles.activityNote}>Recent pool withdrawals will appear here</p></div>
-          <p style={styles.activityValue}>—</p>
-        </div>
-        <div style={styles.activityItem}>
-          <span style={styles.activityIcon}><UserPlus size={17} /></span>
-          <div style={styles.activityContent}><p style={styles.activityLabel}>New pool joins</p><p style={styles.activityNote}>New KingsPool holders will appear here</p></div>
-          <p style={styles.activityValue}>—</p>
-        </div>
+        {poolData?.activities.length ? poolData.activities.map((activity) => <div style={styles.activityItem} key={`${activity.date}-${activity.type}-${activity.amount}`}>
+          <span style={styles.activityIcon}>{activity.type === 'deposit' ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}</span>
+          <div style={styles.activityContent}><p style={styles.activityLabel}>{activity.type === 'deposit' ? 'Pool deposit' : 'Pool withdrawal'}</p><p style={styles.activityNote}>{new Date(activity.date).toLocaleString()}</p></div>
+          <p style={styles.activityValue}>{activity.type === 'deposit' ? '+' : '-'}{formatPoolValue(activity.amount)}</p>
+        </div>) : <div style={styles.activityItem}><span style={styles.activityIcon}><UserPlus size={17} /></span><div style={styles.activityContent}><p style={styles.activityLabel}>No pool activity yet</p><p style={styles.activityNote}>Deposits and withdrawals will appear here.</p></div></div>}
       </div>
     </section>
 
