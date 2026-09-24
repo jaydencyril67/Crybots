@@ -23,10 +23,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   icon: { display: 'inline-flex', flexShrink: 0, color: theme.primary },
   section: { display: 'grid', gap: '10px', marginTop: '16px' },
   sectionTitle: { margin: 0, fontSize: '0.96rem', fontWeight: 900 },
-  position: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' },
-  metric: { padding: '12px', borderRadius: '12px', background: theme.surfaceMuted },
-  metricLabel: { margin: 0, color: theme.textMuted, fontSize: '0.74rem' },
-  metricValue: { margin: '5px 0 0', fontWeight: 900, overflowWrap: 'anywhere' as const },
   steps: { display: 'grid', gap: '9px', margin: 0, paddingLeft: '20px', color: theme.textMuted, fontSize: '0.84rem', lineHeight: 1.5 },
   disclaimer: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.5 },
 });
@@ -43,13 +39,6 @@ const KingsPoolPage = () => {
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total funds in the pool</p><p style={styles.note}>Combined value of participating assets</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>— USDT</p></div>
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>—</p></div>
-    </div></section>
-
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Your KingsPool position</h2><div style={{ ...styles.card, ...styles.position }}>
-      <div style={styles.metric}><p style={styles.metricLabel}>Your investment</p><p style={styles.metricValue}>— USDT</p></div>
-      <div style={styles.metric}><p style={styles.metricLabel}>Current value</p><p style={styles.metricValue}>— USDT</p></div>
-      <div style={styles.metric}><p style={styles.metricLabel}>Your profit/loss</p><p style={styles.metricValue}>—</p></div>
-      <div style={styles.metric}><p style={styles.metricLabel}>Pool share</p><p style={styles.metricValue}>—</p></div>
     </div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>What is happening in the pool?</h2><div style={styles.card}><p style={styles.disclaimer}>KingsHall manages one shared trading strategy for participating users. Pool gains and losses will be reflected proportionally in each user’s position.</p><ul style={styles.steps}><li>Users deposit supported crypto.</li><li>Deposited funds are allocated to KingsPool.</li><li>KingsHall trades the pooled assets.</li><li>Each user’s value changes with the pool’s performance.</li></ul></div></section>
