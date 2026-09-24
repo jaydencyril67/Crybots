@@ -368,7 +368,7 @@ const TransactionHistoryPage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
           <div style={styles.body}>
             <section style={{ ...styles.topGrid, marginTop: 0 }}>
-              <div style={{ ...styles.card, gap: '12px' }}>
+              <div style={{ ...styles.card, gap: '12px', position: 'relative', zIndex: 2 }}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
                 <div className="transaction-history-filters" style={{ ...styles.filters, marginTop: 0 }}>
                   <div style={styles.field as React.CSSProperties}>
