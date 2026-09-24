@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, ChevronDown, Copy } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
-import { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import api from '../api/axios';
@@ -35,11 +35,11 @@ const DepositPage = () => {
     },
     card: {
       ...cardStyles.card,
-      border: `1px solid ${theme.border}`,
-      background: theme.surface,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
       color: theme.text,
-      borderRadius: '16px',
-      padding: 'clamp(12px, 2.5vw, 16px)',
+      borderRadius: '22px',
+      padding: '18px',
       marginTop: '14px',
       display: 'grid',
       gap: '12px',
@@ -69,10 +69,10 @@ const DepositPage = () => {
     },
     mutedCard: {
       ...cardStyles.panel,
-      border: `1px solid ${theme.border}`,
-      background: theme.surfaceElevated,
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceMuted,
       marginTop: 0,
-      borderRadius: '13px',
+      borderRadius: '15px',
       color: theme.textMuted,
     },
     label: { display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700 },
@@ -85,7 +85,7 @@ const DepositPage = () => {
     secondaryButton: { border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
     address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
     recentList: { display: 'grid', gap: '8px', marginTop: '10px' },
-    recentItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 12px', border: `1px solid ${theme.border}`, borderRadius: '10px', background: theme.surface, color: theme.text },
+    recentItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '13px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', background: theme.surfaceMuted, color: theme.text },
     recentItemClickable: { cursor: 'pointer', transition: 'border-color 0.15s ease, background 0.15s ease' },
     recentMeta: { color: theme.textMuted, fontSize: '0.76rem' },
     status: { fontSize: '0.75rem', fontWeight: 700, textTransform: 'capitalize' as const },
@@ -281,7 +281,8 @@ const DepositPage = () => {
   );
 
   return (
-    <div data-shadow-free-page="deposit" style={styles.page}>
+    <HybridTheme mode={themeMode}>
+      <div data-shadow-free-page="deposit" style={styles.page}>
       <style>{'[data-shadow-free-page="deposit"] [style*="box-shadow"] { box-shadow: none !important; }'}</style>
       <div style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
@@ -337,7 +338,8 @@ const DepositPage = () => {
         </div>
         <NowBar />
       </div>
-    </div>
+      </div>
+    </HybridTheme>
   );
 };
 
