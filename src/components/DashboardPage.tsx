@@ -148,8 +148,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '14px',
     padding: '18px',
     borderRadius: '22px',
-    border: `1px solid ${HYBRID_THEME_TOKENS.dark.borderGlass}`,
-    background: HYBRID_THEME_TOKENS.dark.surfaceGlass,
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
     boxSizing: 'border-box' as const,
   },
   heroGrid: {
