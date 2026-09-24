@@ -236,7 +236,6 @@ const getActivePath = () => window.location.pathname || window.location.hash.rep
 const getCurrentPageTitle = (path: string) => {
   if (path === '/dashboard') return 'DASHBOARD';
   if (path === '/profile') return 'DETAILS';
-  if (path === '/staking') return 'STAKING';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme-settings') return 'THEME SETTINGS';
   if (path === '/nowbar-settings') return 'NOWBAR SETTINGS';

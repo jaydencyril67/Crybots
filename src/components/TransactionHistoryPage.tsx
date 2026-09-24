@@ -8,7 +8,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
-type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'staking' | 'trade' | 'reward';
+type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'trade' | 'reward';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
 type TransactionStatus = 'all' | 'completed' | 'pending' | 'failed' | 'cancelled';
 
@@ -206,7 +206,6 @@ const getTypeLabel = (type: Exclude<TransactionType, 'all'>) => {
   if (type === 'deposit') return 'Deposit';
   if (type === 'withdrawal') return 'Withdrawal';
   if (type === 'transfer') return 'Transfer';
-  if (type === 'staking') return 'Staking';
   if (type === 'trade') return 'Trade';
   return 'Reward';
 };
@@ -387,7 +386,7 @@ const TransactionHistoryPage = () => {
                     </button>
                     {isTypeMenuOpen ? (
                       <div style={styles.selectMenu}>
-                        {(['all', 'deposit', 'withdrawal', 'transfer', 'staking', 'trade', 'reward'] as const).map((option) => (
+                        {(['all', 'deposit', 'withdrawal', 'transfer', 'trade', 'reward'] as const).map((option) => (
                           <button
                             key={option}
                             type="button"
