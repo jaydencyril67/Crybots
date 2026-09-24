@@ -55,7 +55,7 @@ type PoolResponse = { current: { value: number; dailyChangePercent: number; date
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
 const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
-  if (history.length < 2) return <div style={getStyles(theme).chartMessage}>Pool performance chart will appear after more daily data is recorded.</div>;
+  if (history.length < 2) return null;
 
   const values = history.map((point) => point.value);
   const minimum = Math.min(...values);
@@ -112,7 +112,7 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <div style={styles.chartMessage}>{poolError}</div> : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={{ ...styles.chartChange, color: poolData.current.dailyChangePercent >= 0 ? theme.primary : theme.danger }}><TrendingUp size={15} /> {poolData.current.dailyChangePercent >= 0 ? '+' : ''}{poolData.current.dailyChangePercent.toFixed(2)}% target today</p></div><PoolChart history={poolData.history} theme={theme} /></> : <div style={styles.chartMessage}><TrendingUp size={28} /><span>Loading pool performance…</span></div>}
+      {poolError ? null : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={{ ...styles.chartChange, color: poolData.current.dailyChangePercent >= 0 ? theme.primary : theme.danger }}><TrendingUp size={15} /> {poolData.current.dailyChangePercent >= 0 ? '+' : ''}{poolData.current.dailyChangePercent.toFixed(2)}% target today</p></div><PoolChart history={poolData.history} theme={theme} /></> : null}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
