@@ -17,6 +17,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   listCard: { display: 'grid', gap: '8px', minWidth: 0, padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
   listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, padding: '12px 13px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
   listItemContent: { minWidth: 0 },
+  movementHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
+  periodSelect: { border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.78rem', fontWeight: 700 },
+  movementGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' },
+  movementCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '9px' },
+  movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
+  movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
   label: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.3 },
   value: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem', lineHeight: 1.35 },
@@ -29,6 +35,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const KingsPoolPage = () => {
   const { themeMode } = useAppTheme();
+  const [movementPeriod, setMovementPeriod] = React.useState<'week' | 'month' | 'year'>('week');
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
 
   return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
@@ -40,6 +47,29 @@ const KingsPoolPage = () => {
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total funds in the pool</p><p style={styles.note}>Combined value of participating assets</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>— USDT</p></div>
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>—</p></div>
     </div></section>
+
+    <section style={styles.section}>
+      <div style={styles.movementHeader}>
+        <h2 style={styles.sectionTitle}>Biggest market moves</h2>
+        <select aria-label="Select market move period" value={movementPeriod} onChange={(event) => setMovementPeriod(event.target.value as 'week' | 'month' | 'year')} style={styles.periodSelect}>
+          <option value="week">This week</option>
+          <option value="month">This month</option>
+          <option value="year">This year</option>
+        </select>
+      </div>
+      <div style={styles.movementGrid}>
+        <div style={styles.movementCard}>
+          <p style={styles.movementLabel}><TrendingUp size={17} /> Biggest rise</p>
+          <p style={styles.movementValue}>—</p>
+          <p style={styles.note}>Highest move in the selected {movementPeriod}</p>
+        </div>
+        <div style={styles.movementCard}>
+          <p style={styles.movementLabel}><TrendingDown size={17} /> Biggest fall</p>
+          <p style={styles.movementValue}>—</p>
+          <p style={styles.note}>Largest drop in the selected {movementPeriod}</p>
+        </div>
+      </div>
+    </section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>What is happening in the pool?</h2><div style={styles.card}><p style={styles.disclaimer}>KingsHall manages one shared trading strategy for participating users. Pool gains and losses will be reflected proportionally in each user’s position.</p><ul style={styles.steps}><li>Users deposit supported crypto.</li><li>Deposited funds are allocated to KingsPool.</li><li>KingsHall trades the pooled assets.</li><li>Each user’s value changes with the pool’s performance.</li></ul></div></section>
 
