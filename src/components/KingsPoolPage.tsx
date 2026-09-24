@@ -13,12 +13,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   card: { ...createHybridCardStyles(theme).card },
   performanceCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
-  balanceGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' },
-  balanceCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '8px' },
-  actionRow: { display: 'flex', gap: '8px', flexWrap: 'wrap' as const },
-  amountInput: { flex: '1 1 150px', minWidth: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.9rem' },
-  actionButton: { border: 'none', borderRadius: '12px', padding: '10px 14px', background: theme.primary, color: theme.background, fontWeight: 800, cursor: 'pointer' },
-  actionButtonSecondary: { border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', padding: '10px 14px', background: theme.surfaceMuted, color: theme.text, fontWeight: 800, cursor: 'pointer' },
   chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
   chartHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   chartValue: { margin: '3px 0 0', color: theme.text, fontSize: 'clamp(1.35rem, 4vw, 1.8rem)', fontWeight: 900 },
@@ -57,7 +51,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 type PoolPoint = { date: string; value: number; dailyChangePercent: number };
 type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[] };
-type PoolBalanceResponse = { poolBalance: number; usdtBalance: number; lastPerformanceDate: string };
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
@@ -90,12 +83,7 @@ const KingsPoolPage = () => {
   const [movementPeriod, setMovementPeriod] = React.useState<'week' | 'month' | 'year'>('week');
   const [isMovementMenuOpen, setIsMovementMenuOpen] = React.useState(false);
   const [poolData, setPoolData] = React.useState<PoolResponse | null>(null);
-  const [poolBalance, setPoolBalance] = React.useState<PoolBalanceResponse | null>(null);
   const [poolError, setPoolError] = React.useState('');
-  const [poolActionError, setPoolActionError] = React.useState('');
-  const [poolActionMessage, setPoolActionMessage] = React.useState('');
-  const [poolAmount, setPoolAmount] = React.useState('');
-  const [poolActionLoading, setPoolActionLoading] = React.useState(false);
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
   const theme = HYBRID_THEME_TOKENS[themeMode];
 
@@ -104,33 +92,8 @@ const KingsPoolPage = () => {
     api.get<PoolResponse>('/api/pool')
       .then(({ data }) => { if (active) setPoolData(data); })
       .catch(() => { if (active) setPoolError('Unable to load pool performance right now.'); });
-    api.get<PoolBalanceResponse>('/api/pool/balance')
-      .then(({ data }) => { if (active) setPoolBalance(data); })
-      .catch(() => { if (active) setPoolActionError('Sign in to view and manage your KingsPool balance.'); });
     return () => { active = false; };
   }, []);
-
-  const handlePoolAction = async (action: 'deposit' | 'withdraw') => {
-    const amount = Number(poolAmount);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      setPoolActionError('Enter a valid USDT amount.');
-      return;
-    }
-    setPoolActionLoading(true);
-    setPoolActionError('');
-    setPoolActionMessage('');
-    try {
-      const { data } = await api.post<PoolBalanceResponse>(`/api/pool/${action}`, { amount });
-      setPoolBalance((current) => current ? { ...current, ...data } : data);
-      setPoolAmount('');
-      setPoolActionMessage(`KingsPool ${action} completed successfully.`);
-    } catch (error: unknown) {
-      const responseMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setPoolActionError(responseMessage || `Unable to complete pool ${action}.`);
-    } finally {
-      setPoolActionLoading(false);
-    }
-  };
 
   return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
@@ -138,12 +101,6 @@ const KingsPoolPage = () => {
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
       {poolError ? <div style={styles.chartMessage}>{poolError}</div> : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartTitle}>KingsPool performance</p><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={styles.chartChange}><TrendingUp size={15} /> +{poolData.current.dailyChangePercent.toFixed(2)}% today</p></div><PoolChart history={poolData.history} theme={theme} /></> : <div style={styles.chartMessage}><TrendingUp size={28} /><span>Loading pool performance…</span></div>}
     </div></div></section>
-
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Your KingsPool balance</h2><div style={styles.balanceGrid}>
-      <div style={styles.balanceCard}><p style={styles.label}>Pool balance</p><p style={styles.chartValue}>{poolBalance ? formatPoolValue(poolBalance.poolBalance) : '—'}</p><p style={styles.note}>Your invested amount, updated with daily pool movements.</p></div>
-      <div style={styles.balanceCard}><p style={styles.label}>Available USDT</p><p style={styles.chartValue}>{poolBalance ? formatPoolValue(poolBalance.usdtBalance) : '—'}</p><p style={styles.note}>Deposits are taken from your available USDT balance.</p></div>
-      <div style={styles.balanceCard}><p style={styles.label}>Add or withdraw</p><div style={styles.actionRow}><input aria-label="Pool amount in USDT" type="number" min="0" step="0.01" placeholder="Amount in USDT" value={poolAmount} onChange={(event) => setPoolAmount(event.target.value)} style={styles.amountInput} /><button type="button" style={styles.actionButton} disabled={poolActionLoading} onClick={() => handlePoolAction('deposit')}>Deposit</button><button type="button" style={styles.actionButtonSecondary} disabled={poolActionLoading} onClick={() => handlePoolAction('withdraw')}>Withdraw</button></div>{poolActionError ? <p style={styles.note}>{poolActionError}</p> : null}{poolActionMessage ? <p style={styles.note}>{poolActionMessage}</p> : null}</div>
-    </div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Pool performance index</p><p style={styles.note}>Current persisted pool value</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData ? formatPoolValue(poolData.current.value) : '—'}</p></div>
