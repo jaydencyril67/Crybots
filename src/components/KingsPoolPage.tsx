@@ -61,7 +61,7 @@ type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
-const POOL_BAR_MIN_PERCENT = -1.5;
+const POOL_BAR_MIN_PERCENT = -5;
 const POOL_BAR_MAX_PERCENT = 5;
 
 const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[]; current: PoolResponse['current']; direction: 'up' | 'down' | 'flat'; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
@@ -70,7 +70,7 @@ const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[
 
   const latestDate = safeHistory[safeHistory.length - 1].date;
 
-  return <div role="img" aria-label="KingsPool seven day vertical bar chart scaled from -1.5% to 5%" style={getStyles(theme).chartBars}>
+  return <div role="img" aria-label="KingsPool seven day vertical bar chart scaled from -5% to 5%" style={getStyles(theme).chartBars}>
     {safeHistory.map((point) => {
       const boundedPercent = Math.min(POOL_BAR_MAX_PERCENT, Math.max(POOL_BAR_MIN_PERCENT, point.dailyChangePercent));
       const barHeight = ((boundedPercent - POOL_BAR_MIN_PERCENT) / (POOL_BAR_MAX_PERCENT - POOL_BAR_MIN_PERCENT)) * 100;
