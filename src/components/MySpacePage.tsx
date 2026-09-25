@@ -5,6 +5,7 @@ import api from '../api/axios';
 import { useAppTheme } from './AppTheme';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
+import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
@@ -90,7 +91,7 @@ const MySpacePage = () => {
   const recentPointTransactions = pointTransactions.slice(0, 5);
   return <HybridTheme><Helmet><title>My Space | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}><div style={styles.content}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
-    {error ? <div style={styles.card}>{error}</div> : null}
+    {error ? <NotificationBanner tone="error" title="My Space unavailable" message={error} /> : null}
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market points</h2><div style={styles.listCard}>
       <div style={styles.pointGrid}>
         <div style={styles.pointMetric}><p style={styles.label}>Total bought</p><p style={styles.value}>{pointSummary ? boughtPoints.toFixed(2) : <LoadingDots />}</p><p style={styles.note}>{pointSummary ? `${pointSummary.buyCount} purchases · ${formatUsdt(pointSummary.totalBoughtValue)}` : 'Lifetime points purchased'}</p></div>
