@@ -5,7 +5,7 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
-import api from '../api/axios';
+import api, { API_BASE_URL } from '../api/axios';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
@@ -20,7 +20,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chartBarGroup: { minWidth: 0, height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', alignItems: 'end', justifyItems: 'center', gap: '8px' },
   chartBarValue: { margin: 0, color: theme.text, fontSize: 'clamp(0.62rem, 1.8vw, 0.78rem)', fontWeight: 800, whiteSpace: 'nowrap' as const },
   chartBarTrack: { width: '100%', height: '100%', minHeight: '120px', display: 'flex', alignItems: 'end', justifyContent: 'center', borderRadius: '8px 8px 2px 2px', background: theme.surfaceGlass },
-  chartBar: { width: 'min(34px, 68%)', minHeight: '6px', borderRadius: '8px 8px 2px 2px', background: theme.primary, transition: 'height 0.8s ease' },
+  chartBar: { width: 'min(34px, 68%)', minHeight: 0, borderRadius: '8px 8px 2px 2px', background: theme.primary, transition: 'height 0.8s ease' },
   chartBarDate: { margin: 0, color: theme.textMuted, fontSize: 'clamp(0.62rem, 1.8vw, 0.76rem)' },
   chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
   chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
@@ -60,24 +60,24 @@ type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
-const PoolChart = ({ history, current, theme }: { history: PoolPoint[]; current: PoolResponse['current']; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
-  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string').slice(-7).map((point) => point.date === current.date ? { ...point, dailyChangePercent: current.progressPercent } : point);
+const POOL_BAR_MIN_PERCENT = -1.5;
+const POOL_BAR_MAX_PERCENT = 5;
+
+const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[]; current: PoolResponse['current']; direction: 'up' | 'down' | 'flat'; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
+  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string').slice(-7).map((point) => point.date === current.date ? { ...point, value: current.value, dailyChangePercent: current.progressPercent } : point);
   if (!safeHistory.length) return null;
 
-  const values = safeHistory.map((point) => point.value);
-  const minimum = Math.min(...values);
-  const maximum = Math.max(...values);
-  const range = maximum - minimum || Math.max(Math.abs(maximum) * 0.02, 1);
   const latestDate = safeHistory[safeHistory.length - 1].date;
 
-  return <div role="img" aria-label="KingsPool seven day vertical bar chart" style={getStyles(theme).chartBars}>
+  return <div role="img" aria-label="KingsPool seven day vertical bar chart scaled from -1.5% to 5%" style={getStyles(theme).chartBars}>
     {safeHistory.map((point) => {
-      const barHeight = Math.max(8, ((point.value - minimum) / range) * 100);
+      const boundedPercent = Math.min(POOL_BAR_MAX_PERCENT, Math.max(POOL_BAR_MIN_PERCENT, point.dailyChangePercent));
+      const barHeight = ((boundedPercent - POOL_BAR_MIN_PERCENT) / (POOL_BAR_MAX_PERCENT - POOL_BAR_MIN_PERCENT)) * 100;
       const isCurrent = point.date === latestDate;
       return <div key={point.date} style={getStyles(theme).chartBarGroup}>
         <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
         <div style={getStyles(theme).chartBarTrack}>
-          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, opacity: isCurrent ? 1 : 0.72 }} />
+          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : point.dailyChangePercent >= 0 ? '#16a34a' : '#dc2626', opacity: isCurrent ? 1 : 0.72 }} />
         </div>
         <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
       </div>;
@@ -91,32 +91,57 @@ const KingsPoolPage = () => {
   const [isMovementMenuOpen, setIsMovementMenuOpen] = React.useState(false);
   const [poolData, setPoolData] = React.useState<PoolResponse | null>(null);
   const [poolError, setPoolError] = React.useState('');
+  const [movementDirection, setMovementDirection] = React.useState<'up' | 'down' | 'flat'>('flat');
+  const previousProgressRef = React.useRef<number | null>(null);
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
   const theme = HYBRID_THEME_TOKENS[themeMode];
 
   React.useEffect(() => {
     let active = true;
+    const applyCurrentPerformance = (current: PoolResponse['current']) => {
+      const nextProgress = Number(current.progressPercent ?? 0);
+      const previousProgress = previousProgressRef.current;
+      setMovementDirection(previousProgress === null || nextProgress === previousProgress ? 'flat' : nextProgress > previousProgress ? 'up' : 'down');
+      previousProgressRef.current = nextProgress;
+      setPoolData((previous) => previous ? { ...previous, current, history: previous.history.map((point) => point.date === current.date ? { ...point, value: current.value, dailyChangePercent: current.progressPercent } : point) } : previous);
+      setPoolError('');
+    };
+
     const loadPoolPerformance = async () => {
       try {
         const { data } = await api.get<PoolApiResponse>('/api/pool');
         if (active) {
-          setPoolData({
+          applyCurrentPerformance(data.current);
+          setPoolData((previous) => ({
+            ...previous,
             ...data,
             history: Array.isArray(data.history) ? data.history : [],
             overview: data.overview || { poolCapital: data.current?.value || 0, totalHolders: 0 },
             activities: Array.isArray(data.activities) ? data.activities : [],
-          });
-          setPoolError('');
+          }));
         }
       } catch {
         if (active) setPoolError('Unable to load pool performance right now.');
       }
     };
+
     void loadPoolPerformance();
-    const refreshTimer = window.setInterval(() => { void loadPoolPerformance(); }, 60_000);
+    const token = localStorage.getItem('token');
+    const stream = token ? new EventSource(`${API_BASE_URL}/api/pool/stream?token=${encodeURIComponent(token)}`) : null;
+    stream?.addEventListener('performance', (event) => {
+      if (!active) return;
+      try {
+        applyCurrentPerformance(JSON.parse((event as MessageEvent).data) as PoolResponse['current']);
+      } catch {
+        setPoolError('Unable to read live pool performance.');
+      }
+    });
+    stream?.addEventListener('error', () => {
+      if (active && stream.readyState === EventSource.CLOSED) setPoolError('Live pool performance disconnected.');
+    });
     return () => {
       active = false;
-      window.clearInterval(refreshTimer);
+      stream?.close();
     };
   }, []);
 
@@ -124,7 +149,7 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} current={poolData.current} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
+      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} current={poolData.current} direction={movementDirection} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
