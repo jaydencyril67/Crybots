@@ -13,6 +13,22 @@ const UPDATE_INTERVAL_MS = 60_000;
 
 type MarketPoint = { timestamp: number; percent: number };
 
+type MarketPosition = {
+  points: number;
+  cost: number;
+  purchasedAt: string;
+  activeFrom: string;
+  active: boolean;
+  value: number;
+};
+
+type MarketPointsResponse = {
+  points: number;
+  value: number;
+  current: number;
+  positions: MarketPosition[];
+};
+
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
@@ -31,6 +47,19 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   movementSubject: { display: 'grid', gap: '3px', minWidth: 0 },
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, flexShrink: 0 },
+  pointsGrid: { display: 'grid', gap: '12px', padding: '14px' },
+  pointsSummary: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' },
+  pointsMetric: { display: 'grid', gap: '4px', padding: '12px', borderRadius: '12px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
+  metricLabel: { margin: 0, color: theme.textMuted, fontSize: '0.75rem' },
+  metricValue: { margin: 0, fontSize: '1.08rem', fontWeight: 900 },
+  buyForm: { display: 'flex', flexWrap: 'wrap' as const, alignItems: 'end', gap: '9px' },
+  inputGroup: { display: 'grid', gap: '5px', flex: '1 1 180px' },
+  input: { width: '100%', boxSizing: 'border-box' as const, padding: '10px 11px', borderRadius: '9px', border: `1px solid ${theme.borderGlass}`, background: theme.background, color: theme.text, fontSize: '0.9rem' },
+  buyButton: { border: 0, borderRadius: '9px', padding: '11px 16px', background: theme.primary, color: '#fff', fontWeight: 800, cursor: 'pointer' },
+  disabledButton: { opacity: 0.55, cursor: 'not-allowed' },
+  status: { margin: 0, fontSize: '0.8rem', color: theme.textMuted },
+  positionList: { display: 'grid', gap: '7px' },
+  positionRow: { display: 'flex', justifyContent: 'space-between', gap: '12px', padding: '9px 10px', borderRadius: '9px', background: theme.surfaceMuted, fontSize: '0.8rem' },
 });
 
 const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
@@ -61,14 +90,22 @@ const MarketPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>([]);
+  const [marketAccount, setMarketAccount] = React.useState<MarketPointsResponse>({ points: 0, value: 0, current: 0, positions: [] });
+  const [buyPoints, setBuyPoints] = React.useState('');
+  const [buying, setBuying] = React.useState(false);
+  const [buyStatus, setBuyStatus] = React.useState('');
 
   React.useEffect(() => {
     let active = true;
     const loadMarketPerformance = async () => {
       try {
-        const response = await api.get<{ points: MarketPoint[] }>('/api/market/performance');
+        const [performanceResponse, pointsResponse] = await Promise.all([
+          api.get<{ points: MarketPoint[] }>('/api/market/performance'),
+          api.get<MarketPointsResponse>('/api/market/points'),
+        ]);
         if (active) {
-          setMarketPoints(response.data.points);
+          setMarketPoints(performanceResponse.data.points);
+          setMarketAccount(pointsResponse.data);
         }
       } catch (error) {
         console.error('Unable to load market performance.', error);
@@ -85,10 +122,47 @@ const MarketPage = () => {
 
   const high = Math.max(...marketPoints.map((point) => point.percent));
   const low = Math.min(...marketPoints.map((point) => point.percent));
+  const formatUsdt = (amount: number) => `${amount.toFixed(2)} USDT`;
+  const handleBuy = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const points = Number(buyPoints);
+    if (!Number.isFinite(points) || points < 1) {
+      setBuyStatus('Enter at least 1 point.');
+      return;
+    }
+
+    setBuying(true);
+    setBuyStatus('');
+    try {
+      await api.post('/api/market/points/buy', { points });
+      setBuyPoints('');
+      setBuyStatus('Points purchased. They begin following market performance tomorrow.');
+      const response = await api.get<MarketPointsResponse>('/api/market/points');
+      setMarketAccount(response.data);
+    } catch (error) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setBuyStatus(message || 'Unable to purchase points right now.');
+    } finally {
+      setBuying(false);
+    }
+  };
 
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Market points</h2><div style={styles.card}><div style={styles.pointsGrid}>
+      <div style={styles.pointsSummary}>
+        <div style={styles.pointsMetric}><p style={styles.metricLabel}>Points held</p><p style={styles.metricValue}>{marketAccount.points.toFixed(2)}</p></div>
+        <div style={styles.pointsMetric}><p style={styles.metricLabel}>Current value</p><p style={styles.metricValue}>{formatUsdt(marketAccount.value)}</p></div>
+        <div style={styles.pointsMetric}><p style={styles.metricLabel}>Market rate</p><p style={styles.metricValue}>{marketAccount.current.toFixed(2)}%</p></div>
+      </div>
+      <form style={styles.buyForm} onSubmit={handleBuy}>
+        <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to buy (1 point = 1 USDT)</span><input style={styles.input} type="number" min="1" step="0.01" value={buyPoints} onChange={(event) => setBuyPoints(event.target.value)} placeholder="e.g. 100" /></label>
+        <button type="submit" style={{ ...styles.buyButton, ...(buying ? styles.disabledButton : {}) }} disabled={buying}>{buying ? 'Buying…' : 'Buy points'}</button>
+      </form>
+      <p style={styles.status}>{buyStatus || 'New purchases start following the market from the next UTC day. Selling points is not available yet.'}</p>
+      {marketAccount.positions.length > 0 && <div style={styles.positionList}>{marketAccount.positions.slice().reverse().map((position) => <div key={`${position.purchasedAt}-${position.points}`} style={styles.positionRow}><span>{position.points.toFixed(2)} points · {position.active ? 'Active' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</span><strong>{formatUsdt(position.value)}</strong></div>)}</div>}
+    </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
       <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.note}>Maximum movement in the current live window</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
       <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.note}>Minimum movement in the current live window</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p></div>
