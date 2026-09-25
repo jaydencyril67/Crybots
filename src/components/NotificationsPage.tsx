@@ -6,7 +6,6 @@ import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import api from '../api/axios';
 import { AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
-import { navigate } from '../utils/navigate';
 
 type NotificationItem = {
   id: string;
@@ -108,7 +107,7 @@ const NotificationsPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
+          <button type="button" style={styles.back} onClick={() => window.history.back()}><ArrowLeft size={17} /> Back</button>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
           {refreshing ? <NotificationBanner tone="info" title="Updating notifications" message="Checking for new in-app alerts." /> : null}
