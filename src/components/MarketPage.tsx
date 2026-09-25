@@ -92,8 +92,11 @@ const MarketPage = () => {
   const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>([]);
   const [marketAccount, setMarketAccount] = React.useState<MarketPointsResponse>({ points: 0, value: 0, current: 0, positions: [] });
   const [buyPoints, setBuyPoints] = React.useState('');
+  const [sellPoints, setSellPoints] = React.useState('');
   const [buying, setBuying] = React.useState(false);
+  const [selling, setSelling] = React.useState(false);
   const [buyStatus, setBuyStatus] = React.useState('');
+  const [sellStatus, setSellStatus] = React.useState('');
 
   React.useEffect(() => {
     let active = true;
@@ -147,6 +150,30 @@ const MarketPage = () => {
     }
   };
 
+  const handleSell = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const points = Number(sellPoints);
+    if (!Number.isFinite(points) || points < 1) {
+      setSellStatus('Enter at least 1 point.');
+      return;
+    }
+
+    setSelling(true);
+    setSellStatus('');
+    try {
+      const response = await api.post<{ value: number }>('/api/market/points/sell', { points });
+      setSellPoints('');
+      setSellStatus(`${points.toFixed(2)} points sold for ${formatUsdt(response.data.value)}.`);
+      const accountResponse = await api.get<MarketPointsResponse>('/api/market/points');
+      setMarketAccount(accountResponse.data);
+    } catch (error) {
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setSellStatus(message || 'Unable to sell points right now.');
+    } finally {
+      setSelling(false);
+    }
+  };
+
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
@@ -160,7 +187,11 @@ const MarketPage = () => {
         <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to buy (1 point = 1 USDT)</span><input style={styles.input} type="number" min="1" step="0.01" value={buyPoints} onChange={(event) => setBuyPoints(event.target.value)} placeholder="e.g. 100" /></label>
         <button type="submit" style={{ ...styles.buyButton, ...(buying ? styles.disabledButton : {}) }} disabled={buying}>{buying ? 'Buying…' : 'Buy points'}</button>
       </form>
-      <p style={styles.status}>{buyStatus || 'New purchases start following the market from the next UTC day. Selling points will be available soon.'}</p>
+      <form style={styles.buyForm} onSubmit={handleSell}>
+        <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to sell at current market value</span><input style={styles.input} type="number" min="1" step="0.01" value={sellPoints} onChange={(event) => setSellPoints(event.target.value)} placeholder="e.g. 100" /></label>
+        <button type="submit" style={{ ...styles.buyButton, ...(selling ? styles.disabledButton : {}) }} disabled={selling}>{selling ? 'Selling…' : 'Sell points'}</button>
+      </form>
+      <p style={styles.status}>{buyStatus || sellStatus || 'New purchases start following the market from the next UTC day. Unsold points reset to their original value at the next daily reset.'}</p>
       {marketAccount.positions.length > 0 && <div style={styles.positionList}>{marketAccount.positions.slice().reverse().map((position) => <div key={`${position.purchasedAt}-${position.points}`} style={styles.positionRow}><span>{position.points.toFixed(2)} points · {position.active ? 'Active' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</span><strong>{formatUsdt(position.value)}</strong></div>)}</div>}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
