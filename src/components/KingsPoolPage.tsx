@@ -16,7 +16,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
   chartHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   chartValue: { margin: '3px 0 0', color: theme.text, fontSize: 'clamp(1.35rem, 4vw, 1.8rem)', fontWeight: 900 },
-  chartCanvas: { width: '100%', minWidth: 0, height: 'clamp(210px, 42vw, 340px)', overflow: 'visible' },
+  chartBars: { minHeight: 'clamp(210px, 42vw, 340px)', display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', alignItems: 'end', gap: 'clamp(8px, 2vw, 18px)', padding: '24px 8px 4px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const },
+  chartBarGroup: { minWidth: 0, height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', alignItems: 'end', justifyItems: 'center', gap: '8px' },
+  chartBarValue: { margin: 0, color: theme.text, fontSize: 'clamp(0.62rem, 1.8vw, 0.78rem)', fontWeight: 800, whiteSpace: 'nowrap' as const },
+  chartBarTrack: { width: '100%', height: '100%', minHeight: '120px', display: 'flex', alignItems: 'end', justifyContent: 'center', borderRadius: '8px 8px 2px 2px', background: theme.surfaceGlass },
+  chartBar: { width: 'min(34px, 68%)', minHeight: '6px', borderRadius: '8px 8px 2px 2px', background: theme.primary, transition: 'height 0.8s ease' },
+  chartBarDate: { margin: 0, color: theme.textMuted, fontSize: 'clamp(0.62rem, 1.8vw, 0.76rem)' },
   chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
   chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
   listCard: { display: 'grid', gap: '8px', minWidth: 0, padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
@@ -50,42 +55,34 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 type PoolPoint = { date: string; value: number; dailyChangePercent: number };
 type PoolActivity = { type: 'deposit' | 'withdrawal'; amount: number; date: string };
-type PoolResponse = { current: { value: number; dailyChangePercent: number; date: string }; history: PoolPoint[]; overview: { poolCapital: number; totalHolders: number }; activities: PoolActivity[] };
+type PoolResponse = { current: { value: number; dailyChangePercent: number; progressPercent: number; date: string }; history: PoolPoint[]; overview: { poolCapital: number; totalHolders: number }; activities: PoolActivity[] };
 type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'] };
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
-const PoolChart = ({ history, theme }: { history: PoolPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
-  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string');
-  if (safeHistory.length < 2) return null;
+const PoolChart = ({ history, current, theme }: { history: PoolPoint[]; current: PoolResponse['current']; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
+  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string').slice(-7).map((point) => point.date === current.date ? { ...point, dailyChangePercent: current.progressPercent } : point);
+  if (!safeHistory.length) return null;
 
   const values = safeHistory.map((point) => point.value);
   const minimum = Math.min(...values);
   const maximum = Math.max(...values);
-  const range = maximum - minimum || 1;
-  const points = safeHistory.map((point, index) => {
-    const x = (index / (safeHistory.length - 1)) * 800;
-    const y = 270 - ((point.value - minimum) / range) * 230;
-    return { x, y };
-  });
-  const wormPath = points.reduce((path, point, index) => {
-    if (index === 0) return `M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-    const previous = points[index - 1];
-    const midpoint = (previous.x + point.x) / 2;
-    return `${path} C ${midpoint.toFixed(2)} ${previous.y.toFixed(2)}, ${midpoint.toFixed(2)} ${point.y.toFixed(2)}, ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
-  }, '');
-  const areaPath = `${wormPath} L 800 300 L 0 300 Z`;
-  const labelIndexes = [0, Math.floor((safeHistory.length - 1) / 2), safeHistory.length - 1];
+  const range = maximum - minimum || Math.max(Math.abs(maximum) * 0.02, 1);
+  const latestDate = safeHistory[safeHistory.length - 1].date;
 
-  return <svg viewBox="0 0 800 320" role="img" aria-label="KingsPool performance line chart" style={getStyles(theme).chartCanvas} preserveAspectRatio="none">
-    <defs><linearGradient id="poolChartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.28" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
-    {[50, 105, 160, 215, 270].map((y) => <line key={y} x1="0" x2="800" y1={y} y2={y} stroke={theme.borderGlass} strokeDasharray="5 8" />)}
-    <path d={areaPath} fill="url(#poolChartFill)" />
-    <path d={wormPath} fill="none" stroke={theme.primary} strokeOpacity="0.18" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-    <path d={wormPath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-    {points.map((point, index) => <circle key={`${safeHistory[index].date}-${index}`} cx={point.x} cy={point.y} r="4" fill={theme.surfaceMuted} stroke={theme.primary} strokeWidth="3" vectorEffect="non-scaling-stroke" />)}
-    {labelIndexes.map((index) => <text key={`${safeHistory[index].date}-${index}`} x={(index / (safeHistory.length - 1)) * 800} y="316" fill={theme.textMuted} fontSize="13" textAnchor={index === 0 ? 'start' : index === safeHistory.length - 1 ? 'end' : 'middle'}>{safeHistory[index].date.slice(5)}</text>)}
-  </svg>;
+  return <div role="img" aria-label="KingsPool seven day vertical bar chart" style={getStyles(theme).chartBars}>
+    {safeHistory.map((point) => {
+      const barHeight = Math.max(8, ((point.value - minimum) / range) * 100);
+      const isCurrent = point.date === latestDate;
+      return <div key={point.date} style={getStyles(theme).chartBarGroup}>
+        <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
+        <div style={getStyles(theme).chartBarTrack}>
+          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, opacity: isCurrent ? 1 : 0.72 }} />
+        </div>
+        <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
+      </div>;
+    })}
+  </div>;
 };
 
 const KingsPoolPage = () => {
@@ -127,7 +124,7 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
+      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} current={poolData.current} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
