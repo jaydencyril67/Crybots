@@ -10,7 +10,7 @@ import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
 type StatData = { finance: { balance: number; totalDeposits: number; depositCount: number; totalWithdrawals: number; withdrawalCount: number; totalInvested: number; investmentCount: number; totalProfit: number } };
-type PointPosition = { points: number; cost: number; activeFrom: string; active: boolean; value: number };
+type PointPosition = { points: number; cost: number; purchasedAt: string; activeFrom: string; active: boolean; value: number };
 type MarketPointsData = { points: number; value: number; current: number; positions: PointPosition[] };
 type TransactionEntry = { id: string; title: string; direction: 'inbound' | 'outbound'; amountValue: number; date: string; time: string; points?: number; source: string };
 type PointSummary = { totalBoughtPoints: number; totalSoldPoints: number; totalBoughtValue: number; totalSoldValue: number; buyCount: number; sellCount: number };
@@ -33,9 +33,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   label: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.3 },
   value: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem', lineHeight: 1.35 },
-  pointGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px' },
-  pointMetric: { display: 'grid', gap: '4px', padding: '12px', border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', background: theme.surfaceMuted },
   pointActivity: { display: 'grid', gap: '8px' },
+  positionList: { display: 'grid', gap: '8px' },
+  positionRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', padding: '10px 12px', background: theme.surfaceMuted },
   section: { display: 'grid', gap: '10px' },
   sectionTitle: { margin: 0, fontSize: '0.94rem', fontWeight: 900 },
   selectorGroup: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', gap: '10px' },
@@ -93,15 +93,17 @@ const MySpacePage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     {error ? <NotificationBanner tone="error" title="My Space unavailable" message={error} /> : null}
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market points</h2><div style={styles.listCard}>
-      <div style={styles.pointGrid}>
-        <div style={styles.pointMetric}><p style={styles.label}>Total bought</p><p style={styles.value}>{pointSummary ? boughtPoints.toFixed(2) : <LoadingDots />}</p><p style={styles.note}>{pointSummary ? `${pointSummary.buyCount} purchases · ${formatUsdt(pointSummary.totalBoughtValue)}` : 'Lifetime points purchased'}</p></div>
-        <div style={styles.pointMetric}><p style={styles.label}>Total sold</p><p style={styles.value}>{pointSummary ? soldPoints.toFixed(2) : <LoadingDots />}</p><p style={styles.note}>{pointSummary ? `${pointSummary.sellCount} sales · ${formatUsdt(pointSummary.totalSoldValue)}` : 'Lifetime points sold'}</p></div>
-        <div style={styles.pointMetric}><p style={styles.label}>Current holding</p><p style={styles.value}>{marketPoints ? marketPoints.points.toFixed(2) : <LoadingDots />}</p><p style={styles.note}>Active and pending points</p></div>
-        <div style={styles.pointMetric}><p style={styles.label}>Current value</p><p style={styles.value}>{marketPoints ? formatUsdt(marketPoints.value) : <LoadingDots />}</p><p style={styles.note}>{marketPoints ? `${marketPoints.current.toFixed(2)}% market movement` : 'Current market value'}</p></div>
-      </div>
+      <div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Total bought</p><p style={styles.note}>{pointSummary ? `${pointSummary.buyCount} purchases · ${formatUsdt(pointSummary.totalBoughtValue)}` : 'Lifetime points purchased'}</p></div><p style={styles.value}>{pointSummary ? boughtPoints.toFixed(2) : <LoadingDots />}</p></div>
+      <div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Total sold</p><p style={styles.note}>{pointSummary ? `${pointSummary.sellCount} sales · ${formatUsdt(pointSummary.totalSoldValue)}` : 'Lifetime points sold'}</p></div><p style={styles.value}>{pointSummary ? soldPoints.toFixed(2) : <LoadingDots />}</p></div>
+      <div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Current holding</p><p style={styles.note}>Active and pending points</p></div><p style={styles.value}>{marketPoints ? marketPoints.points.toFixed(2) : <LoadingDots />}</p></div>
+      <div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Current value</p><p style={styles.note}>{marketPoints ? `${marketPoints.current.toFixed(2)}% market movement` : 'Current market value'}</p></div><p style={styles.value}>{marketPoints ? formatUsdt(marketPoints.value) : <LoadingDots />}</p></div>
       <div style={styles.pointActivity}>
         <p style={styles.label}>Recent point activity</p>
         {recentPointTransactions.length ? recentPointTransactions.map((transaction) => <div style={styles.listItem} key={transaction.id}><div style={styles.itemContent}><p style={styles.label}>{transaction.title}</p><p style={styles.note}>{transaction.date} · {transaction.time}</p></div><p style={styles.value}>{transaction.points?.toFixed(2)} points</p></div>) : <p style={styles.note}>No point activity recorded yet.</p>}
+      </div>
+      <div style={styles.pointActivity}>
+        <p style={styles.label}>Purchase history</p>
+        {marketPoints?.positions.length ? <div style={styles.positionList}>{marketPoints.positions.slice().reverse().map((position) => <div style={styles.positionRow} key={`${position.purchasedAt}-${position.points}`}><div style={styles.itemContent}><p style={styles.label}>{position.points.toFixed(2)} points · {position.active ? 'Active' : 'Pending'}</p><p style={styles.note}>{position.active ? 'Currently following market performance' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</p></div><p style={styles.value}>{formatUsdt(position.value)}</p></div>)}</div> : <p style={styles.note}>No point purchases recorded yet.</p>}
       </div>
     </div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Holding stats</h2><div style={styles.listCard}>
