@@ -27,7 +27,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chartValue: { color: theme.text, fontWeight: 900 },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.45 },
   movementGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' },
-  movement: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '9px' },
   movementInner: { display: 'grid', gap: '9px', padding: '12px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
@@ -90,10 +89,10 @@ const MarketPage = () => {
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.movementGrid}>
-      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p><p style={styles.note}>Maximum movement in the current live window</p></div></div>
-      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p><p style={styles.note}>Minimum movement in the current live window</p></div></div>
-    </div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
+      <div style={styles.movementInner}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p><p style={styles.note}>Maximum movement in the current live window</p></div>
+      <div style={styles.movementInner}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p><p style={styles.note}>Minimum movement in the current live window</p></div>
+    </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market information</h2><div style={styles.card}><p style={styles.note}>The market moves gradually between 0% and 4%. A new fluctuation is calculated once every minute.</p><p style={styles.note}>Current movement: {marketPoints.length ? `${current.toFixed(2)}%` : <LoadingDots />}</p></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
