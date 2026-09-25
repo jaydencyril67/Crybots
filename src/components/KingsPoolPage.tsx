@@ -14,9 +14,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   card: { ...createHybridCardStyles(theme).card },
   performanceCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
-  chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
-  chartWave: { position: 'relative' as const, minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateRows: '1fr auto', gap: '12px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
-  chartWaveSvg: { width: '100%', height: '100%', minHeight: '220px', overflow: 'visible' as const },
+  chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateRows: 'minmax(0, 1fr)', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
+  chartWave: { position: 'relative' as const, height: '100%', minHeight: 0, display: 'grid', gridTemplateRows: 'minmax(0, 1fr) auto', gap: '12px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
+  chartWaveSvg: { display: 'block', width: '100%', height: '100%', minHeight: 0, overflow: 'visible' as const },
   chartWaveDate: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
   chartWaveValue: { color: theme.text, fontWeight: 900 },
   chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
@@ -67,7 +67,7 @@ const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme
   const areaPath = `${wavePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`KingsPool current day performance: ${performance.toFixed(2)} percent, shown as a wave chart from zero to three point five percent`} style={styles.chartWave}>
+  return <div role="img" aria-label={`KingsPool current day performance: ${performance.toFixed(2)} percent`} style={styles.chartWave}>
     <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartWaveSvg}>
       <defs>
         <linearGradient id="pool-wave-fill" x1="0" x2="0" y1="0" y2="1">
@@ -81,7 +81,7 @@ const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme
       <path d={wavePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="620" cy={waveY} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
     </svg>
-    <p style={styles.chartWaveDate}><span>Today · {current.date}</span><span style={styles.chartWaveValue}>+{performance.toFixed(2)}% / {POOL_MAX_PERCENT}%</span></p>
+    <p style={styles.chartWaveDate}><span>Today · {current.date}</span><span style={styles.chartWaveValue}>+{performance.toFixed(2)}%</span></p>
   </div>;
 };
 

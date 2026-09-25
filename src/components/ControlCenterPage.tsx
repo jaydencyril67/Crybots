@@ -110,7 +110,7 @@ const ControlCenterPage = () => {
     <section style={styles.card}>
       <div style={styles.inner}>
         <h1 style={styles.sectionTitle}>Pool control center</h1>
-        <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool. Pool performance is calculated daily and ranges from 0% to 3.5%.</p>
+        <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool. Your pool balance updates as performance is applied.</p>
         <div style={styles.balance}><div><p style={styles.balanceLabel}>Your KingsPool balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? <LoadingDots /> : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
         <div style={styles.balance}><div><p style={styles.balanceLabel}>Main USDT balance</p><p style={styles.sectionText}>Available for pool deposits</p></div><p style={styles.balanceValue}>{usdtBalance === null ? <LoadingDots /> : `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
       </div>
