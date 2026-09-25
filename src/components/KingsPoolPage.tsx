@@ -76,9 +76,9 @@ const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[
       const barHeight = ((boundedPercent - POOL_BAR_MIN_PERCENT) / (POOL_BAR_MAX_PERCENT - POOL_BAR_MIN_PERCENT)) * 100;
       const isCurrent = point.date === latestDate;
       return <div key={point.date} style={getStyles(theme).chartBarGroup}>
-        <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
+        <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(4)}%</p>
         <div style={getStyles(theme).chartBarTrack}>
-          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : point.dailyChangePercent >= 0 ? '#16a34a' : '#dc2626', opacity: isCurrent ? 1 : 0.72 }} />
+          <div title={`${point.dailyChangePercent.toFixed(4)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : point.dailyChangePercent >= 0 ? '#16a34a' : '#dc2626', opacity: isCurrent ? 1 : 0.72 }} />
         </div>
         <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
       </div>;
@@ -131,6 +131,7 @@ const KingsPoolPage = () => {
     void loadPoolPerformance();
     const token = localStorage.getItem('token');
     const stream = token ? new EventSource(`${API_BASE_URL}/api/pool/stream?token=${encodeURIComponent(token)}`) : null;
+    const refreshTimer = window.setInterval(() => { void loadPoolPerformance(); }, 60_000);
     stream?.addEventListener('performance', (event) => {
       if (!active) return;
       try {
@@ -144,6 +145,7 @@ const KingsPoolPage = () => {
     });
     return () => {
       active = false;
+      window.clearInterval(refreshTimer);
       stream?.close();
     };
   }, []);
