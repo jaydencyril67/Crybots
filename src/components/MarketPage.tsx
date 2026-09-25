@@ -150,7 +150,7 @@ const MarketPage = () => {
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Market points</h2><div style={styles.card}><div style={styles.pointsGrid}>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Buy and sell points</h2><div style={styles.card}><div style={styles.pointsGrid}>
       <div style={styles.pointsSummary}>
         <div style={styles.pointsMetric}><p style={styles.metricLabel}>Points held</p><p style={styles.metricValue}>{marketAccount.points.toFixed(2)}</p></div>
         <div style={styles.pointsMetric}><p style={styles.metricLabel}>Current value</p><p style={styles.metricValue}>{formatUsdt(marketAccount.value)}</p></div>
@@ -160,7 +160,7 @@ const MarketPage = () => {
         <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to buy (1 point = 1 USDT)</span><input style={styles.input} type="number" min="1" step="0.01" value={buyPoints} onChange={(event) => setBuyPoints(event.target.value)} placeholder="e.g. 100" /></label>
         <button type="submit" style={{ ...styles.buyButton, ...(buying ? styles.disabledButton : {}) }} disabled={buying}>{buying ? 'Buying…' : 'Buy points'}</button>
       </form>
-      <p style={styles.status}>{buyStatus || 'New purchases start following the market from the next UTC day. Selling points is not available yet.'}</p>
+      <p style={styles.status}>{buyStatus || 'New purchases start following the market from the next UTC day. Selling points will be available soon.'}</p>
       {marketAccount.positions.length > 0 && <div style={styles.positionList}>{marketAccount.positions.slice().reverse().map((position) => <div key={`${position.purchasedAt}-${position.points}`} style={styles.positionRow}><span>{position.points.toFixed(2)} points · {position.active ? 'Active' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</span><strong>{formatUsdt(position.value)}</strong></div>)}</div>}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
