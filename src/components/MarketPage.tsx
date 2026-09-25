@@ -5,11 +5,10 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
+import api from '../api/axios';
 
-const MIN_MARKET_PERCENT = 0;
 const MAX_MARKET_PERCENT = 4;
 const UPDATE_INTERVAL_MS = 60_000;
-const MAX_STEP_PERCENT = 0.18;
 
 type MarketPoint = { timestamp: number; percent: number };
 
@@ -32,27 +31,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
 });
-
-const nextMarketPercent = (current: number) => {
-  const direction = Math.random() > 0.5 ? 1 : -1;
-  const step = 0.03 + Math.random() * MAX_STEP_PERCENT;
-  return Number(Math.min(MAX_MARKET_PERCENT, Math.max(MIN_MARKET_PERCENT, current + direction * step)).toFixed(2));
-};
-
-const createInitialMarketPoints = (): MarketPoint[] => {
-  const now = Date.now();
-  const points: MarketPoint[] = [{ timestamp: now - 23 * UPDATE_INTERVAL_MS, percent: 1.5 }];
-
-  for (let index = 1; index < 24; index += 1) {
-    const previous = points[index - 1];
-    points.push({
-      timestamp: now - (23 - index) * UPDATE_INTERVAL_MS,
-      percent: nextMarketPercent(previous.percent),
-    });
-  }
-
-  return points;
-};
 
 const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
   const current = points[points.length - 1]?.percent ?? 0;
@@ -81,15 +59,27 @@ const MarketPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
-  const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>(createInitialMarketPoints);
+  const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>([]);
 
   React.useEffect(() => {
-    const timer = window.setInterval(() => setMarketPoints((points) => {
-      const current = points[points.length - 1]?.percent ?? 0;
-      const next = { timestamp: Date.now(), percent: nextMarketPercent(current) };
-      return [...points, next].slice(-24);
-    }), UPDATE_INTERVAL_MS);
-    return () => window.clearInterval(timer);
+    let active = true;
+    const loadMarketPerformance = async () => {
+      try {
+        const response = await api.get<{ points: MarketPoint[] }>('/api/market/performance');
+        if (active) {
+          setMarketPoints(response.data.points);
+        }
+      } catch (error) {
+        console.error('Unable to load market performance.', error);
+      }
+    };
+
+    loadMarketPerformance();
+    const timer = window.setInterval(loadMarketPerformance, UPDATE_INTERVAL_MS);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
   }, []);
 
   const current = marketPoints[marketPoints.length - 1]?.percent ?? 0;
