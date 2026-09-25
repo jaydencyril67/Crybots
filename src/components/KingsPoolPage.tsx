@@ -81,7 +81,7 @@ const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[
         <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
         <div style={getStyles(theme).chartBarTrack}>
           <div aria-hidden="true" style={getStyles(theme).chartBarZeroLine} />
-          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, top: isPositive ? `${50 - barHeight}%` : '50%', height: `${barHeight}%`, borderRadius: isPositive ? '8px 8px 0 0' : '0 0 8px 8px', background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : '#ffffff', opacity: 1 }} />
+          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, top: isPositive ? `${50 - barHeight}%` : '50%', height: `${barHeight}%`, borderRadius: isPositive ? '8px 8px 0 0' : '0 0 8px 8px', background: point.dailyChangePercent < 0 ? '#dc2626' : isCurrent ? (direction === 'up' ? '#16a34a' : theme.primary) : '#ffffff', opacity: 1 }} />
         </div>
         <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
       </div>;
