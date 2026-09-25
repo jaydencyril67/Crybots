@@ -102,10 +102,11 @@ const KingsPoolPage = () => {
     let active = true;
     const applyCurrentPerformance = (current: PoolResponse['current']) => {
       const nextProgress = Number(current.progressPercent ?? 0);
+      const normalizedCurrent = { ...current, progressPercent: Number(nextProgress.toFixed(2)) };
       const previousProgress = previousProgressRef.current;
       setMovementDirection(previousProgress === null || nextProgress === previousProgress ? 'flat' : nextProgress > previousProgress ? 'up' : 'down');
       previousProgressRef.current = nextProgress;
-      setPoolData((previous) => previous ? { ...previous, current, history: previous.history.map((point) => point.date === current.date ? { ...point, value: current.value, dailyChangePercent: current.progressPercent } : point) } : previous);
+      setPoolData((previous) => previous ? { ...previous, current: normalizedCurrent, history: previous.history.map((point) => point.date === normalizedCurrent.date ? { ...point, value: normalizedCurrent.value, dailyChangePercent: normalizedCurrent.progressPercent } : point) } : previous);
       setPoolError('');
     };
 
@@ -117,6 +118,7 @@ const KingsPoolPage = () => {
           setPoolData((previous) => ({
             ...previous,
             ...data,
+            current: { ...data.current, progressPercent: Number(Number(data.current.progressPercent ?? 0).toFixed(2)) },
             history: Array.isArray(data.history) ? data.history : [],
             overview: data.overview || { poolCapital: data.current?.value || 0, totalHolders: 0 },
             activities: Array.isArray(data.activities) ? data.activities : [],
@@ -130,6 +132,9 @@ const KingsPoolPage = () => {
     };
 
     void loadPoolPerformance();
+    // Keep a polling fallback for browsers, proxies, or service workers that do
+    // not deliver the EventSource response promptly.
+    const refreshTimer = window.setInterval(() => { void loadPoolPerformance(); }, 15_000);
     const token = localStorage.getItem('token');
     const stream = token ? new EventSource(`${API_BASE_URL}/api/pool/stream?token=${encodeURIComponent(token)}`) : null;
     stream?.addEventListener('performance', (event) => {
@@ -145,6 +150,7 @@ const KingsPoolPage = () => {
     });
     return () => {
       active = false;
+      window.clearInterval(refreshTimer);
       stream?.close();
     };
   }, []);
