@@ -60,8 +60,8 @@ type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
-const PoolChart = ({ history, current, theme }: { history: PoolPoint[]; current: PoolResponse['current']; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
-  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string').slice(-7).map((point) => point.date === current.date ? { ...point, dailyChangePercent: current.progressPercent } : point);
+const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[]; current: PoolResponse['current']; direction: 'up' | 'down' | 'flat'; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
+  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string').slice(-7).map((point) => point.date === current.date ? { ...point, value: current.value, dailyChangePercent: current.progressPercent } : point);
   if (!safeHistory.length) return null;
 
   const values = safeHistory.map((point) => point.value);
@@ -77,7 +77,7 @@ const PoolChart = ({ history, current, theme }: { history: PoolPoint[]; current:
       return <div key={point.date} style={getStyles(theme).chartBarGroup}>
         <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
         <div style={getStyles(theme).chartBarTrack}>
-          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, opacity: isCurrent ? 1 : 0.72 }} />
+          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : point.dailyChangePercent >= 0 ? '#16a34a' : '#dc2626', opacity: isCurrent ? 1 : 0.72 }} />
         </div>
         <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
       </div>;
@@ -91,6 +91,8 @@ const KingsPoolPage = () => {
   const [isMovementMenuOpen, setIsMovementMenuOpen] = React.useState(false);
   const [poolData, setPoolData] = React.useState<PoolResponse | null>(null);
   const [poolError, setPoolError] = React.useState('');
+  const [movementDirection, setMovementDirection] = React.useState<'up' | 'down' | 'flat'>('flat');
+  const previousProgressRef = React.useRef<number | null>(null);
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
   const theme = HYBRID_THEME_TOKENS[themeMode];
 
@@ -100,6 +102,10 @@ const KingsPoolPage = () => {
       try {
         const { data } = await api.get<PoolApiResponse>('/api/pool');
         if (active) {
+          const nextProgress = Number(data.current?.progressPercent ?? 0);
+          const previousProgress = previousProgressRef.current;
+          setMovementDirection(previousProgress === null || nextProgress === previousProgress ? 'flat' : nextProgress > previousProgress ? 'up' : 'down');
+          previousProgressRef.current = nextProgress;
           setPoolData({
             ...data,
             history: Array.isArray(data.history) ? data.history : [],
@@ -124,7 +130,7 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} current={poolData.current} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
+      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} current={poolData.current} direction={movementDirection} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
