@@ -131,7 +131,6 @@ const KingsPoolPage = () => {
     void loadPoolPerformance();
     const token = localStorage.getItem('token');
     const stream = token ? new EventSource(`${API_BASE_URL}/api/pool/stream?token=${encodeURIComponent(token)}`) : null;
-    const refreshTimer = window.setInterval(() => { void loadPoolPerformance(); }, 60_000);
     stream?.addEventListener('performance', (event) => {
       if (!active) return;
       try {
@@ -145,7 +144,6 @@ const KingsPoolPage = () => {
     });
     return () => {
       active = false;
-      window.clearInterval(refreshTimer);
       stream?.close();
     };
   }, []);
