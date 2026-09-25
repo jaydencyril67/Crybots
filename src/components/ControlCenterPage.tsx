@@ -6,6 +6,7 @@ import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './Hybr
 import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
+import NotificationBanner from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
@@ -55,6 +56,7 @@ const ControlCenterPage = () => {
   const [usdtBalance, setUsdtBalance] = useState<number | null>(null);
   const [amount, setAmount] = useState('');
   const [transferMessage, setTransferMessage] = useState('');
+  const [transferMessageTone, setTransferMessageTone] = useState<'success' | 'error'>('error');
   const [isTransferring, setIsTransferring] = useState(false);
 
   React.useEffect(() => {
@@ -68,6 +70,7 @@ const ControlCenterPage = () => {
   const handleTransfer = async () => {
     const normalizedAmount = Number(amount);
     if (!Number.isFinite(normalizedAmount) || normalizedAmount < 1) {
+      setTransferMessageTone('error');
       setTransferMessage('Enter at least 1.00 USDT.');
       return;
     }
@@ -80,11 +83,13 @@ const ControlCenterPage = () => {
       setPoolBalance(data.poolBalance);
       setUsdtBalance(data.usdtBalance);
       setAmount('');
+      setTransferMessageTone('success');
       setTransferMessage(action === 'deposit' ? 'USDT deposited into KingsPool.' : 'USDT withdrawn to your main balance.');
     } catch (error: unknown) {
       const message = error && typeof error === 'object' && 'response' in error
         ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
         : undefined;
+      setTransferMessageTone('error');
       setTransferMessage(message || 'Unable to complete this transfer.');
     } finally {
       setIsTransferring(false);
@@ -123,7 +128,7 @@ const ControlCenterPage = () => {
         {action === 'deposit' ? <div style={styles.field}><span style={styles.label}>Deposit source</span>{renderPicker('deposit', depositSource, ['Main USDT balance'], setDepositSource)}</div> : <div style={styles.field}><span style={styles.label}>Withdrawal destination</span>{renderPicker('withdraw', withdrawDestination, ['Main USDT balance'], setWithdrawDestination)}</div>}
         <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="1" placeholder="0 USDT" value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} /></div>
         <button type="button" style={{ ...styles.button, opacity: isTransferring ? 0.65 : 1 }} disabled={isTransferring} onClick={() => { void handleTransfer(); }}>{isTransferring ? <><InlineLoadingDots /> Processing…</> : action === 'deposit' ? 'Deposit into pool' : 'Withdraw to main balance'}</button>
-        {transferMessage ? <p style={styles.sectionText}>{transferMessage}</p> : null}
+        {transferMessage ? <NotificationBanner tone={transferMessageTone} title={transferMessageTone === 'success' ? 'Pool transfer completed' : 'Pool transfer failed'} message={transferMessage} /> : null}
       </div>
     </section>
 
