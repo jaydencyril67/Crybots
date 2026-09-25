@@ -67,7 +67,7 @@ const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme
   const areaPath = `${wavePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`KingsPool current day performance: ${performance.toFixed(2)} percent, shown as a wave chart from zero to three point five percent`} style={styles.chartWave}>
+  return <div role="img" aria-label={`KingsPool current day performance: ${performance.toFixed(2)} percent`} style={styles.chartWave}>
     <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartWaveSvg}>
       <defs>
         <linearGradient id="pool-wave-fill" x1="0" x2="0" y1="0" y2="1">
@@ -81,7 +81,7 @@ const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme
       <path d={wavePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="620" cy={waveY} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
     </svg>
-    <p style={styles.chartWaveDate}><span>Today · {current.date}</span><span style={styles.chartWaveValue}>+{performance.toFixed(2)}% / {POOL_MAX_PERCENT}%</span></p>
+    <p style={styles.chartWaveDate}><span>Today · {current.date}</span><span style={styles.chartWaveValue}>+{performance.toFixed(2)}%</span></p>
   </div>;
 };
 
