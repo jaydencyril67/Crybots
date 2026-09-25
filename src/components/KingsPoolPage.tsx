@@ -5,7 +5,7 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
-import api from '../api/axios';
+import api, { API_BASE_URL } from '../api/axios';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
@@ -98,31 +98,50 @@ const KingsPoolPage = () => {
 
   React.useEffect(() => {
     let active = true;
+    const applyCurrentPerformance = (current: PoolResponse['current']) => {
+      const nextProgress = Number(current.progressPercent ?? 0);
+      const previousProgress = previousProgressRef.current;
+      setMovementDirection(previousProgress === null || nextProgress === previousProgress ? 'flat' : nextProgress > previousProgress ? 'up' : 'down');
+      previousProgressRef.current = nextProgress;
+      setPoolData((previous) => previous ? { ...previous, current, history: previous.history.map((point) => point.date === current.date ? { ...point, value: current.value, dailyChangePercent: current.progressPercent } : point) } : previous);
+      setPoolError('');
+    };
+
     const loadPoolPerformance = async () => {
       try {
         const { data } = await api.get<PoolApiResponse>('/api/pool');
         if (active) {
-          const nextProgress = Number(data.current?.progressPercent ?? 0);
-          const previousProgress = previousProgressRef.current;
-          setMovementDirection(previousProgress === null || nextProgress === previousProgress ? 'flat' : nextProgress > previousProgress ? 'up' : 'down');
-          previousProgressRef.current = nextProgress;
-          setPoolData({
+          applyCurrentPerformance(data.current);
+          setPoolData((previous) => ({
+            ...previous,
             ...data,
             history: Array.isArray(data.history) ? data.history : [],
             overview: data.overview || { poolCapital: data.current?.value || 0, totalHolders: 0 },
             activities: Array.isArray(data.activities) ? data.activities : [],
-          });
-          setPoolError('');
+          }));
         }
       } catch {
         if (active) setPoolError('Unable to load pool performance right now.');
       }
     };
+
     void loadPoolPerformance();
-    const refreshTimer = window.setInterval(() => { void loadPoolPerformance(); }, 60_000);
+    const token = localStorage.getItem('token');
+    const stream = token ? new EventSource(`${API_BASE_URL}/api/pool/stream?token=${encodeURIComponent(token)}`) : null;
+    stream?.addEventListener('performance', (event) => {
+      if (!active) return;
+      try {
+        applyCurrentPerformance(JSON.parse((event as MessageEvent).data) as PoolResponse['current']);
+      } catch {
+        setPoolError('Unable to read live pool performance.');
+      }
+    });
+    stream?.addEventListener('error', () => {
+      if (active && stream.readyState === EventSource.CLOSED) setPoolError('Live pool performance disconnected.');
+    });
     return () => {
       active = false;
-      window.clearInterval(refreshTimer);
+      stream?.close();
     };
   }, []);
 
