@@ -273,7 +273,7 @@ const DepositPage = () => {
       <strong>USDT deposits only</strong>
       <p style={{ margin: '8px 0 14px' }}>Choose a network and create a payment address. Do not send funds until an address is shown.</p>
       <label style={styles.label} htmlFor="deposit-amount">Amount (USDT)</label>
-      <input id="deposit-amount" style={styles.input} type="number" min="10" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100.00" required />
+      <input id="deposit-amount" style={styles.input} type="number" min="10" step="1" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="100" required />
       <div ref={networkMenuRef} style={{ marginTop: '12px', position: 'relative' }}>
         <span style={styles.label}>USDT network</span>
         <button id="deposit-network" type="button" style={styles.selectTrigger} onClick={() => setIsNetworkMenuOpen((current) => !current)} aria-expanded={isNetworkMenuOpen}>

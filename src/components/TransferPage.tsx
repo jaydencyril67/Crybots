@@ -274,7 +274,7 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Amount</span>
-                  <input style={styles.input} type="number" min="1" max="10000" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="1.00 USDT" />
+                  <input style={styles.input} type="number" min="1" max="10000" step="1" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="1 USDT" />
                   <span style={styles.helper}>Minimum 1 USDT · Maximum 10,000 USDT per transaction</span>
                 </div>
                 <div style={styles.field as React.CSSProperties}>

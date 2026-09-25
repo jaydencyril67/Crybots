@@ -121,7 +121,7 @@ const ControlCenterPage = () => {
           <button type="button" style={action === 'withdraw' ? styles.button : styles.secondaryButton} onClick={() => setAction('withdraw')}>Withdraw from pool</button>
         </div>
         {action === 'deposit' ? <div style={styles.field}><span style={styles.label}>Deposit source</span>{renderPicker('deposit', depositSource, ['Main USDT balance'], setDepositSource)}</div> : <div style={styles.field}><span style={styles.label}>Withdrawal destination</span>{renderPicker('withdraw', withdrawDestination, ['Main USDT balance'], setWithdrawDestination)}</div>}
-        <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="0.01" placeholder="0.00 USDT" value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} /></div>
+        <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="1" placeholder="0 USDT" value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} /></div>
         <button type="button" style={{ ...styles.button, opacity: isTransferring ? 0.65 : 1 }} disabled={isTransferring} onClick={() => { void handleTransfer(); }}>{isTransferring ? <><InlineLoadingDots /> Processing…</> : action === 'deposit' ? 'Deposit into pool' : 'Withdraw to main balance'}</button>
         {transferMessage ? <p style={styles.sectionText}>{transferMessage}</p> : null}
       </div>
