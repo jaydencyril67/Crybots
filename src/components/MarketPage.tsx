@@ -67,7 +67,7 @@ const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme
   const areaPath = `${wavePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`KingsPool current day performance: ${performance.toFixed(2)} percent`} style={styles.chartWave}>
+  return <div role="img" aria-label={`Market current day performance: ${performance.toFixed(2)} percent`} style={styles.chartWave}>
     <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartWaveSvg}>
       <defs>
         <linearGradient id="pool-wave-fill" x1="0" x2="0" y1="0" y2="1">
@@ -85,7 +85,7 @@ const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme
   </div>;
 };
 
-const KingsPoolPage = () => {
+const MarketPage = () => {
   const { themeMode } = useAppTheme();
   const [movementPeriod, setMovementPeriod] = React.useState<'week' | 'month' | 'year'>('week');
   const [isMovementMenuOpen, setIsMovementMenuOpen] = React.useState(false);
@@ -148,7 +148,7 @@ const KingsPoolPage = () => {
     };
   }, []);
 
-  return <HybridTheme><Helmet><title>KingsPool | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
+  return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
@@ -157,7 +157,7 @@ const KingsPoolPage = () => {
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
       <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? formatPoolValue(poolData.overview.poolCapital) : <LoadingDots />}</p></div>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? poolData.overview.totalHolders.toLocaleString() : <LoadingDots />}</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active market participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? poolData.overview.totalHolders.toLocaleString() : <LoadingDots />}</p></div>
     </div></section>
 
     <section style={styles.section}>
@@ -210,4 +210,4 @@ const KingsPoolPage = () => {
   </div><NowBar /></div></HybridTheme>;
 };
 
-export default KingsPoolPage;
+export default MarketPage;

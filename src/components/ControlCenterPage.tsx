@@ -97,7 +97,7 @@ const ControlCenterPage = () => {
       setUsdtBalance(data.usdtBalance);
       setAmount('');
       setTransferMessageTone('success');
-      setTransferMessage(action === 'deposit' ? 'USDT deposited into KingsPool.' : 'USDT withdrawn to your main balance.');
+      setTransferMessage(action === 'deposit' ? 'USDT deposited into Market.' : 'USDT withdrawn to your main balance.');
     } catch (error: unknown) {
       const message = error && typeof error === 'object' && 'response' in error
         ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
@@ -124,8 +124,8 @@ const ControlCenterPage = () => {
     <section style={styles.card}>
       <div style={styles.inner}>
         <h1 style={styles.sectionTitle}>Pool control center</h1>
-        <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool. Your pool balance updates as performance is applied.</p>
-        <div style={styles.balance}><div><p style={styles.balanceLabel}>Your KingsPool balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? <LoadingDots /> : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
+        <p style={styles.sectionText}>Move funds between your main USDT balance and Market. Your pool balance updates as performance is applied.</p>
+        <div style={styles.balance}><div><p style={styles.balanceLabel}>Your Market balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? <LoadingDots /> : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
         <div style={styles.balance}><div><p style={styles.balanceLabel}>Main USDT balance</p><p style={styles.sectionText}>Available for pool deposits</p></div><p style={styles.balanceValue}>{usdtBalance === null ? <LoadingDots /> : `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
       </div>
     </section>

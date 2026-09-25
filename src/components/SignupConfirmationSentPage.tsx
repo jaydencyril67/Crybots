@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { navigate } from '../utils/navigate';
 import { Helmet } from 'react-helmet-async';
 import { CheckCircle2 } from 'lucide-react';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -16,15 +16,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     padding: 'clamp(14px, 2.5vw, 24px) clamp(12px, 2vw, 18px) 32px',
   },
   card: {
+    ...createHybridCardStyles(theme).card,
     width: '100%',
     maxWidth: '760px',
-    borderRadius: '20px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
+    padding: '14px',
+  },
+  innerCard: {
+    ...createHybridCardStyles(theme).panel,
     padding: 'clamp(18px, 3.5vw, 26px)',
     textAlign: 'center' as const,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
   },
   iconWrap: {
     width: '56px',
@@ -85,14 +85,16 @@ const SignupConfirmationSentPage = () => {
       </Helmet>
       <main style={styles.page}>
         <section style={styles.card}>
-          <div style={styles.iconWrap}>
-            <CheckCircle2 size={30} />
+          <div style={styles.innerCard}>
+            <div style={styles.iconWrap}>
+              <CheckCircle2 size={30} />
+            </div>
+            <h2 style={styles.title}>Account created</h2>
+            <p style={styles.text}>
+              We sent a confirmation link to your email. Open it within 15 minutes to verify your account before signing in.
+            </p>
+            <p style={styles.countdown}>Redirecting to sign in in {secondsLeft} seconds...</p>
           </div>
-          <h2 style={styles.title}>Account created</h2>
-          <p style={styles.text}>
-            We sent a confirmation link to your email. Open it within 15 minutes to verify your account before signing in.
-          </p>
-          <p style={styles.countdown}>Redirecting to sign in in {secondsLeft} seconds...</p>
         </section>
       </main>
     </HybridTheme>

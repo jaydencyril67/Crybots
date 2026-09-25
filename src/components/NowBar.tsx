@@ -250,7 +250,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/exchange') return 'EXCHANGE';
   if (path === '/my-space') return 'MY SPACE';
   if (path === '/control-center') return 'CONTROL CENTER';
-  if (path === '/kingspool') return 'KINGSPOOL';
+  if (path === '/market') return 'MARKET';
   if (path === '/records') return 'RECORDS';
   if (path === '/contact') return 'CONTACT';
   if (path === '/options') return 'OPTIONS';
