@@ -78,10 +78,10 @@ const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[
       const isPositive = boundedPercent >= 0;
       const isCurrent = point.date === latestDate;
       return <div key={point.date} style={getStyles(theme).chartBarGroup}>
-        <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(4)}%</p>
+        <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
         <div style={getStyles(theme).chartBarTrack}>
           <div aria-hidden="true" style={getStyles(theme).chartBarZeroLine} />
-          <div title={`${point.dailyChangePercent.toFixed(4)}%`} style={{ ...getStyles(theme).chartBar, top: isPositive ? `${50 - barHeight}%` : '50%', height: `${barHeight}%`, borderRadius: isPositive ? '8px 8px 0 0' : '0 0 8px 8px', background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : '#ffffff', opacity: 1 }} />
+          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, top: isPositive ? `${50 - barHeight}%` : '50%', height: `${barHeight}%`, borderRadius: isPositive ? '8px 8px 0 0' : '0 0 8px 8px', background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : '#ffffff', opacity: 1 }} />
         </div>
         <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
       </div>;
