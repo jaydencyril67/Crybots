@@ -8,6 +8,7 @@ import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
+const MIN_MARKET_PERCENT = -3;
 const MAX_MARKET_PERCENT = 4;
 const UPDATE_INTERVAL_MS = 60_000;
 
@@ -38,7 +39,7 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, percent: current }, ...points];
   const linePath = chartPoints.map((point, index) => {
     const x = (index / Math.max(1, chartPoints.length - 1)) * 620;
-    const y = 188 - (point.percent / MAX_MARKET_PERCENT) * 122;
+    const y = 66 + ((MAX_MARKET_PERCENT - point.percent) / (MAX_MARKET_PERCENT - MIN_MARKET_PERCENT)) * 122;
     return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
   }).join(' ');
   const areaPath = `${linePath} L 620 230 L 0 230 Z`;
@@ -47,10 +48,10 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   return <div role="img" aria-label={`Market performance: ${current.toFixed(2)} percent`} style={styles.chartWave}>
     {points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
       <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
-      <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
+      <line x1="0" x2="620" y1={66 + ((MAX_MARKET_PERCENT - 0) / (MAX_MARKET_PERCENT - MIN_MARKET_PERCENT)) * 122} y2={66 + ((MAX_MARKET_PERCENT - 0) / (MAX_MARKET_PERCENT - MIN_MARKET_PERCENT)) * 122} stroke={theme.borderGlass} strokeWidth="1" />
       <line x1="0" x2="620" y1="66" y2="66" stroke={theme.borderGlass} strokeWidth="1" strokeDasharray="4 8" />
       <path d={areaPath} fill="url(#market-wave-fill)" /><path d={linePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={620} cy={188 - (current / MAX_MARKET_PERCENT) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
+      <circle cx={620} cy={66 + ((MAX_MARKET_PERCENT - current) / (MAX_MARKET_PERCENT - MIN_MARKET_PERCENT)) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
     </svg> : <LoadingDots />}
     <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(2)}%` : <LoadingDots />}</span></p>
   </div>;
