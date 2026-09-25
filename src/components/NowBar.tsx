@@ -249,7 +249,6 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/agent/menu') return 'AGENT MENU';
   if (path === '/exchange') return 'EXCHANGE';
   if (path === '/my-space') return 'MY SPACE';
-  if (path === '/control-center') return 'CONTROL CENTER';
   if (path === '/market') return 'MARKET';
   if (path === '/records') return 'RECORDS';
   if (path === '/contact') return 'CONTACT';
