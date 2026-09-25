@@ -164,8 +164,8 @@ const MarketPage = () => {
       {marketAccount.positions.length > 0 && <div style={styles.positionList}>{marketAccount.positions.slice().reverse().map((position) => <div key={`${position.purchasedAt}-${position.points}`} style={styles.positionRow}><span>{position.points.toFixed(2)} points · {position.active ? 'Active' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</span><strong>{formatUsdt(position.value)}</strong></div>)}</div>}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.note}>Maximum movement in the current live window</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.note}>Minimum movement in the current live window</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p></div>
+      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
+      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p></div>
     </div></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
