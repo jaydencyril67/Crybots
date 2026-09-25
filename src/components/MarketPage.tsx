@@ -5,6 +5,7 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
+import NotificationBanner, { type NotificationTone } from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
@@ -28,6 +29,8 @@ type MarketPointsResponse = {
   current: number;
   positions: MarketPosition[];
 };
+
+type MarketNotification = { tone: NotificationTone; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
@@ -92,8 +95,8 @@ const MarketPage = () => {
   const [sellPoints, setSellPoints] = React.useState('');
   const [buying, setBuying] = React.useState(false);
   const [selling, setSelling] = React.useState(false);
-  const [buyStatus, setBuyStatus] = React.useState('');
-  const [sellStatus, setSellStatus] = React.useState('');
+  const [buyStatus, setBuyStatus] = React.useState<MarketNotification | null>(null);
+  const [sellStatus, setSellStatus] = React.useState<MarketNotification | null>(null);
 
   React.useEffect(() => {
     let active = true;
@@ -127,22 +130,22 @@ const MarketPage = () => {
     event.preventDefault();
     const points = Number(buyPoints);
     if (!Number.isFinite(points) || points < 1) {
-      setBuyStatus('Enter at least 1 point.');
+      setBuyStatus({ tone: 'warning', message: 'Enter at least 1 point.' });
       return;
     }
 
     setBuying(true);
-    setBuyStatus('');
-    setSellStatus('');
+    setBuyStatus(null);
+    setSellStatus(null);
     try {
       await api.post('/api/market/points/buy', { points });
       setBuyPoints('');
-      setBuyStatus('Points purchased. They begin following market performance tomorrow.');
+      setBuyStatus({ tone: 'success', message: 'Points purchased. They begin following market performance tomorrow.' });
       const response = await api.get<MarketPointsResponse>('/api/market/points');
       setMarketAccount(response.data);
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setBuyStatus(message || 'Unable to purchase points right now.');
+      setBuyStatus({ tone: 'error', message: message || 'Unable to purchase points right now.' });
     } finally {
       setBuying(false);
     }
@@ -152,22 +155,22 @@ const MarketPage = () => {
     event.preventDefault();
     const points = Number(sellPoints);
     if (!Number.isFinite(points) || points < 1) {
-      setSellStatus('Enter at least 1 point.');
+      setSellStatus({ tone: 'warning', message: 'Enter at least 1 point.' });
       return;
     }
 
     setSelling(true);
-    setSellStatus('');
-    setBuyStatus('');
+    setSellStatus(null);
+    setBuyStatus(null);
     try {
       const response = await api.post<{ value: number }>('/api/market/points/sell', { points });
       setSellPoints('');
-      setSellStatus(`${points.toFixed(2)} points sold for ${formatUsdt(response.data.value)}.`);
+      setSellStatus({ tone: 'success', message: `${points.toFixed(2)} points sold for ${formatUsdt(response.data.value)}.` });
       const accountResponse = await api.get<MarketPointsResponse>('/api/market/points');
       setMarketAccount(accountResponse.data);
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setSellStatus(message || 'Unable to sell points right now.');
+      setSellStatus({ tone: 'error', message: message || 'Unable to sell points right now.' });
     } finally {
       setSelling(false);
     }
@@ -185,7 +188,7 @@ const MarketPage = () => {
         <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to sell at current market value</span><input style={styles.input} type="number" min="1" step="0.01" value={sellPoints} onChange={(event) => setSellPoints(event.target.value)} placeholder="e.g. 100" /></label>
         <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{selling ? 'Selling…' : 'Sell points'}</button>
       </form>
-      <p style={styles.status}>{buyStatus || sellStatus || 'New purchases start following the market from the next UTC day. Unsold points reset to their original value at the next daily reset.'}</p>
+      {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : <p style={styles.status}>New purchases start following the market from the next UTC day. Unsold points reset to their original value at the next daily reset.</p>}
       {marketAccount.positions.length > 0 && <div style={styles.positionList}>{marketAccount.positions.slice().reverse().map((position) => <div key={`${position.purchasedAt}-${position.points}`} style={styles.positionRow}><span>{position.points.toFixed(2)} points · {position.active ? 'Active' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</span><strong>{formatUsdt(position.value)}</strong></div>)}</div>}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
