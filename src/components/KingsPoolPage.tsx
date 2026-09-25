@@ -15,13 +15,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   card: { ...createHybridCardStyles(theme).card },
   performanceCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
   chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
-  chartBars: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', alignItems: 'end', gap: 'clamp(8px, 2vw, 18px)', padding: '24px 8px 4px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const },
-  chartBarGroup: { minWidth: 0, height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', alignItems: 'end', justifyItems: 'center', gap: '8px' },
-  chartBarValue: { margin: 0, color: theme.text, fontSize: 'clamp(0.62rem, 1.8vw, 0.78rem)', fontWeight: 800, whiteSpace: 'nowrap' as const },
-  chartBarTrack: { position: 'relative' as const, width: '100%', height: '100%', minHeight: '120px', borderRadius: '8px', background: theme.surfaceGlass, overflow: 'hidden' },
-  chartBarZeroLine: { position: 'absolute' as const, zIndex: 1, top: '50%', left: 0, right: 0, borderTop: `1px solid ${theme.borderGlass}` },
-  chartBar: { position: 'absolute' as const, zIndex: 2, left: '50%', width: 'min(34px, 68%)', minHeight: 0, transform: 'translateX(-50%)', background: theme.primary, transition: 'top 0.8s ease, height 0.8s ease' },
-  chartBarDate: { margin: 0, color: theme.textMuted, fontSize: 'clamp(0.62rem, 1.8vw, 0.76rem)' },
+  chartWave: { position: 'relative' as const, minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateRows: '1fr auto', gap: '12px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
+  chartWaveSvg: { width: '100%', height: '100%', minHeight: '220px', overflow: 'visible' as const },
+  chartWaveDate: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
+  chartWaveValue: { color: theme.text, fontWeight: 900 },
   chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
   chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
   listCard: { display: 'grid', gap: '8px', minWidth: 0, padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
@@ -60,28 +57,31 @@ type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
-const POOL_BAR_MIN_PERCENT = -3;
-const POOL_BAR_MAX_PERCENT = 3;
+const POOL_MAX_PERCENT = 3.5;
 
-const PoolChart = ({ history, current, theme }: { history: PoolPoint[]; current: PoolResponse['current']; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
-  const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string').slice(-7).map((point) => point.date === current.date ? { ...point, value: current.value, dailyChangePercent: current.progressPercent } : point);
-  if (!safeHistory.length) return null;
+const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
+  const performance = Math.min(POOL_MAX_PERCENT, Math.max(0, Number(current.progressPercent ?? current.dailyChangePercent ?? 0)));
+  const progress = performance / POOL_MAX_PERCENT;
+  const waveY = 188 - (progress * 122);
+  const wavePath = `M 0 150 C 55 102, 92 198, 148 148 S 240 98, 296 142 S 388 194, 444 ${waveY} S 548 ${waveY - 36}, 620 ${waveY}`;
+  const areaPath = `${wavePath} L 620 230 L 0 230 Z`;
+  const styles = getStyles(theme);
 
-  return <div role="img" aria-label="KingsPool seven most recent days vertical bar chart with a centered zero baseline, scaled from -3% to 3%" style={getStyles(theme).chartBars}>
-    {safeHistory.map((point) => {
-      const boundedPercent = Math.min(POOL_BAR_MAX_PERCENT, Math.max(POOL_BAR_MIN_PERCENT, point.dailyChangePercent));
-      const barHeight = (Math.abs(boundedPercent) / POOL_BAR_MAX_PERCENT) * 50;
-      const isPositive = boundedPercent >= 0;
-      const isCurrent = point.date === current.date;
-      return <div key={point.date} style={getStyles(theme).chartBarGroup}>
-        <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
-        <div style={getStyles(theme).chartBarTrack}>
-          <div aria-hidden="true" style={getStyles(theme).chartBarZeroLine} />
-          <div title={`${point.dailyChangePercent.toFixed(2)}%`} style={{ ...getStyles(theme).chartBar, top: isPositive ? `${50 - barHeight}%` : '50%', height: `${barHeight}%`, borderRadius: isPositive ? '8px 8px 0 0' : '0 0 8px 8px', background: point.dailyChangePercent < 0 ? '#dc2626' : isCurrent ? '#16a34a' : '#ffffff', opacity: 1 }} />
-        </div>
-        <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
-      </div>;
-    })}
+  return <div role="img" aria-label={`KingsPool current day performance: ${performance.toFixed(2)} percent, shown as a wave chart from zero to three point five percent`} style={styles.chartWave}>
+    <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartWaveSvg}>
+      <defs>
+        <linearGradient id="pool-wave-fill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={theme.primary} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
+      <line x1="0" x2="620" y1="66" y2="66" stroke={theme.borderGlass} strokeWidth="1" strokeDasharray="4 8" />
+      <path d={areaPath} fill="url(#pool-wave-fill)" />
+      <path d={wavePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="620" cy={waveY} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
+    </svg>
+    <p style={styles.chartWaveDate}><span>Today · {current.date}</span><span style={styles.chartWaveValue}>+{performance.toFixed(2)}% / {POOL_MAX_PERCENT}%</span></p>
   </div>;
 };
 
@@ -152,7 +152,7 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <PoolChart history={poolData.history} current={poolData.current} theme={theme} /> : <div style={styles.chartMessage}><LoadingDots /></div>}
+      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <PoolChart current={poolData.current} theme={theme} /> : <div style={styles.chartMessage}><LoadingDots /></div>}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
