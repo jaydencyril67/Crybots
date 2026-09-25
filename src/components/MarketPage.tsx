@@ -1,212 +1,94 @@
 import React from 'react';
-import { ArrowDownLeft, ArrowLeft, ArrowUpRight, Coins, TrendingDown, TrendingUp, UserPlus, Users } from 'lucide-react';
+import { ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
-import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
-import api, { API_BASE_URL } from '../api/axios';
+
+const MIN_MARKET_PERCENT = 0;
+const MAX_MARKET_PERCENT = 4;
+const UPDATE_INTERVAL_MS = 60_000;
+const MAX_STEP_PERCENT = 0.18;
+
+type MarketPoint = { timestamp: number; percent: number };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  card: { ...createHybridCardStyles(theme).card },
-  performanceCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
+  section: { display: 'grid', gap: '10px', marginTop: '16px' },
+  sectionTitle: { margin: 0, fontSize: '0.96rem', fontWeight: 900 },
+  card: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
   chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateRows: 'minmax(0, 1fr)', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
-  chartWave: { position: 'relative' as const, height: '100%', minHeight: 0, display: 'grid', gridTemplateRows: 'minmax(0, 1fr) auto', gap: '12px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
-  chartWaveSvg: { display: 'block', width: '100%', height: '100%', minHeight: 0, overflow: 'visible' as const },
-  chartWaveDate: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
-  chartWaveValue: { color: theme.text, fontWeight: 900 },
-  chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
-  chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
-  listCard: { display: 'grid', gap: '8px', minWidth: 0, padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
-  listItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, padding: '12px 13px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
-  listItemContent: { minWidth: 0 },
-  movementHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
-  selectWrap: { position: 'relative' as const, minWidth: '150px' },
-  selectTrigger: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '10px 12px', fontSize: '0.78rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
-  selectMenu: { position: 'absolute' as const, zIndex: 10, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
-  selectOption: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
+  chartWave: { display: 'grid', gridTemplateRows: 'minmax(0, 1fr) auto', gap: '12px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
+  chartSvg: { display: 'block', width: '100%', height: '100%', minHeight: 0, overflow: 'visible' as const },
+  chartFooter: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
+  chartValue: { color: theme.text, fontWeight: 900 },
+  note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.45 },
   movementGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' },
-  movementCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '9px' },
+  movement: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '9px' },
   movementInner: { display: 'grid', gap: '9px', padding: '12px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
-  activityList: { display: 'grid', gap: '8px', padding: '10px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
-  activityItem: { display: 'flex', alignItems: 'center', gap: '11px', minWidth: 0, padding: '12px 13px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
-  activityIcon: { display: 'inline-flex', flexShrink: 0, padding: '8px', borderRadius: '10px', color: theme.primary, background: theme.surfaceGlass },
-  activityContent: { minWidth: 0, flex: 1 },
-  activityLabel: { margin: 0, fontSize: '0.8rem', fontWeight: 800 },
-  activityNote: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem' },
-  activityValue: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800 },
-  label: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.3 },
-  value: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
-  note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem', lineHeight: 1.35 },
-  icon: { display: 'inline-flex', flexShrink: 0, color: theme.primary },
-  section: { display: 'grid', gap: '10px', marginTop: '16px' },
-  sectionTitle: { margin: 0, fontSize: '0.96rem', fontWeight: 900 },
-  disclaimer: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.5 },
 });
 
-type PoolPoint = { date: string; value: number; dailyChangePercent: number };
-type PoolActivity = { type: 'deposit' | 'withdrawal'; amount: number; date: string };
-type PoolResponse = { current: { value: number; dailyChangePercent: number; progressPercent: number; date: string }; history: PoolPoint[]; overview: { poolCapital: number; totalHolders: number }; activities: PoolActivity[] };
-type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'] };
+const nextMarketPercent = (current: number) => {
+  const direction = Math.random() > 0.5 ? 1 : -1;
+  const step = 0.03 + Math.random() * MAX_STEP_PERCENT;
+  return Number(Math.min(MAX_MARKET_PERCENT, Math.max(MIN_MARKET_PERCENT, current + direction * step)).toFixed(2));
+};
 
-const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
-
-const POOL_MAX_PERCENT = 3.5;
-
-const PoolChart = ({ current, theme }: { current: PoolResponse['current']; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
-  const performance = Math.min(POOL_MAX_PERCENT, Math.max(0, Number(current.progressPercent ?? current.dailyChangePercent ?? 0)));
-  const progress = performance / POOL_MAX_PERCENT;
-  const waveY = 188 - (progress * 122);
-  const wavePath = `M 0 150 C 55 102, 92 198, 148 148 S 240 98, 296 142 S 388 194, 444 ${waveY} S 548 ${waveY - 36}, 620 ${waveY}`;
-  const areaPath = `${wavePath} L 620 230 L 0 230 Z`;
+const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
+  const current = points[points.length - 1]?.percent ?? 0;
+  const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, percent: current }, ...points];
+  const linePath = chartPoints.map((point, index) => {
+    const x = (index / Math.max(1, chartPoints.length - 1)) * 620;
+    const y = 188 - (point.percent / MAX_MARKET_PERCENT) * 122;
+    return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+  }).join(' ');
+  const areaPath = `${linePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`Market current day performance: ${performance.toFixed(2)} percent`} style={styles.chartWave}>
-    <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartWaveSvg}>
-      <defs>
-        <linearGradient id="pool-wave-fill" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={theme.primary} stopOpacity="0" />
-        </linearGradient>
-      </defs>
+  return <div role="img" aria-label={`Market performance: ${current.toFixed(2)} percent`} style={styles.chartWave}>
+    <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
+      <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
       <line x1="0" x2="620" y1="66" y2="66" stroke={theme.borderGlass} strokeWidth="1" strokeDasharray="4 8" />
-      <path d={areaPath} fill="url(#pool-wave-fill)" />
-      <path d={wavePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="620" cy={waveY} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
+      <path d={areaPath} fill="url(#market-wave-fill)" /><path d={linePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={620} cy={188 - (current / MAX_MARKET_PERCENT) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
     </svg>
-    <p style={styles.chartWaveDate}><span>Today · {current.date}</span><span style={styles.chartWaveValue}>+{performance.toFixed(2)}%</span></p>
+    <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{current.toFixed(2)}%</span></p>
   </div>;
 };
 
 const MarketPage = () => {
   const { themeMode } = useAppTheme();
-  const [movementPeriod, setMovementPeriod] = React.useState<'week' | 'month' | 'year'>('week');
-  const [isMovementMenuOpen, setIsMovementMenuOpen] = React.useState(false);
-  const [poolData, setPoolData] = React.useState<PoolResponse | null>(null);
-  const [poolError, setPoolError] = React.useState('');
-  const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const styles = getStyles(theme);
+  const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>([{ timestamp: Date.now(), percent: 1.5 }]);
 
   React.useEffect(() => {
-    let active = true;
-    const applyCurrentPerformance = (current: PoolResponse['current']) => {
-      const nextProgress = Number(current.progressPercent ?? 0);
-      const normalizedCurrent = { ...current, progressPercent: Number(nextProgress.toFixed(2)) };
-      setPoolData((previous) => previous ? { ...previous, current: normalizedCurrent, history: previous.history.map((point) => point.date === normalizedCurrent.date ? { ...point, value: normalizedCurrent.value, dailyChangePercent: normalizedCurrent.progressPercent } : point) } : previous);
-      setPoolError('');
-    };
-
-    const loadPoolPerformance = async () => {
-      try {
-        const { data } = await api.get<PoolApiResponse>('/api/pool');
-        if (active) {
-          applyCurrentPerformance(data.current);
-          setPoolData((previous) => ({
-            ...previous,
-            ...data,
-            current: { ...data.current, progressPercent: Number(Number(data.current.progressPercent ?? 0).toFixed(2)) },
-            history: Array.isArray(data.history) ? data.history : [],
-            overview: data.overview || { poolCapital: data.current?.value || 0, totalHolders: 0 },
-            activities: Array.isArray(data.activities) ? data.activities : [],
-          }));
-        }
-      } catch {
-        if (active) {
-          setPoolError('Unable to load pool performance right now.');
-        }
-      }
-    };
-
-    void loadPoolPerformance();
-    // Keep a polling fallback for browsers, proxies, or service workers that do
-    // not deliver the EventSource response promptly.
-    const refreshTimer = window.setInterval(() => { void loadPoolPerformance(); }, 15_000);
-    const token = localStorage.getItem('token');
-    const stream = token ? new EventSource(`${API_BASE_URL}/api/pool/stream?token=${encodeURIComponent(token)}`) : null;
-    stream?.addEventListener('performance', (event) => {
-      if (!active) return;
-      try {
-        applyCurrentPerformance(JSON.parse((event as MessageEvent).data) as PoolResponse['current']);
-      } catch {
-        setPoolError('Unable to read live pool performance.');
-      }
-    });
-    stream?.addEventListener('error', () => {
-      if (active && stream.readyState === EventSource.CLOSED) setPoolError('Live pool performance disconnected.');
-    });
-    return () => {
-      active = false;
-      window.clearInterval(refreshTimer);
-      stream?.close();
-    };
+    const timer = window.setInterval(() => setMarketPoints((points) => {
+      const current = points[points.length - 1]?.percent ?? 0;
+      const next = { timestamp: Date.now(), percent: nextMarketPercent(current) };
+      return [...points, next].slice(-24);
+    }), UPDATE_INTERVAL_MS);
+    return () => window.clearInterval(timer);
   }, []);
+
+  const current = marketPoints[marketPoints.length - 1]?.percent ?? 0;
+  const high = Math.max(...marketPoints.map((point) => point.percent));
+  const low = Math.min(...marketPoints.map((point) => point.percent));
 
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
-
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <PoolChart current={poolData.current} theme={theme} /> : <div style={styles.chartMessage}><LoadingDots /></div>}
-    </div></div></section>
-
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? formatPoolValue(poolData.overview.poolCapital) : <LoadingDots />}</p></div>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active market participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? poolData.overview.totalHolders.toLocaleString() : <LoadingDots />}</p></div>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.movementGrid}>
+      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.movementValue}>{high.toFixed(2)}%</p><p style={styles.note}>Maximum movement in the current live window</p></div></div>
+      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.movementValue}>{low.toFixed(2)}%</p><p style={styles.note}>Minimum movement in the current live window</p></div></div>
     </div></section>
-
-    <section style={styles.section}>
-      <div style={styles.movementHeader}>
-        <h2 style={styles.sectionTitle}>Biggest market moves</h2>
-        <div style={styles.selectWrap}>
-          <button type="button" aria-label="Select market move period" style={styles.selectTrigger} onClick={() => setIsMovementMenuOpen((current) => !current)}>
-            <span>{movementPeriod === 'week' ? 'This week' : movementPeriod === 'month' ? 'This month' : 'This year'}</span>
-            <span style={{ transform: isMovementMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
-          </button>
-          {isMovementMenuOpen ? <div style={styles.selectMenu}>
-            {(['week', 'month', 'year'] as const).map((period) => (
-              <button key={period} type="button" style={styles.selectOption} onClick={() => { setMovementPeriod(period); setIsMovementMenuOpen(false); }}>
-                {period === 'week' ? 'This week' : period === 'month' ? 'This month' : 'This year'}
-              </button>
-            ))}
-          </div> : null}
-        </div>
-      </div>
-      <div style={styles.movementGrid}>
-        <div style={styles.movementCard}>
-          <div style={styles.movementInner}>
-            <p style={styles.movementLabel}><TrendingUp size={17} /> Biggest rise</p>
-            <p style={styles.movementValue}>—</p>
-            <p style={styles.note}>Highest move in the selected {movementPeriod}</p>
-          </div>
-        </div>
-        <div style={styles.movementCard}>
-          <div style={styles.movementInner}>
-            <p style={styles.movementLabel}><TrendingDown size={17} /> Biggest fall</p>
-            <p style={styles.movementValue}>—</p>
-            <p style={styles.note}>Largest drop in the selected {movementPeriod}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section style={styles.section}>
-      <h2 style={styles.sectionTitle}>Recent pool activity</h2>
-      <div style={styles.activityList}>
-        {poolData?.activities?.length ? poolData.activities.map((activity) => <div style={styles.activityItem} key={`${activity.date}-${activity.type}-${activity.amount}`}>
-          <span style={styles.activityIcon}>{activity.type === 'deposit' ? <ArrowDownLeft size={17} /> : <ArrowUpRight size={17} />}</span>
-          <div style={styles.activityContent}><p style={styles.activityLabel}>{activity.type === 'deposit' ? 'Pool deposit' : 'Pool withdrawal'}</p><p style={styles.activityNote}>{new Date(activity.date).toLocaleString()}</p></div>
-          <p style={styles.activityValue}>{activity.type === 'deposit' ? '+' : '-'}{formatPoolValue(activity.amount)}</p>
-        </div>) : <div style={styles.activityItem}><span style={styles.activityIcon}><UserPlus size={17} /></span><div style={styles.activityContent}><p style={styles.activityLabel}>No pool activity yet</p><p style={styles.activityNote}>Deposits and withdrawals will appear here.</p></div></div>}
-      </div>
-    </section>
-
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Risk notice</h2><div style={styles.card}><div style={styles.movementInner}><p style={styles.disclaimer}><TrendingDown size={16} /> Investment value can rise or fall. Returns are not guaranteed, and users may lose part or all of their invested funds.</p></div></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Market information</h2><div style={styles.card}><p style={styles.note}>The market moves gradually between 0% and 4%. A new fluctuation is calculated once every minute.</p><p style={styles.note}>Current movement: {current.toFixed(2)}%</p></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
 
