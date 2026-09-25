@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Filter, ListFilter, Search, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Filter, ListFilter, Search, ShieldCheck } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
@@ -230,6 +230,7 @@ const TransactionHistoryPage = () => {
   const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false);
   const [isDirectionMenuOpen, setIsDirectionMenuOpen] = useState(false);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const [openReferenceId, setOpenReferenceId] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
   const [transactionHistoryPage, setTransactionHistoryPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -272,10 +273,12 @@ const TransactionHistoryPage = () => {
       const insideTypeMenu = document.getElementById('transaction-type-menu')?.contains(target) ?? false;
       const insideDirectionMenu = document.getElementById('transaction-direction-menu')?.contains(target) ?? false;
       const insideStatusMenu = document.getElementById('transaction-status-menu')?.contains(target) ?? false;
+      const insideReferenceMenu = (target as Element).closest('[data-transaction-reference-menu]') !== null;
 
       if (!insideTypeMenu) setIsTypeMenuOpen(false);
       if (!insideDirectionMenu) setIsDirectionMenuOpen(false);
       if (!insideStatusMenu) setIsStatusMenuOpen(false);
+      if (!insideReferenceMenu) setOpenReferenceId(null);
     };
 
     document.addEventListener('mousedown', handleOutsideClick);
@@ -514,9 +517,24 @@ const TransactionHistoryPage = () => {
                       <td style={styles.td}>{transaction.date}</td>
                       <td style={styles.td}>{transaction.time}</td>
                       <td style={styles.td}>
-                        <div style={styles.meta}>
-                          <strong>{transaction.reference}</strong>
-                          <span style={styles.muted}>{transaction.id}</span>
+                        <div data-transaction-reference-menu="true" style={{ position: 'relative', minWidth: '180px' }}>
+                          <button
+                            type="button"
+                            aria-expanded={openReferenceId === transaction.id}
+                            style={styles.selectTrigger}
+                            onClick={() => setOpenReferenceId(openReferenceId === transaction.id ? null : transaction.id)}
+                          >
+                            <span>View reference</span>
+                            <ChevronDown size={16} style={{ transform: openReferenceId === transaction.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                          </button>
+                          {openReferenceId === transaction.id ? (
+                            <div style={styles.selectMenu}>
+                              <div style={styles.selectOption}>
+                                <strong>{transaction.reference}</strong>
+                                <span style={{ ...styles.muted, display: 'block', marginTop: '4px' }}>{transaction.id}</span>
+                              </div>
+                            </div>
+                          ) : null}
                         </div>
                       </td>
                     </tr>
