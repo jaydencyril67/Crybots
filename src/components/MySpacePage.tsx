@@ -10,7 +10,7 @@ import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 
 type StatData = { finance: { balance: number; totalDeposits: number; depositCount: number; totalWithdrawals: number; withdrawalCount: number; totalInvested: number; investmentCount: number; totalProfit: number } };
-type PointPosition = { points: number; cost: number; activeFrom: string; active: boolean; value: number };
+type PointPosition = { points: number; cost: number; purchasedAt: string; activeFrom: string; active: boolean; value: number };
 type MarketPointsData = { points: number; value: number; current: number; positions: PointPosition[] };
 type TransactionEntry = { id: string; title: string; direction: 'inbound' | 'outbound'; amountValue: number; date: string; time: string; points?: number; source: string };
 type PointSummary = { totalBoughtPoints: number; totalSoldPoints: number; totalBoughtValue: number; totalSoldValue: number; buyCount: number; sellCount: number };
@@ -34,6 +34,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   value: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem', lineHeight: 1.35 },
   pointActivity: { display: 'grid', gap: '8px' },
+  positionList: { display: 'grid', gap: '8px' },
+  positionRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', padding: '10px 12px', background: theme.surfaceMuted },
   section: { display: 'grid', gap: '10px' },
   sectionTitle: { margin: 0, fontSize: '0.94rem', fontWeight: 900 },
   selectorGroup: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', gap: '10px' },
@@ -98,6 +100,10 @@ const MySpacePage = () => {
       <div style={styles.pointActivity}>
         <p style={styles.label}>Recent point activity</p>
         {recentPointTransactions.length ? recentPointTransactions.map((transaction) => <div style={styles.listItem} key={transaction.id}><div style={styles.itemContent}><p style={styles.label}>{transaction.title}</p><p style={styles.note}>{transaction.date} · {transaction.time}</p></div><p style={styles.value}>{transaction.points?.toFixed(2)} points</p></div>) : <p style={styles.note}>No point activity recorded yet.</p>}
+      </div>
+      <div style={styles.pointActivity}>
+        <p style={styles.label}>Purchase history</p>
+        {marketPoints?.positions.length ? <div style={styles.positionList}>{marketPoints.positions.slice().reverse().map((position) => <div style={styles.positionRow} key={`${position.purchasedAt}-${position.points}`}><div style={styles.itemContent}><p style={styles.label}>{position.points.toFixed(2)} points · {position.active ? 'Active' : 'Pending'}</p><p style={styles.note}>{position.active ? 'Currently following market performance' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</p></div><p style={styles.value}>{formatUsdt(position.value)}</p></div>)}</div> : <p style={styles.note}>No point purchases recorded yet.</p>}
       </div>
     </div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Holding stats</h2><div style={styles.listCard}>
