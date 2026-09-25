@@ -53,6 +53,8 @@ const ControlCenterPage = () => {
   const [lossPercentage, setLossPercentage] = useState('10%');
   const [autoWithdraw, setAutoWithdraw] = useState(false);
   const [poolBalance, setPoolBalance] = useState<number | null>(null);
+  const [pendingPoolBalance, setPendingPoolBalance] = useState(0);
+  const [pendingActivationDate, setPendingActivationDate] = useState<string | undefined>();
   const [usdtBalance, setUsdtBalance] = useState<number | null>(null);
   const [amount, setAmount] = useState('');
   const [transferMessage, setTransferMessage] = useState('');
@@ -61,8 +63,8 @@ const ControlCenterPage = () => {
 
   React.useEffect(() => {
     let active = true;
-    api.get<{ poolBalance: number; usdtBalance: number }>('/api/pool/balance')
-      .then(({ data }) => { if (active) { setPoolBalance(data.poolBalance); setUsdtBalance(data.usdtBalance); } })
+    api.get<{ poolBalance: number; pendingPoolBalance?: number; pendingActivationDate?: string; usdtBalance: number }>('/api/pool/balance')
+      .then(({ data }) => { if (active) { setPoolBalance(data.poolBalance); setPendingPoolBalance(data.pendingPoolBalance || 0); setPendingActivationDate(data.pendingActivationDate); setUsdtBalance(data.usdtBalance); } })
       .catch(() => { if (active) setPoolBalance(null); });
     return () => { active = false; };
   }, []);
@@ -79,12 +81,14 @@ const ControlCenterPage = () => {
     setTransferMessage('');
     try {
       const endpoint = action === 'deposit' ? '/api/pool/deposit' : '/api/pool/withdraw';
-      const { data } = await api.post<{ poolBalance: number; usdtBalance: number }>(endpoint, { amount: normalizedAmount });
+      const { data } = await api.post<{ poolBalance: number; pendingPoolBalance?: number; pendingActivationDate?: string; usdtBalance: number }>(endpoint, { amount: normalizedAmount });
       setPoolBalance(data.poolBalance);
+      setPendingPoolBalance(data.pendingPoolBalance || 0);
+      setPendingActivationDate(data.pendingActivationDate);
       setUsdtBalance(data.usdtBalance);
       setAmount('');
       setTransferMessageTone('success');
-      setTransferMessage(action === 'deposit' ? 'USDT deposited into KingsPool.' : 'USDT withdrawn to your main balance.');
+      setTransferMessage(action === 'deposit' ? 'USDT deposit received. It will start earning on the next UTC day.' : 'USDT withdrawn to your main balance.');
     } catch (error: unknown) {
       const message = error && typeof error === 'object' && 'response' in error
         ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
@@ -129,6 +133,7 @@ const ControlCenterPage = () => {
         <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="1" placeholder="0 USDT" value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} /></div>
         <button type="button" style={{ ...styles.button, opacity: isTransferring ? 0.65 : 1 }} disabled={isTransferring} onClick={() => { void handleTransfer(); }}>{isTransferring ? <><InlineLoadingDots /> Processing…</> : action === 'deposit' ? 'Deposit into pool' : 'Withdraw to main balance'}</button>
         {transferMessage ? <NotificationBanner tone={transferMessageTone} title={transferMessageTone === 'success' ? 'Pool transfer completed' : 'Pool transfer failed'} message={transferMessage} /> : null}
+        {pendingPoolBalance > 0 ? <NotificationBanner tone="info" title="Deposit scheduled" message={`${pendingPoolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT is pending activation and will start earning on ${pendingActivationDate || 'the next UTC day'}.`} /> : null}
       </div>
     </section>
 
