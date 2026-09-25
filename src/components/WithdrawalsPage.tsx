@@ -269,7 +269,7 @@ const WithdrawPage = () => {
             </div>
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Amount</span>
-              <input style={styles.input} value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00 USDT" />
+              <input style={styles.input} type="number" min="1" step="1" inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="1 USDT" />
             </div>
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Withdrawal wallet</span>
