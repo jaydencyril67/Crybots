@@ -15,7 +15,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   card: { ...createHybridCardStyles(theme).card },
   performanceCard: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
   chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
-  chartBars: { minHeight: 'clamp(210px, 42vw, 340px)', display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', alignItems: 'end', gap: 'clamp(8px, 2vw, 18px)', padding: '24px 8px 4px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const },
+  chartBars: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', alignItems: 'end', gap: 'clamp(8px, 2vw, 18px)', padding: '24px 8px 4px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const },
   chartBarGroup: { minWidth: 0, height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', alignItems: 'end', justifyItems: 'center', gap: '8px' },
   chartBarValue: { margin: 0, color: theme.text, fontSize: 'clamp(0.62rem, 1.8vw, 0.78rem)', fontWeight: 800, whiteSpace: 'nowrap' as const },
   chartBarTrack: { position: 'relative' as const, width: '100%', height: '100%', minHeight: '120px', borderRadius: '8px', background: theme.surfaceGlass, overflow: 'hidden' },
