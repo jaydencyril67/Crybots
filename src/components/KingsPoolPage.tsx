@@ -20,7 +20,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chartBarGroup: { minWidth: 0, height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', alignItems: 'end', justifyItems: 'center', gap: '8px' },
   chartBarValue: { margin: 0, color: theme.text, fontSize: 'clamp(0.62rem, 1.8vw, 0.78rem)', fontWeight: 800, whiteSpace: 'nowrap' as const },
   chartBarTrack: { width: '100%', height: '100%', minHeight: '120px', display: 'flex', alignItems: 'end', justifyContent: 'center', borderRadius: '8px 8px 2px 2px', background: theme.surfaceGlass },
-  chartBar: { width: 'min(34px, 68%)', minHeight: '6px', borderRadius: '8px 8px 2px 2px', background: theme.primary, transition: 'height 0.8s ease' },
+  chartBar: { width: 'min(34px, 68%)', minHeight: 0, borderRadius: '8px 8px 2px 2px', background: theme.primary, transition: 'height 0.8s ease' },
   chartBarDate: { margin: 0, color: theme.textMuted, fontSize: 'clamp(0.62rem, 1.8vw, 0.76rem)' },
   chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
   chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
@@ -60,19 +60,19 @@ type PoolApiResponse = Partial<PoolResponse> & { current: PoolResponse['current'
 
 const formatPoolValue = (value: number) => `${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
+const POOL_BAR_MIN_PERCENT = -1.5;
+const POOL_BAR_MAX_PERCENT = 5;
+
 const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[]; current: PoolResponse['current']; direction: 'up' | 'down' | 'flat'; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
   const safeHistory = history.filter((point) => Number.isFinite(point.value) && typeof point.date === 'string').slice(-7).map((point) => point.date === current.date ? { ...point, value: current.value, dailyChangePercent: current.progressPercent } : point);
   if (!safeHistory.length) return null;
 
-  const values = safeHistory.map((point) => point.value);
-  const minimum = Math.min(...values);
-  const maximum = Math.max(...values);
-  const range = maximum - minimum || Math.max(Math.abs(maximum) * 0.02, 1);
   const latestDate = safeHistory[safeHistory.length - 1].date;
 
-  return <div role="img" aria-label="KingsPool seven day vertical bar chart" style={getStyles(theme).chartBars}>
+  return <div role="img" aria-label="KingsPool seven day vertical bar chart scaled from -1.5% to 5%" style={getStyles(theme).chartBars}>
     {safeHistory.map((point) => {
-      const barHeight = Math.max(8, ((point.value - minimum) / range) * 100);
+      const boundedPercent = Math.min(POOL_BAR_MAX_PERCENT, Math.max(POOL_BAR_MIN_PERCENT, point.dailyChangePercent));
+      const barHeight = ((boundedPercent - POOL_BAR_MIN_PERCENT) / (POOL_BAR_MAX_PERCENT - POOL_BAR_MIN_PERCENT)) * 100;
       const isCurrent = point.date === latestDate;
       return <div key={point.date} style={getStyles(theme).chartBarGroup}>
         <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(2)}%</p>
