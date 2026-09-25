@@ -20,8 +20,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chartBars: { minHeight: 'clamp(210px, 42vw, 340px)', display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', alignItems: 'end', gap: 'clamp(8px, 2vw, 18px)', padding: '24px 8px 4px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const },
   chartBarGroup: { minWidth: 0, height: '100%', display: 'grid', gridTemplateRows: 'auto 1fr auto', alignItems: 'end', justifyItems: 'center', gap: '8px' },
   chartBarValue: { margin: 0, color: theme.text, fontSize: 'clamp(0.62rem, 1.8vw, 0.78rem)', fontWeight: 800, whiteSpace: 'nowrap' as const },
-  chartBarTrack: { width: '100%', height: '100%', minHeight: '120px', display: 'flex', alignItems: 'end', justifyContent: 'center', borderRadius: '8px 8px 2px 2px', background: theme.surfaceGlass },
-  chartBar: { width: 'min(34px, 68%)', minHeight: 0, borderRadius: '8px 8px 2px 2px', background: theme.primary, transition: 'height 0.8s ease' },
+  chartBarTrack: { position: 'relative' as const, width: '100%', height: '100%', minHeight: '120px', borderRadius: '8px', background: theme.surfaceGlass, overflow: 'hidden' },
+  chartBarZeroLine: { position: 'absolute' as const, zIndex: 1, top: '50%', left: 0, right: 0, borderTop: `1px solid ${theme.borderGlass}` },
+  chartBar: { position: 'absolute' as const, zIndex: 2, left: '50%', width: 'min(34px, 68%)', minHeight: 0, transform: 'translateX(-50%)', background: theme.primary, transition: 'top 0.8s ease, height 0.8s ease' },
   chartBarDate: { margin: 0, color: theme.textMuted, fontSize: 'clamp(0.62rem, 1.8vw, 0.76rem)' },
   chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
   chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
@@ -70,15 +71,17 @@ const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[
 
   const latestDate = safeHistory[safeHistory.length - 1].date;
 
-  return <div role="img" aria-label="KingsPool seven day vertical bar chart scaled from -5% to 5%" style={getStyles(theme).chartBars}>
+  return <div role="img" aria-label="KingsPool seven day vertical bar chart with a centered zero baseline, scaled from -5% to 5%" style={getStyles(theme).chartBars}>
     {safeHistory.map((point) => {
       const boundedPercent = Math.min(POOL_BAR_MAX_PERCENT, Math.max(POOL_BAR_MIN_PERCENT, point.dailyChangePercent));
-      const barHeight = ((boundedPercent - POOL_BAR_MIN_PERCENT) / (POOL_BAR_MAX_PERCENT - POOL_BAR_MIN_PERCENT)) * 100;
+      const barHeight = (Math.abs(boundedPercent) / POOL_BAR_MAX_PERCENT) * 50;
+      const isPositive = boundedPercent >= 0;
       const isCurrent = point.date === latestDate;
       return <div key={point.date} style={getStyles(theme).chartBarGroup}>
         <p style={getStyles(theme).chartBarValue}>{point.dailyChangePercent >= 0 ? '+' : ''}{point.dailyChangePercent.toFixed(4)}%</p>
         <div style={getStyles(theme).chartBarTrack}>
-          <div title={`${point.dailyChangePercent.toFixed(4)}%`} style={{ ...getStyles(theme).chartBar, height: `${barHeight}%`, background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : point.dailyChangePercent >= 0 ? '#16a34a' : '#dc2626', opacity: isCurrent ? 1 : 0.72 }} />
+          <div aria-hidden="true" style={getStyles(theme).chartBarZeroLine} />
+          <div title={`${point.dailyChangePercent.toFixed(4)}%`} style={{ ...getStyles(theme).chartBar, top: isPositive ? `${50 - barHeight}%` : '50%', height: `${barHeight}%`, borderRadius: isPositive ? '8px 8px 0 0' : '0 0 8px 8px', background: isCurrent ? (direction === 'up' ? '#16a34a' : direction === 'down' ? '#dc2626' : theme.primary) : point.dailyChangePercent >= 0 ? '#16a34a' : '#dc2626', opacity: isCurrent ? 1 : 0.72 }} />
         </div>
         <p style={getStyles(theme).chartBarDate}>{point.date.slice(5)}</p>
       </div>;
