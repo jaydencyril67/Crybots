@@ -71,7 +71,7 @@ const PoolChart = ({ history, current, direction, theme }: { history: PoolPoint[
 
   const latestDate = safeHistory[safeHistory.length - 1].date;
 
-  return <div role="img" aria-label="KingsPool seven day vertical bar chart with a centered zero baseline, scaled from -5% to 5%" style={getStyles(theme).chartBars}>
+  return <div role="img" aria-label="KingsPool seven most recent days vertical bar chart with a centered zero baseline, scaled from -5% to 5%" style={getStyles(theme).chartBars}>
     {safeHistory.map((point) => {
       const boundedPercent = Math.min(POOL_BAR_MAX_PERCENT, Math.max(POOL_BAR_MIN_PERCENT, point.dailyChangePercent));
       const barHeight = (Math.abs(boundedPercent) / POOL_BAR_MAX_PERCENT) * 50;
