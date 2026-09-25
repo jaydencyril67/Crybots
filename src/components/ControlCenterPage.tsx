@@ -60,10 +60,24 @@ const ControlCenterPage = () => {
 
   React.useEffect(() => {
     let active = true;
-    api.get<{ poolBalance: number; usdtBalance: number }>('/api/pool/balance')
-      .then(({ data }) => { if (active) { setPoolBalance(data.poolBalance); setUsdtBalance(data.usdtBalance); } })
-      .catch(() => { if (active) setPoolBalance(null); });
-    return () => { active = false; };
+    const loadPoolBalance = async () => {
+      try {
+        const { data } = await api.get<{ poolBalance: number; usdtBalance: number }>('/api/pool/balance');
+        if (active) {
+          setPoolBalance(data.poolBalance);
+          setUsdtBalance(data.usdtBalance);
+        }
+      } catch {
+        if (active) setPoolBalance(null);
+      }
+    };
+
+    void loadPoolBalance();
+    const refreshTimer = window.setInterval(() => { void loadPoolBalance(); }, 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(refreshTimer);
+    };
   }, []);
 
   const handleTransfer = async () => {
