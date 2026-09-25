@@ -10,7 +10,7 @@ import NotificationBanner from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
-type PickerName = 'deposit' | 'withdraw' | 'loss';
+type PickerName = 'deposit' | 'withdraw';
 type PoolAction = 'deposit' | 'withdraw';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -50,8 +50,6 @@ const ControlCenterPage = () => {
   const [openPicker, setOpenPicker] = useState<PickerName | null>(null);
   const [depositSource, setDepositSource] = useState('Main USDT balance');
   const [withdrawDestination, setWithdrawDestination] = useState('Main USDT balance');
-  const [lossPercentage, setLossPercentage] = useState('10%');
-  const [autoWithdraw, setAutoWithdraw] = useState(false);
   const [poolBalance, setPoolBalance] = useState<number | null>(null);
   const [usdtBalance, setUsdtBalance] = useState<number | null>(null);
   const [amount, setAmount] = useState('');
@@ -111,7 +109,7 @@ const ControlCenterPage = () => {
     <section style={styles.card}>
       <div style={styles.inner}>
         <h1 style={styles.sectionTitle}>Pool control center</h1>
-        <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool, and configure how your investment should be protected.</p>
+        <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool. Pool performance is calculated daily and ranges from 0% to 3.5%.</p>
         <div style={styles.balance}><div><p style={styles.balanceLabel}>Your KingsPool balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? <LoadingDots /> : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
         <div style={styles.balance}><div><p style={styles.balanceLabel}>Main USDT balance</p><p style={styles.sectionText}>Available for pool deposits</p></div><p style={styles.balanceValue}>{usdtBalance === null ? <LoadingDots /> : `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
       </div>
@@ -132,16 +130,7 @@ const ControlCenterPage = () => {
       </div>
     </section>
 
-    <section style={{ ...styles.card, position: 'relative', zIndex: 2 }}>
-      <div style={styles.inner}>
-        <h2 style={styles.sectionTitle}>Risk controls</h2>
-        <p style={styles.sectionText}>Set a loss threshold and decide whether your pool funds should automatically return to your main USDT balance.</p>
-        <div style={styles.field}><span style={styles.label}>Stop-loss percentage</span>{renderPicker('loss', lossPercentage, ['5%', '10%', '15%', '20%', '25%'], setLossPercentage)}</div>
-        <div style={styles.settingRow}><div style={styles.settingText}><p style={styles.settingLabel}>Enable auto-withdraw</p><p style={styles.settingNote}>Automatically move your available pool funds to your main USDT balance if the selected loss level is reached.</p></div><input type="checkbox" aria-label="Enable auto-withdraw" checked={autoWithdraw} onChange={(event) => setAutoWithdraw(event.target.checked)} style={styles.checkbox} /></div>
-      </div>
-    </section>
-
-    <section style={styles.card}><div style={styles.inner}><p style={styles.notice}><Info size={16} /><span>Pool deposits and withdrawals may be subject to availability, processing rules, and investment risk. Review the amount before confirming.</span></p></div></section>
+    <section style={styles.card}><div style={styles.inner}><p style={styles.notice}><Info size={16} /><span>Pool deposits and withdrawals may be subject to availability and processing rules. Review the amount before confirming.</span></p></div></section>
   </div></main><NowBar /></div></HybridTheme>;
 };
 
