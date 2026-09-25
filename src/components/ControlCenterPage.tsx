@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
@@ -105,8 +107,8 @@ const ControlCenterPage = () => {
       <div style={styles.inner}>
         <h1 style={styles.sectionTitle}>Pool control center</h1>
         <p style={styles.sectionText}>Move funds between your main USDT balance and KingsPool, and configure how your investment should be protected.</p>
-        <div style={styles.balance}><div><p style={styles.balanceLabel}>Your KingsPool balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? '—' : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
-        <div style={styles.balance}><div><p style={styles.balanceLabel}>Main USDT balance</p><p style={styles.sectionText}>Available for pool deposits</p></div><p style={styles.balanceValue}>{usdtBalance === null ? '—' : `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
+        <div style={styles.balance}><div><p style={styles.balanceLabel}>Your KingsPool balance</p><p style={styles.sectionText}>Current invested pool value</p></div><p style={styles.balanceValue}>{poolBalance === null ? <LoadingDots /> : `${poolBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
+        <div style={styles.balance}><div><p style={styles.balanceLabel}>Main USDT balance</p><p style={styles.sectionText}>Available for pool deposits</p></div><p style={styles.balanceValue}>{usdtBalance === null ? <LoadingDots /> : `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`}</p></div>
       </div>
     </section>
 
@@ -120,7 +122,7 @@ const ControlCenterPage = () => {
         </div>
         {action === 'deposit' ? <div style={styles.field}><span style={styles.label}>Deposit source</span>{renderPicker('deposit', depositSource, ['Main USDT balance'], setDepositSource)}</div> : <div style={styles.field}><span style={styles.label}>Withdrawal destination</span>{renderPicker('withdraw', withdrawDestination, ['Main USDT balance'], setWithdrawDestination)}</div>}
         <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="0.01" placeholder="0.00 USDT" value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} /></div>
-        <button type="button" style={{ ...styles.button, opacity: isTransferring ? 0.65 : 1 }} disabled={isTransferring} onClick={() => { void handleTransfer(); }}>{isTransferring ? 'Processing…' : action === 'deposit' ? 'Deposit into pool' : 'Withdraw to main balance'}</button>
+        <button type="button" style={{ ...styles.button, opacity: isTransferring ? 0.65 : 1 }} disabled={isTransferring} onClick={() => { void handleTransfer(); }}>{isTransferring ? <><InlineLoadingDots /> Processing…</> : action === 'deposit' ? 'Deposit into pool' : 'Withdraw to main balance'}</button>
         {transferMessage ? <p style={styles.sectionText}>{transferMessage}</p> : null}
       </div>
     </section>

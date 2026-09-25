@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import api, { API_BASE_URL } from '../api/axios';
 
@@ -121,7 +122,9 @@ const KingsPoolPage = () => {
           }));
         }
       } catch {
-        if (active) setPoolError('Unable to load pool performance right now.');
+        if (active) {
+          setPoolError('Unable to load pool performance right now.');
+        }
       }
     };
 
@@ -149,12 +152,12 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} current={poolData.current} direction={movementDirection} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
+      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} current={poolData.current} direction={movementDirection} theme={theme} /></> : <LoadingDots />}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? formatPoolValue(poolData.overview.poolCapital) : '—'}</p></div>
-      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? poolData.overview.totalHolders.toLocaleString() : '—'}</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total pool capital</p><p style={styles.note}>Capital currently held in user pool positions</p></div><Coins size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? formatPoolValue(poolData.overview.poolCapital) : <LoadingDots />}</p></div>
+      <div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.label}>Total holders</p><p style={styles.note}>Active KingsPool participants</p></div><Users size={19} style={styles.icon} /><p style={styles.value}>{poolData?.overview ? poolData.overview.totalHolders.toLocaleString() : <LoadingDots />}</p></div>
     </div></section>
 
     <section style={styles.section}>
