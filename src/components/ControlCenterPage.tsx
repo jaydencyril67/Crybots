@@ -56,6 +56,7 @@ const ControlCenterPage = () => {
   const [transferMessage, setTransferMessage] = useState('');
   const [transferMessageTone, setTransferMessageTone] = useState<'success' | 'error'>('error');
   const [isTransferring, setIsTransferring] = useState(false);
+  const [autoWithdraw, setAutoWithdraw] = useState(false);
 
   React.useEffect(() => {
     let active = true;
@@ -127,6 +128,20 @@ const ControlCenterPage = () => {
         <div style={styles.field}><label style={styles.label} htmlFor="pool-amount">Amount</label><input id="pool-amount" type="number" min="0" step="1" placeholder="0 USDT" value={amount} onChange={(event) => setAmount(event.target.value)} style={styles.input} /></div>
         <button type="button" style={{ ...styles.button, opacity: isTransferring ? 0.65 : 1 }} disabled={isTransferring} onClick={() => { void handleTransfer(); }}>{isTransferring ? <><InlineLoadingDots /> Processing…</> : action === 'deposit' ? 'Deposit into pool' : 'Withdraw to main balance'}</button>
         {transferMessage ? <NotificationBanner tone={transferMessageTone} title={transferMessageTone === 'success' ? 'Pool transfer completed' : 'Pool transfer failed'} message={transferMessage} /> : null}
+      </div>
+    </section>
+
+    <section style={styles.card}>
+      <div style={styles.inner}>
+        <h2 style={styles.sectionTitle}>Auto withdrawal</h2>
+        <p style={styles.sectionText}>Automatically move your available pool balance back to your main USDT balance when enabled.</p>
+        <div style={styles.settingRow}>
+          <div style={styles.settingText}>
+            <p style={styles.settingLabel}>Enable auto withdrawal</p>
+            <p style={styles.settingNote}>You can turn this preference off at any time.</p>
+          </div>
+          <input type="checkbox" aria-label="Enable auto withdrawal" checked={autoWithdraw} onChange={(event) => setAutoWithdraw(event.target.checked)} style={styles.checkbox} />
+        </div>
       </div>
     </section>
 
