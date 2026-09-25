@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
@@ -44,14 +45,14 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   const styles = getStyles(theme);
 
   return <div role="img" aria-label={`Market performance: ${current.toFixed(2)} percent`} style={styles.chartWave}>
-    <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
+    {points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
       <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
       <line x1="0" x2="620" y1="66" y2="66" stroke={theme.borderGlass} strokeWidth="1" strokeDasharray="4 8" />
       <path d={areaPath} fill="url(#market-wave-fill)" /><path d={linePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx={620} cy={188 - (current / MAX_MARKET_PERCENT) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
-    </svg>
-    <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{current.toFixed(2)}%</span></p>
+    </svg> : <LoadingDots />}
+    <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(2)}%` : <LoadingDots />}</span></p>
   </div>;
 };
 
@@ -90,10 +91,10 @@ const MarketPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.movementGrid}>
-      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.movementValue}>{high.toFixed(2)}%</p><p style={styles.note}>Maximum movement in the current live window</p></div></div>
-      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.movementValue}>{low.toFixed(2)}%</p><p style={styles.note}>Minimum movement in the current live window</p></div></div>
+      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p><p style={styles.note}>Maximum movement in the current live window</p></div></div>
+      <div style={styles.movement}><div style={styles.movementInner}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p><p style={styles.note}>Minimum movement in the current live window</p></div></div>
     </div></section>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Market information</h2><div style={styles.card}><p style={styles.note}>The market moves gradually between 0% and 4%. A new fluctuation is calculated once every minute.</p><p style={styles.note}>Current movement: {current.toFixed(2)}%</p></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Market information</h2><div style={styles.card}><p style={styles.note}>The market moves gradually between 0% and 4%. A new fluctuation is calculated once every minute.</p><p style={styles.note}>Current movement: {marketPoints.length ? `${current.toFixed(2)}%` : <LoadingDots />}</p></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
 
