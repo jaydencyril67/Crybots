@@ -16,7 +16,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chart: { minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
   chartHeader: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' as const },
   chartValue: { margin: '3px 0 0', color: theme.text, fontSize: 'clamp(1.35rem, 4vw, 1.8rem)', fontWeight: 900 },
-  chartChange: { margin: 0, color: theme.primary, fontSize: '0.8rem', fontWeight: 850 },
   chartCanvas: { width: '100%', minWidth: 0, height: 'clamp(210px, 42vw, 340px)', overflow: 'visible' },
   chartMessage: { minHeight: '220px', display: 'grid', placeItems: 'center', textAlign: 'center' as const },
   chartTitle: { margin: 0, color: theme.text, fontSize: '1rem', fontWeight: 900 },
@@ -128,7 +127,7 @@ const KingsPoolPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool performance</h2><div style={styles.performanceCard}><div style={styles.chart}>
-      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><div><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><p style={{ ...styles.chartChange, color: poolData.current.dailyChangePercent >= 0 ? theme.primary : theme.danger }}><TrendingUp size={15} /> {poolData.current.dailyChangePercent >= 0 ? '+' : ''}{poolData.current.dailyChangePercent.toFixed(2)}% target today</p></div><PoolChart history={poolData.history} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
+      {poolError ? <p style={styles.note}>{poolError}</p> : poolData ? <><div style={styles.chartHeader}><p style={styles.chartValue}>{formatPoolValue(poolData.current.value)}</p></div><PoolChart history={poolData.history} theme={theme} /></> : <p style={styles.note}>Loading pool performance…</p>}
     </div></div></section>
 
     <section style={styles.section}><h2 style={styles.sectionTitle}>Pool overview</h2><div style={styles.listCard}>
