@@ -27,7 +27,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chartValue: { color: theme.text, fontWeight: 900 },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.45 },
   movementGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' },
-  movementInner: { display: 'grid', gap: '9px', padding: '12px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  movementInner: { display: 'grid', gap: '9px', padding: '12px 4px' },
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: '1.2rem', fontWeight: 900 },
 });
