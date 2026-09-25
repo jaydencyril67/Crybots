@@ -48,14 +48,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, flexShrink: 0 },
   pointsGrid: { display: 'grid', gap: '12px', padding: '14px' },
-  pointsSummary: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' },
-  pointsMetric: { display: 'grid', gap: '4px', padding: '12px', borderRadius: '12px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
   metricLabel: { margin: 0, color: theme.textMuted, fontSize: '0.75rem' },
-  metricValue: { margin: 0, fontSize: '1.08rem', fontWeight: 900 },
   buyForm: { display: 'flex', flexWrap: 'wrap' as const, alignItems: 'end', gap: '9px' },
   inputGroup: { display: 'grid', gap: '5px', flex: '1 1 180px' },
   input: { width: '100%', boxSizing: 'border-box' as const, padding: '10px 11px', borderRadius: '9px', border: `1px solid ${theme.borderGlass}`, background: theme.background, color: theme.text, fontSize: '0.9rem' },
-  buyButton: { border: 0, borderRadius: '9px', padding: '11px 16px', background: theme.primary, color: '#fff', fontWeight: 800, cursor: 'pointer' },
+  buyButton: { border: `1px solid ${theme.primary}`, borderRadius: '9px', padding: '11px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer' },
   disabledButton: { opacity: 0.55, cursor: 'not-allowed' },
   status: { margin: 0, fontSize: '0.8rem', color: theme.textMuted },
   positionList: { display: 'grid', gap: '7px' },
@@ -136,6 +133,7 @@ const MarketPage = () => {
 
     setBuying(true);
     setBuyStatus('');
+    setSellStatus('');
     try {
       await api.post('/api/market/points/buy', { points });
       setBuyPoints('');
@@ -160,6 +158,7 @@ const MarketPage = () => {
 
     setSelling(true);
     setSellStatus('');
+    setBuyStatus('');
     try {
       const response = await api.post<{ value: number }>('/api/market/points/sell', { points });
       setSellPoints('');
@@ -178,18 +177,13 @@ const MarketPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Buy and sell points</h2><div style={styles.card}><div style={styles.pointsGrid}>
-      <div style={styles.pointsSummary}>
-        <div style={styles.pointsMetric}><p style={styles.metricLabel}>Points held</p><p style={styles.metricValue}>{marketAccount.points.toFixed(2)}</p></div>
-        <div style={styles.pointsMetric}><p style={styles.metricLabel}>Current value</p><p style={styles.metricValue}>{formatUsdt(marketAccount.value)}</p></div>
-        <div style={styles.pointsMetric}><p style={styles.metricLabel}>Market rate</p><p style={styles.metricValue}>{marketAccount.current.toFixed(2)}%</p></div>
-      </div>
       <form style={styles.buyForm} onSubmit={handleBuy}>
         <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to buy (1 point = 1 USDT)</span><input style={styles.input} type="number" min="1" step="0.01" value={buyPoints} onChange={(event) => setBuyPoints(event.target.value)} placeholder="e.g. 100" /></label>
-        <button type="submit" style={{ ...styles.buyButton, ...(buying ? styles.disabledButton : {}) }} disabled={buying}>{buying ? 'Buying…' : 'Buy points'}</button>
+        <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{buying ? 'Buying…' : 'Buy points'}</button>
       </form>
       <form style={styles.buyForm} onSubmit={handleSell}>
         <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to sell at current market value</span><input style={styles.input} type="number" min="1" step="0.01" value={sellPoints} onChange={(event) => setSellPoints(event.target.value)} placeholder="e.g. 100" /></label>
-        <button type="submit" style={{ ...styles.buyButton, ...(selling ? styles.disabledButton : {}) }} disabled={selling}>{selling ? 'Selling…' : 'Sell points'}</button>
+        <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{selling ? 'Selling…' : 'Sell points'}</button>
       </form>
       <p style={styles.status}>{buyStatus || sellStatus || 'New purchases start following the market from the next UTC day. Unsold points reset to their original value at the next daily reset.'}</p>
       {marketAccount.positions.length > 0 && <div style={styles.positionList}>{marketAccount.positions.slice().reverse().map((position) => <div key={`${position.purchasedAt}-${position.points}`} style={styles.positionRow}><span>{position.points.toFixed(2)} points · {position.active ? 'Active' : `Starts ${new Date(position.activeFrom).toLocaleDateString()}`}</span><strong>{formatUsdt(position.value)}</strong></div>)}</div>}
