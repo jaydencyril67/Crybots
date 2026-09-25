@@ -83,7 +83,6 @@ const MarketPage = () => {
     };
   }, []);
 
-  const current = marketPoints[marketPoints.length - 1]?.percent ?? 0;
   const high = Math.max(...marketPoints.map((point) => point.percent));
   const low = Math.min(...marketPoints.map((point) => point.percent));
 
@@ -94,7 +93,6 @@ const MarketPage = () => {
       <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p><p style={styles.note}>Maximum movement in the current live window</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
       <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p><p style={styles.note}>Minimum movement in the current live window</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p></div>
     </div></div></section>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Market information</h2><div style={styles.card}><p style={styles.note}>The market moves gradually between 0% and 4%. A new fluctuation is calculated once every minute.</p><p style={styles.note}>Current movement: {marketPoints.length ? `${current.toFixed(2)}%` : <LoadingDots />}</p></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
 
