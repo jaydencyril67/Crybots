@@ -39,6 +39,21 @@ const nextMarketPercent = (current: number) => {
   return Number(Math.min(MAX_MARKET_PERCENT, Math.max(MIN_MARKET_PERCENT, current + direction * step)).toFixed(2));
 };
 
+const createInitialMarketPoints = (): MarketPoint[] => {
+  const now = Date.now();
+  const points: MarketPoint[] = [{ timestamp: now - 23 * UPDATE_INTERVAL_MS, percent: 1.5 }];
+
+  for (let index = 1; index < 24; index += 1) {
+    const previous = points[index - 1];
+    points.push({
+      timestamp: now - (23 - index) * UPDATE_INTERVAL_MS,
+      percent: nextMarketPercent(previous.percent),
+    });
+  }
+
+  return points;
+};
+
 const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
   const current = points[points.length - 1]?.percent ?? 0;
   const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, percent: current }, ...points];
@@ -66,7 +81,7 @@ const MarketPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
-  const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>([{ timestamp: Date.now(), percent: 1.5 }]);
+  const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>(createInitialMarketPoints);
 
   React.useEffect(() => {
     const timer = window.setInterval(() => setMarketPoints((points) => {
