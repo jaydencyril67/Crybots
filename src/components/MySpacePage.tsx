@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronDown } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import { useAppTheme } from './AppTheme';
@@ -15,9 +15,6 @@ type MarketPointsData = { points: number; value: number; current: number; positi
 type TransactionEntry = { id: string; title: string; direction: 'inbound' | 'outbound'; amountValue: number; date: string; time: string; points?: number; source: string };
 type PointSummary = { totalBoughtPoints: number; totalSoldPoints: number; totalBoughtValue: number; totalSoldValue: number; buyCount: number; sellCount: number };
 type TransactionsData = { transactions: TransactionEntry[]; pointSummary: PointSummary };
-type ResultType = 'profit' | 'loss';
-type Period = 'week' | 'month' | 'year';
-type PickerName = 'result' | 'period';
 
 const formatUsdt = (value: number) => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 
@@ -38,11 +35,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   positionRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', padding: '10px 12px', background: theme.surfaceMuted },
   section: { display: 'grid', gap: '10px' },
   sectionTitle: { margin: 0, fontSize: '0.94rem', fontWeight: 900 },
-  selectorGroup: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(120px, 1fr))', gap: '10px' },
-  picker: { position: 'relative' as const, minWidth: 0 },
-  selectTrigger: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '10px 12px', fontSize: '0.82rem', fontWeight: 700, width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
-  selectMenu: { position: 'absolute' as const, zIndex: 5, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
-  selectOption: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
 });
 
 const MySpacePage = () => {
@@ -54,9 +46,6 @@ const MySpacePage = () => {
   const [pointTransactions, setPointTransactions] = useState<TransactionEntry[]>([]);
   const [pointSummary, setPointSummary] = useState<PointSummary | null>(null);
   const [error, setError] = useState('');
-  const [resultType, setResultType] = useState<ResultType>('profit');
-  const [period, setPeriod] = useState<Period>('month');
-  const [openPicker, setOpenPicker] = useState<PickerName | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -75,17 +64,6 @@ const MySpacePage = () => {
   }, []);
 
   const finance = data?.finance;
-  const selectedValue = resultType === 'profit' ? finance?.totalProfit || 0 : 0;
-  const resultOptions: ResultType[] = ['profit', 'loss'];
-  const periodOptions: Period[] = ['week', 'month', 'year'];
-  const renderPicker = <T extends string>(name: PickerName, value: T, options: T[], setValue: (next: T) => void) => (
-    <div style={styles.picker}>
-      <button type="button" aria-expanded={openPicker === name} style={styles.selectTrigger} onClick={() => setOpenPicker(openPicker === name ? null : name)}>
-        <span>{value.charAt(0).toUpperCase() + value.slice(1)}</span><ChevronDown size={16} />
-      </button>
-      {openPicker === name ? <div style={styles.selectMenu}>{options.map((option) => <button type="button" style={styles.selectOption} key={option} onClick={() => { setValue(option); setOpenPicker(null); }}>{option.charAt(0).toUpperCase() + option.slice(1)}</button>)}</div> : null}
-    </div>
-  );
   const boughtPoints = pointSummary?.totalBoughtPoints || 0;
   const soldPoints = pointSummary?.totalSoldPoints || 0;
   const recentPointTransactions = pointTransactions.slice(0, 5);
@@ -111,7 +89,6 @@ const MySpacePage = () => {
       <div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Total withdrawals</p><p style={styles.note}>{finance ? `${finance.withdrawalCount} completed withdrawals` : ''}</p></div><p style={styles.value}>{finance ? formatUsdt(finance.totalWithdrawals) : <LoadingDots />}</p></div>
       <div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Pool capital deployed</p><p style={styles.note}>Funds allocated to investments</p></div><p style={styles.value}>{finance ? formatUsdt(finance.totalInvested) : <LoadingDots />}</p></div>
     </div></section>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Total profit and losses</h2><div style={styles.selectorGroup}>{renderPicker('result', resultType, resultOptions, setResultType)}{renderPicker('period', period, periodOptions, setPeriod)}</div><div style={styles.listCard}><div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>{resultType === 'profit' ? 'Profit' : 'Loss'} · {period}</p><p style={styles.note}>Based on completed ledger records</p></div><p style={styles.value}>{data ? formatUsdt(selectedValue) : <LoadingDots />}</p></div><div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Net position</p><p style={styles.note}>Profit less recorded losses</p></div><p style={styles.value}>{data ? formatUsdt(finance?.totalProfit || 0) : <LoadingDots />}</p></div></div></section>
   </div></div><NowBar /></div></HybridTheme>;
 };
 
