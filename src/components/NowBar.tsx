@@ -231,6 +231,36 @@ type NowBarView = 'title' | 'actions';
 
 type NowBarMode = 'compact' | 'expanded';
 
+type NavigationGroup = {
+  routes: string[];
+};
+
+const parentRoutes = [
+  '/dashboard',
+  '/portfolio',
+  '/agent',
+  '/exchange',
+  '/records',
+  '/asset',
+  '/contact',
+  '/options',
+  '/library',
+  '/about',
+  '/developer',
+  '/logout',
+];
+
+const childNavigationGroups: NavigationGroup[] = [
+  { routes: ['/profile', '/portfolio/statistics', '/security', '/danger'] },
+  { routes: ['/agent/stats', '/agent/tools', '/agent/menu'] },
+  { routes: ['/market', '/my-space'] },
+  { routes: ['/transactions', '/app-usage'] },
+  { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
+  { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
+  { routes: ['/information', '/privacy-policy', '/community-standards'] },
+  { routes: ['/nowbar-color', '/nowbar-button-color'] },
+];
+
 const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
 
 const getCurrentPageTitle = (path: string) => {
@@ -389,6 +419,8 @@ const NowBar = ({ actions }: NowBarProps) => {
   const [pressing, setPressing] = useState(false);
   const holdTriggeredRef = React.useRef(false);
   const barRef = React.useRef<HTMLDivElement | null>(null);
+  const swipeStartRef = React.useRef<{ x: number; y: number } | null>(null);
+  const swipeHandledRef = React.useRef(false);
   const [currentPath, setCurrentPath] = useState(getActivePath());
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
@@ -484,6 +516,34 @@ const NowBar = ({ actions }: NowBarProps) => {
     resetIdleTimer();
   };
 
+  const handleSwipeStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (view !== 'title' || event.touches.length !== 1) return;
+
+    swipeStartRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  };
+
+  const handleSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (view !== 'title' || !start || event.changedTouches.length !== 1) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) < 50 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+    const currentIndex = parentRoutes.indexOf(currentPath);
+    const childGroup = childNavigationGroups.find((group) => group.routes.includes(currentPath));
+    const routes = childGroup ? childGroup.routes : currentIndex >= 0 ? parentRoutes : [];
+    const routeIndex = routes.indexOf(currentPath);
+    if (routeIndex < 0) return;
+
+    swipeHandledRef.current = true;
+    const nextIndex = deltaX < 0 ? routeIndex + 1 : routeIndex - 1;
+    const nextRoute = routes[nextIndex];
+    if (nextRoute) navigate(nextRoute);
+  };
+
   return (
     <>
       <style>{`@keyframes nowbar-label-marquee { 0%, 15% { transform: translateX(0); } 45%, 70% { transform: translateX(calc(-100% + 145px)); } 100% { transform: translateX(0); } }
@@ -519,7 +579,9 @@ const NowBar = ({ actions }: NowBarProps) => {
         tabIndex={0}
         aria-label={view === 'title' ? `${currentPageTitle} page. Tap to show navigation buttons.` : 'Navigation buttons. Tap to show current page.'}
         onClick={() => {
-          if (!pressing && !holdTriggeredRef.current) {
+          if (swipeHandledRef.current) {
+            swipeHandledRef.current = false;
+          } else if (!pressing && !holdTriggeredRef.current) {
             handleInteraction();
             setView(view === 'title' ? 'actions' : 'title');
           }
@@ -528,9 +590,18 @@ const NowBar = ({ actions }: NowBarProps) => {
         onMouseDown={startHold}
         onMouseUp={stopHold}
         onMouseLeave={stopHold}
-        onTouchStart={startHold}
-        onTouchEnd={stopHold}
-        onTouchCancel={stopHold}
+        onTouchStart={(event) => {
+          startHold();
+          handleSwipeStart(event);
+        }}
+        onTouchEnd={(event) => {
+          stopHold();
+          handleSwipeEnd(event);
+        }}
+        onTouchCancel={() => {
+          stopHold();
+          swipeStartRef.current = null;
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
