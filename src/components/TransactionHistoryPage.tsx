@@ -497,7 +497,6 @@ const TransactionHistoryPage = () => {
                     <p style={styles.overviewValue}>{loading ? <LoadingDots /> : completedCount}</p>
                   </div>
                 </div>
-                <p style={styles.cardText}><ShieldCheck size={16} style={{ display: 'inline-block', marginRight: '6px', verticalAlign: 'text-bottom' }} />All entries show type, status, date, time, and reference so you can audit account activity easily on mobile or desktop.</p>
               </div>
             </section>
 
