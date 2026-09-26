@@ -533,7 +533,7 @@ const TransactionHistoryPage = () => {
                             })();
                           }}
                         >
-                          <Copy size={16} /> Copy Ref
+                          <Copy size={16} /> Ref
                         </button>
                       </td>
                     </tr>
