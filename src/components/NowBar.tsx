@@ -299,6 +299,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/market') return 'MARKET';
   if (path === '/records') return 'RECORDS';
   if (path === '/contact') return 'CONTACT';
+  if (path === '/faq') return 'FAQ';
   if (path === '/options') return 'OPTIONS';
   if (path === '/library') return 'LIBRARY';
   if (path === '/about') return 'ABOUT';
