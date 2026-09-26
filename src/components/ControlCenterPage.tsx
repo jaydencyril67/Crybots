@@ -63,7 +63,7 @@ const ControlCenterPage = () => {
     void load();
   }, []);
 
-  const updateRule = <T extends AutoSellRule | RangeRule>(setter: React.Dispatch<React.SetStateAction<T>>, field: keyof T, value: number | boolean | '') => setter((rule) => ({ ...rule, [field]: value }));
+  const updateRule = <T extends AutoSellRule | RangeRule>(setter: React.Dispatch<React.SetStateAction<T>>, field: 'enabled' | 'minPercent' | 'maxPercent' | 'points', value: number | boolean | '') => setter((rule) => ({ ...rule, [field]: value }));
   const save = async (functionKey: FunctionKey, rule: AutoSellRule | RangeRule) => {
     setSaving(functionKey);
     setStatus((current) => ({ ...current, [functionKey]: null }));
