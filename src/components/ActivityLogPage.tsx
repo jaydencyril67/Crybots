@@ -39,7 +39,7 @@ const formatAction = (action: string) => {
     create: 'Created',
     update: 'Updated',
     delete: 'Removed',
-    submit: 'Submitted',
+    submit: 'Action completed',
     enable: 'Enabled',
     disable: 'Disabled',
     login: 'Signed in',
@@ -51,6 +51,34 @@ const formatAction = (action: string) => {
 };
 
 const getReadableActivity = (activity: Activity) => {
+  if (/^\/api\/notifications\/read-all$/.test(activity.path)) {
+    return {
+      title: 'All notifications marked as read',
+      description: 'You marked all of your notifications as read.',
+    };
+  }
+
+  if (/^\/api\/notifications\/[^/]+\/read$/.test(activity.path)) {
+    return {
+      title: 'Notification marked as read',
+      description: 'You marked this notification as read.',
+    };
+  }
+
+  if (/^\/api\/market\/points\/buy\/?$/.test(activity.path)) {
+    return {
+      title: 'Market points purchased',
+      description: 'You purchased market points.',
+    };
+  }
+
+  if (/^\/api\/market\/points\/sell\/?$/.test(activity.path)) {
+    return {
+      title: 'Market points sold',
+      description: 'You sold market points at the current market value.',
+    };
+  }
+
   if (/^\/api\/webauthn\/register\/verify$/.test(activity.path)) {
     return {
       title: 'Biometric security enabled',
