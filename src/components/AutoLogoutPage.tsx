@@ -35,9 +35,24 @@ const AutoLogoutPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [idleEnabled, setIdleEnabled] = useState(false);
+  const [idleSaving, setIdleSaving] = useState(false);
   const [scheduledLogout, setScheduledLogoutValue] = useState(getScheduledLogout);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [status, setStatus] = useState('No automatic logout has been configured.');
+
+  const saveIdleLogout = async () => {
+    const nextValue = !idleEnabled;
+    setIdleSaving(true);
+    try {
+      const response = await api.put('/api/auth/idle-logout', { enabled: nextValue });
+      setIdleEnabled(Boolean(response.data.idleLogoutEnabled));
+      setStatus(response.data.idleLogoutEnabled ? 'Idle logout enabled.' : 'Idle logout disabled.');
+    } catch (error: any) {
+      setStatus(error?.response?.data?.message || 'Unable to update idle logout.');
+    } finally {
+      setIdleSaving(false);
+    }
+  };
 
   const saveSchedule = async (value: string) => {
     try {
@@ -55,8 +70,12 @@ const AutoLogoutPage = () => {
   useEffect(() => {
     const loadSchedule = async () => {
       try {
-        const response = await api.get('/api/auth/scheduled-logout');
-        const serverValue = response.data.scheduledLogoutAt ? toLocalDateTimeValue(response.data.scheduledLogoutAt) : '';
+        const [scheduleResponse, idleResponse] = await Promise.all([
+          api.get('/api/auth/scheduled-logout'),
+          api.get('/api/auth/idle-logout'),
+        ]);
+        const serverValue = scheduleResponse.data.scheduledLogoutAt ? toLocalDateTimeValue(scheduleResponse.data.scheduledLogoutAt) : '';
+        setIdleEnabled(Boolean(idleResponse.data.idleLogoutEnabled));
         setScheduledLogoutValue(serverValue);
         setScheduledLogout(serverValue);
         setStatus(serverValue ? `Scheduled logout set for ${serverValue.replace('T', ' ')}.` : 'No automatic logout has been configured.');
@@ -84,7 +103,7 @@ const AutoLogoutPage = () => {
                 <div style={styles.dangerRow}>
                   <strong>Logout when the app is idle</strong>
                   <p style={styles.status}>End your session after a period of inactivity.</p>
-                  <div style={styles.buttonRow}><button type="button" style={styles.button} aria-pressed={idleEnabled} onClick={() => { setIdleEnabled(!idleEnabled); setStatus(!idleEnabled ? 'Idle logout enabled.' : 'Idle logout disabled.'); }}>{idleEnabled ? 'Enabled' : 'Enable'}</button></div>
+                  <div style={styles.buttonRow}><button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={saveIdleLogout}>{idleSaving ? 'Saving...' : idleEnabled ? 'Enabled' : 'Enable'}</button></div>
                 </div>
                 <div style={styles.dangerRow}>
                   <strong>Scheduled logout</strong>
