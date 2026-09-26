@@ -64,6 +64,7 @@ const MySpacePage = () => {
 
   const boughtPoints = pointSummary?.totalBoughtPoints || 0;
   const soldPoints = pointSummary?.totalSoldPoints || 0;
+  const recentPointTransactions = pointTransactions.slice(0, 10);
   return <HybridTheme><Helmet><title>My Space | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}><div style={styles.content}>
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     {error ? <NotificationBanner tone="error" title="My Space unavailable" message={error} /> : null}
@@ -75,7 +76,7 @@ const MySpacePage = () => {
       <div style={styles.listItem}><div style={styles.itemContent}><p style={styles.label}>Active value</p><p style={styles.note}>{marketPoints ? `${marketPoints.current.toFixed(2)}% market movement` : 'Current market value'}</p></div><p style={styles.value}>{marketPoints ? formatUsdt(marketPoints.value) : <LoadingDots />}</p></div>
     </div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Purchase and sell history</h2><div style={styles.listCard}>
-      {pointTransactions.length ? <div style={styles.historyWrap}><table style={styles.historyTable}><thead><tr><th style={styles.historyHeader}>Action</th><th style={styles.historyHeader}>Points</th><th style={styles.historyHeader}>Value</th><th style={styles.historyHeader}>Date</th><th style={styles.historyHeader}>Status</th></tr></thead><tbody>{pointTransactions.map((transaction) => <tr key={transaction.id}><td style={styles.historyCell}>{transaction.title}</td><td style={styles.historyCell}>{transaction.points?.toFixed(2) || '0.00'}</td><td style={styles.historyCell}>{formatUsdt(transaction.amountValue)}</td><td style={styles.historyCellMuted}>{transaction.date} · {transaction.time}</td><td style={styles.historyCell}>Completed</td></tr>)}</tbody></table></div> : <p style={styles.historyEmpty}>No point purchases or sales recorded yet.</p>}
+      {recentPointTransactions.length ? <div style={styles.historyWrap}><table style={styles.historyTable}><thead><tr><th style={styles.historyHeader}>Action</th><th style={styles.historyHeader}>Points</th><th style={styles.historyHeader}>Value</th><th style={styles.historyHeader}>Date</th><th style={styles.historyHeader}>Status</th></tr></thead><tbody>{recentPointTransactions.map((transaction) => <tr key={transaction.id}><td style={styles.historyCell}>{transaction.title}</td><td style={styles.historyCell}>{transaction.points?.toFixed(2) || '0.00'}</td><td style={styles.historyCell}>{formatUsdt(transaction.amountValue)}</td><td style={styles.historyCellMuted}>{transaction.date} · {transaction.time}</td><td style={styles.historyCell}>Completed</td></tr>)}</tbody></table></div> : <p style={styles.historyEmpty}>No point purchases or sales recorded yet.</p>}
     </div></section>
   </div></div><NowBar /></div></HybridTheme>;
 };
