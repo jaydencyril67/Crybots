@@ -266,8 +266,7 @@ const parentRoutes = [
 const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/profile', '/portfolio/statistics', '/security', '/danger'] },
   { routes: ['/agent/stats', '/agent/tools', '/agent/menu'] },
-  { routes: ['/market', '/my-space'] },
-  { routes: ['/exchange', '/control-center'] },
+  { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
