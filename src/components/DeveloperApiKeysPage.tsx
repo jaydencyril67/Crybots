@@ -57,7 +57,7 @@ const DeveloperApiKeysPage = () => {
   }
 
   const input: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text };
-  const button: React.CSSProperties = { border: 0, borderRadius: 999, padding: '10px 15px', fontWeight: 800, cursor: 'pointer', background: theme.primary, color: theme.textInverse };
+  const button: React.CSSProperties = { border: 0, borderRadius: 999, padding: '10px 15px', fontWeight: 800, cursor: 'pointer', background: theme.primary, color: theme.textInverse, width: '100%', maxWidth: '100%', boxSizing: 'border-box' };
   const rowList: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', minWidth: 0, padding: 18, border: `1px solid ${theme.borderGlass}`, borderRadius: 22, background: theme.surfaceGlass, boxSizing: 'border-box' };
   const row: React.CSSProperties = { padding: '13px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: 15, background: theme.surfaceMuted, boxSizing: 'border-box' };
 
