@@ -55,6 +55,7 @@ import AppHeader from './components/AppHeader';
 import AppSplashOverlay from './components/AppSplashOverlay';
 import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { forceLogout } from './api/axios';
+import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -222,6 +223,38 @@ const RouteTransition = () => {
       setIsAuthenticated(Boolean(localStorage.getItem('token')));
     };
 
+    let scheduledLogoutTimer: number | undefined;
+    let hasTriggeredScheduledLogout = false;
+
+    const validateScheduledLogout = () => {
+      if (hasTriggeredScheduledLogout) return;
+
+      const scheduledLogout = getScheduledLogout();
+      if (scheduledLogout && isScheduledLogoutDue(scheduledLogout)) {
+        hasTriggeredScheduledLogout = true;
+        setScheduledLogout('');
+        forceLogout();
+      }
+    };
+
+    const scheduleNextLogoutCheck = () => {
+      if (scheduledLogoutTimer !== undefined) {
+        window.clearTimeout(scheduledLogoutTimer);
+      }
+
+      const scheduledLogout = getScheduledLogout();
+      if (!scheduledLogout) return;
+
+      const scheduledTime = new Date(scheduledLogout).getTime();
+      if (!Number.isFinite(scheduledTime)) return;
+
+      const delay = Math.max(0, scheduledTime - Date.now());
+      scheduledLogoutTimer = window.setTimeout(() => {
+        validateScheduledLogout();
+        scheduleNextLogoutCheck();
+      }, Math.min(delay, 2147483647));
+    };
+
     const validateSession = async () => {
       if (!localStorage.getItem('token')) {
         setIsAuthenticated(false);
@@ -239,8 +272,11 @@ const RouteTransition = () => {
     };
 
     const interval = window.setInterval(() => {
+      validateScheduledLogout();
       void validateSession();
     }, 15000);
+
+    validateScheduledLogout();
 
     const connectForceLogoutStream = () => {
       const token = localStorage.getItem('token');
@@ -271,15 +307,27 @@ const RouteTransition = () => {
 
     const forceLogoutStream = connectForceLogoutStream();
 
+    const handleScheduledLogoutChange = () => {
+      hasTriggeredScheduledLogout = false;
+      scheduleNextLogoutCheck();
+      validateScheduledLogout();
+    };
+
     window.addEventListener('storage', syncAuthState);
     window.addEventListener('ke:force-logout', syncAuthState);
+    window.addEventListener('ke:scheduled-logout-change', handleScheduledLogoutChange);
 
+    scheduleNextLogoutCheck();
     void validateSession();
 
     return () => {
       window.clearInterval(interval);
+      if (scheduledLogoutTimer !== undefined) {
+        window.clearTimeout(scheduledLogoutTimer);
+      }
       window.removeEventListener('storage', syncAuthState);
       window.removeEventListener('ke:force-logout', syncAuthState);
+      window.removeEventListener('ke:scheduled-logout-change', handleScheduledLogoutChange);
       forceLogoutStream?.close();
     };
   }, []);
@@ -332,15 +380,15 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'alert-settings') return <ProtectedRoute><AlertSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'app-usage') return <ProtectedRoute><AppUsagePage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'nowbar-button-color', 'portfolio', 'logout', 'portfolio-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'profile', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'nowbar-button-color', 'portfolio', 'logout', 'auto-logout', 'manual-logout', 'portfolio-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'records', 'contact', 'options', 'library', 'about', 'developer', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'manage' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'logout' || displayedRouteKey === 'portfolio-statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'agent-tools' || displayedRouteKey === 'agent-stats' || displayedRouteKey === 'agent-menu' || displayedRouteKey === 'exchange' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['dashboard', 'profile', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'nowbar-button-color', 'portfolio', 'logout', 'portfolio-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'records', 'contact', 'options', 'library', 'about', 'information', 'privacy-policy', 'community-standards', 'developer', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'manage' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'logout' || displayedRouteKey === 'auto-logout' || displayedRouteKey === 'manual-logout' || displayedRouteKey === 'portfolio-statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'agent-tools' || displayedRouteKey === 'agent-stats' || displayedRouteKey === 'agent-menu' || displayedRouteKey === 'exchange' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
+  const isProtectedPage = ['dashboard', 'profile', 'manage', 'theme-settings', 'nowbar-settings', 'nowbar-color', 'nowbar-button-color', 'portfolio', 'logout', 'auto-logout', 'manual-logout', 'portfolio-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'records', 'contact', 'options', 'library', 'about', 'information', 'privacy-policy', 'community-standards', 'developer', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
   const usagePagePath = displayedRouteKey === 'logout' ? '/logout' : displayedRouteKey === 'portfolio-statistics' ? '/portfolio/statistics' : displayedRouteKey === 'agent-tools' ? '/agent/tools' : displayedRouteKey === 'agent-stats' ? '/agent/stats' : displayedRouteKey === 'agent-menu' ? '/agent/menu' : displayedRouteKey === 'nowbar-settings' ? '/nowbar-settings' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   const trackedUsagePage = useRef('');

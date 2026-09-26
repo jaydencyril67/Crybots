@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import { getScheduledLogout, setScheduledLogout } from '../utils/scheduledLogout';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '132px', background: theme.background, color: theme.text },
@@ -23,15 +24,22 @@ const AutoLogoutPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [idleEnabled, setIdleEnabled] = useState(false);
-  const [scheduledLogout, setScheduledLogout] = useState('');
+  const [scheduledLogout, setScheduledLogoutValue] = useState(getScheduledLogout);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [status, setStatus] = useState('No automatic logout has been configured.');
 
   const saveSchedule = (value: string) => {
+    setScheduledLogoutValue(value);
     setScheduledLogout(value);
     setShowDatePicker(false);
     setStatus(`Scheduled logout set for ${value.replace('T', ' ')}.`);
   };
+
+  useEffect(() => {
+    if (scheduledLogout) {
+      setStatus(`Scheduled logout set for ${scheduledLogout.replace('T', ' ')}.`);
+    }
+  }, [scheduledLogout]);
 
   if (showDatePicker) {
     return <ReusableDatePage title="Scheduled logout" description="Choose the date and time when this session should end automatically." value={scheduledLogout} mode="datetime-local" confirmLabel="Save scheduled logout" onConfirm={saveSchedule} onCancel={() => setShowDatePicker(false)} />;
