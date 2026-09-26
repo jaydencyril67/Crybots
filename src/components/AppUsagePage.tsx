@@ -77,7 +77,7 @@ const AppUsagePage = () => {
                   <article key={page} style={{ width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, boxSizing: 'border-box', fontSize: '0.95rem' }}>
                     <span style={{ fontWeight: 800 }}>{label}</span>
                     <strong style={{ color: theme.primary }}>
-                      {loading ? <LoadingDots /> : `${usage[page] || 0} Visit(s)`}
+                      {loading ? <LoadingDots /> : `${usage[page] || 0} ${usage[page] === 1 ? 'Visit' : 'Visits'}`}
                     </strong>
                   </article>
                 ))}
