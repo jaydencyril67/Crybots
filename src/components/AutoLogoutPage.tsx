@@ -21,6 +21,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   status: { margin: '5px 0 0', fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', padding: '12px 16px', border: `1px solid ${theme.primary}`, cursor: 'pointer', fontWeight: 700, color: theme.textInverse, background: theme.primary, width: '100%', maxWidth: '100%' },
+  selectorWrapper: { position: 'relative' as const, width: '100%', maxWidth: '220px' },
+  selector: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', font: 'inherit', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const },
+  selectorMenu: { position: 'absolute' as const, zIndex: 10, top: 'calc(100% + 6px)', left: 0, right: 0, maxHeight: '220px', overflowY: 'auto' as const, padding: '6px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surface, boxShadow: `0 16px 36px ${theme.borderGlass}` },
+  selectorOption: { display: 'block', width: '100%', border: 0, borderRadius: '9px', background: 'transparent', color: theme.text, padding: '9px 10px', font: 'inherit', fontWeight: 700, textAlign: 'left' as const, cursor: 'pointer' },
+  selectedSelectorOption: { background: theme.primary, color: theme.textInverse },
 });
 
 const toLocalDateTimeValue = (value: string) => {
@@ -37,6 +42,7 @@ const AutoLogoutPage = () => {
   const [idleEnabled, setIdleEnabled] = useState(false);
   const [idleMinutes, setIdleMinutes] = useState(10);
   const [idleSaving, setIdleSaving] = useState(false);
+  const [idlePickerOpen, setIdlePickerOpen] = useState(false);
   const [scheduledLogout, setScheduledLogoutValue] = useState(getScheduledLogout);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [scheduleSaving, setScheduleSaving] = useState(false);
@@ -125,10 +131,15 @@ const AutoLogoutPage = () => {
                   <strong>Logout when the app is idle</strong>
                   <p style={styles.status}>End your session after the selected period of inactivity. Scheduled logout remains independent.</p>
                   <div style={styles.buttonRow}>
-                    <label style={styles.status} htmlFor="idle-logout-minutes">Timeout</label>
-                    <select id="idle-logout-minutes" value={idleMinutes} disabled={idleSaving} onChange={(event) => setIdleMinutes(Number(event.target.value))}>
-                      {[5, 10, 15, 30].map((minutes) => <option key={minutes} value={minutes}>{minutes} minutes</option>)}
-                    </select>
+                    <span style={styles.status}>Timeout</span>
+                    <div style={styles.selectorWrapper}>
+                      <button type="button" aria-haspopup="listbox" aria-expanded={idlePickerOpen} disabled={idleSaving} style={{ ...styles.selector, ...(idleSaving ? { opacity: 0.6, cursor: 'not-allowed' } : {}) }} onClick={() => setIdlePickerOpen((open) => !open)}>
+                        <span>{idleMinutes} minutes</span><span aria-hidden="true">⌄</span>
+                      </button>
+                      {idlePickerOpen ? <div role="listbox" aria-label="Idle logout timeout" style={styles.selectorMenu}>
+                        {[5, 10, 15, 30].map((minutes) => <button key={minutes} type="button" role="option" aria-selected={idleMinutes === minutes} style={{ ...styles.selectorOption, ...(idleMinutes === minutes ? styles.selectedSelectorOption : {}) }} onClick={() => { setIdleMinutes(minutes); setIdlePickerOpen(false); }}>{minutes} minutes</button>)}
+                      </div> : null}
+                    </div>
                     {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleLogout(true)}>{idleSaving ? 'Saving...' : 'Save timeout'}</button>}
                     <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleLogout(!idleEnabled)}>{idleSaving ? 'Saving...' : idleEnabled ? 'Disable' : 'Enable'}</button>
                   </div>
