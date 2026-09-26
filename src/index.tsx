@@ -92,6 +92,8 @@ const getRouteKey = () => {
   if (pathname === '/portfolio/statistics' || hash === '#/portfolio/statistics') return 'portfolio-statistics';
   if (pathname === '/portfolio' || hash === '#/portfolio') return 'portfolio';
   if (pathname === '/logout' || hash === '#/logout') return 'logout';
+  if (pathname === '/auto-logout' || hash === '#/auto-logout') return 'auto-logout';
+  if (pathname === '/manual-logout' || hash === '#/manual-logout') return 'manual-logout';
   if (pathname === '/agent/stats' || hash === '#/agent/stats') return 'agent-stats';
   if (pathname === '/agent/tools' || hash === '#/agent/tools') return 'agent-tools';
   if (pathname === '/agent/menu' || hash === '#/agent/menu') return 'agent-menu';
