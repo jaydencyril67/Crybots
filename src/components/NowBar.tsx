@@ -244,6 +244,8 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/portfolio/statistics') return 'ACCOUNT STATISTICS';
   if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/logout') return 'LOGOUT';
+  if (path === '/auto-logout') return 'AUTO LOGOUT';
+  if (path === '/manual-logout') return 'MANUAL LOGOUT';
   if (path === '/agent') return 'AGENT';
   if (path === '/agent/stats') return 'AGENT STATS';
   if (path === '/agent/tools') return 'AGENT TOOLS';
