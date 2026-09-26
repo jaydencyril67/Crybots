@@ -9,6 +9,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
+    overflowY: 'auto' as const,
     paddingBottom: '132px',
     background: theme.background,
     color: theme.text,
@@ -29,37 +30,65 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     display: 'grid',
     gap: '10px',
   },
-  title: {
+  sectionTitle: {
     margin: 0,
     fontSize: '1.45rem',
     fontWeight: 900,
     letterSpacing: '-0.02em',
+    color: theme.text,
   },
-  description: {
+  sectionText: {
     margin: 0,
-    maxWidth: '62ch',
+    fontSize: '0.92rem',
     color: theme.textMuted,
     lineHeight: 1.7,
+    maxWidth: '62ch',
+  },
+  cardGrid: {
+    display: 'grid',
+    gap: '10px',
+    marginTop: '6px',
   },
   card: {
     display: 'grid',
-    gap: '12px',
-    padding: '16px',
+    gridTemplateColumns: 'minmax(110px, 0.35fr) minmax(0, 1fr) auto',
+    alignItems: 'center',
+    gap: '14px',
+    padding: '12px 14px',
     borderRadius: '14px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
+    color: theme.text,
+    textAlign: 'left' as const,
+    boxSizing: 'border-box' as const,
     backdropFilter: 'blur(24px) saturate(1.15)',
     WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
   },
-  button: {
+  cardTitle: {
+    margin: 0,
+    fontSize: '0.95rem',
+    fontWeight: 850,
+    whiteSpace: 'nowrap' as const,
+  },
+  cardSubtext: {
+    margin: 0,
+    color: theme.textMuted,
+    fontSize: '0.84rem',
+    lineHeight: 1.4,
+    whiteSpace: 'nowrap' as const,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  viewButton: {
     borderRadius: '999px',
     border: `1px solid ${theme.borderGlass}`,
-    padding: '10px 14px',
-    fontSize: '0.88rem',
+    padding: '7px 12px',
+    fontSize: '0.82rem',
     fontWeight: 800,
     color: theme.text,
     background: theme.surfaceMuted,
     cursor: 'pointer',
+    justifySelf: 'end',
   },
   dangerButton: {
     borderColor: 'rgba(248, 113, 113, 0.65)',
@@ -94,16 +123,28 @@ const LogoutPage = () => {
         <div style={styles.shell}>
           <div style={styles.content}>
             <section style={styles.section}>
-              <h2 style={styles.title}>Logout</h2>
-              <p style={styles.description}>Choose an automatic session exit or sign out manually from this device.</p>
+              <h2 style={styles.sectionTitle}>Logout</h2>
+              <p style={styles.sectionText}>Choose an automatic session exit or sign out manually from this device.</p>
             </section>
 
-            <section style={styles.card} aria-label="Logout options">
-              <button type="button" style={styles.button} onClick={forceLogout}>Auto Logout</button>
-              <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => { void handleManualLogout(); }}>Manual Logout</button>
-              <button type="button" style={styles.button} onClick={() => navigate('/portfolio')}>Back to Portfolio</button>
+            <div style={styles.cardGrid} aria-label="Logout options">
+              <article style={styles.card}>
+                <h3 style={styles.cardTitle}>Auto Logout</h3>
+                <p style={styles.cardSubtext}>End this session immediately.</p>
+                <button type="button" style={styles.viewButton} onClick={forceLogout}>Logout</button>
+              </article>
+              <article style={styles.card}>
+                <h3 style={styles.cardTitle}>Manual Logout</h3>
+                <p style={styles.cardSubtext}>Sign out securely from this device.</p>
+                <button type="button" style={{ ...styles.viewButton, ...styles.dangerButton }} onClick={() => { void handleManualLogout(); }}>Logout</button>
+              </article>
+              <article style={styles.card}>
+                <h3 style={styles.cardTitle}>Portfolio</h3>
+                <p style={styles.cardSubtext}>Return to your account sections.</p>
+                <button type="button" style={styles.viewButton} onClick={() => navigate('/portfolio')}>View</button>
+              </article>
               <p style={styles.status} aria-live="polite">{status}</p>
-            </section>
+            </div>
           </div>
         </div>
         <NowBar />
