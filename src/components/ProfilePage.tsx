@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Camera, CircleUserRound, Coins, LogOut, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { ArrowLeft, Camera, CircleUserRound, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -168,16 +168,6 @@ const baseStyles = {
     margin: 0,
     lineHeight: 1.5,
   },
-  helperAction: {
-    border: 'none',
-    background: 'transparent',
-    borderRadius: '999px',
-    padding: '12px 16px',
-    fontWeight: 700,
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
   avatarCameraButton: {
     position: 'absolute' as const,
     right: '-18px',
@@ -190,18 +180,6 @@ const baseStyles = {
     border: '3px solid #111827',
     cursor: 'pointer',
     boxShadow: '0 6px 16px rgba(0,0,0,0.28)',
-  },
-  logoutButton: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '36px',
-    height: '36px',
-    borderRadius: '999px',
-    border: 'none',
-    background: 'transparent',
-    cursor: 'pointer',
-    flexShrink: 0,
   },
 };
 
@@ -241,25 +219,6 @@ const ProfilePage = () => {
     helperText: {
       ...baseStyles.helperText,
       color: theme.textMuted,
-    },
-    helperAction: {
-      ...baseStyles.helperAction,
-      color: theme.text,
-    },
-    logoutRow: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-      padding: '8px 10px',
-      minHeight: 'auto',
-      borderRadius: '15px',
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceMuted,
-      boxSizing: 'border-box' as const,
-    },
-    logoutButton: {
-      ...baseStyles.logoutButton,
-      color: theme.text,
     },
     portfolioBack: {
       display: 'inline-flex',
@@ -414,21 +373,6 @@ const ProfilePage = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/api/auth/signout');
-    } catch {
-      // Even if signout API fails, clear local state
-    }
-    window.localStorage.removeItem('token');
-    window.localStorage.removeItem('user');
-    window.localStorage.removeItem('kingshall_user');
-    window.localStorage.removeItem('firstName');
-    window.localStorage.removeItem('kingshall_first_name');
-    window.dispatchEvent(new Event('ke:force-logout'));
-    navigate('/');
-  };
-
   return (
     <HybridTheme mode={themeMode}>
       <>
@@ -491,13 +435,6 @@ const ProfilePage = () => {
 
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
 
-              <div style={styles.rowList}>
-                <div style={styles.logoutRow}>
-                  <button type="button" onClick={handleLogout} style={styles.helperAction}>
-                  <LogOut size={16} /> Logout
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
