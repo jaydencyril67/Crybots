@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, BarChart3 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -71,12 +71,9 @@ const AppUsagePage = () => {
           <div style={{ display: 'grid', gap: '14px', marginTop: '10px' }}>
             <button type="button" onClick={() => navigate('/records')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' }}><ArrowLeft size={17} /> Records</button>
             <section style={cardStyles.card}>
-              <h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em' }}>App Usage</h1>
-              <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.92rem', lineHeight: 1.7 }}>See how many times you have opened each protected page.</p>
               {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
               <div style={{ display: 'grid', gap: '10px', width: '100%', minWidth: 0, marginTop: '6px', padding: '12px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', background: theme.surfaceGlass, boxSizing: 'border-box' }} aria-live="polite">
                 {loading ? <div style={{ padding: '28px 18px', textAlign: 'center' }}><LoadingDots /></div> : null}
-                {!loading && !Object.keys(pageLabels).some((page) => usage[page]) ? <div style={{ display: 'grid', placeItems: 'center', gap: '8px', padding: '28px 18px', color: theme.textMuted, fontSize: '0.92rem', textAlign: 'center' }}><BarChart3 size={22} /><span>No protected pages have been opened yet.</span></div> : null}
                 {!loading && Object.entries(pageLabels).map(([page, label]) => (
                   <article key={page} style={{ width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, boxSizing: 'border-box', fontSize: '0.95rem' }}>
                     <span style={{ fontWeight: 800 }}>{label}</span>
