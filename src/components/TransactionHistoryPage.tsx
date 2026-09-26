@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Copy, Filter, ListFilter, Search } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Filter, ListFilter, Search } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
@@ -109,15 +109,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   selectMenu: { position: 'absolute' as const, zIndex: 20, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.surfaceElevated, border: `1px solid ${theme.border}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
   selectOption: { border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   tableWrap: {
-    overflowX: 'auto' as const,
-    overflowY: 'hidden' as const,
     width: '100%',
     boxSizing: 'border-box' as const,
   },
   table: {
     width: '100%',
     borderCollapse: 'collapse' as const,
-    minWidth: '820px',
+    tableLayout: 'fixed' as const,
   },
   th: {
     textAlign: 'left' as const,
@@ -186,6 +184,33 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     textAlign: 'right' as const,
     flexShrink: 0,
   },
+  detailList: {
+    display: 'grid',
+    gap: '7px',
+    padding: '12px 14px 14px',
+    background: theme.surface,
+  },
+  detailItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '14px',
+    borderRadius: '14px',
+    border: `1px solid ${theme.border}`,
+    background: theme.surfaceMuted,
+    padding: '11px 12px',
+  },
+  detailLabel: {
+    color: theme.textMuted,
+    fontSize: '0.82rem',
+  },
+  detailValue: {
+    margin: 0,
+    fontSize: '0.88rem',
+    fontWeight: 800,
+    textAlign: 'right' as const,
+    overflowWrap: 'anywhere' as const,
+  },
   loadingState: {
     padding: '24px 18px',
     textAlign: 'center' as const,
@@ -223,6 +248,7 @@ const TransactionHistoryPage = () => {
   const [isDirectionMenuOpen, setIsDirectionMenuOpen] = useState(false);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
+  const [expandedTransactionId, setExpandedTransactionId] = useState<string | null>(null);
   const [transactionHistoryPage, setTransactionHistoryPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState<{ tone: NotificationTone; title: string; message: string } | null>(null);
@@ -484,62 +510,58 @@ const TransactionHistoryPage = () => {
                 <thead>
                   <tr>
                     <th style={styles.th}>Transaction</th>
-                    <th style={styles.th}>Amount</th>
-                    <th style={styles.th}>Status</th>
-                    <th style={styles.th}>Date</th>
-                    <th style={styles.th}>Time</th>
-                    <th style={styles.th}>Action</th>
+                    <th style={{ ...styles.th, width: '64px', textAlign: 'right' }}>Details</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
-                      <td style={styles.loadingState} colSpan={6}><LoadingDots /></td>
+                      <td style={styles.loadingState} colSpan={2}><LoadingDots /></td>
                     </tr>
                   ) : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => (
-                    <tr key={transaction.id} style={{ background: index % 2 === 0 ? theme.surfaceShine : 'transparent' }}>
-                      <td style={styles.td}>
-                        <div style={styles.meta}>
+                    <React.Fragment key={transaction.id}>
+                      <tr style={{ background: index % 2 === 0 ? theme.surfaceShine : 'transparent' }}>
+                        <td style={styles.td}>
                           <strong>{transaction.title}</strong>
-                        </div>
-                      </td>
-                      <td style={styles.td}><strong>{transaction.amount}</strong></td>
-                      <td style={styles.td}><span style={{ ...styles.pill, ...getStatusStyle(theme, transaction.status) }}>{transaction.status}</span></td>
-                      <td style={styles.td}>{transaction.date}</td>
-                      <td style={styles.td}>{transaction.time}</td>
-                      <td style={styles.td}>
-                        <button
-                          type="button"
-                          style={{ ...styles.selectOption, display: 'inline-flex', alignItems: 'center', gap: '7px' }}
-                          onClick={() => {
-                            void (async () => {
-                              try {
-                                if (navigator.clipboard?.writeText) {
-                                  await navigator.clipboard.writeText(transaction.reference);
-                                } else {
-                                  const textArea = document.createElement('textarea');
-                                  textArea.value = transaction.reference;
-                                  textArea.style.position = 'fixed';
-                                  textArea.style.opacity = '0';
-                                  document.body.appendChild(textArea);
-                                  textArea.select();
-                                  document.execCommand('copy');
-                                  document.body.removeChild(textArea);
-                                }
-                                setAlert({ tone: 'success', title: 'Reference copied', message: 'The transaction reference has been copied to your clipboard.' });
-                              } catch {
-                                setAlert({ tone: 'error', title: 'Copy failed', message: 'The transaction reference could not be copied. Please try again.' });
-                              }
-                            })();
-                          }}
-                        >
-                          <Copy size={16} /> Ref
-                        </button>
-                      </td>
-                    </tr>
+                        </td>
+                        <td style={{ ...styles.td, width: '64px', textAlign: 'right' }}>
+                          <button
+                            type="button"
+                            aria-label={`${expandedTransactionId === transaction.id ? 'Hide' : 'Show'} details for ${transaction.title}`}
+                            aria-expanded={expandedTransactionId === transaction.id}
+                            style={{ ...styles.selectOption, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '8px' }}
+                            onClick={() => setExpandedTransactionId((current) => current === transaction.id ? null : transaction.id)}
+                          >
+                            {expandedTransactionId === transaction.id ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedTransactionId === transaction.id ? (
+                        <tr>
+                          <td style={{ padding: 0 }} colSpan={2}>
+                            <div style={styles.detailList}>
+                              {[
+                                ['Amount', transaction.amount],
+                                ['Status', transaction.status],
+                                ['Direction', transaction.direction],
+                                ['Date', transaction.date],
+                                ['Time', transaction.time],
+                                ...(transaction.counterpart ? [['Counterpart', transaction.counterpart]] : []),
+                                ['Reference', transaction.reference],
+                              ].map(([label, value]) => (
+                                <div key={label} style={styles.detailItem}>
+                                  <span style={styles.detailLabel}>{label}</span>
+                                  <strong style={{ ...styles.detailValue, ...(label === 'Status' ? getStatusStyle(theme, transaction.status) : {}) }}>{value}</strong>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ) : null}
+                    </React.Fragment>
                   )) : (
                     <tr>
-                      <td style={styles.td} colSpan={6}>
+                      <td style={styles.td} colSpan={2}>
                         <div style={{ padding: '18px 0', textAlign: 'center' }}>
                           <p style={{ margin: 0, fontWeight: 800 }}>No transactions found</p>
                           <p style={{ margin: '8px 0 0', color: theme.textMuted, fontSize: '0.92rem' }}>Try changing your search, type, or status filters.</p>
