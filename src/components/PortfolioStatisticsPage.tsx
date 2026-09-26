@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowDownToLine, ArrowLeft, ArrowUpFromLine, CalendarDays, CheckCircle2, CircleDollarSign, LockKeyhole, LogIn, ShieldAlert, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CheckCircle2, LockKeyhole, LogIn, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -42,7 +42,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   muted: { color: theme.textMuted },
 });
 
-const formatUsdt = (value: number) => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`;
 const formatDate = (value: string | null) => value ? new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not available';
 
 const PortfolioStatisticsPage = () => {
@@ -60,19 +59,9 @@ const PortfolioStatisticsPage = () => {
     return () => { active = false; };
   }, []);
 
-  const cards = [
-    { label: 'Total deposits', value: data ? formatUsdt(data.finance.totalDeposits) : null, note: data ? `${data.finance.depositCount} completed deposits` : '', icon: <ArrowDownToLine size={19} /> },
-    { label: 'Total withdrawals', value: data ? formatUsdt(data.finance.totalWithdrawals) : null, note: data ? `${data.finance.withdrawalCount} completed withdrawals` : '', icon: <ArrowUpFromLine size={19} /> },
-    { label: 'Total transfers', value: data ? formatUsdt(data.finance.totalTransfers) : null, note: data ? `${data.finance.transferCount} completed transfers` : '', icon: <Users size={19} /> },
-    { label: 'Total invested', value: data ? formatUsdt(data.finance.totalInvested) : null, note: data ? `${data.finance.investmentCount} investments` : '', icon: <TrendingUp size={19} /> },
-    { label: 'Profit earned', value: data ? formatUsdt(data.finance.totalProfit) : null, note: data ? 'Completed rewards' : '', icon: <CircleDollarSign size={19} /> },
-    { label: 'Current balance', value: data ? formatUsdt(data.finance.balance) : null, note: data ? 'Available USDT balance' : '', icon: <CircleDollarSign size={19} /> },
-  ];
-
   return <HybridTheme><Helmet><title>Account statistics | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <div style={styles.header}><button type="button" style={styles.back} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button></div>
     {error ? <div style={styles.card}>{error}</div> : null}
-    <div style={styles.listCard}>{cards.map((card) => <div style={styles.listItem} key={card.label}><div style={styles.listItemContent}><p style={styles.cardLabel}>{card.label}</p>{card.note ? <p style={styles.small}>{card.note}</p> : null}</div>{card.value ? <><div style={{ color: theme.primary, flexShrink: 0 }}>{card.icon}</div><p style={styles.value}>{card.value}</p></> : <LoadingDots />}</div>)}</div>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Account activity</h2>{data ? <div style={styles.listCard}><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Account created</p></div><CalendarDays size={19} color={theme.primary} /><p style={styles.value}>{formatDate(data.account.createdAt)}</p></div><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Total logins</p><p style={styles.small}>{data.account.activeSessions} active sessions</p></div><LogIn size={19} color={theme.primary} /><p style={styles.value}>{data.account.totalLogins.toLocaleString()}</p></div><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Email confirmation</p></div><CheckCircle2 size={19} color={theme.primary} /><p style={styles.value}>{formatDate(data.account.confirmedAt)}</p></div></div> : <div style={styles.listCard}><div style={styles.listItem}><LoadingDots /></div></div>}</section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Security level</h2>{data ? <div style={styles.listCard}><div style={styles.securityItemCard}><div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}><ShieldCheck size={24} color={theme.primary} /><div style={styles.listItemContent}><p style={styles.cardLabel}>Protection enabled</p><div style={styles.progress}><div style={{ ...styles.progressFill, width: `${data.security.score}%` }} /></div></div></div><div style={styles.score}>{data.security.score}%</div></div>{data.security.enabled.map((item) => <div style={styles.securityItemCard} key={item.key}><div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}><CheckCircle2 size={17} color="#22c55e" /><span>{item.label}</span></div><span style={styles.muted}>Enabled</span></div>)}{data.security.needed.map((item) => <div style={{ ...styles.securityItemCard, ...styles.muted }} key={item.key}><div style={{ display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}><ShieldAlert size={17} color="#f59e0b" /><span>{item.label} needed</span></div><span>Action required</span></div>)}{data.security.needed.length === 0 ? <div style={styles.securityItemCard}><div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}><LockKeyhole size={17} color={theme.primary} />Your security setup is complete.</div></div> : null}</div> : <div style={styles.listCard}><div style={styles.listItem}><LoadingDots /></div></div>}</section>
   </div><NowBar /></div></HybridTheme>;
