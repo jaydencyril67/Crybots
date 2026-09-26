@@ -50,6 +50,8 @@ jobs:
           const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#111827"/><g transform="translate(916 916)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
           fs.writeFileSync('assets/splash.svg', splash);
           sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')
+            .then(() => sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-foreground.png'))
+            .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#111827' } }).png().toFile('assets/icon-background.png'))
             .then(() => sharp('assets/splash.svg').png().toFile('assets/splash.png'))
             .catch(error => { console.error(error); process.exit(1); });
           NODE
