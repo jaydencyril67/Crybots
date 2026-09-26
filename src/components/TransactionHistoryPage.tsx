@@ -117,11 +117,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     overflowY: 'hidden' as const,
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '15px',
+    borderRadius: '10px',
     border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    background: theme.surfaceGlass,
   },
   table: {
     width: '100%',
@@ -488,10 +486,11 @@ const TransactionHistoryPage = () => {
               </div>
             </section>
 
-            {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
+            <section style={styles.card}>
+              {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
 
-            <section style={styles.tableWrap}>
-              <table style={styles.table}>
+              <div style={styles.tableWrap}>
+                <table style={styles.table}>
                 <thead>
                   <tr>
                     <th style={styles.th}>Transaction</th>
@@ -559,11 +558,11 @@ const TransactionHistoryPage = () => {
                     </tr>
                   )}
                 </tbody>
-              </table>
-            </section>
+                </table>
+              </div>
 
-            {filteredTransactions.length > transactionHistoryPageSize ? (
-              <div style={styles.card}>
+              {filteredTransactions.length > transactionHistoryPageSize ? (
+              <div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '12px', alignItems: 'center' }}>
                   <p style={styles.cardText}>Showing {transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredTransactions.length)} of {filteredTransactions.length} transactions</p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
@@ -590,7 +589,8 @@ const TransactionHistoryPage = () => {
                   </div>
                 </div>
               </div>
-            ) : null}
+              ) : null}
+            </section>
           </div>
         </div>
         <NowBar />
