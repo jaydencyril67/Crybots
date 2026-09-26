@@ -3,9 +3,9 @@ import ParentPageLayout, { ParentPageCard } from './ParentPageLayout';
 
 const destinations: ParentPageCard[] = [
   { label: 'Transactions', description: 'View your transaction history and status.', route: '/transactions' },
-  { label: 'Activity Log', description: 'Review actions from the last 24 hours.', route: '/activity-log' },
+  { label: 'App Usage', description: 'See how many times you have opened each protected page.', route: '/app-usage' },
 ];
 
-const RecordsPage = () => <ParentPageLayout title="Records" description="Review your transactions and account activity." cards={destinations} />;
+const RecordsPage = () => <ParentPageLayout title="Records" description="Review your transactions and app usage." cards={destinations} />;
 
 export default RecordsPage;
