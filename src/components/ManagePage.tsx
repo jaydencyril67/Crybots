@@ -6,6 +6,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
+import ReusableDatePage from './ReusableDatePage';
 import NowBar from './NowBar';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 import { navigate } from '../utils/navigate';
@@ -13,6 +14,8 @@ import { navigate } from '../utils/navigate';
 type WalletNetwork = 'TRC-20' | 'BEP-20' | 'TRX';
 type Wallet = { id?: string; network: WalletNetwork; address: string; description?: string };
 type MeResponse = { user?: { wallets?: Wallet[]; walletAddress?: string } };
+type BlockSecurityResponse = { enabled: boolean; startsAt: string | null; endsAt: string | null; active: boolean };
+type BlockPicker = 'startsAt' | 'endsAt' | null;
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -50,18 +53,38 @@ const ManagePage = () => {
   const [editingWalletId, setEditingWalletId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'idle', message: '' });
+  const [blockSettings, setBlockSettings] = useState<BlockSecurityResponse>({ enabled: false, startsAt: null, endsAt: null, active: false });
+  const [blockPicker, setBlockPicker] = useState<BlockPicker>(null);
+  const [blockSaving, setBlockSaving] = useState(false);
 
   useEffect(() => {
-    const loadWallet = async () => {
+    const loadSettings = async () => {
       try {
-        const { data } = await api.get<MeResponse>('/api/settings/me');
-        setWallets(data.user?.wallets ?? []);
+        const [{ data: walletData }, { data: blockData }] = await Promise.all([
+          api.get<MeResponse>('/api/settings/me'),
+          api.get<BlockSecurityResponse>('/api/settings/withdrawal-transfer-security'),
+        ]);
+        setWallets(walletData.user?.wallets ?? []);
+        setBlockSettings(blockData);
       } catch {
         navigate('/signin');
       }
     };
-    void loadWallet();
+    void loadSettings();
   }, []);
+
+  const saveBlockSettings = async (nextSettings: BlockSecurityResponse) => {
+    setBlockSaving(true);
+    try {
+      const { data } = await api.patch<BlockSecurityResponse>('/api/settings/withdrawal-transfer-security', nextSettings.enabled ? { enabled: true, startsAt: nextSettings.startsAt, endsAt: nextSettings.endsAt } : { enabled: false });
+      setBlockSettings(data);
+      setStatus({ kind: 'success', message: data.enabled ? 'Withdrawals and transfers are blocked for the selected period.' : 'Withdrawal and transfer blocking disabled.' });
+    } catch (error: any) {
+      setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to update withdrawal and transfer blocking.') });
+    } finally {
+      setBlockSaving(false);
+    }
+  };
 
   const resetWalletForm = () => {
     setWalletAddress('');
@@ -98,6 +121,28 @@ const ManagePage = () => {
       setSaving(false);
     }
   };
+
+  if (blockPicker) {
+    const currentValue = blockSettings[blockPicker];
+    const isStartPicker = blockPicker === 'startsAt';
+    return <ReusableDatePage
+      title={isStartPicker ? 'Block start date and time' : 'Block end date and time'}
+      description={isStartPicker ? 'Choose when withdrawals and transfers should be blocked.' : 'Choose when the withdrawal and transfer block should end.'}
+      value={currentValue || ''}
+      mode="datetime-local"
+      min={isStartPicker ? new Date().toISOString().slice(0, 16) : blockSettings.startsAt || new Date().toISOString().slice(0, 16)}
+      confirmLabel={isStartPicker ? 'Set start time' : 'Set end time'}
+      cancelLabel="Back"
+      showNowBar={false}
+      onConfirm={(value) => {
+        const nextSettings = { ...blockSettings, [blockPicker]: value, enabled: true };
+        setBlockSettings(nextSettings);
+        setBlockPicker(null);
+        if (nextSettings.startsAt && nextSettings.endsAt) void saveBlockSettings(nextSettings);
+      }}
+      onCancel={() => setBlockPicker(null)}
+    />;
+  }
 
   return (
     <HybridTheme mode={themeMode}>
@@ -141,6 +186,14 @@ const ManagePage = () => {
               </div>
             </div>
             {wallets.length ? <div style={styles.innerCard}><div style={styles.walletList}><strong>Bound wallets ({wallets.length}/10)</strong>{wallets.map((wallet) => <div key={wallet.id} style={styles.walletRow}><span><b>{wallet.description || wallet.network}</b><br /><small>{wallet.network} · {wallet.address}</small></span><div style={{ display: 'flex', gap: '8px' }}><button type="button" style={styles.button} onClick={() => { setEditingWalletId(wallet.id || null); setNetwork(wallet.network); setWalletAddress(wallet.address); setDescription(wallet.description || ''); setWalletValid(true); }}>Edit</button><button type="button" style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} onClick={() => void (async () => { if (securityCode.replace(/\D/g, '').length !== 6) { setStatus({ kind: 'error', message: 'Enter your 6-digit security code before unbinding a wallet.' }); return; } try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`, { data: { securityCode: securityCode.replace(/\D/g, '').slice(0, 6) } }); setWallets(data.wallets || []); if (editingWalletId === wallet.id) resetWalletForm(); setStatus({ kind: 'success', message: 'Wallet unbound successfully.' }); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Unbind</button></div></div>)}</div></div> : null}
+            <div style={styles.innerCard}>
+              <strong>Withdrawal and transfer block</strong>
+              <p style={styles.text}>Temporarily prevent withdrawals and transfers during a selected date and time range.</p>
+              <button type="button" style={styles.button} onClick={() => setBlockPicker('startsAt')}>Start: {blockSettings.startsAt ? new Date(blockSettings.startsAt).toLocaleString() : 'Choose date and time'}</button>
+              <button type="button" style={styles.button} onClick={() => setBlockPicker('endsAt')}>End: {blockSettings.endsAt ? new Date(blockSettings.endsAt).toLocaleString() : 'Choose date and time'}</button>
+              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} disabled={blockSaving || !blockSettings.startsAt || !blockSettings.endsAt} onClick={() => void saveBlockSettings({ ...blockSettings, enabled: true })}>{blockSaving ? <InlineLoadingDots /> : blockSettings.active ? 'Update block' : 'Enable block'}</button>
+              {blockSettings.enabled ? <button type="button" style={styles.button} disabled={blockSaving} onClick={() => void saveBlockSettings({ enabled: false, startsAt: null, endsAt: null, active: false })}>Disable block</button> : null}
+            </div>
           </section>
         </div>
         <NowBar />
