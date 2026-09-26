@@ -9,7 +9,7 @@ import NotificationBanner, { type NotificationTone } from './NotificationBanner'
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
-const MAX_MARKET_PERCENT = 3.5;
+const MAX_MARKET_PERCENT = 3;
 const UPDATE_INTERVAL_MS = 60_000;
 
 type MarketPoint = { timestamp: number; percent: number };

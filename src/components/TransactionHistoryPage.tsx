@@ -44,57 +44,41 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   shell: {
     width: '100%',
-    maxWidth: '1160px',
+    maxWidth: '920px',
     margin: '0 auto',
-    padding: 'clamp(14px, 3vw, 28px) clamp(8px, 1.5vw, 16px) 40px',
+    padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px',
     boxSizing: 'border-box' as const,
   },
-  panel: {
+  content: {
     display: 'grid',
-    gap: '16px',
+    gap: '14px',
+    marginTop: '10px',
+  },
+  back: { alignSelf: 'start', justifySelf: 'start', width: 'fit-content', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
+  rowList: {
+    display: 'grid',
+    gap: '10px',
     width: '100%',
+    minWidth: 0,
     padding: '18px',
-    boxSizing: 'border-box' as const,
     borderRadius: '22px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
-  },
-  body: {
-    padding: 'clamp(0px, 2vw, 30px) 0 0',
-    display: 'grid',
-    gap: '16px',
-    width: '100%',
     boxSizing: 'border-box' as const,
-  },
-  back: { alignSelf: 'start', justifySelf: 'start', width: 'fit-content', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  topGrid: {
-    display: 'grid',
-    gap: '18px',
-    gridTemplateColumns: '1fr',
   },
   card: {
-    display: 'grid',
     width: '100%',
-    boxSizing: 'border-box' as const,
-    gap: '20px',
-    padding: 'clamp(18px, 4vw, 28px)',
-    borderRadius: '15px',
-    border: `1px solid ${theme.borderGlass}`,
+    maxWidth: '100%',
     background: theme.surfaceMuted,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-  },
-  sectionCard: {
+    border: `1px solid ${theme.borderGlass}`,
+    borderRadius: '15px',
+    padding: '13px 14px',
     display: 'grid',
     gap: '12px',
-    width: '100%',
+    textAlign: 'left' as const,
+    minWidth: 0,
     boxSizing: 'border-box' as const,
-    padding: '12px',
-    borderRadius: '15px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    overflow: 'hidden' as const,
   },
   cardTitle: {
     margin: 0,
@@ -371,11 +355,10 @@ const TransactionHistoryPage = () => {
       <Helmet><title>Transaction History | KingsHall Exchange</title></Helmet>
       <div style={styles.shell}>
         
-        <div style={styles.panel}>
+        <div style={styles.content}>
           <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
-          <div style={styles.body}>
-            <section style={styles.sectionCard}>
-              <div style={{ ...styles.card, gap: '12px', position: 'relative', zIndex: 2 }}>
+          <div style={styles.rowList}>
+            <section style={{ ...styles.card, position: 'relative', zIndex: 2 }}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
                 <div className="transaction-history-filters" style={{ ...styles.filters, marginTop: 0 }}>
                   <div style={styles.field as React.CSSProperties}>
@@ -466,11 +449,9 @@ const TransactionHistoryPage = () => {
                     <input style={styles.input} value={amountMax} onChange={(event) => setAmountMax(event.target.value)} placeholder="9999.99" inputMode="decimal" />
                   </div>
                 </div>
-              </div>
             </section>
 
-            <section style={styles.sectionCard}>
-              <div style={styles.card}>
+            <section style={styles.card}>
                 <h2 style={styles.cardTitle}><ListFilter size={18} /> Overview</h2>
                 <div style={styles.overviewList}>
                   <div style={styles.overviewItem}>
@@ -494,11 +475,9 @@ const TransactionHistoryPage = () => {
                     <p style={styles.overviewValue}>{loading ? <LoadingDots /> : completedCount}</p>
                   </div>
                 </div>
-              </div>
             </section>
 
-            <section style={styles.sectionCard}>
-              <div style={styles.card}>
+            <section style={{ ...styles.card, gap: '16px' }}>
                 {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
                 <div style={styles.tableWrap}>
                 <table style={styles.table}>
@@ -601,7 +580,6 @@ const TransactionHistoryPage = () => {
                 </div>
               </div>
                 ) : null}
-              </div>
             </section>
           </div>
         </div>
