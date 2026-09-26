@@ -9,6 +9,8 @@ type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'puls
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 const BUTTON_COLOR_ENABLED_STORAGE_KEY = 'nowbar_button_color_enabled';
+const SWIPE_NAVIGATION_STORAGE_KEY = 'nowbar_swipe_navigation_enabled';
+const EXPAND_MODE_STORAGE_KEY = 'nowbar_expand_mode_enabled';
 const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
   { key: 'stable-light', label: 'Stable Light' },
   { key: 'stable', label: 'Stable glow' },
@@ -47,14 +49,20 @@ const NowBarSettingsPage = () => {
   const styles = getStyles(theme);
   const [enabled, setEnabled] = useState(false);
   const [buttonColorEnabled, setButtonColorEnabled] = useState(true);
+  const [swipeNavigationEnabled, setSwipeNavigationEnabled] = useState(true);
+  const [expandModeEnabled, setExpandModeEnabled] = useState(true);
   const [mode, setMode] = useState<EdgeLightMode>('stable');
 
   useEffect(() => {
     try {
       const saved = JSON.parse(window.localStorage.getItem(EDGE_LIGHT_STORAGE_KEY) ?? '{}') as { enabled?: boolean; mode?: EdgeLightMode };
       const savedButtonColorEnabled = window.localStorage.getItem(BUTTON_COLOR_ENABLED_STORAGE_KEY);
+      const savedSwipeNavigation = window.localStorage.getItem(SWIPE_NAVIGATION_STORAGE_KEY);
+      const savedExpandMode = window.localStorage.getItem(EXPAND_MODE_STORAGE_KEY);
       setEnabled(Boolean(saved.enabled));
       if (savedButtonColorEnabled !== null) setButtonColorEnabled(savedButtonColorEnabled === 'true');
+      if (savedSwipeNavigation !== null) setSwipeNavigationEnabled(savedSwipeNavigation === 'true');
+      if (savedExpandMode !== null) setExpandModeEnabled(savedExpandMode === 'true');
       if (saved.mode && EDGE_LIGHT_MODES.some((option) => option.key === saved.mode)) setMode(saved.mode);
     } catch {
       // Keep defaults when saved settings are invalid.
@@ -80,6 +88,20 @@ const NowBarSettingsPage = () => {
     setButtonColorEnabled(nextEnabled);
     window.localStorage.setItem(BUTTON_COLOR_ENABLED_STORAGE_KEY, String(nextEnabled));
     window.dispatchEvent(new Event('nowbar-button-color-changed'));
+  };
+
+  const toggleFeature = (key: string, value: boolean, setValue: React.Dispatch<React.SetStateAction<boolean>>) => {
+    setValue(value);
+    window.localStorage.setItem(key, String(value));
+    window.dispatchEvent(new Event('nowbar-feature-settings-changed'));
+  };
+
+  const toggleSwipeNavigation = () => {
+    toggleFeature(SWIPE_NAVIGATION_STORAGE_KEY, !swipeNavigationEnabled, setSwipeNavigationEnabled);
+  };
+
+  const toggleExpandMode = () => {
+    toggleFeature(EXPAND_MODE_STORAGE_KEY, !expandModeEnabled, setExpandModeEnabled);
   };
 
   const toggle = () => {
@@ -128,6 +150,26 @@ const NowBarSettingsPage = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </section>
+          <section style={styles.card}>
+            <h2 style={styles.cardHeading}>🧭 Navigation behavior</h2>
+            <p style={styles.cardText}>Choose which touch interactions are available on the NowBar. Both features are enabled by default.</p>
+            <div style={styles.list}>
+              <div style={styles.row}>
+                <div style={styles.rowContent}>
+                  <p style={styles.label}>Swipe navigation</p>
+                  <p style={styles.description}>Navigate between related pages by swiping left or right on the NowBar.</p>
+                </div>
+                <button type="button" style={{ ...styles.button, ...(swipeNavigationEnabled ? styles.active : {}) }} onClick={toggleSwipeNavigation} aria-pressed={swipeNavigationEnabled}>{swipeNavigationEnabled ? 'Enabled' : 'Enable'}</button>
+              </div>
+              <div style={styles.row}>
+                <div style={styles.rowContent}>
+                  <p style={styles.label}>Expand mode</p>
+                  <p style={styles.description}>Allow holding the NowBar to expand its navigation buttons.</p>
+                </div>
+                <button type="button" style={{ ...styles.button, ...(expandModeEnabled ? styles.active : {}) }} onClick={toggleExpandMode} aria-pressed={expandModeEnabled}>{expandModeEnabled ? 'Enabled' : 'Enable'}</button>
               </div>
             </div>
           </section>

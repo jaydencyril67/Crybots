@@ -18,6 +18,8 @@ type EdgeLightSettings = { enabled: boolean; color: string; mode: EdgeLightMode 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 const BUTTON_COLOR_STORAGE_KEY = 'nowbar_button_color';
 const BUTTON_COLOR_ENABLED_STORAGE_KEY = 'nowbar_button_color_enabled';
+const SWIPE_NAVIGATION_STORAGE_KEY = 'nowbar_swipe_navigation_enabled';
+const EXPAND_MODE_STORAGE_KEY = 'nowbar_expand_mode_enabled';
 const DEFAULT_BUTTON_COLOR = '#38bdf8';
 const EDGE_LIGHT_MODES: EdgeLightMode[] = ['stable-light', 'stable', 'blink-light', 'blink', 'pulse-light', 'pulse', 'color-light', 'color'];
 
@@ -29,6 +31,17 @@ const getButtonColor = () => {
     return stored && /^#[0-9a-f]{6}$/i.test(stored) ? stored : DEFAULT_BUTTON_COLOR;
   } catch {
     return DEFAULT_BUTTON_COLOR;
+  }
+};
+
+const getFeatureEnabled = (key: string) => {
+  if (typeof window === 'undefined') return true;
+
+  try {
+    const stored = window.localStorage.getItem(key);
+    return stored === null ? true : stored === 'true';
+  } catch {
+    return true;
   }
 };
 
@@ -408,9 +421,12 @@ const createDefaultActions = (): NowBarAction[] => [
 const NowBar = ({ actions }: NowBarProps) => {
   const [edgeLightVersion, setEdgeLightVersion] = useState(0);
   const [buttonColorVersion, setButtonColorVersion] = useState(0);
+  const [featureSettingsVersion, setFeatureSettingsVersion] = useState(0);
   const edgeLight = useMemo(() => getEdgeLightSettings(), [edgeLightVersion]);
   const buttonColor = useMemo(() => getButtonColor(), [buttonColorVersion]);
   const buttonColorEnabled = useMemo(() => getButtonColorEnabled(), [buttonColorVersion]);
+  const swipeNavigationEnabled = useMemo(() => getFeatureEnabled(SWIPE_NAVIGATION_STORAGE_KEY), [featureSettingsVersion]);
+  const expandModeEnabled = useMemo(() => getFeatureEnabled(EXPAND_MODE_STORAGE_KEY), [featureSettingsVersion]);
   const edgeLightColor = edgeLight.color;
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
@@ -424,7 +440,13 @@ const NowBar = ({ actions }: NowBarProps) => {
   const [currentPath, setCurrentPath] = useState(getActivePath());
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
-  const isExpanded = mode === 'expanded';
+  const isExpanded = expandModeEnabled && mode === 'expanded';
+
+  useEffect(() => {
+    if (!expandModeEnabled && mode === 'expanded') {
+      setMode('compact');
+    }
+  }, [expandModeEnabled, mode]);
 
   useEffect(() => {
     const syncPath = () => {
@@ -441,6 +463,10 @@ const NowBar = ({ actions }: NowBarProps) => {
       setButtonColorVersion((current) => current + 1);
     };
 
+    const syncFeatureSettings = () => {
+      setFeatureSettingsVersion((current) => current + 1);
+    };
+
     window.addEventListener('popstate', syncPath);
     window.addEventListener('hashchange', syncPath);
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
@@ -448,7 +474,7 @@ const NowBar = ({ actions }: NowBarProps) => {
     window.addEventListener('storage', syncButtonColor);
     window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
     window.addEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
-
+    window.addEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
 
     return () => {
       window.removeEventListener('popstate', syncPath);
@@ -458,6 +484,7 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.removeEventListener('storage', syncButtonColor);
       window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
       window.removeEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
+      window.removeEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
 
     };
   }, []);
@@ -499,7 +526,9 @@ const NowBar = ({ actions }: NowBarProps) => {
       if (view === 'title') {
         setView('actions');
       }
-      setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
+      if (expandModeEnabled) {
+        setMode((currentMode) => (currentMode === 'compact' ? 'expanded' : 'compact'));
+      }
     }, 700);
     setHoldTimer(timer);
   };
@@ -517,7 +546,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   };
 
   const handleSwipeStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    if (view !== 'title' || event.touches.length !== 1) return;
+    if (!swipeNavigationEnabled || view !== 'title' || event.touches.length !== 1) return;
 
     swipeStartRef.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
   };
@@ -525,7 +554,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   const handleSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
     const start = swipeStartRef.current;
     swipeStartRef.current = null;
-    if (view !== 'title' || !start || event.changedTouches.length !== 1) return;
+    if (!swipeNavigationEnabled || view !== 'title' || !start || event.changedTouches.length !== 1) return;
 
     const touch = event.changedTouches[0];
     const deltaX = touch.clientX - start.x;
