@@ -270,7 +270,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
-  { routes: ['/information', '/privacy-policy', '/community-standards'] },
+  { routes: ['/information', '/privacy-policy', '/community-standards', '/faq'] },
   { routes: ['/nowbar-color', '/nowbar-button-color'] },
 ];
 
