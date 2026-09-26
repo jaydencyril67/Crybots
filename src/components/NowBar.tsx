@@ -272,6 +272,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
   { routes: ['/nowbar-color', '/nowbar-button-color'] },
+  { routes: ['/faq'] },
 ];
 
 const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
@@ -299,6 +300,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/market') return 'MARKET';
   if (path === '/records') return 'RECORDS';
   if (path === '/contact') return 'CONTACT';
+  if (path === '/faq') return 'FAQ';
   if (path === '/options') return 'OPTIONS';
   if (path === '/library') return 'LIBRARY';
   if (path === '/about') return 'ABOUT';
