@@ -3,7 +3,6 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
 import api, { forceLogout } from '../api/axios';
-import { navigate } from '../utils/navigate';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
@@ -137,11 +136,6 @@ const LogoutPage = () => {
                 <h3 style={styles.cardTitle}>Manual Logout</h3>
                 <p style={styles.cardSubtext}>Sign out securely from this device.</p>
                 <button type="button" style={{ ...styles.viewButton, ...styles.dangerButton }} onClick={() => { void handleManualLogout(); }}>Logout</button>
-              </article>
-              <article style={styles.card}>
-                <h3 style={styles.cardTitle}>Portfolio</h3>
-                <p style={styles.cardSubtext}>Return to your account sections.</p>
-                <button type="button" style={styles.viewButton} onClick={() => navigate('/portfolio')}>View</button>
               </article>
               <p style={styles.status} aria-live="polite">{status}</p>
             </div>
