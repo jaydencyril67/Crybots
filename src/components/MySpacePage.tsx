@@ -59,7 +59,7 @@ const MySpacePage = () => {
     ]).then(([pointsResponse, transactionsResponse]) => {
       if (!active) return;
       setMarketPoints(pointsResponse.data);
-      setPointTransactions(transactionsResponse.data.transactions.filter((transaction) => transaction.source === 'trade' && transaction.points));
+      setPointTransactions(transactionsResponse.data.transactions.filter((transaction) => transaction.source === 'trade' && typeof transaction.points === 'number'));
       setPointSummary(transactionsResponse.data.pointSummary);
     }).catch(() => { if (active) setError('Unable to load your account statistics.'); });
     return () => { active = false; };
