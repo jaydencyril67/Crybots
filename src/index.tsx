@@ -57,6 +57,8 @@ import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { forceLogout } from './api/axios';
 import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
 
+const DEFAULT_IDLE_LOGOUT_MINUTES = 10;
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {
@@ -226,6 +228,10 @@ const RouteTransition = () => {
     };
 
     let scheduledLogoutTimer: number | undefined;
+    let idleLogoutTimer: number | undefined;
+    let idleLogoutEnabled = false;
+    let idleLogoutMinutes = DEFAULT_IDLE_LOGOUT_MINUTES;
+    let lastActivityPingAt = 0;
     let hasTriggeredScheduledLogout = false;
 
     const validateScheduledLogout = () => {
@@ -273,12 +279,76 @@ const RouteTransition = () => {
       }
     };
 
+    const loadIdleLogoutSetting = async () => {
+      if (!localStorage.getItem('token')) {
+        idleLogoutEnabled = false;
+        idleLogoutMinutes = DEFAULT_IDLE_LOGOUT_MINUTES;
+        if (idleLogoutTimer !== undefined) {
+          window.clearTimeout(idleLogoutTimer);
+          idleLogoutTimer = undefined;
+        }
+        return;
+      }
+
+      try {
+        const response = await api.get('/api/auth/idle-logout');
+        const nextIdleLogoutEnabled = response.data.idleLogoutEnabled === true;
+        const nextIdleLogoutMinutes = [5, 10, 15, 30].includes(Number(response.data.idleLogoutMinutes)) ? Number(response.data.idleLogoutMinutes) : DEFAULT_IDLE_LOGOUT_MINUTES;
+        const settingChanged = idleLogoutEnabled !== nextIdleLogoutEnabled || idleLogoutMinutes !== nextIdleLogoutMinutes;
+        idleLogoutEnabled = nextIdleLogoutEnabled;
+        idleLogoutMinutes = nextIdleLogoutMinutes;
+        if (settingChanged) {
+          resetIdleLogoutTimer();
+        }
+      } catch {
+        if (idleLogoutEnabled) {
+          idleLogoutEnabled = false;
+          resetIdleLogoutTimer();
+        }
+      }
+    };
+
+    const resetIdleLogoutTimer = () => {
+      if (idleLogoutTimer !== undefined) {
+        window.clearTimeout(idleLogoutTimer);
+      }
+
+      if (!idleLogoutEnabled || !localStorage.getItem('token')) {
+        idleLogoutTimer = undefined;
+        return;
+      }
+
+      idleLogoutTimer = window.setTimeout(() => {
+        if (idleLogoutEnabled && localStorage.getItem('token')) {
+          forceLogout();
+        }
+      }, idleLogoutMinutes * 60 * 1000);
+    };
+
+    const handleUserActivity = () => {
+      resetIdleLogoutTimer();
+
+      const token = localStorage.getItem('token');
+      const now = Date.now();
+      if (!token || now - lastActivityPingAt < 30000) return;
+
+      lastActivityPingAt = now;
+      void api.post('/api/auth/idle-logout/activity').catch(() => {
+        // The regular session validation handles expired or invalid sessions.
+      });
+    };
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'pointerdown'];
+    activityEvents.forEach((eventName) => window.addEventListener(eventName, handleUserActivity, { passive: true }));
+
     const interval = window.setInterval(() => {
       validateScheduledLogout();
       void validateSession();
+      void loadIdleLogoutSetting();
     }, 15000);
 
     validateScheduledLogout();
+    void loadIdleLogoutSetting();
 
     const connectForceLogoutStream = () => {
       const token = localStorage.getItem('token');
@@ -327,6 +397,10 @@ const RouteTransition = () => {
       if (scheduledLogoutTimer !== undefined) {
         window.clearTimeout(scheduledLogoutTimer);
       }
+      if (idleLogoutTimer !== undefined) {
+        window.clearTimeout(idleLogoutTimer);
+      }
+      activityEvents.forEach((eventName) => window.removeEventListener(eventName, handleUserActivity));
       window.removeEventListener('storage', syncAuthState);
       window.removeEventListener('ke:force-logout', syncAuthState);
       window.removeEventListener('ke:scheduled-logout-change', handleScheduledLogoutChange);

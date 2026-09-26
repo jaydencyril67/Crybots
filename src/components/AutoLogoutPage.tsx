@@ -35,22 +35,21 @@ const AutoLogoutPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [idleEnabled, setIdleEnabled] = useState(false);
+  const [idleMinutes, setIdleMinutes] = useState(10);
   const [idleSaving, setIdleSaving] = useState(false);
   const [scheduledLogout, setScheduledLogoutValue] = useState(getScheduledLogout);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [scheduleSaving, setScheduleSaving] = useState(false);
   const [status, setStatus] = useState('No automatic logout has been configured.');
 
-  const saveIdleLogout = async () => {
-    const nextValue = !idleEnabled;
-    if (nextValue && !scheduledLogout) {
-      setStatus('Choose a logout time before enabling automatic logout.');
-      return;
-    }
+  const saveIdleLogout = async (enabled = !idleEnabled) => {
+    const nextValue = enabled;
     setIdleSaving(true);
     try {
-      const response = await api.put('/api/auth/idle-logout', { enabled: nextValue });
+      const response = await api.put('/api/auth/idle-logout', { enabled: nextValue, minutes: idleMinutes });
       setIdleEnabled(Boolean(response.data.idleLogoutEnabled));
-      setStatus(response.data.idleLogoutEnabled ? 'Idle logout enabled.' : 'Idle logout disabled.');
+      setIdleMinutes(Number(response.data.idleLogoutMinutes) || idleMinutes);
+      setStatus(response.data.idleLogoutEnabled ? `Idle logout enabled after ${response.data.idleLogoutMinutes} minutes.` : 'Idle logout disabled.');
     } catch (error: any) {
       setStatus(error?.response?.data?.message || 'Unable to update idle logout.');
     } finally {
@@ -59,6 +58,7 @@ const AutoLogoutPage = () => {
   };
 
   const saveSchedule = async (value: string) => {
+    setScheduleSaving(true);
     try {
       const response = await api.put('/api/auth/scheduled-logout', { scheduledLogoutAt: new Date(value).toISOString() });
       const savedValue = toLocalDateTimeValue(response.data.scheduledLogoutAt);
@@ -68,6 +68,22 @@ const AutoLogoutPage = () => {
       setStatus(`Scheduled logout set for ${savedValue.replace('T', ' ')}.`);
     } catch (error: any) {
       setStatus(error?.response?.data?.message || 'Unable to save scheduled logout.');
+    } finally {
+      setScheduleSaving(false);
+    }
+  };
+
+  const cancelSchedule = async () => {
+    setScheduleSaving(true);
+    try {
+      await api.put('/api/auth/scheduled-logout', { scheduledLogoutAt: null });
+      setScheduledLogoutValue('');
+      setScheduledLogout('');
+      setStatus('Scheduled logout cancelled.');
+    } catch (error: any) {
+      setStatus(error?.response?.data?.message || 'Unable to cancel scheduled logout.');
+    } finally {
+      setScheduleSaving(false);
     }
   };
 
@@ -80,6 +96,7 @@ const AutoLogoutPage = () => {
         ]);
         const serverValue = scheduleResponse.data.scheduledLogoutAt ? toLocalDateTimeValue(scheduleResponse.data.scheduledLogoutAt) : '';
         setIdleEnabled(Boolean(idleResponse.data.idleLogoutEnabled));
+        setIdleMinutes([5, 10, 15, 30].includes(Number(idleResponse.data.idleLogoutMinutes)) ? Number(idleResponse.data.idleLogoutMinutes) : 10);
         setScheduledLogoutValue(serverValue);
         setScheduledLogout(serverValue);
         setStatus(serverValue ? `Scheduled logout set for ${serverValue.replace('T', ' ')}.` : 'No automatic logout has been configured.');
@@ -106,13 +123,23 @@ const AutoLogoutPage = () => {
                 <p style={styles.text}>Set an automatic logout for inactivity or schedule a specific time to end this session.</p>
                 <div style={styles.dangerRow}>
                   <strong>Logout when the app is idle</strong>
-                  <p style={styles.status}>End your session after a period of inactivity.</p>
-                  <div style={styles.buttonRow}><button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={saveIdleLogout}>{idleSaving ? 'Saving...' : idleEnabled ? 'Enabled' : 'Enable'}</button></div>
+                  <p style={styles.status}>End your session after the selected period of inactivity. Scheduled logout remains independent.</p>
+                  <div style={styles.buttonRow}>
+                    <label style={styles.status} htmlFor="idle-logout-minutes">Timeout</label>
+                    <select id="idle-logout-minutes" value={idleMinutes} disabled={idleSaving} onChange={(event) => setIdleMinutes(Number(event.target.value))}>
+                      {[5, 10, 15, 30].map((minutes) => <option key={minutes} value={minutes}>{minutes} minutes</option>)}
+                    </select>
+                    {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleLogout(true)}>{idleSaving ? 'Saving...' : 'Save timeout'}</button>}
+                    <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleLogout(!idleEnabled)}>{idleSaving ? 'Saving...' : idleEnabled ? 'Disable' : 'Enable'}</button>
+                  </div>
                 </div>
                 <div style={styles.dangerRow}>
                   <strong>Scheduled logout</strong>
                   <p style={styles.status}>{scheduledLogout ? `Set for ${scheduledLogout.replace('T', ' ')}` : 'No scheduled logout set.'}</p>
-                  <div style={styles.buttonRow}><button type="button" style={styles.button} onClick={() => setShowDatePicker(true)}>{scheduledLogout ? 'Change time' : 'Choose time'}</button></div>
+                  <div style={styles.buttonRow}>
+                    <button type="button" style={styles.button} disabled={scheduleSaving} onClick={() => setShowDatePicker(true)}>{scheduledLogout ? 'Change time' : 'Choose time'}</button>
+                    {scheduledLogout && <button type="button" style={styles.button} disabled={scheduleSaving} onClick={cancelSchedule}>{scheduleSaving ? 'Cancelling...' : 'Cancel scheduled logout'}</button>}
+                  </div>
                 </div>
                 <p style={styles.status} aria-live="polite">{status}</p>
               </section>
