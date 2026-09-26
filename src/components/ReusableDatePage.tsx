@@ -73,7 +73,7 @@ const ReusableDatePage = ({
     const parsed = new Date(`${initialDate}T12:00:00`);
     return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
   });
-  const [openPicker, setOpenPicker] = useState<'month' | 'year' | null>(null);
+  const [openPicker, setOpenPicker] = useState<'month' | 'year' | 'hour' | 'minute' | null>(null);
 
   useEffect(() => {
     const nextDate = value.split('T')[0] || toDateKey(new Date());
@@ -97,6 +97,14 @@ const ReusableDatePage = ({
   const minYear = min ? Number(min.slice(0, 4)) : currentYear - 120;
   const maxYear = max ? Number(max.slice(0, 4)) : currentYear + 20;
   const yearOptions = Array.from({ length: Math.max(1, maxYear - minYear + 1) }, (_, index) => minYear + index);
+  const hourOptions = Array.from({ length: 24 }, (_, index) => String(index).padStart(2, '0'));
+  const minuteOptions = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, '0'));
+  const [selectedHour, selectedMinute] = time.split(':');
+  const changeTime = (part: 'hour' | 'minute', nextValue: string) => {
+    const hour = part === 'hour' ? nextValue : selectedHour;
+    const minute = part === 'minute' ? nextValue : selectedMinute;
+    setTime(`${hour}:${minute}`);
+  };
   const changeMonth = (offset: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + offset, 1));
   const changePickerMonth = (nextMonth: number, nextYear = month.getFullYear()) => setMonth(new Date(nextYear, nextMonth, 1));
 
@@ -143,7 +151,21 @@ const ReusableDatePage = ({
                 </div>
               </>
             ) : null}
-            {resolvedMode === 'datetime-local' || resolvedMode === 'time' ? <div style={styles.field}><label style={styles.label} htmlFor="reusable-time-input">{resolvedMode === 'time' ? resolvedLabel : 'Time'}</label><input id="reusable-time-input" style={styles.input} type="time" value={time} onChange={(event) => setTime(event.target.value)} /></div> : null}
+            {resolvedMode === 'datetime-local' || resolvedMode === 'time' ? <div style={styles.field}><span style={styles.label}>{resolvedMode === 'time' ? resolvedLabel : 'Time'}</span><div style={styles.pickerGroup}>
+              <div style={styles.pickerWrapper}>
+                <button type="button" aria-haspopup="listbox" aria-expanded={openPicker === 'hour'} aria-label="Choose hour" style={styles.picker} onClick={() => setOpenPicker(openPicker === 'hour' ? null : 'hour')}>
+                  <span style={styles.pickerLabel}>{selectedHour}</span><span style={styles.pickerArrow} aria-hidden="true">⌄</span>
+                </button>
+                {openPicker === 'hour' ? <div role="listbox" aria-label="Hours" style={styles.pickerMenu}>{hourOptions.map((hour) => <button key={hour} type="button" role="option" aria-selected={selectedHour === hour} style={{ ...styles.pickerOption, ...(selectedHour === hour ? styles.selectedPickerOption : {}) }} onClick={() => { changeTime('hour', hour); setOpenPicker(null); }}>{hour}</button>)}</div> : null}
+              </div>
+              <span aria-hidden="true">:</span>
+              <div style={styles.pickerWrapper}>
+                <button type="button" aria-haspopup="listbox" aria-expanded={openPicker === 'minute'} aria-label="Choose minute" style={styles.picker} onClick={() => setOpenPicker(openPicker === 'minute' ? null : 'minute')}>
+                  <span style={styles.pickerLabel}>{selectedMinute}</span><span style={styles.pickerArrow} aria-hidden="true">⌄</span>
+                </button>
+                {openPicker === 'minute' ? <div role="listbox" aria-label="Minutes" style={styles.pickerMenu}>{minuteOptions.map((minute) => <button key={minute} type="button" role="option" aria-selected={selectedMinute === minute} style={{ ...styles.pickerOption, ...(selectedMinute === minute ? styles.selectedPickerOption : {}) }} onClick={() => { changeTime('minute', minute); setOpenPicker(null); }}>{minute}</button>)}</div> : null}
+              </div>
+            </div></div> : null}
             <div style={styles.actions}>
               <button type="button" style={styles.secondary} onClick={onCancel}>{cancelLabel}</button>
               <button type="button" style={styles.primary} onClick={() => onConfirm(outputValue)} disabled={!selectedDate || ((resolvedMode === 'datetime-local' || resolvedMode === 'time') && !time)}>{confirmLabel}</button>

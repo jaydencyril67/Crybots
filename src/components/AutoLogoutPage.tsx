@@ -42,6 +42,10 @@ const AutoLogoutPage = () => {
 
   const saveIdleLogout = async () => {
     const nextValue = !idleEnabled;
+    if (nextValue && !scheduledLogout) {
+      setStatus('Choose a logout time before enabling automatic logout.');
+      return;
+    }
     setIdleSaving(true);
     try {
       const response = await api.put('/api/auth/idle-logout', { enabled: nextValue });
