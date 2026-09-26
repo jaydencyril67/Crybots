@@ -39,5 +39,4 @@ android/app/src/test/
 
 # 💼 Misc
 client/public/*.apk
-capacitor.config.ts
 dist/
