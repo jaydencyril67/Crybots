@@ -38,6 +38,7 @@ const AutoLogoutPage = () => {
   const [idleSaving, setIdleSaving] = useState(false);
   const [scheduledLogout, setScheduledLogoutValue] = useState(getScheduledLogout);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [scheduleSaving, setScheduleSaving] = useState(false);
   const [status, setStatus] = useState('No automatic logout has been configured.');
 
   const saveIdleLogout = async () => {
@@ -59,6 +60,7 @@ const AutoLogoutPage = () => {
   };
 
   const saveSchedule = async (value: string) => {
+    setScheduleSaving(true);
     try {
       const response = await api.put('/api/auth/scheduled-logout', { scheduledLogoutAt: new Date(value).toISOString() });
       const savedValue = toLocalDateTimeValue(response.data.scheduledLogoutAt);
@@ -68,6 +70,22 @@ const AutoLogoutPage = () => {
       setStatus(`Scheduled logout set for ${savedValue.replace('T', ' ')}.`);
     } catch (error: any) {
       setStatus(error?.response?.data?.message || 'Unable to save scheduled logout.');
+    } finally {
+      setScheduleSaving(false);
+    }
+  };
+
+  const cancelSchedule = async () => {
+    setScheduleSaving(true);
+    try {
+      await api.put('/api/auth/scheduled-logout', { scheduledLogoutAt: null });
+      setScheduledLogoutValue('');
+      setScheduledLogout('');
+      setStatus('Scheduled logout cancelled.');
+    } catch (error: any) {
+      setStatus(error?.response?.data?.message || 'Unable to cancel scheduled logout.');
+    } finally {
+      setScheduleSaving(false);
     }
   };
 
@@ -112,7 +130,10 @@ const AutoLogoutPage = () => {
                 <div style={styles.dangerRow}>
                   <strong>Scheduled logout</strong>
                   <p style={styles.status}>{scheduledLogout ? `Set for ${scheduledLogout.replace('T', ' ')}` : 'No scheduled logout set.'}</p>
-                  <div style={styles.buttonRow}><button type="button" style={styles.button} onClick={() => setShowDatePicker(true)}>{scheduledLogout ? 'Change time' : 'Choose time'}</button></div>
+                  <div style={styles.buttonRow}>
+                    <button type="button" style={styles.button} disabled={scheduleSaving} onClick={() => setShowDatePicker(true)}>{scheduledLogout ? 'Change time' : 'Choose time'}</button>
+                    {scheduledLogout && <button type="button" style={styles.button} disabled={scheduleSaving} onClick={cancelSchedule}>{scheduleSaving ? 'Cancelling...' : 'Cancel scheduled logout'}</button>}
+                  </div>
                 </div>
                 <p style={styles.status} aria-live="polite">{status}</p>
               </section>
