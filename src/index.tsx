@@ -57,7 +57,7 @@ import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { forceLogout } from './api/axios';
 import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
 
-const IDLE_LOGOUT_TIMEOUT_MS = 30 * 60 * 1000;
+const DEFAULT_IDLE_LOGOUT_MINUTES = 10;
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -230,6 +230,8 @@ const RouteTransition = () => {
     let scheduledLogoutTimer: number | undefined;
     let idleLogoutTimer: number | undefined;
     let idleLogoutEnabled = false;
+    let idleLogoutMinutes = DEFAULT_IDLE_LOGOUT_MINUTES;
+    let lastActivityPingAt = 0;
     let hasTriggeredScheduledLogout = false;
 
     const validateScheduledLogout = () => {
@@ -280,6 +282,7 @@ const RouteTransition = () => {
     const loadIdleLogoutSetting = async () => {
       if (!localStorage.getItem('token')) {
         idleLogoutEnabled = false;
+        idleLogoutMinutes = DEFAULT_IDLE_LOGOUT_MINUTES;
         if (idleLogoutTimer !== undefined) {
           window.clearTimeout(idleLogoutTimer);
           idleLogoutTimer = undefined;
@@ -290,8 +293,10 @@ const RouteTransition = () => {
       try {
         const response = await api.get('/api/auth/idle-logout');
         const nextIdleLogoutEnabled = response.data.idleLogoutEnabled === true;
-        const settingChanged = idleLogoutEnabled !== nextIdleLogoutEnabled;
+        const nextIdleLogoutMinutes = [5, 10, 15, 30].includes(Number(response.data.idleLogoutMinutes)) ? Number(response.data.idleLogoutMinutes) : DEFAULT_IDLE_LOGOUT_MINUTES;
+        const settingChanged = idleLogoutEnabled !== nextIdleLogoutEnabled || idleLogoutMinutes !== nextIdleLogoutMinutes;
         idleLogoutEnabled = nextIdleLogoutEnabled;
+        idleLogoutMinutes = nextIdleLogoutMinutes;
         if (settingChanged) {
           resetIdleLogoutTimer();
         }
@@ -317,11 +322,20 @@ const RouteTransition = () => {
         if (idleLogoutEnabled && localStorage.getItem('token')) {
           forceLogout();
         }
-      }, IDLE_LOGOUT_TIMEOUT_MS);
+      }, idleLogoutMinutes * 60 * 1000);
     };
 
     const handleUserActivity = () => {
       resetIdleLogoutTimer();
+
+      const token = localStorage.getItem('token');
+      const now = Date.now();
+      if (!token || now - lastActivityPingAt < 30000) return;
+
+      lastActivityPingAt = now;
+      void api.post('/api/auth/idle-logout/activity').catch(() => {
+        // The regular session validation handles expired or invalid sessions.
+      });
     };
 
     const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'pointerdown'];
