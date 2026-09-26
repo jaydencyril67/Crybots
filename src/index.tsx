@@ -57,6 +57,8 @@ import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { forceLogout } from './api/axios';
 import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
 
+const IDLE_LOGOUT_TIMEOUT_MS = 30 * 60 * 1000;
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {
@@ -226,6 +228,8 @@ const RouteTransition = () => {
     };
 
     let scheduledLogoutTimer: number | undefined;
+    let idleLogoutTimer: number | undefined;
+    let idleLogoutEnabled = false;
     let hasTriggeredScheduledLogout = false;
 
     const validateScheduledLogout = () => {
@@ -273,12 +277,64 @@ const RouteTransition = () => {
       }
     };
 
+    const loadIdleLogoutSetting = async () => {
+      if (!localStorage.getItem('token')) {
+        idleLogoutEnabled = false;
+        if (idleLogoutTimer !== undefined) {
+          window.clearTimeout(idleLogoutTimer);
+          idleLogoutTimer = undefined;
+        }
+        return;
+      }
+
+      try {
+        const response = await api.get('/api/auth/idle-logout');
+        const nextIdleLogoutEnabled = response.data.idleLogoutEnabled === true;
+        const settingChanged = idleLogoutEnabled !== nextIdleLogoutEnabled;
+        idleLogoutEnabled = nextIdleLogoutEnabled;
+        if (settingChanged) {
+          resetIdleLogoutTimer();
+        }
+      } catch {
+        if (idleLogoutEnabled) {
+          idleLogoutEnabled = false;
+          resetIdleLogoutTimer();
+        }
+      }
+    };
+
+    const resetIdleLogoutTimer = () => {
+      if (idleLogoutTimer !== undefined) {
+        window.clearTimeout(idleLogoutTimer);
+      }
+
+      if (!idleLogoutEnabled || !localStorage.getItem('token')) {
+        idleLogoutTimer = undefined;
+        return;
+      }
+
+      idleLogoutTimer = window.setTimeout(() => {
+        if (idleLogoutEnabled && localStorage.getItem('token')) {
+          forceLogout();
+        }
+      }, IDLE_LOGOUT_TIMEOUT_MS);
+    };
+
+    const handleUserActivity = () => {
+      resetIdleLogoutTimer();
+    };
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'pointerdown'];
+    activityEvents.forEach((eventName) => window.addEventListener(eventName, handleUserActivity, { passive: true }));
+
     const interval = window.setInterval(() => {
       validateScheduledLogout();
       void validateSession();
+      void loadIdleLogoutSetting();
     }, 15000);
 
     validateScheduledLogout();
+    void loadIdleLogoutSetting();
 
     const connectForceLogoutStream = () => {
       const token = localStorage.getItem('token');
@@ -327,6 +383,10 @@ const RouteTransition = () => {
       if (scheduledLogoutTimer !== undefined) {
         window.clearTimeout(scheduledLogoutTimer);
       }
+      if (idleLogoutTimer !== undefined) {
+        window.clearTimeout(idleLogoutTimer);
+      }
+      activityEvents.forEach((eventName) => window.removeEventListener(eventName, handleUserActivity));
       window.removeEventListener('storage', syncAuthState);
       window.removeEventListener('ke:force-logout', syncAuthState);
       window.removeEventListener('ke:scheduled-logout-change', handleScheduledLogoutChange);

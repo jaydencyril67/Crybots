@@ -43,10 +43,6 @@ const AutoLogoutPage = () => {
 
   const saveIdleLogout = async () => {
     const nextValue = !idleEnabled;
-    if (nextValue && !scheduledLogout) {
-      setStatus('Choose a logout time before enabling automatic logout.');
-      return;
-    }
     setIdleSaving(true);
     try {
       const response = await api.put('/api/auth/idle-logout', { enabled: nextValue });
@@ -124,7 +120,7 @@ const AutoLogoutPage = () => {
                 <p style={styles.text}>Set an automatic logout for inactivity or schedule a specific time to end this session.</p>
                 <div style={styles.dangerRow}>
                   <strong>Logout when the app is idle</strong>
-                  <p style={styles.status}>End your session after a period of inactivity.</p>
+                  <p style={styles.status}>End your session after 30 minutes of inactivity. Scheduled logout remains independent.</p>
                   <div style={styles.buttonRow}><button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={saveIdleLogout}>{idleSaving ? 'Saving...' : idleEnabled ? 'Enabled' : 'Enable'}</button></div>
                 </div>
                 <div style={styles.dangerRow}>
