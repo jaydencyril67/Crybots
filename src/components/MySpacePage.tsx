@@ -30,7 +30,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   value: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.7rem', lineHeight: 1.35 },
   pointActivity: { display: 'grid', gap: '8px' },
-  historyWrap: { width: '100%', overflowX: 'auto' as const },
+  historyWrap: { width: '100%', maxHeight: '360px', overflowX: 'auto' as const, overflowY: 'auto' as const },
   historyTable: { width: '100%', minWidth: '560px', borderCollapse: 'collapse' as const, fontSize: '0.78rem' },
   historyHeader: { padding: '10px 12px', borderBottom: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: '0.72rem', fontWeight: 800, textAlign: 'left' as const, whiteSpace: 'nowrap' as const },
   historyCell: { padding: '12px', borderBottom: `1px solid ${theme.borderGlass}`, color: theme.text, whiteSpace: 'nowrap' as const },
