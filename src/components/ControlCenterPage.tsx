@@ -9,6 +9,7 @@ import NotificationBanner, { type NotificationTone } from './NotificationBanner'
 
 type AutoSellRule = { enabled: boolean; minPercent: number; maxPercent: number; points: number };
 type TakeProfitRule = { enabled: boolean; minPercent: number; maxPercent: number };
+type MarketRangeNotificationRule = { enabled: boolean; minPercent: number; maxPercent: number };
 type Status = { tone: NotificationTone; message: string } | null;
 
 type RuleFieldsProps = {
@@ -31,6 +32,7 @@ const ControlCenterPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [autoSellRules, setAutoSellRules] = useState<AutoSellRule[]>([]);
   const [takeProfitRules, setTakeProfitRules] = useState<TakeProfitRule[]>([]);
+  const [marketRangeNotificationRules, setMarketRangeNotificationRules] = useState<MarketRangeNotificationRule[]>([]);
   const [status, setStatus] = useState<Status>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -55,9 +57,10 @@ const ControlCenterPage = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await api.get<{ autoSellRules: AutoSellRule[]; takeProfitRules: TakeProfitRule[] }>('/api/control-center');
+        const { data } = await api.get<{ autoSellRules: AutoSellRule[]; takeProfitRules: TakeProfitRule[]; marketRangeNotificationRules: MarketRangeNotificationRule[] }>('/api/control-center');
         setAutoSellRules(data.autoSellRules || []);
         setTakeProfitRules(data.takeProfitRules || []);
+        setMarketRangeNotificationRules(data.marketRangeNotificationRules || []);
       } catch {
         setStatus({ tone: 'error', message: 'Unable to load your Control Center settings.' });
       } finally {
@@ -69,16 +72,19 @@ const ControlCenterPage = () => {
 
   const updateAutoSell = (index: number, field: keyof AutoSellRule, value: number | boolean) => setAutoSellRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
   const updateTakeProfit = (index: number, field: keyof TakeProfitRule, value: number | boolean) => setTakeProfitRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
+  const updateMarketNotification = (index: number, field: keyof MarketRangeNotificationRule, value: number | boolean) => setMarketRangeNotificationRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
   const addAutoSell = () => setAutoSellRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1, points: 1 }]);
   const addTakeProfit = () => setTakeProfitRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1 }]);
+  const addMarketNotification = () => setMarketRangeNotificationRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1 }]);
 
   const save = async () => {
     setSaving(true);
     setStatus(null);
     try {
-      const { data } = await api.put('/api/control-center', { autoSellRules, takeProfitRules });
+      const { data } = await api.put('/api/control-center', { autoSellRules, takeProfitRules, marketRangeNotificationRules });
       setAutoSellRules(data.autoSellRules || []);
       setTakeProfitRules(data.takeProfitRules || []);
+      setMarketRangeNotificationRules(data.marketRangeNotificationRules || []);
       setStatus({ tone: 'success', message: 'Control Center settings saved.' });
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -99,6 +105,10 @@ const ControlCenterPage = () => {
       <section style={styles.section}><h2 style={styles.title}>Auto-sell points</h2><div style={styles.card}><p style={styles.description}>When the market is inside a selected range, withdraw the chosen number of active points into your USDT balance. Each rule triggers once per market entry.</p>
         {autoSellRules.map((rule, index) => <div style={styles.rule} key={`auto-${index}`}><div style={styles.ruleTop}><label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800 }}><input style={styles.toggle} type="checkbox" checked={rule.enabled} onChange={(event) => updateAutoSell(index, 'enabled', event.target.checked)} /> Rule {index + 1}</label><button type="button" aria-label="Remove auto-sell rule" style={styles.iconButton} onClick={() => setAutoSellRules((rules) => rules.filter((_, ruleIndex) => ruleIndex !== index))}><Trash2 size={17} /></button></div>{rangeFields(rule, (field, value) => updateAutoSell(index, field, value))}<label style={{ display: 'grid', gap: '5px' }}><span style={{ color: theme.textMuted, fontSize: '0.76rem' }}>Points to withdraw</span><input style={{ width: '100%', boxSizing: 'border-box', padding: '10px 11px', borderRadius: '9px', border: `1px solid ${theme.borderGlass}`, background: theme.background, color: theme.text, fontSize: '0.9rem' }} type="number" min="1" max="1000000" step="0.01" value={rule.points} onChange={(event) => updateAutoSell(index, 'points', Number(event.target.value))} /></label></div>)}
         <button type="button" style={styles.button} onClick={addAutoSell}><Plus size={16} /> Add auto-sell rule</button>
+      </div></section>
+      <section style={styles.section}><h2 style={styles.title}>Market range notifications</h2><div style={styles.card}><p style={styles.description}>Get notified when the market enters one of these ranges. These rules only send alerts and never sell or withdraw points. Delivery follows your enabled market and notification channel preferences.</p>
+        {marketRangeNotificationRules.map((rule, index) => <div style={styles.rule} key={`notification-${index}`}><div style={styles.ruleTop}><label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800 }}><input style={styles.toggle} type="checkbox" checked={rule.enabled} onChange={(event) => updateMarketNotification(index, 'enabled', event.target.checked)} /> Rule {index + 1}</label><button type="button" aria-label="Remove market notification rule" style={styles.iconButton} onClick={() => setMarketRangeNotificationRules((rules) => rules.filter((_, ruleIndex) => ruleIndex !== index))}><Trash2 size={17} /></button></div>{rangeFields(rule, (field, value) => updateMarketNotification(index, field, value))}</div>)}
+        <button type="button" style={styles.button} onClick={addMarketNotification}><Plus size={16} /> Add market notification</button>
       </div></section>
       <section style={styles.section}><h2 style={styles.title}>Take profits</h2><div style={styles.card}><p style={styles.description}>Take-profit rules sell only points earned above your original capital. Your initial points bought stay invested.</p>
         {takeProfitRules.map((rule, index) => <div style={styles.rule} key={`profit-${index}`}><div style={styles.ruleTop}><label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800 }}><input style={styles.toggle} type="checkbox" checked={rule.enabled} onChange={(event) => updateTakeProfit(index, 'enabled', event.target.checked)} /> Rule {index + 1}</label><button type="button" aria-label="Remove take-profit rule" style={styles.iconButton} onClick={() => setTakeProfitRules((rules) => rules.filter((_, ruleIndex) => ruleIndex !== index))}><Trash2 size={17} /></button></div>{rangeFields(rule, (field, value) => updateTakeProfit(index, field, value))}</div>)}
