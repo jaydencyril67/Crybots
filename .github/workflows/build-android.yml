@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Install Capacitor build tools
-        run: npm install --no-save @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9
+        run: npm install --no-save --package-lock=false @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9
 
       - name: Build web app
         run: npm run build
