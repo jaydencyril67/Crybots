@@ -266,7 +266,7 @@ const parentRoutes = [
 const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/profile', '/portfolio/statistics', '/security', '/danger'] },
   { routes: ['/agent/stats', '/agent/tools', '/agent/menu'] },
-  { routes: ['/market', '/my-space'] },
+  { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
@@ -294,6 +294,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/agent/tools') return 'AGENT TOOLS';
   if (path === '/agent/menu') return 'AGENT MENU';
   if (path === '/exchange') return 'EXCHANGE';
+  if (path === '/control-center') return 'CONTROL CENTER';
   if (path === '/my-space') return 'MY SPACE';
   if (path === '/market') return 'MARKET';
   if (path === '/records') return 'RECORDS';
