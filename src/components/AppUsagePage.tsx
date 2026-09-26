@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, BarChart3 } from 'lucide-react';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import api from '../api/axios';
@@ -52,6 +52,7 @@ const pageLabels: Record<string, string> = {
 const AppUsagePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const cardStyles = createHybridCardStyles(theme);
   const [usage, setUsage] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -66,21 +67,25 @@ const AppUsagePage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' }}>
-        <div style={{ width: '100%', maxWidth: '900px', margin: '0 auto', padding: 'clamp(14px, 3vw, 28px) 16px 40px', boxSizing: 'border-box' }}>
-          <button type="button" onClick={() => navigate('/records')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={17} /> Records</button>
-          <h1 style={{ margin: '28px 0 8px', fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>App Usage</h1>
-          <p style={{ margin: 0, color: theme.textMuted }}>See how many times you have opened each protected page.</p>
-          {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
-          <section style={{ display: 'grid', gap: '10px', marginTop: '22px', padding: '18px', border: `1px solid ${theme.borderGlass}`, borderRadius: '22px', background: theme.surfaceGlass }} aria-live="polite">
-            {loading ? <div style={{ padding: '42px 18px', textAlign: 'center' }}><LoadingDots /></div> : null}
-            {!loading && !Object.keys(pageLabels).some((page) => usage[page]) ? <div style={{ display: 'grid', placeItems: 'center', gap: '8px', padding: '42px 18px', color: theme.textMuted, textAlign: 'center' }}><BarChart3 size={25} /><span>No protected pages have been opened yet.</span></div> : null}
-            {!loading && Object.entries(pageLabels).map(([page, label]) => (
-              <article key={page} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', padding: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', background: theme.surfaceMuted }}>
-                <span style={{ fontWeight: 700 }}>{label}</span>
-                <strong style={{ color: theme.primary }}>{usage[page] || 0} {usage[page] === 1 ? 'opening' : 'openings'}</strong>
-              </article>
-            ))}
-          </section>
+        <div style={{ width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' }}>
+          <div style={{ display: 'grid', gap: '14px', marginTop: '10px' }}>
+            <button type="button" onClick={() => navigate('/records')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' }}><ArrowLeft size={17} /> Records</button>
+            <section style={cardStyles.card}>
+              <h1 style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>App Usage</h1>
+              <p style={{ margin: '3px 0 0', color: theme.textMuted }}>See how many times you have opened each protected page.</p>
+              {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
+              <div style={{ display: 'grid', gap: '10px', width: '100%', minWidth: 0, marginTop: '14px', padding: '18px', border: `1px solid ${theme.borderGlass}`, borderRadius: '22px', background: theme.surfaceGlass, boxSizing: 'border-box' }} aria-live="polite">
+                {loading ? <div style={{ padding: '42px 18px', textAlign: 'center' }}><LoadingDots /></div> : null}
+                {!loading && !Object.keys(pageLabels).some((page) => usage[page]) ? <div style={{ display: 'grid', placeItems: 'center', gap: '8px', padding: '42px 18px', color: theme.textMuted, textAlign: 'center' }}><BarChart3 size={25} /><span>No protected pages have been opened yet.</span></div> : null}
+                {!loading && Object.entries(pageLabels).map(([page, label]) => (
+                  <article key={page} style={{ width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', minWidth: 0, boxSizing: 'border-box' }}>
+                    <span style={{ fontWeight: 800 }}>{label}</span>
+                    <strong style={{ color: theme.primary }}>{usage[page] || 0} {usage[page] === 1 ? 'opening' : 'openings'}</strong>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
         <NowBar />
       </main>
