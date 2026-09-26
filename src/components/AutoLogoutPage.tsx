@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import { ArrowLeft } from 'lucide-react';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
 import { useAppTheme } from './AppTheme';
@@ -8,22 +9,23 @@ import api from '../api/axios';
 import { getScheduledLogout, setScheduledLogout } from '../utils/scheduledLogout';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', paddingBottom: '132px', background: theme.background, color: theme.text },
-  shell: { width: '100%', maxWidth: '760px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
-  card: { display: 'grid', gap: '14px', borderRadius: '20px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, padding: 'clamp(16px, 3.5vw, 24px)' },
-  eyebrow: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' as const },
-  title: { margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 900 },
-  text: { margin: 0, color: theme.textMuted, lineHeight: 1.65 },
-  row: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '14px', flexWrap: 'wrap' as const, padding: '14px 0', borderTop: `1px solid ${theme.borderGlass}` },
-  button: { borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, padding: '10px 14px', cursor: 'pointer', fontWeight: 800, background: theme.surfaceMuted, color: theme.text },
-  primary: { background: theme.primary, borderColor: theme.primary, color: theme.textInverse },
-  status: { margin: 0, color: theme.textMuted, fontSize: '0.86rem' },
+  page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '132px', background: theme.background, color: theme.text },
+  shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
+  content: { display: 'grid', gap: '14px', marginTop: '10px' },
+  card: { ...createHybridCardStyles(theme).card },
+  rowList: { display: 'grid', gap: '10px', width: '100%', minWidth: 0, padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
+  dangerRow: { width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
+  back: { display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
+  title: { margin: 0, fontSize: '0.96rem', fontWeight: 800, color: theme.text },
+  text: { margin: '5px 0 0', fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4, maxWidth: '64ch' },
+  status: { margin: '5px 0 0', fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4 },
+  buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
+  button: { borderRadius: '999px', padding: '12px 16px', border: `1px solid ${theme.primary}`, cursor: 'pointer', fontWeight: 700, color: theme.textInverse, background: theme.primary, width: '100%', maxWidth: '100%' },
 });
 
 const toLocalDateTimeValue = (value: string) => {
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return value;
-
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
 };
@@ -62,7 +64,6 @@ const AutoLogoutPage = () => {
         if (scheduledLogout) setStatus(`Scheduled logout set for ${scheduledLogout.replace('T', ' ')}.`);
       }
     };
-
     void loadSchedule();
   }, []);
 
@@ -71,24 +72,29 @@ const AutoLogoutPage = () => {
   }
 
   return (
-    <HybridTheme>
+    <HybridTheme mode={themeMode}>
       <div style={styles.page}>
         <main style={styles.shell}>
-          <section style={styles.card}>
-            <p style={styles.eyebrow}>Security settings</p>
-            <h1 style={styles.title}>AUTO LOGOUT</h1>
-            <p style={styles.text}>Set an automatic logout for inactivity or schedule a specific time to end this session.</p>
-            <div style={styles.row}>
-              <div><strong>Logout when the app is idle</strong><p style={styles.status}>End your session after a period of inactivity.</p></div>
-              <button type="button" aria-pressed={idleEnabled} style={{ ...styles.button, ...(idleEnabled ? styles.primary : {}) }} onClick={() => { setIdleEnabled(!idleEnabled); setStatus(!idleEnabled ? 'Idle logout enabled.' : 'Idle logout disabled.'); }}>{idleEnabled ? 'Enabled' : 'Enable'}</button>
+          <div style={styles.content}>
+            <button type="button" style={styles.back} onClick={() => navigate('/logout')}><ArrowLeft size={17} /> Logout</button>
+            <div style={styles.rowList}>
+              <section style={styles.dangerRow}>
+                <h3 style={styles.title}>Automatic Logout</h3>
+                <p style={styles.text}>Set an automatic logout for inactivity or schedule a specific time to end this session.</p>
+                <div style={styles.dangerRow}>
+                  <strong>Logout when the app is idle</strong>
+                  <p style={styles.status}>End your session after a period of inactivity.</p>
+                  <div style={styles.buttonRow}><button type="button" style={styles.button} aria-pressed={idleEnabled} onClick={() => { setIdleEnabled(!idleEnabled); setStatus(!idleEnabled ? 'Idle logout enabled.' : 'Idle logout disabled.'); }}>{idleEnabled ? 'Enabled' : 'Enable'}</button></div>
+                </div>
+                <div style={styles.dangerRow}>
+                  <strong>Scheduled logout</strong>
+                  <p style={styles.status}>{scheduledLogout ? `Set for ${scheduledLogout.replace('T', ' ')}` : 'No scheduled logout set.'}</p>
+                  <div style={styles.buttonRow}><button type="button" style={styles.button} onClick={() => setShowDatePicker(true)}>{scheduledLogout ? 'Change time' : 'Choose time'}</button></div>
+                </div>
+                <p style={styles.status} aria-live="polite">{status}</p>
+              </section>
             </div>
-            <div style={styles.row}>
-              <div><strong>Scheduled logout</strong><p style={styles.status}>{scheduledLogout ? `Set for ${scheduledLogout.replace('T', ' ')}` : 'No scheduled logout set.'}</p></div>
-              <button type="button" style={{ ...styles.button, ...styles.primary }} onClick={() => setShowDatePicker(true)}>{scheduledLogout ? 'Change time' : 'Choose time'}</button>
-            </div>
-            <p style={styles.status} aria-live="polite">{status}</p>
-            <button type="button" style={styles.button} onClick={() => navigate('/logout')}>Back to logout</button>
-          </section>
+          </div>
         </main>
         <NowBar />
       </div>
