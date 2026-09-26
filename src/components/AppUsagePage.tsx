@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
-import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import api from '../api/axios';
@@ -52,7 +52,72 @@ const pageLabels: Record<string, string> = {
 const AppUsagePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const cardStyles = createHybridCardStyles(theme);
+  const styles = {
+    page: {
+      minHeight: '100vh',
+      overflowX: 'hidden' as const,
+      overflowY: 'auto' as const,
+      paddingBottom: '132px',
+      background: theme.background,
+      color: theme.text,
+    },
+    shell: {
+      width: '100%',
+      maxWidth: '920px',
+      margin: '0 auto',
+      padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px',
+      boxSizing: 'border-box' as const,
+    },
+    content: {
+      paddingTop: '8px',
+      display: 'grid',
+      gap: '14px',
+      marginTop: '14px',
+    },
+    rowList: {
+      display: 'grid',
+      gap: '10px',
+      width: '100%',
+      minWidth: 0,
+      padding: '18px',
+      borderRadius: '22px',
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      boxSizing: 'border-box' as const,
+    },
+    row: {
+      width: '100%',
+      maxWidth: '100%',
+      background: theme.surfaceMuted,
+      border: `1px solid ${theme.borderGlass}`,
+      borderRadius: '15px',
+      padding: '13px 14px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: '14px',
+      minWidth: 0,
+      boxSizing: 'border-box' as const,
+    },
+    rowLabel: {
+      margin: 0,
+      color: theme.textMuted,
+      fontSize: '0.74rem',
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.08em',
+      fontWeight: 800,
+    },
+    rowValue: {
+      margin: 0,
+      color: theme.primary,
+      fontSize: '0.94rem',
+      fontWeight: 800,
+      lineHeight: 1.5,
+      textAlign: 'right' as const,
+      wordBreak: 'break-word' as const,
+      overflowWrap: 'anywhere' as const,
+    },
+  };
   const [usage, setUsage] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -66,23 +131,21 @@ const AppUsagePage = () => {
 
   return (
     <HybridTheme mode={themeMode}>
-      <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' }}>
-        <div style={{ width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' }}>
-          <div style={{ display: 'grid', gap: '14px', marginTop: '10px' }}>
-            <button type="button" onClick={() => navigate('/records')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' }}><ArrowLeft size={17} /> Records</button>
-            <section style={cardStyles.card}>
-              {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
-              <div style={{ display: 'grid', gap: '10px', width: '100%', minWidth: 0, marginTop: '6px', padding: '12px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', background: theme.surfaceGlass, boxSizing: 'border-box' }} aria-live="polite">
-                {Object.entries(pageLabels).map(([page, label]) => (
-                  <article key={page} style={{ width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, boxSizing: 'border-box', fontSize: '0.95rem' }}>
-                    <span style={{ fontWeight: 800 }}>{label}</span>
-                    <strong style={{ color: theme.primary }}>
-                      {loading ? <LoadingDots /> : `${usage[page] || 0} ${usage[page] === 1 ? 'Visit' : 'Visits'}`}
-                    </strong>
-                  </article>
-                ))}
-              </div>
-            </section>
+      <main style={styles.page}>
+        <div style={styles.shell}>
+          <button type="button" onClick={() => navigate('/records')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Records</button>
+          <div style={styles.content}>
+            {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
+            <div style={styles.rowList} aria-live="polite">
+              {Object.entries(pageLabels).map(([page, label]) => (
+                <div key={page} style={styles.row}>
+                  <p style={styles.rowLabel}>{label}</p>
+                  <p style={styles.rowValue}>
+                    {loading ? <LoadingDots /> : `${usage[page] || 0} ${usage[page] === 1 ? 'Visit' : 'Visits'}`}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <NowBar />
