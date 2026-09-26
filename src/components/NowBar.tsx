@@ -265,7 +265,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/transactions') return 'TRANSACTIONS';
   if (path === '/notifications') return 'NOTIFICATIONS';
   if (path === '/alert-settings') return 'ALERT SETTINGS';
-  if (path === '/activity-log') return 'ACTIVITY LOG';
+  if (path === '/app-usage') return 'APP USAGE';
   if (path === '/privacy-policy') return 'PRIVACY POLICY';
   if (path === '/information') return 'INFORMATION';
   if (path === '/community-standards') return 'COMMUNITY STANDARDS';
