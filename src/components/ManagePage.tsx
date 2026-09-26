@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, WalletCards } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, WalletCards } from 'lucide-react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -13,6 +13,7 @@ import { navigate } from '../utils/navigate';
 type WalletNetwork = 'TRC-20' | 'BEP-20' | 'TRX';
 type Wallet = { id?: string; network: WalletNetwork; address: string; description?: string };
 type MeResponse = { user?: { wallets?: Wallet[]; walletAddress?: string } };
+type WithdrawalTransferSecurity = { enabled: boolean; startsAt: string | null; endsAt: string | null; active: boolean };
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -47,6 +48,11 @@ const ManagePage = () => {
   const [description, setDescription] = useState('');
   const [walletValid, setWalletValid] = useState(false);
   const [securityCode, setSecurityCode] = useState('');
+  const [blockEnabled, setBlockEnabled] = useState(false);
+  const [blockStartsAt, setBlockStartsAt] = useState('');
+  const [blockEndsAt, setBlockEndsAt] = useState('');
+  const [securitySaving, setSecuritySaving] = useState(false);
+  const [securitySettings, setSecuritySettings] = useState<WithdrawalTransferSecurity | null>(null);
   const [editingWalletId, setEditingWalletId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'idle', message: '' });
@@ -56,6 +62,11 @@ const ManagePage = () => {
       try {
         const { data } = await api.get<MeResponse>('/api/settings/me');
         setWallets(data.user?.wallets ?? []);
+        const { data: securityData } = await api.get<WithdrawalTransferSecurity>('/api/settings/withdrawal-transfer-security');
+        setSecuritySettings(securityData);
+        setBlockEnabled(securityData.enabled);
+        setBlockStartsAt(securityData.startsAt ? securityData.startsAt.slice(0, 16) : '');
+        setBlockEndsAt(securityData.endsAt ? securityData.endsAt.slice(0, 16) : '');
       } catch {
         navigate('/signin');
       }
@@ -68,6 +79,31 @@ const ManagePage = () => {
     setDescription('');
     setWalletValid(false);
     setEditingWalletId(null);
+  };
+
+  const handleSecuritySave = async () => {
+    if (blockEnabled && (!blockStartsAt || !blockEndsAt)) {
+      setStatus({ kind: 'error', message: 'Choose both a start and end date and time for the security block.' });
+      return;
+    }
+
+    setSecuritySaving(true);
+    try {
+      const { data } = await api.patch<WithdrawalTransferSecurity>('/api/settings/withdrawal-transfer-security', {
+        enabled: blockEnabled,
+        startsAt: blockEnabled ? new Date(blockStartsAt).toISOString() : undefined,
+        endsAt: blockEnabled ? new Date(blockEndsAt).toISOString() : undefined,
+      });
+      setSecuritySettings(data);
+      setBlockEnabled(data.enabled);
+      setBlockStartsAt(data.startsAt ? data.startsAt.slice(0, 16) : '');
+      setBlockEndsAt(data.endsAt ? data.endsAt.slice(0, 16) : '');
+      setStatus({ kind: 'success', message: data.active ? 'Withdrawals and transfers are now blocked.' : 'Security block scheduled successfully.' });
+    } catch (error: any) {
+      setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to save withdrawal and transfer security settings.') });
+    } finally {
+      setSecuritySaving(false);
+    }
   };
 
   const handleSave = async () => {
@@ -141,6 +177,17 @@ const ManagePage = () => {
               </div>
             </div>
             {wallets.length ? <div style={styles.innerCard}><div style={styles.walletList}><strong>Bound wallets ({wallets.length}/10)</strong>{wallets.map((wallet) => <div key={wallet.id} style={styles.walletRow}><span><b>{wallet.description || wallet.network}</b><br /><small>{wallet.network} · {wallet.address}</small></span><div style={{ display: 'flex', gap: '8px' }}><button type="button" style={styles.button} onClick={() => { setEditingWalletId(wallet.id || null); setNetwork(wallet.network); setWalletAddress(wallet.address); setDescription(wallet.description || ''); setWalletValid(true); }}>Edit</button><button type="button" style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} onClick={() => void (async () => { if (securityCode.replace(/\D/g, '').length !== 6) { setStatus({ kind: 'error', message: 'Enter your 6-digit security code before unbinding a wallet.' }); return; } try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`, { data: { securityCode: securityCode.replace(/\D/g, '').slice(0, 6) } }); setWallets(data.wallets || []); if (editingWalletId === wallet.id) resetWalletForm(); setStatus({ kind: 'success', message: 'Wallet unbound successfully.' }); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Unbind</button></div></div>)}</div></div> : null}
+            <div style={styles.innerCard}>
+              <h3 style={{ ...styles.title, display: 'flex', alignItems: 'center', gap: '8px' }}><ShieldCheck size={20} /> Advanced transaction security</h3>
+              <p style={{ ...styles.text, marginTop: 0 }}>Block all outgoing withdrawals and transfers during a selected date and time window. Incoming funds remain available, and access resumes automatically when the block ends.</p>
+              <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '10px', flexDirection: 'row' }}><input type="checkbox" checked={blockEnabled} onChange={(event) => setBlockEnabled(event.target.checked)} /> Enable withdrawal and transfer block</label>
+              {blockEnabled ? <div style={styles.form}>
+                <label style={styles.label}><span>Block starts</span><input style={styles.input} type="datetime-local" value={blockStartsAt} onChange={(event) => setBlockStartsAt(event.target.value)} /></label>
+                <label style={styles.label}><span>Block ends</span><input style={styles.input} type="datetime-local" value={blockEndsAt} onChange={(event) => setBlockEndsAt(event.target.value)} /></label>
+              </div> : null}
+              {securitySettings?.active ? <span style={{ ...styles.helper, color: theme.danger }}>Outgoing withdrawals and transfers are currently blocked.</span> : null}
+              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSecuritySave()} disabled={securitySaving}>{securitySaving ? <InlineLoadingDots /> : 'Save transaction security'}</button>
+            </div>
           </section>
         </div>
         <NowBar />
