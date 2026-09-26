@@ -129,9 +129,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     overflowY: 'hidden' as const,
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '10px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
   },
   table: {
     width: '100%',
