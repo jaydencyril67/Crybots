@@ -162,28 +162,37 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     fontWeight: 800,
     whiteSpace: 'nowrap' as const,
   },
-  statsGrid: {
+  overviewList: {
     display: 'grid',
-    gap: '12px',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '7px',
   },
-  stat: {
-    borderRadius: '16px',
-    background: theme.surfaceMuted,
+  overviewItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '14px',
+    borderRadius: '14px',
     border: `1px solid ${theme.border}`,
-    padding: '14px',
+    background: theme.surfaceMuted,
+    padding: '13px 14px',
   },
-  statLabel: {
+  overviewLabelWrap: {
+    minWidth: 0,
+    display: 'grid',
+    gap: '4px',
+  },
+  overviewLabel: {
     margin: 0,
-    color: theme.textMuted,
-    fontSize: '0.82rem',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.08em',
+    color: theme.text,
+    fontSize: '0.9rem',
+    fontWeight: 700,
   },
-  statValue: {
-    margin: '8px 0 0',
-    fontSize: '1.15rem',
+  overviewValue: {
+    margin: 0,
+    fontSize: '1rem',
     fontWeight: 900,
+    textAlign: 'right' as const,
+    flexShrink: 0,
   },
   message: {
     padding: '14px 16px',
@@ -466,23 +475,28 @@ const TransactionHistoryPage = () => {
 
               <div style={styles.card}>
                 <h2 style={styles.cardTitle}><ListFilter size={18} /> Overview</h2>
-                <div style={styles.statsGrid}>
-                  <div style={styles.stat}>
-                    <p style={styles.statLabel}>Total entries</p>
-                    <p style={styles.statValue}>{loading ? <LoadingDots /> : totalCount}</p>
+                <div style={styles.overviewList}>
+                  <div style={styles.overviewItem}>
+                    <div style={styles.overviewLabelWrap}>
+                      <p style={styles.overviewLabel}>Total entries</p>
+                    </div>
+                    <p style={styles.overviewValue}>{loading ? <LoadingDots /> : totalCount}</p>
                   </div>
-                  <div style={styles.stat}>
-                    <p style={styles.statLabel}>Filtered results</p>
-                    <p style={styles.statValue}>{loading ? <LoadingDots /> : filteredCount}</p>
-                    <p style={styles.cardText}>{loading ? <LoadingDots /> : `Showing ${filteredCount === 0 ? 0 : transactionHistoryStartIndex + 1}-${Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredCount)} of ${filteredCount}`}</p>
+                  <div style={styles.overviewItem}>
+                    <div style={styles.overviewLabelWrap}>
+                      <p style={styles.overviewLabel}>Filtered results</p>
+                      <p style={styles.cardText}>{loading ? <LoadingDots /> : `Showing ${filteredCount === 0 ? 0 : transactionHistoryStartIndex + 1}-${Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredCount)} of ${filteredCount}`}</p>
+                    </div>
+                    <p style={styles.overviewValue}>{loading ? <LoadingDots /> : filteredCount}</p>
                   </div>
-                  <div style={styles.stat}>
-                    <p style={styles.statLabel}>Completed</p>
-                    <p style={styles.statValue}>{loading ? <LoadingDots /> : completedCount}</p>
-                    <p style={styles.cardText}>Completed in the current filter set</p>
+                  <div style={styles.overviewItem}>
+                    <div style={styles.overviewLabelWrap}>
+                      <p style={styles.overviewLabel}>Completed</p>
+                      <p style={styles.cardText}>Completed in the current filter set</p>
+                    </div>
+                    <p style={styles.overviewValue}>{loading ? <LoadingDots /> : completedCount}</p>
                   </div>
                 </div>
-                <p style={styles.cardText}><ShieldCheck size={16} style={{ display: 'inline-block', marginRight: '6px', verticalAlign: 'text-bottom' }} />All entries show type, status, date, time, and reference so you can audit account activity easily on mobile or desktop.</p>
               </div>
             </section>
 
