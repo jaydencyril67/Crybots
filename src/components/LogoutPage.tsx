@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
-import api, { forceLogout } from '../api/axios';
+import { navigate } from '../utils/navigate';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
@@ -104,18 +104,6 @@ const LogoutPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
-  const [status, setStatus] = useState('Choose how you want to end this session.');
-
-  const handleManualLogout = async () => {
-    setStatus('Signing you out securely...');
-    try {
-      await api.post('/api/auth/signout');
-    } catch {
-      // Clear local authentication even if the API is unavailable.
-    }
-    forceLogout();
-  };
-
   return (
     <HybridTheme>
       <div style={styles.page}>
@@ -129,15 +117,14 @@ const LogoutPage = () => {
             <div style={styles.cardGrid} aria-label="Logout options">
               <article style={styles.card}>
                 <h3 style={styles.cardTitle}>Auto Logout</h3>
-                <p style={styles.cardSubtext}>End this session immediately.</p>
-                <button type="button" style={styles.viewButton} onClick={forceLogout}>Logout</button>
+                <p style={styles.cardSubtext}>Choose idle or scheduled session exits.</p>
+                <button type="button" style={styles.viewButton} onClick={() => navigate('/auto-logout')}>View</button>
               </article>
               <article style={styles.card}>
                 <h3 style={styles.cardTitle}>Manual Logout</h3>
-                <p style={styles.cardSubtext}>Sign out securely from this device.</p>
-                <button type="button" style={{ ...styles.viewButton, ...styles.dangerButton }} onClick={() => { void handleManualLogout(); }}>Logout</button>
+                <p style={styles.cardSubtext}>Review the warning before ending your session.</p>
+                <button type="button" style={{ ...styles.viewButton, ...styles.dangerButton }} onClick={() => navigate('/manual-logout')}>View</button>
               </article>
-              <p style={styles.status} aria-live="polite">{status}</p>
             </div>
           </div>
         </div>

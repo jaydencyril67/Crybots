@@ -20,6 +20,8 @@ import DepositPage from './components/DepositPage';
 import PortfolioPage from './components/PortfolioPage';
 import PortfolioStatisticsPage from './components/PortfolioStatisticsPage';
 import LogoutPage from './components/LogoutPage';
+import AutoLogoutPage from './components/AutoLogoutPage';
+import ManualLogoutPage from './components/ManualLogoutPage';
 import AgentPage from './components/AgentPage';
 import AgentToolsPage from './components/AgentToolsPage';
 import AgentStatsPage from './components/AgentStatsPage';
@@ -137,6 +139,8 @@ const routeToKey = (path: string) => {
   if (path === '/portfolio/statistics' || path === '#/portfolio/statistics') return 'portfolio-statistics';
   if (path === '/portfolio' || path === '#/portfolio') return 'portfolio';
   if (path === '/logout' || path === '#/logout') return 'logout';
+  if (path === '/auto-logout' || path === '#/auto-logout') return 'auto-logout';
+  if (path === '/manual-logout' || path === '#/manual-logout') return 'manual-logout';
   if (path === '/agent/stats' || path === '#/agent/stats') return 'agent-stats';
   if (path === '/agent/tools' || path === '#/agent/tools') return 'agent-tools';
   if (path === '/agent/menu' || path === '#/agent/menu') return 'agent-menu';
@@ -296,6 +300,8 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'nowbar-button-color') return <ProtectedRoute><NowBarButtonColorPage /></ProtectedRoute>;
     if (displayedRouteKey === 'portfolio') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
     if (displayedRouteKey === 'logout') return <ProtectedRoute><LogoutPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'auto-logout') return <ProtectedRoute><AutoLogoutPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'manual-logout') return <ProtectedRoute><ManualLogoutPage /></ProtectedRoute>;
     if (displayedRouteKey === 'portfolio-statistics') return <ProtectedRoute><PortfolioStatisticsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'agent') return <ProtectedRoute><AgentPage /></ProtectedRoute>;
     if (displayedRouteKey === 'agent-tools') return <ProtectedRoute><AgentToolsPage /></ProtectedRoute>;
