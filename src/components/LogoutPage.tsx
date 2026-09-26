@@ -36,6 +36,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     letterSpacing: '-0.02em',
     color: theme.text,
   },
+  sectionText: {
+    margin: 0,
+    fontSize: '0.92rem',
+    color: theme.textMuted,
+    lineHeight: 1.7,
+    maxWidth: '62ch',
+  },
   cardGrid: {
     display: 'grid',
     gap: '10px',
@@ -100,6 +107,7 @@ const LogoutPage = () => {
           <div style={styles.content}>
             <section style={styles.section}>
               <h2 style={styles.sectionTitle}>Logout</h2>
+              <p style={styles.sectionText}>Choose how you want to end your session, either automatically when idle or manually when you are ready.</p>
             </section>
 
             <div style={styles.cardGrid} aria-label="Logout options">
