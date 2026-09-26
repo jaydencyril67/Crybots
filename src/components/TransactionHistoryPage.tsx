@@ -84,6 +84,18 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     backdropFilter: 'blur(18px)',
     WebkitBackdropFilter: 'blur(18px)',
   },
+  sectionCard: {
+    display: 'grid',
+    gap: '12px',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    padding: '12px',
+    borderRadius: '15px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+  },
   cardTitle: {
     margin: 0,
     fontSize: '1.05rem',
@@ -117,9 +129,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     overflowY: 'hidden' as const,
     width: '100%',
     boxSizing: 'border-box' as const,
-    borderRadius: '10px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
   },
   table: {
     width: '100%',
@@ -365,7 +374,7 @@ const TransactionHistoryPage = () => {
         <div style={styles.panel}>
           <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
           <div style={styles.body}>
-            <section style={{ ...styles.topGrid, marginTop: 0 }}>
+            <section style={styles.sectionCard}>
               <div style={{ ...styles.card, gap: '12px', position: 'relative', zIndex: 2 }}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>
                 <div className="transaction-history-filters" style={{ ...styles.filters, marginTop: 0 }}>
@@ -458,7 +467,9 @@ const TransactionHistoryPage = () => {
                   </div>
                 </div>
               </div>
+            </section>
 
+            <section style={styles.sectionCard}>
               <div style={styles.card}>
                 <h2 style={styles.cardTitle}><ListFilter size={18} /> Overview</h2>
                 <div style={styles.overviewList}>
@@ -486,10 +497,10 @@ const TransactionHistoryPage = () => {
               </div>
             </section>
 
-            <section style={styles.card}>
-              {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
-
-              <div style={styles.tableWrap}>
+            <section style={styles.sectionCard}>
+              <div style={styles.card}>
+                {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
+                <div style={styles.tableWrap}>
                 <table style={styles.table}>
                 <thead>
                   <tr>
@@ -559,9 +570,9 @@ const TransactionHistoryPage = () => {
                   )}
                 </tbody>
                 </table>
-              </div>
+                </div>
 
-              {filteredTransactions.length > transactionHistoryPageSize ? (
+                {filteredTransactions.length > transactionHistoryPageSize ? (
               <div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '12px', alignItems: 'center' }}>
                   <p style={styles.cardText}>Showing {transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredTransactions.length)} of {filteredTransactions.length} transactions</p>
@@ -589,7 +600,8 @@ const TransactionHistoryPage = () => {
                   </div>
                 </div>
               </div>
-              ) : null}
+                ) : null}
+              </div>
             </section>
           </div>
         </div>
