@@ -247,6 +247,44 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     outline: 'none',
     fontSize: '0.9rem',
   },
+  selectTrigger: {
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '10px',
+    borderRadius: '14px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceMuted,
+    color: theme.text,
+    padding: '11px 12px',
+    fontSize: '0.95rem',
+    cursor: 'pointer',
+  },
+  selectMenu: {
+    position: 'absolute' as const,
+    zIndex: 10,
+    top: 'calc(100% + 6px)',
+    left: 0,
+    right: 0,
+    display: 'grid',
+    gap: '6px',
+    padding: '8px',
+    borderRadius: '16px',
+    background: theme.surfaceMuted,
+    border: `1px solid ${theme.borderGlass}`,
+  },
+  selectOption: {
+    width: '100%',
+    borderRadius: '12px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.highlightSoft,
+    color: theme.text,
+    padding: '10px 12px',
+    textAlign: 'left' as const,
+    cursor: 'pointer',
+  },
   buttonRow: {
     display: 'flex',
     gap: '12px',
@@ -324,6 +362,7 @@ const SecurityPage = () => {
   const [loading, setLoading] = useState(true);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [maxActiveSessions, setMaxActiveSessions] = useState(2);
+  const [maxSessionsMenuOpen, setMaxSessionsMenuOpen] = useState(false);
   const [savingMaxSessions, setSavingMaxSessions] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -382,7 +421,7 @@ const SecurityPage = () => {
         setTwoFactorConfigured(Boolean(twoFactorStatus.configured));
         setTwoFactorEnabled(Boolean(twoFactorStatus.enabled));
         setHardwareKeyEnabled(Boolean(data.user?.hardwareKeyEnabled));
-        setMaxActiveSessions(Math.min(10, Math.max(2, data.user?.maxActiveSessions ?? 2)));
+        setMaxActiveSessions(Math.min(10, Math.max(1, data.user?.maxActiveSessions ?? 2)));
 
         setLogins(data.logins ?? []);
       } catch {
@@ -408,8 +447,8 @@ const SecurityPage = () => {
 
   const handleMaxSessionsSave = async () => {
     const value = Number(maxActiveSessions);
-    if (!Number.isInteger(value) || value < 2 || value > 10) {
-      return showStatus('error', 'Choose a whole number between 2 and 10 active sessions.', 'sessions');
+    if (!Number.isInteger(value) || value < 1 || value > 10) {
+      return showStatus('error', 'Choose a whole number between 1 and 10 active sessions.', 'sessions');
     }
 
     setSavingMaxSessions(true);
@@ -775,13 +814,18 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{sessionsLoading ? <LoadingDots /> : `${currentLoginCount} active device${currentLoginCount === 1 ? '' : 's'} • max ${maxActiveSessions} per account`}</p>
                 <div className="security-control" style={styles.control}>
                   <label style={styles.note} htmlFor="max-active-sessions">Maximum active sessions</label>
-                  <select id="max-active-sessions" style={styles.input} value={maxActiveSessions} onChange={(event) => setMaxActiveSessions(Number(event.target.value))} disabled={savingMaxSessions}>
-                    {Array.from({ length: 9 }, (_, index) => index + 2).map((value) => <option key={value} value={value}>{value} devices</option>)}
-                  </select>
+                  <div style={{ position: 'relative' as const }}>
+                    <button id="max-active-sessions" type="button" style={{ ...styles.selectTrigger, cursor: savingMaxSessions ? 'not-allowed' : 'pointer', opacity: savingMaxSessions ? 0.65 : 1 }} onClick={() => setMaxSessionsMenuOpen((current) => !current)} disabled={savingMaxSessions} aria-expanded={maxSessionsMenuOpen}>
+                      <span>{maxActiveSessions} device{maxActiveSessions === 1 ? '' : 's'}</span><span>▾</span>
+                    </button>
+                    {maxSessionsMenuOpen ? <div style={styles.selectMenu}>
+                      {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => <button key={value} type="button" style={{ ...styles.selectOption, background: value === maxActiveSessions ? theme.primarySoft : theme.highlightSoft }} onClick={() => { setMaxActiveSessions(value); setMaxSessionsMenuOpen(false); }}>{value} device{value === 1 ? '' : 's'}</button>)}
+                    </div> : null}
+                  </div>
                   <button type="button" style={styles.button} onClick={() => void handleMaxSessionsSave()} disabled={savingMaxSessions}>{savingMaxSessions ? <InlineLoadingDots /> : 'Save session limit'}</button>
                 </div>
                 {renderStatus('sessions')}
-                <p style={styles.note}>Choose how many devices can stay signed in at once. The default is 2, and you can allow up to 10.</p>
+                <p style={styles.note}>Choose how many devices can stay signed in at once. The default is 2, and you can allow from 1 up to 10.</p>
                 <div style={styles.tableWrap}>
                   <table style={styles.table}>
                     <thead>
