@@ -271,6 +271,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
+  { routes: ['/developer', '/developer/api-keys', '/developer/webhooks', '/developer/configure'] },
   { routes: ['/nowbar-color', '/nowbar-button-color'] },
   { routes: ['/faq'] },
 ];
@@ -305,6 +306,9 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/library') return 'LIBRARY';
   if (path === '/about') return 'ABOUT';
   if (path === '/developer') return 'DEVELOPER';
+  if (path === '/developer/api-keys') return 'API KEYS';
+  if (path === '/developer/webhooks') return 'WEBHOOKS';
+  if (path === '/developer/configure') return 'CONFIGURE';
   if (path === '/logout') return 'LOGOUT';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
