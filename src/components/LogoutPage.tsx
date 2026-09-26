@@ -82,10 +82,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     cursor: 'pointer',
     justifySelf: 'end',
   },
-  dangerButton: {
-    borderColor: 'rgba(248, 113, 113, 0.65)',
-    background: 'rgba(127, 29, 29, 0.28)',
-  },
   status: {
     margin: 0,
     color: theme.textMuted,
@@ -115,7 +111,7 @@ const LogoutPage = () => {
               <article style={styles.card}>
                 <h3 style={styles.cardTitle}>Manual Logout</h3>
                 <p style={styles.cardSubtext}>Review the warning before ending your session.</p>
-                <button type="button" style={{ ...styles.viewButton, ...styles.dangerButton }} onClick={() => navigate('/manual-logout')}>View</button>
+                <button type="button" style={styles.viewButton} onClick={() => navigate('/manual-logout')}>View</button>
               </article>
             </div>
           </div>
