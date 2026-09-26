@@ -73,11 +73,12 @@ const AppUsagePage = () => {
             <section style={cardStyles.card}>
               {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
               <div style={{ display: 'grid', gap: '10px', width: '100%', minWidth: 0, marginTop: '6px', padding: '12px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', background: theme.surfaceGlass, boxSizing: 'border-box' }} aria-live="polite">
-                {loading ? <div style={{ padding: '28px 18px', textAlign: 'center' }}><LoadingDots /></div> : null}
-                {!loading && Object.entries(pageLabels).map(([page, label]) => (
+                {Object.entries(pageLabels).map(([page, label]) => (
                   <article key={page} style={{ width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, boxSizing: 'border-box', fontSize: '0.95rem' }}>
                     <span style={{ fontWeight: 800 }}>{label}</span>
-                    <strong style={{ color: theme.primary }}>{usage[page] || 0} {usage[page] === 1 ? 'opening' : 'openings'}</strong>
+                    <strong style={{ color: theme.primary }}>
+                      {loading ? <LoadingDots /> : `${usage[page] || 0} ${usage[page] === 1 ? 'Visit' : 'Visits'}`}
+                    </strong>
                   </article>
                 ))}
               </div>

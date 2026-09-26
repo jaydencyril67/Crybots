@@ -135,10 +135,8 @@ const ManagePage = () => {
       cancelLabel="Back"
       showNowBar={false}
       onConfirm={(value) => {
-        const nextSettings = { ...blockSettings, [blockPicker]: value, enabled: true };
-        setBlockSettings(nextSettings);
+        setBlockSettings((current) => ({ ...current, [blockPicker]: value }));
         setBlockPicker(null);
-        if (nextSettings.startsAt && nextSettings.endsAt) void saveBlockSettings(nextSettings);
       }}
       onCancel={() => setBlockPicker(null)}
     />;
@@ -191,8 +189,7 @@ const ManagePage = () => {
               <p style={styles.text}>Temporarily prevent withdrawals and transfers during a selected date and time range.</p>
               <button type="button" style={styles.button} onClick={() => setBlockPicker('startsAt')}>Start: {blockSettings.startsAt ? new Date(blockSettings.startsAt).toLocaleString() : 'Choose date and time'}</button>
               <button type="button" style={styles.button} onClick={() => setBlockPicker('endsAt')}>End: {blockSettings.endsAt ? new Date(blockSettings.endsAt).toLocaleString() : 'Choose date and time'}</button>
-              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} disabled={blockSaving || !blockSettings.startsAt || !blockSettings.endsAt} onClick={() => void saveBlockSettings({ ...blockSettings, enabled: true })}>{blockSaving ? <InlineLoadingDots /> : blockSettings.active ? 'Update block' : 'Enable block'}</button>
-              {blockSettings.enabled ? <button type="button" style={styles.button} disabled={blockSaving} onClick={() => void saveBlockSettings({ enabled: false, startsAt: null, endsAt: null, active: false })}>Disable block</button> : null}
+              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} disabled={blockSaving || (!blockSettings.enabled && (!blockSettings.startsAt || !blockSettings.endsAt))} onClick={() => void saveBlockSettings(blockSettings.enabled ? { enabled: false, startsAt: null, endsAt: null, active: false } : { ...blockSettings, enabled: true })}>{blockSaving ? <InlineLoadingDots /> : blockSettings.enabled ? 'Disable block' : 'Enable block'}</button>
             </div>
           </section>
         </div>
