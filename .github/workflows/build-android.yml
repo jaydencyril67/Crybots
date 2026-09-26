@@ -29,7 +29,10 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Install Capacitor build tools
+        run: npm install --no-save @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9
 
       - name: Build web app
         run: npm run build
