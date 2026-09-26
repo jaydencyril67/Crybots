@@ -36,10 +36,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   movementValue: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, flexShrink: 0 },
   pointsGrid: { width: '100%', display: 'grid', gap: '12px', padding: '14px', boxSizing: 'border-box' as const },
   metricLabel: { margin: 0, color: theme.textMuted, fontSize: '0.75rem' },
-  buyForm: { display: 'flex', flexWrap: 'wrap' as const, alignItems: 'end', gap: '9px' },
-  inputGroup: { display: 'grid', gap: '5px', flex: '1 1 180px' },
+  buyForm: { display: 'grid', gap: '10px' },
+  switcher: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', padding: '4px', borderRadius: '10px', background: theme.surfaceMuted },
+  modeButton: { border: 0, borderRadius: '7px', padding: '8px 10px', background: 'transparent', color: theme.textMuted, fontWeight: 800, cursor: 'pointer' },
+  activeModeButton: { background: theme.primary, color: theme.textInverse },
+  inputGroup: { display: 'grid', gap: '5px' },
   input: { width: '100%', boxSizing: 'border-box' as const, padding: '10px 11px', borderRadius: '9px', border: `1px solid ${theme.borderGlass}`, background: theme.background, color: theme.text, fontSize: '0.9rem' },
-  buyButton: { border: `1px solid ${theme.primary}`, borderRadius: '9px', padding: '11px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer' },
+  sellPreview: { margin: 0, padding: '9px 11px', borderRadius: '9px', background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem' },
+  buyButton: { border: `1px solid ${theme.primary}`, borderRadius: '9px', padding: '10px 14px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer' },
   disabledButton: { opacity: 0.55, cursor: 'not-allowed' },
   status: { margin: 0, fontSize: '0.8rem', color: theme.textMuted },
 });
@@ -72,8 +76,8 @@ const MarketPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [marketPoints, setMarketPoints] = React.useState<MarketPoint[]>([]);
-  const [buyPoints, setBuyPoints] = React.useState('');
-  const [sellPoints, setSellPoints] = React.useState('');
+  const [tradeMode, setTradeMode] = React.useState<'buy' | 'sell'>('buy');
+  const [points, setPoints] = React.useState('');
   const [buying, setBuying] = React.useState(false);
   const [selling, setSelling] = React.useState(false);
   const [buyStatus, setBuyStatus] = React.useState<MarketNotification | null>(null);
@@ -105,8 +109,8 @@ const MarketPage = () => {
   const formatUsdt = (amount: number) => `${amount.toFixed(2)} USDT`;
   const handleBuy = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const points = Number(buyPoints);
-    if (!Number.isFinite(points) || points < 1) {
+    const pointsAmount = Number(points);
+    if (!Number.isFinite(pointsAmount) || pointsAmount < 1) {
       setBuyStatus({ tone: 'warning', message: 'Enter at least 1 point.' });
       return;
     }
@@ -115,8 +119,8 @@ const MarketPage = () => {
     setBuyStatus(null);
     setSellStatus(null);
     try {
-      await api.post('/api/market/points/buy', { points });
-      setBuyPoints('');
+      await api.post('/api/market/points/buy', { points: pointsAmount });
+      setPoints('');
       setBuyStatus({ tone: 'success', message: 'Points purchased. They begin following market performance tomorrow.' });
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -128,8 +132,8 @@ const MarketPage = () => {
 
   const handleSell = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const points = Number(sellPoints);
-    if (!Number.isFinite(points) || points < 1) {
+    const pointsAmount = Number(points);
+    if (!Number.isFinite(pointsAmount) || pointsAmount < 1) {
       setSellStatus({ tone: 'warning', message: 'Enter at least 1 point.' });
       return;
     }
@@ -138,9 +142,9 @@ const MarketPage = () => {
     setSellStatus(null);
     setBuyStatus(null);
     try {
-      const response = await api.post<{ value: number }>('/api/market/points/sell', { points });
-      setSellPoints('');
-      setSellStatus({ tone: 'success', message: `${points.toFixed(2)} points sold for ${formatUsdt(response.data.value)}.` });
+      const response = await api.post<{ value: number }>('/api/market/points/sell', { points: pointsAmount });
+      setPoints('');
+      setSellStatus({ tone: 'success', message: `${pointsAmount.toFixed(2)} points sold for ${formatUsdt(response.data.value)}.` });
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setSellStatus({ tone: 'error', message: message || 'Unable to sell points right now.' });
@@ -153,13 +157,14 @@ const MarketPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Buy and sell points</h2><div style={styles.card}><div style={styles.pointsGrid}>
-      <form style={styles.buyForm} onSubmit={handleBuy}>
-        <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to buy (1 point = 1 USDT)</span><input style={styles.input} type="number" min="1" step="0.01" value={buyPoints} onChange={(event) => setBuyPoints(event.target.value)} placeholder="e.g. 100" /></label>
-        <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{buying ? 'Buying…' : 'Buy points'}</button>
-      </form>
-      <form style={styles.buyForm} onSubmit={handleSell}>
-        <label style={styles.inputGroup}><span style={styles.metricLabel}>Points to sell at current market value</span><input style={styles.input} type="number" min="1" step="0.01" value={sellPoints} onChange={(event) => setSellPoints(event.target.value)} placeholder="e.g. 100" /></label>
-        <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{selling ? 'Selling…' : 'Sell points'}</button>
+      <form style={styles.buyForm} onSubmit={tradeMode === 'buy' ? handleBuy : handleSell}>
+        <div style={styles.switcher} role="tablist" aria-label="Market points action">
+          <button type="button" role="tab" aria-selected={tradeMode === 'buy'} style={{ ...styles.modeButton, ...(tradeMode === 'buy' ? styles.activeModeButton : {}) }} onClick={() => { setTradeMode('buy'); setBuyStatus(null); setSellStatus(null); }}>Buy</button>
+          <button type="button" role="tab" aria-selected={tradeMode === 'sell'} style={{ ...styles.modeButton, ...(tradeMode === 'sell' ? styles.activeModeButton : {}) }} onClick={() => { setTradeMode('sell'); setBuyStatus(null); setSellStatus(null); }}>Sell</button>
+        </div>
+        <label style={styles.inputGroup}><span style={styles.metricLabel}>{tradeMode === 'buy' ? 'Points to buy · 1 point = 1 USDT' : 'Points to sell at current market value'}</span><input style={styles.input} type="number" min="1" step="0.01" value={points} onChange={(event) => setPoints(event.target.value)} placeholder="e.g. 100" /></label>
+        {tradeMode === 'sell' && Number.isFinite(Number(points)) && Number(points) > 0 ? <p style={styles.sellPreview}>Estimated payout: <strong>{formatUsdt(Number(points) * (1 + (marketPoints[marketPoints.length - 1]?.percent ?? 0) / 100))}</strong></p> : null}
+        <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{tradeMode === 'buy' ? (buying ? 'Buying…' : 'Buy points') : (selling ? 'Selling…' : 'Sell points')}</button>
       </form>
       {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : <p style={styles.status}>New purchases start following the market from the next UTC day. Unsold points reset to their original value at the next daily reset.</p>}
     </div></div></section>
