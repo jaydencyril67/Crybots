@@ -72,12 +72,12 @@ const ControlCenterPage = () => {
     void load();
   }, []);
 
-  const updateAutoSell = (index: number, field: keyof AutoSellRule, value: number | boolean | '') => setAutoSellRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
-  const updateTakeProfit = (index: number, field: keyof TakeProfitRule, value: number | boolean | '') => setTakeProfitRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
-  const updateMarketNotification = (index: number, field: keyof MarketRangeNotificationRule, value: number | boolean | '') => setMarketRangeNotificationRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
-  const addAutoSell = () => setAutoSellRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1, points: 1 }]);
-  const addTakeProfit = () => setTakeProfitRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1 }]);
-  const addMarketNotification = () => setMarketRangeNotificationRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1 }]);
+  const updateAutoSell = (index: number, field: keyof AutoSellRule, value: number | boolean | '') => setAutoSellRules((rules) => rules.map((rule, ruleIndex) => field === 'enabled' && value === true ? { ...rule, enabled: ruleIndex === index } : ruleIndex === index ? { ...rule, [field]: value } : rule));
+  const updateTakeProfit = (index: number, field: keyof TakeProfitRule, value: number | boolean | '') => setTakeProfitRules((rules) => rules.map((rule, ruleIndex) => field === 'enabled' && value === true ? { ...rule, enabled: ruleIndex === index } : ruleIndex === index ? { ...rule, [field]: value } : rule));
+  const updateMarketNotification = (index: number, field: keyof MarketRangeNotificationRule, value: number | boolean | '') => setMarketRangeNotificationRules((rules) => rules.map((rule, ruleIndex) => field === 'enabled' && value === true ? { ...rule, enabled: ruleIndex === index } : ruleIndex === index ? { ...rule, [field]: value } : rule));
+  const addAutoSell = () => setAutoSellRules((rules) => [...rules, { enabled: rules.every((rule) => !rule.enabled), minPercent: 0, maxPercent: 1, points: 1 }]);
+  const addTakeProfit = () => setTakeProfitRules((rules) => [...rules, { enabled: rules.every((rule) => !rule.enabled), minPercent: 0, maxPercent: 1 }]);
+  const addMarketNotification = () => setMarketRangeNotificationRules((rules) => [...rules, { enabled: rules.every((rule) => !rule.enabled), minPercent: 0, maxPercent: 1 }]);
 
   const save = async () => {
     setSaving(true);
