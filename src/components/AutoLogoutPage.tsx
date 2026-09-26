@@ -4,6 +4,7 @@ import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import api from '../api/axios';
 import { getScheduledLogout, setScheduledLogout } from '../utils/scheduledLogout';
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -19,6 +20,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   status: { margin: 0, color: theme.textMuted, fontSize: '0.86rem' },
 });
 
+const toLocalDateTimeValue = (value: string) => {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return value;
+
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+};
+
 const AutoLogoutPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
@@ -28,18 +37,34 @@ const AutoLogoutPage = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [status, setStatus] = useState('No automatic logout has been configured.');
 
-  const saveSchedule = (value: string) => {
-    setScheduledLogoutValue(value);
-    setScheduledLogout(value);
-    setShowDatePicker(false);
-    setStatus(`Scheduled logout set for ${value.replace('T', ' ')}.`);
+  const saveSchedule = async (value: string) => {
+    try {
+      const response = await api.put('/api/auth/scheduled-logout', { scheduledLogoutAt: new Date(value).toISOString() });
+      const savedValue = toLocalDateTimeValue(response.data.scheduledLogoutAt);
+      setScheduledLogoutValue(savedValue);
+      setScheduledLogout(savedValue);
+      setShowDatePicker(false);
+      setStatus(`Scheduled logout set for ${savedValue.replace('T', ' ')}.`);
+    } catch (error: any) {
+      setStatus(error?.response?.data?.message || 'Unable to save scheduled logout.');
+    }
   };
 
   useEffect(() => {
-    if (scheduledLogout) {
-      setStatus(`Scheduled logout set for ${scheduledLogout.replace('T', ' ')}.`);
-    }
-  }, [scheduledLogout]);
+    const loadSchedule = async () => {
+      try {
+        const response = await api.get('/api/auth/scheduled-logout');
+        const serverValue = response.data.scheduledLogoutAt ? toLocalDateTimeValue(response.data.scheduledLogoutAt) : '';
+        setScheduledLogoutValue(serverValue);
+        setScheduledLogout(serverValue);
+        setStatus(serverValue ? `Scheduled logout set for ${serverValue.replace('T', ' ')}.` : 'No automatic logout has been configured.');
+      } catch {
+        if (scheduledLogout) setStatus(`Scheduled logout set for ${scheduledLogout.replace('T', ' ')}.`);
+      }
+    };
+
+    void loadSchedule();
+  }, []);
 
   if (showDatePicker) {
     return <ReusableDatePage title="Scheduled logout" description="Choose the date and time when this session should end automatically." value={scheduledLogout} mode="datetime-local" confirmLabel="Save scheduled logout" onConfirm={saveSchedule} onCancel={() => setShowDatePicker(false)} />;
