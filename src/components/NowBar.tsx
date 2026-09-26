@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Code2, Home, Info, LifeBuoy, Bot, Settings2, WalletCards } from 'lucide-react';
+import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Code2, Home, Info, LifeBuoy, LogOut, Bot, Settings2, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 
 const EDGE_LIGHT_COLORS = {
@@ -243,6 +243,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
   if (path === '/portfolio/statistics') return 'ACCOUNT STATISTICS';
   if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/logout') return 'LOGOUT';
   if (path === '/agent') return 'AGENT';
   if (path === '/agent/stats') return 'AGENT STATS';
   if (path === '/agent/tools') return 'AGENT TOOLS';
@@ -256,6 +257,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/library') return 'LIBRARY';
   if (path === '/about') return 'ABOUT';
   if (path === '/developer') return 'DEVELOPER';
+  if (path === '/logout') return 'LOGOUT';
   if (path === '/asset') return 'ASSET';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -361,6 +363,14 @@ const createDefaultActions = (): NowBarAction[] => [
     },
     active: getActivePath() === '/developer',
   },
+  {
+    label: 'LOGOUT',
+    icon: <LogOut size={18} />,
+    onClick: () => {
+      navigate('/logout');
+    },
+    active: getActivePath() === '/logout',
+  },
 ];
 
 const NowBar = ({ actions }: NowBarProps) => {
@@ -432,13 +442,13 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.clearTimeout(idleTimer);
     }
 
-    if (getActivePath() === '/nowbar-button-color') {
+    if (getActivePath() === '/nowbar-button-color' || getActivePath() === '/logout') {
       setIdleTimer(null);
       return;
     }
 
     const timer = window.setTimeout(() => {
-      if (getActivePath() !== '/nowbar-button-color') {
+      if (getActivePath() !== '/nowbar-button-color' && getActivePath() !== '/logout') {
         setView('title');
       }
     }, 10000);
