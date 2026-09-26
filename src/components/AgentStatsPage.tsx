@@ -33,13 +33,13 @@ const styles = {
   back: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '8px 12px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.86rem', cursor: 'pointer', fontWeight: 700 }),
   text: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ margin: 0, maxWidth: '62ch', color: theme.textMuted, fontSize: '0.92rem', lineHeight: 1.7 }),
   content: { display: 'grid', gap: 14, marginTop: 18 },
-  rowList: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 10, width: '100%', padding: 18, borderRadius: 22, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const }),
-  metrics: { display: 'grid', gridTemplateColumns: '1fr', gap: 10 },
-  card: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 10, padding: 18, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }),
-  panel: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 10, padding: 14, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }),
+  rowList: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 10, width: '100%', padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const }),
+  metrics: { display: 'grid', gridTemplateColumns: '1fr', gap: 8 },
+  card: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, minWidth: 0, padding: '12px 13px', borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }),
+  panel: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'grid', gap: 8, padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }),
   cardTitle: { display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: '1rem', fontWeight: 800 },
-  value: { fontSize: '1.12rem' },
-  itemRow: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '12px 0', borderBottom: `1px solid ${theme.borderGlass}`, textTransform: 'capitalize' as const }),
+  value: { margin: 0, fontSize: '1.12rem', fontWeight: 900, textAlign: 'right' as const, overflowWrap: 'anywhere' as const },
+  itemRow: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minWidth: 0, padding: '12px 13px', border: `1px solid ${theme.borderGlass}`, borderRadius: 12, background: theme.surfaceGlass, textTransform: 'capitalize' as const }),
   muted: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'block', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.6 }),
   challenge: { display: 'grid', gap: 6 },
   track: (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ height: 8, overflow: 'hidden' as const, borderRadius: 8, background: theme.surfaceMuted }),
@@ -47,6 +47,6 @@ const styles = {
   loading: { display: 'flex', justifyContent: 'center', padding: 32 },
 };
 
-const Metric = ({ theme, icon, label, value, loading }: { theme: typeof HYBRID_THEME_TOKENS.dark; icon: ReactNode; label: string; value: string | number; loading: boolean }) => <div style={styles.card(theme)}><div>{icon}</div>{loading ? <LoadingDots /> : <strong style={styles.value}>{value}</strong>}<span style={styles.muted(theme)}>{label}</span></div>;
+const Metric = ({ theme, icon, label, value, loading }: { theme: typeof HYBRID_THEME_TOKENS.dark; icon: ReactNode; label: string; value: string | number; loading: boolean }) => <div style={styles.card(theme)}><span style={styles.muted(theme)}>{label}</span><div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>{icon}{loading ? <LoadingDots /> : <strong style={styles.value}>{value}</strong>}</div></div>;
 
 export default AgentStatsPage;
