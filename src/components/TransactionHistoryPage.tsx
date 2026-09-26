@@ -1,12 +1,13 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ChevronDown, Filter, ListFilter, Search, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Copy, Filter, ListFilter, Search } from 'lucide-react';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import NotificationBanner, { NotificationTone } from './NotificationBanner';
 
 type TransactionType = 'all' | 'deposit' | 'withdrawal' | 'transfer' | 'trade' | 'reward';
 type TransactionDirection = 'all' | 'inbound' | 'outbound';
@@ -194,15 +195,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     textAlign: 'right' as const,
     flexShrink: 0,
   },
-  message: {
-    padding: '14px 16px',
-    borderRadius: '16px',
-    border: `1px solid ${theme.warning}`,
-    background: theme.primarySoft,
-    color: theme.warning,
-    fontSize: '0.92rem',
-    lineHeight: 1.5,
-  },
   loadingState: {
     padding: '24px 18px',
     textAlign: 'center' as const,
@@ -239,16 +231,15 @@ const TransactionHistoryPage = () => {
   const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false);
   const [isDirectionMenuOpen, setIsDirectionMenuOpen] = useState(false);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
-  const [openReferenceId, setOpenReferenceId] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
   const [transactionHistoryPage, setTransactionHistoryPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [alert, setAlert] = useState<{ tone: NotificationTone; title: string; message: string } | null>(null);
 
   useEffect(() => {
     const loadTransactions = async () => {
       setLoading(true);
-      setError('');
+      setAlert(null);
       try {
         const { data } = await api.get<TransactionHistoryResponse>('/api/transactions/me');
         const normalizedTransactions = Array.isArray(data?.transactions)
@@ -263,11 +254,11 @@ const TransactionHistoryPage = () => {
         setTransactions(normalizedTransactions);
         setTransactionHistoryPage(1);
         if (!Array.isArray(data?.transactions)) {
-          setError('The backend returned no transaction records.');
+          setAlert({ tone: 'info', title: 'No transaction records', message: 'The backend returned no transaction records.' });
         }
       } catch {
         setTransactions([]);
-        setError('Unable to load transaction history from the backend.');
+        setAlert({ tone: 'error', title: 'Unable to load transactions', message: 'Unable to load transaction history from the backend.' });
       } finally {
         setLoading(false);
       }
@@ -282,12 +273,9 @@ const TransactionHistoryPage = () => {
       const insideTypeMenu = document.getElementById('transaction-type-menu')?.contains(target) ?? false;
       const insideDirectionMenu = document.getElementById('transaction-direction-menu')?.contains(target) ?? false;
       const insideStatusMenu = document.getElementById('transaction-status-menu')?.contains(target) ?? false;
-      const insideReferenceMenu = (target as Element).closest('[data-transaction-reference-menu]') !== null;
-
       if (!insideTypeMenu) setIsTypeMenuOpen(false);
       if (!insideDirectionMenu) setIsDirectionMenuOpen(false);
       if (!insideStatusMenu) setIsStatusMenuOpen(false);
-      if (!insideReferenceMenu) setOpenReferenceId(null);
     };
 
     document.addEventListener('mousedown', handleOutsideClick);
@@ -500,7 +488,7 @@ const TransactionHistoryPage = () => {
               </div>
             </section>
 
-            {error ? <div style={styles.message}>{error}</div> : null}
+            {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
 
             <section style={styles.tableWrap}>
               <table style={styles.table}>
@@ -511,7 +499,7 @@ const TransactionHistoryPage = () => {
                     <th style={styles.th}>Status</th>
                     <th style={styles.th}>Date</th>
                     <th style={styles.th}>Time</th>
-                    <th style={styles.th}>Reference</th>
+                    <th style={styles.th}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -531,25 +519,33 @@ const TransactionHistoryPage = () => {
                       <td style={styles.td}>{transaction.date}</td>
                       <td style={styles.td}>{transaction.time}</td>
                       <td style={styles.td}>
-                        <div data-transaction-reference-menu="true" style={{ position: 'relative', minWidth: '180px' }}>
-                          <button
-                            type="button"
-                            aria-expanded={openReferenceId === transaction.id}
-                            style={styles.selectTrigger}
-                            onClick={() => setOpenReferenceId(openReferenceId === transaction.id ? null : transaction.id)}
-                          >
-                            <span>View reference</span>
-                            <ChevronDown size={16} style={{ transform: openReferenceId === transaction.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
-                          </button>
-                          {openReferenceId === transaction.id ? (
-                            <div style={styles.selectMenu}>
-                              <div style={styles.selectOption}>
-                                <strong>{transaction.reference}</strong>
-                                <span style={{ ...styles.muted, display: 'block', marginTop: '4px' }}>{transaction.id}</span>
-                              </div>
-                            </div>
-                          ) : null}
-                        </div>
+                        <button
+                          type="button"
+                          style={{ ...styles.selectOption, display: 'inline-flex', alignItems: 'center', gap: '7px' }}
+                          onClick={() => {
+                            void (async () => {
+                              try {
+                                if (navigator.clipboard?.writeText) {
+                                  await navigator.clipboard.writeText(transaction.reference);
+                                } else {
+                                  const textArea = document.createElement('textarea');
+                                  textArea.value = transaction.reference;
+                                  textArea.style.position = 'fixed';
+                                  textArea.style.opacity = '0';
+                                  document.body.appendChild(textArea);
+                                  textArea.select();
+                                  document.execCommand('copy');
+                                  document.body.removeChild(textArea);
+                                }
+                                setAlert({ tone: 'success', title: 'Reference copied', message: 'The transaction reference has been copied to your clipboard.' });
+                              } catch {
+                                setAlert({ tone: 'error', title: 'Copy failed', message: 'The transaction reference could not be copied. Please try again.' });
+                              }
+                            })();
+                          }}
+                        >
+                          <Copy size={16} /> Copy Ref
+                        </button>
                       </td>
                     </tr>
                   )) : (
