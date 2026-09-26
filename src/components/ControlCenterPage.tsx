@@ -7,23 +7,24 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NotificationBanner, { type NotificationTone } from './NotificationBanner';
 
-type AutoSellRule = { enabled: boolean; minPercent: number; maxPercent: number; points: number };
-type TakeProfitRule = { enabled: boolean; minPercent: number; maxPercent: number };
-type MarketRangeNotificationRule = { enabled: boolean; minPercent: number; maxPercent: number };
+type PercentValue = number | '';
+type AutoSellRule = { enabled: boolean; minPercent: PercentValue; maxPercent: PercentValue; points: number };
+type TakeProfitRule = { enabled: boolean; minPercent: PercentValue; maxPercent: PercentValue };
+type MarketRangeNotificationRule = { enabled: boolean; minPercent: PercentValue; maxPercent: PercentValue };
 type Status = { tone: NotificationTone; message: string } | null;
 
 type RuleFieldsProps = {
-  minPercent: number;
-  maxPercent: number;
-  onChange: (field: 'minPercent' | 'maxPercent', value: number) => void;
+  minPercent: PercentValue;
+  maxPercent: PercentValue;
+  onChange: (field: 'minPercent' | 'maxPercent', value: PercentValue) => void;
   theme: typeof HYBRID_THEME_TOKENS.dark;
 };
 
 const RuleFields = ({ minPercent, maxPercent, onChange, theme }: RuleFieldsProps) => {
   const inputStyle = { width: '100%', boxSizing: 'border-box' as const, padding: '10px 11px', borderRadius: '9px', border: `1px solid ${theme.borderGlass}`, background: theme.background, color: theme.text, fontSize: '0.9rem' };
   return <>
-    <label style={{ display: 'grid', gap: '5px', flex: 1 }}><span style={{ color: theme.textMuted, fontSize: '0.76rem' }}>Range starts at (%)</span><input style={inputStyle} type="number" min="0" max="3" step="0.01" value={minPercent} onChange={(event) => onChange('minPercent', Number(event.target.value))} /></label>
-    <label style={{ display: 'grid', gap: '5px', flex: 1 }}><span style={{ color: theme.textMuted, fontSize: '0.76rem' }}>Range ends at (%)</span><input style={inputStyle} type="number" min="0" max="3" step="0.01" value={maxPercent} onChange={(event) => onChange('maxPercent', Number(event.target.value))} /></label>
+    <label style={{ display: 'grid', gap: '5px', flex: 1 }}><span style={{ color: theme.textMuted, fontSize: '0.76rem' }}>Range starts at (%)</span><input style={inputStyle} type="number" min="0" max="3" step="0.01" value={minPercent} onChange={(event) => onChange('minPercent', event.target.value === '' ? '' : Number(event.target.value))} /></label>
+    <label style={{ display: 'grid', gap: '5px', flex: 1 }}><span style={{ color: theme.textMuted, fontSize: '0.76rem' }}>Range ends at (%)</span><input style={inputStyle} type="number" min="0" max="3" step="0.01" value={maxPercent} onChange={(event) => onChange('maxPercent', event.target.value === '' ? '' : Number(event.target.value))} /></label>
   </>;
 };
 
@@ -70,9 +71,9 @@ const ControlCenterPage = () => {
     void load();
   }, []);
 
-  const updateAutoSell = (index: number, field: keyof AutoSellRule, value: number | boolean) => setAutoSellRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
-  const updateTakeProfit = (index: number, field: keyof TakeProfitRule, value: number | boolean) => setTakeProfitRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
-  const updateMarketNotification = (index: number, field: keyof MarketRangeNotificationRule, value: number | boolean) => setMarketRangeNotificationRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
+  const updateAutoSell = (index: number, field: keyof AutoSellRule, value: number | boolean | '') => setAutoSellRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
+  const updateTakeProfit = (index: number, field: keyof TakeProfitRule, value: number | boolean | '') => setTakeProfitRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
+  const updateMarketNotification = (index: number, field: keyof MarketRangeNotificationRule, value: number | boolean | '') => setMarketRangeNotificationRules((rules) => rules.map((rule, ruleIndex) => ruleIndex === index ? { ...rule, [field]: value } : rule));
   const addAutoSell = () => setAutoSellRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1, points: 1 }]);
   const addTakeProfit = () => setTakeProfitRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1 }]);
   const addMarketNotification = () => setMarketRangeNotificationRules((rules) => [...rules, { enabled: true, minPercent: 0, maxPercent: 1 }]);
@@ -81,7 +82,11 @@ const ControlCenterPage = () => {
     setSaving(true);
     setStatus(null);
     try {
-      const { data } = await api.put('/api/control-center', { autoSellRules, takeProfitRules, marketRangeNotificationRules });
+      const toNumber = (value: PercentValue) => value === '' ? Number.NaN : value;
+      const normalizedAutoSellRules = autoSellRules.map((rule) => ({ ...rule, minPercent: toNumber(rule.minPercent), maxPercent: toNumber(rule.maxPercent) }));
+      const normalizedTakeProfitRules = takeProfitRules.map((rule) => ({ ...rule, minPercent: toNumber(rule.minPercent), maxPercent: toNumber(rule.maxPercent) }));
+      const normalizedMarketNotificationRules = marketRangeNotificationRules.map((rule) => ({ ...rule, minPercent: toNumber(rule.minPercent), maxPercent: toNumber(rule.maxPercent) }));
+      const { data } = await api.put('/api/control-center', { autoSellRules: normalizedAutoSellRules, takeProfitRules: normalizedTakeProfitRules, marketRangeNotificationRules: normalizedMarketNotificationRules });
       setAutoSellRules(data.autoSellRules || []);
       setTakeProfitRules(data.takeProfitRules || []);
       setMarketRangeNotificationRules(data.marketRangeNotificationRules || []);
