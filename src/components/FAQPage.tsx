@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
-import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -70,9 +70,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '132px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '14px', marginTop: '10px' },
-  card: { ...createHybridCardStyles(theme).card },
   rowList: { display: 'grid', gap: '10px', width: '100%', minWidth: 0, padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
-  faqRow: { width: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '14px', boxSizing: 'border-box' as const },
+  faqRow: { width: '100%', maxWidth: '100%', display: 'grid', gap: '6px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', boxSizing: 'border-box' as const },
   summary: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', cursor: 'pointer', listStyle: 'none' as const },
   question: { margin: 0, fontSize: '0.94rem', fontWeight: 800, color: theme.text },
   answer: { margin: '10px 0 0', fontSize: '0.84rem', color: theme.textMuted, lineHeight: 1.55 },
@@ -92,8 +91,7 @@ const FAQPage = () => {
         <div style={styles.shell}>
           <div style={styles.content}>
             <button type="button" style={styles.back} onClick={() => navigate('/contact')}><ArrowLeft size={17} /> Contact</button>
-            <section style={styles.card}>
-              <div style={styles.rowList}>
+            <div style={styles.rowList}>
                 <header>
                   <h2 style={styles.sectionTitle}>Frequently asked questions</h2>
                   <p style={styles.sectionText}>Helpful answers about your KingsHall account, security, funds, and support.</p>
@@ -112,8 +110,7 @@ const FAQPage = () => {
                     </div>
                   </section>
                 ))}
-              </div>
-            </section>
+            </div>
           </div>
         </div>
       </div>
