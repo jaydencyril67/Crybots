@@ -1,0 +1,113 @@
+name: Build Production Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+
+      - name: Accept Android SDK licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Capacitor build tools
+        run: npm install --no-save --package-lock=false @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9 @capacitor/assets@3.0.5 @capacitor/splash-screen@7.0.3 sharp
+
+      - name: Create app branding assets
+        run: |
+          mkdir -p assets
+          node - <<'NODE'
+          const fs = require('fs');
+          const sharp = require('sharp');
+          const logo = fs.readFileSync('public/icons/ke-icon.svg', 'utf8')
+            .replace(/<svg[^>]*>/, '<svg width="900" height="900" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">');
+          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#111827"/><g transform="translate(916 916)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
+          fs.writeFileSync('assets/splash.svg', splash);
+          sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')
+            .then(() => sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-foreground.png'))
+            .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#111827' } }).png().toFile('assets/icon-background.png'))
+            .then(() => sharp('assets/splash.svg').png().toFile('assets/splash.png'))
+            .catch(error => { console.error(error); process.exit(1); });
+          NODE
+
+      - name: Build web app
+        run: npm run build
+        env:
+          REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL || 'https://kingshalls.onrender.com' }}
+
+      - name: Create Android project and generate branding
+        run: |
+          npx cap add android
+          npx capacitor-assets generate --android
+          npx cap sync android
+
+      - name: Configure release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_KEYSTORE_BASE64"
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_ALIAS"
+          test -n "$ANDROID_KEY_PASSWORD"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/kingshall-release.keystore
+          cat >> android/gradle.properties <<EOF
+          KINGS_HALL_KEYSTORE_FILE=kingshall-release.keystore
+          KINGS_HALL_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD
+          KINGS_HALL_KEY_ALIAS=$ANDROID_KEY_ALIAS
+          KINGS_HALL_KEY_PASSWORD=$ANDROID_KEY_PASSWORD
+          EOF
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('android/app/build.gradle')
+          text = path.read_text()
+          signing = '''
+              signingConfigs {
+                  release {
+                      storeFile file(project.findProperty("KINGS_HALL_KEYSTORE_FILE"))
+                      storePassword project.findProperty("KINGS_HALL_KEYSTORE_PASSWORD")
+                      keyAlias project.findProperty("KINGS_HALL_KEY_ALIAS")
+                      keyPassword project.findProperty("KINGS_HALL_KEY_PASSWORD")
+                  }
+              }
+          '''
+          text = text.replace('    buildTypes {', signing + '\n    buildTypes {', 1)
+          text = text.replace('        release {', '        release {\n            signingConfig signingConfigs.release', 1)
+          path.write_text(text)
+          PY
+
+      - name: Build signed production APK
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Upload production APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingshall-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
