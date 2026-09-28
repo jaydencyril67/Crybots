@@ -354,9 +354,9 @@ const DepositPage = () => {
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'completed' ? <NotificationBanner tone="success" title="Deposit confirmed" message="Your USDT deposit has been confirmed and your balance will reflect it shortly." /> : null}
           {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'pending' ? <NotificationBanner tone="info" title="Deposit awaiting confirmation" message="Send the requested amount to the address above. We will update this page when the network confirms it." /> : null}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button type="button" style={{ ...styles.secondaryButton, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Fixed address</button>
-            <button type="button" style={{ ...styles.secondaryButton, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
+          <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
+            <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Fixed address</button>
+            <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
           </div>
           {cryptoContent}
           <div style={styles.mutedCard}>
