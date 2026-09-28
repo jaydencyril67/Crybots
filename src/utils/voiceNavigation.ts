@@ -62,6 +62,25 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'APP USAGE', route: '/app-usage' },
 ];
 
+const AUTHENTICATED_ROUTES = new Set([
+  '/home', '/details', '/manage', '/theme', '/nowbar', '/voice-commands',
+  '/nowbar-color', '/nowbar-button-color', '/profile', '/exit', '/auto-exit',
+  '/manual-exit', '/statistics', '/agent', '/tools', '/stats', '/menu', '/trade',
+  '/my-space', '/market', '/control-center', '/logs', '/help', '/faq', '/options',
+  '/store', '/about', '/dev', '/api-keys', '/webhooks', '/configure', '/asset',
+  '/danger', '/security', '/withdrawals', '/transfer', '/deposit', '/transactions',
+  '/notifications', '/alert', '/app-usage',
+]);
+
+// These are the authenticated routes represented by the NowBar.
+export const NOWBAR_ROUTES = new Set([
+  ...AUTHENTICATED_ROUTES,
+]);
+
+export const AUTHENTICATED_NOWBAR_PAGE_ROUTES = PAGE_ROUTES.filter(({ route }) =>
+  AUTHENTICATED_ROUTES.has(route) && NOWBAR_ROUTES.has(route),
+);
+
 export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'COMMAND', route: '/voice-commands' },
   { label: 'HOME', route: '/home' },
@@ -114,7 +133,7 @@ export const navigateFromVoice = (transcript: string) => {
     return true;
   }
 
-  const command = VOICE_COMMANDS.find(({ label }) => {
+  const command = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES].find(({ label }) => {
     const normalizedLabel = normalizeVoiceText(label);
     return normalized === normalizedLabel || normalized.includes(normalizedLabel);
   });

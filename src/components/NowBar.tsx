@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Code2, Home, Info, LifeBuoy, LogOut, Bot, Settings2, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
+import { PAGE_ROUTES } from '../utils/voiceNavigation';
 
 const EDGE_LIGHT_COLORS = {
   blue: '#38bdf8',
@@ -276,9 +277,15 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/faq'] },
 ];
 
-const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/home';
+const getActivePath = () => {
+  const rawPath = window.location.pathname || window.location.hash.replace('#', '') || '/home';
+  const path = rawPath.split(/[?#]/)[0].replace(/\/$/, '');
+  return path || '/home';
+};
 
 const getCurrentPageTitle = (path: string) => {
+  const catalogEntry = PAGE_ROUTES.find((page) => page.route === path);
+  if (catalogEntry) return catalogEntry.label;
   if (path === '/home') return 'HOME';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
