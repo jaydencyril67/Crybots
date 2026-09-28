@@ -5,6 +5,7 @@ import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import KHLogo from './KHLogo';
 import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
+import { getVoiceModeEnabled, VOICE_MODE_CHANGED_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 const styles = {
   header: {
@@ -102,9 +103,26 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [unreadCount, setUnreadCount] = useState(0);
   const [isAlertActive, setIsAlertActive] = useState(false);
+  const [voiceModeEnabled, setVoiceModeEnabled] = useState(getVoiceModeEnabled);
+  const [isListening, setIsListening] = useState(false);
   const previousCount = useRef(0);
   const hasLoadedCount = useRef(false);
   const alertTimeout = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    const handleVoiceStatus = (event: Event) => {
+      const detail = (event as CustomEvent<{ listening?: boolean }>).detail;
+      setIsListening(Boolean(detail?.listening));
+      setVoiceModeEnabled(getVoiceModeEnabled());
+    };
+    const handleVoiceMode = () => setVoiceModeEnabled(getVoiceModeEnabled());
+    window.addEventListener(VOICE_STATUS_EVENT, handleVoiceStatus);
+    window.addEventListener(VOICE_MODE_CHANGED_EVENT, handleVoiceMode);
+    return () => {
+      window.removeEventListener(VOICE_STATUS_EVENT, handleVoiceStatus);
+      window.removeEventListener(VOICE_MODE_CHANGED_EVENT, handleVoiceMode);
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -206,7 +224,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   // Keep the edge visible while unread notifications exist, and pulse it for
   // ten seconds whenever a realtime notification arrives. This also covers
   // notifications created before the header/SSE connection finished loading.
-  const isEdgeLit = isAlertActive || unreadCount > 0;
+  const isEdgeLit = voiceModeEnabled || isAlertActive || unreadCount > 0;
   const headerStyle = isEdgeLit
     ? {
       ...styles.header,
@@ -214,11 +232,11 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       boxShadow: isAlertActive
         ? '0 0 0 1px rgba(239, 68, 68, 0.72), 0 0 16px rgba(239, 68, 68, 0.48), 0 14px 30px rgba(0,0,0,0.24)'
         : '0 0 0 1px rgba(239, 68, 68, 0.42), 0 0 10px rgba(239, 68, 68, 0.24), 0 14px 30px rgba(0,0,0,0.24)',
-      animation: isAlertActive ? 'ke-header-alert 1.2s ease-in-out infinite' : 'none',
-      filter: isAlertActive ? 'drop-shadow(0 0 7px rgba(239, 68, 68, 0.34))' : 'none',
+      animation: voiceModeEnabled || isAlertActive ? 'ke-header-alert 1.2s ease-in-out infinite' : 'none',
+      filter: voiceModeEnabled || isAlertActive ? 'drop-shadow(0 0 7px rgba(239, 68, 68, 0.34))' : 'none',
     }
     : styles.header;
-  const headerTitle = unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
+  const headerTitle = voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
   const artworkStyle = {
     ...styles.unreadArtwork,
     color: theme.textInverse,
