@@ -135,6 +135,11 @@ export const navigateFromVoice = (transcript: string) => {
   const normalized = normalizeVoiceText(transcript);
   const normalizedTranscript = ` ${normalized} `;
 
+  if (normalizedTranscript.includes(' off ') || normalizedTranscript.includes(' of ')) {
+    window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
+    window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
+    return true;
+  }
   if (normalizedTranscript.includes(' back ')) {
     window.history.back();
     return true;
