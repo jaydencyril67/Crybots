@@ -25,9 +25,9 @@ import LogoutPage from './components/LogoutPage';
 import AutoLogoutPage from './components/AutoLogoutPage';
 import ManualLogoutPage from './components/ManualLogoutPage';
 import AgentPage from './components/AgentPage';
-import AgentToolsPage from './components/AgentToolsPage';
-import AgentStatsPage from './components/AgentStatsPage';
-import AgentMenuPage from './components/AgentMenuPage';
+import ToolsPage from './components/ToolsPage';
+import StatsPage from './components/StatsPage';
+import MenuPage from './components/MenuPage';
 import ExchangePage from './components/ExchangePage';
 import MySpacePage from './components/MySpacePage';
 import MarketPage from './components/MarketPage';
@@ -104,9 +104,9 @@ const getRouteKey = () => {
   if (pathname === '/logout' || hash === '#/logout') return 'logout';
   if (pathname === '/auto-logout' || hash === '#/auto-logout') return 'auto-logout';
   if (pathname === '/manual-logout' || hash === '#/manual-logout') return 'manual-logout';
-  if (pathname === '/agent/stats' || hash === '#/agent/stats') return 'agent-stats';
-  if (pathname === '/agent/tools' || hash === '#/agent/tools') return 'agent-tools';
-  if (pathname === '/agent/menu' || hash === '#/agent/menu') return 'agent-menu';
+  if (pathname === '/stats' || hash === '#/stats') return 'stats';
+  if (pathname === '/tools' || hash === '#/tools') return 'tools';
+  if (pathname === '/menu' || hash === '#/menu') return 'menu';
   if (pathname === '/agent' || hash === '#/agent') return 'agent';
   if (pathname === '/exchange' || hash === '#/exchange') return 'exchange';
   if (pathname === '/my-space' || hash === '#/my-space') return 'my-space';
@@ -160,9 +160,9 @@ const routeToKey = (path: string) => {
   if (path === '/logout' || path === '#/logout') return 'logout';
   if (path === '/auto-logout' || path === '#/auto-logout') return 'auto-logout';
   if (path === '/manual-logout' || path === '#/manual-logout') return 'manual-logout';
-  if (path === '/agent/stats' || path === '#/agent/stats') return 'agent-stats';
-  if (path === '/agent/tools' || path === '#/agent/tools') return 'agent-tools';
-  if (path === '/agent/menu' || path === '#/agent/menu') return 'agent-menu';
+  if (path === '/stats' || path === '#/stats') return 'stats';
+  if (path === '/tools' || path === '#/tools') return 'tools';
+  if (path === '/menu' || path === '#/menu') return 'menu';
   if (path === '/agent' || path === '#/agent') return 'agent';
   if (path === '/exchange' || path === '#/exchange') return 'exchange';
   if (path === '/my-space' || path === '#/my-space') return 'my-space';
@@ -448,9 +448,9 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'manual-logout') return <ProtectedRoute><ManualLogoutPage /></ProtectedRoute>;
     if (displayedRouteKey === 'statistics') return <ProtectedRoute><StatisticsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'agent') return <ProtectedRoute><AgentPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'agent-tools') return <ProtectedRoute><AgentToolsPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'agent-stats') return <ProtectedRoute><AgentStatsPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'agent-menu') return <ProtectedRoute><AgentMenuPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'tools') return <ProtectedRoute><ToolsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'stats') return <ProtectedRoute><StatsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'menu') return <ProtectedRoute><MenuPage /></ProtectedRoute>;
     if (displayedRouteKey === 'exchange') return <ProtectedRoute><ExchangePage /></ProtectedRoute>;
     if (displayedRouteKey === 'my-space') return <ProtectedRoute><MySpacePage /></ProtectedRoute>;
         if (displayedRouteKey === 'market') return <ProtectedRoute><MarketPage /></ProtectedRoute>;
@@ -481,16 +481,16 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'alert-settings') return <ProtectedRoute><AlertSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'app-usage') return <ProtectedRoute><AppUsagePage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'logout', 'auto-logout', 'manual-logout', 'statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'logout', 'auto-logout', 'manual-logout', 'statistics', 'agent', 'tools', 'stats', 'menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'logout' || displayedRouteKey === 'auto-logout' || displayedRouteKey === 'manual-logout' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'agent-tools' || displayedRouteKey === 'agent-stats' || displayedRouteKey === 'agent-menu' || displayedRouteKey === 'exchange' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'developer-api-keys' || displayedRouteKey === 'developer-webhooks' || displayedRouteKey === 'developer-configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'logout', 'auto-logout', 'manual-logout', 'statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'information', 'privacy-policy', 'community-standards', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
-  const usagePagePath = displayedRouteKey === 'logout' ? '/logout' : displayedRouteKey === 'statistics' ? '/statistics' : displayedRouteKey === 'agent-tools' ? '/agent/tools' : displayedRouteKey === 'agent-stats' ? '/agent/stats' : displayedRouteKey === 'agent-menu' ? '/agent/menu' : displayedRouteKey === 'nowbar-settings' ? '/nowbar-settings' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
+  const showNowBar = displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'logout' || displayedRouteKey === 'auto-logout' || displayedRouteKey === 'manual-logout' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'exchange' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'developer-api-keys' || displayedRouteKey === 'developer-webhooks' || displayedRouteKey === 'developer-configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
+  const isProtectedPage = ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'logout', 'auto-logout', 'manual-logout', 'statistics', 'agent', 'tools', 'stats', 'menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'information', 'privacy-policy', 'community-standards', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
+  const usagePagePath = displayedRouteKey === 'logout' ? '/logout' : displayedRouteKey === 'statistics' ? '/statistics' : displayedRouteKey === 'tools' ? '/tools' : displayedRouteKey === 'stats' ? '/stats' : displayedRouteKey === 'menu' ? '/menu' : displayedRouteKey === 'nowbar-settings' ? '/nowbar-settings' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   const trackedUsagePage = useRef('');
 

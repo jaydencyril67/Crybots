@@ -9,7 +9,7 @@ import { navigate } from '../utils/navigate';
 
 type Dashboard = { agent: { code: string | null; link: string | null } };
 
-const AgentToolsPage = () => {
+const ToolsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [data, setData] = useState<Dashboard | null>(null);
@@ -56,4 +56,4 @@ const styles = {
   loading: { display: 'flex', justifyContent: 'center', padding: 32 },
 };
 
-export default AgentToolsPage;
+export default ToolsPage;

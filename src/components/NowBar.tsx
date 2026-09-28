@@ -265,7 +265,7 @@ const parentRoutes = [
 
 const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/details', '/statistics', '/security', '/danger'] },
-  { routes: ['/agent/stats', '/agent/tools', '/agent/menu'] },
+  { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
@@ -292,9 +292,9 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/auto-logout') return 'AUTO LOGOUT';
   if (path === '/manual-logout') return 'MANUAL LOGOUT';
   if (path === '/agent') return 'AGENT';
-  if (path === '/agent/stats') return 'AGENT STATS';
-  if (path === '/agent/tools') return 'AGENT TOOLS';
-  if (path === '/agent/menu') return 'AGENT MENU';
+  if (path === '/stats') return 'STATS';
+  if (path === '/tools') return 'TOOLS';
+  if (path === '/menu') return 'MENU';
   if (path === '/exchange') return 'TRADE';
   if (path === '/control-center') return 'CONTROL CENTER';
   if (path === '/my-space') return 'MY SPACE';
