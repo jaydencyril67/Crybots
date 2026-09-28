@@ -7,6 +7,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Control Center', description: 'Automate point withdrawals and protect your initial capital.', route: '/control-center' },
 ];
 
-const ExchangePage = () => <ParentPageLayout title="Exchange" description="Choose an exchange service to continue." cards={destinations} />;
+const TradePage = () => <ParentPageLayout title="Trade" description="Choose a trading service to continue." cards={destinations} />;
 
-export default ExchangePage;
+export default TradePage;

@@ -252,7 +252,7 @@ const parentRoutes = [
   '/home',
   '/profile',
   '/agent',
-  '/exchange',
+  '/trade',
   '/records',
   '/asset',
   '/contact',
@@ -295,7 +295,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/stats') return 'STATS';
   if (path === '/tools') return 'TOOLS';
   if (path === '/menu') return 'MENU';
-  if (path === '/exchange') return 'TRADE';
+  if (path === '/trade') return 'TRADE';
   if (path === '/control-center') return 'CONTROL CENTER';
   if (path === '/my-space') return 'MY SPACE';
   if (path === '/market') return 'MARKET';
@@ -355,9 +355,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'TRADE',
     icon: <ArrowLeftRight size={18} />,
     onClick: () => {
-      navigate('/exchange');
+      navigate('/trade');
     },
-    active: getActivePath() === '/exchange',
+    active: getActivePath() === '/trade',
   },
   {
     label: 'LOGS',

@@ -45,13 +45,13 @@ const faqSections: FAQSection[] = [
     ],
   },
   {
-    title: 'Exchange, portfolio, and transfers',
+    title: 'Trade, portfolio, and transfers',
     items: [
-      { question: 'How do I exchange assets?', answer: 'Open Exchange, choose the asset or market pair, enter the amount, review the displayed rate and total, and confirm the exchange. Rates can change before confirmation.' },
-      { question: 'Are exchange prices guaranteed?', answer: 'No. Digital-asset prices and displayed market data can move quickly. Review the current quote and confirmation details before submitting an exchange.' },
+      { question: 'How do I trade assets?', answer: 'Open Trade, choose the asset or market pair, enter the amount, review the displayed rate and total, and confirm the trade. Rates can change before confirmation.' },
+      { question: 'Are trade prices guaranteed?', answer: 'No. Digital-asset prices and displayed market data can move quickly. Review the current quote and confirmation details before submitting a trade.' },
       { question: 'What is shown in my portfolio?', answer: 'Portfolio shows your current balances and related value information. Market values are estimates based on available pricing and can change as markets move.' },
       { question: 'How do I send funds to another user?', answer: 'Open Transfer, enter the recipient details and amount, carefully review the destination, and complete the security checks. Transfers are different from blockchain withdrawals.' },
-      { question: 'Where can I find my transaction history?', answer: 'Open Transactions or Records to review account activity, including deposits, withdrawals, exchanges, and transfers with their current status.' },
+      { question: 'Where can I find my transaction history?', answer: 'Open Transactions or Records to review account activity, including deposits, withdrawals, trades, and transfers with their current status.' },
     ],
   },
   {
