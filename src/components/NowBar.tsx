@@ -288,7 +288,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
   if (path === '/portfolio/statistics') return 'ACCOUNT STATISTICS';
   if (path === '/portfolio') return 'PROFILE';
-  if (path === '/logout') return 'LOGOUT';
+  if (path === '/logout') return 'EXIT';
   if (path === '/auto-logout') return 'AUTO LOGOUT';
   if (path === '/manual-logout') return 'MANUAL LOGOUT';
   if (path === '/agent') return 'AGENT';
