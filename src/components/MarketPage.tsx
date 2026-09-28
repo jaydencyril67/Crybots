@@ -12,7 +12,7 @@ import api from '../api/axios';
 const MAX_MARKET_PERCENT = 3;
 const UPDATE_INTERVAL_MS = 60_000;
 
-type MarketPoint = { timestamp: number; percent: number };
+type MarketPoint = { timestamp: number; value: number; percent: number };
 
 type MarketNotification = { tone: NotificationTone; message: string };
 
@@ -24,8 +24,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   sectionTitle: { margin: 0, fontSize: '0.96rem', fontWeight: 900 },
   card: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
   chart: { width: '100%', minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateRows: 'minmax(0, 1fr)', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
-  chartWave: { display: 'grid', gridTemplateRows: 'minmax(0, 1fr) auto', gap: '12px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
+  chartWave: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '16px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
+  chartVisual: { display: 'grid', gridTemplateRows: 'minmax(0, 1fr) auto', gap: '12px', minWidth: 0 },
   chartSvg: { display: 'block', width: '100%', height: '100%', minHeight: 0, overflow: 'visible' as const },
+  pricePanel: { display: 'grid', alignContent: 'center', gap: '4px', minWidth: '108px', paddingLeft: '16px', borderLeft: `1px solid ${theme.borderGlass}`, textAlign: 'right' as const },
+  priceLabel: { margin: 0, color: theme.textMuted, fontSize: '0.72rem' },
+  priceValue: { margin: 0, color: theme.text, fontSize: 'clamp(1rem, 3vw, 1.35rem)', fontWeight: 900 },
+  priceChange: { margin: 0, fontSize: '0.78rem', fontWeight: 800 },
   chartFooter: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
   chartValue: { color: theme.text, fontWeight: 900 },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.45 },
@@ -50,24 +55,27 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
   const current = points[points.length - 1]?.percent ?? 0;
-  const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, percent: current }, ...points];
+  const currentValue = points[points.length - 1]?.value ?? 1;
+  const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, value: currentValue, percent: current }, ...points];
   const linePath = chartPoints.map((point, index) => {
     const x = (index / Math.max(1, chartPoints.length - 1)) * 620;
-    const y = 188 - (point.percent / MAX_MARKET_PERCENT) * 122;
+    const y = 188 - ((point.percent + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122;
     return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
   }).join(' ');
   const areaPath = `${linePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`Market performance: ${current.toFixed(2)} percent`} style={styles.chartWave}>
-    {points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
+  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(6)} USDT per point, ${current.toFixed(2)} percent today`} style={styles.chartWave}>
+    <div style={styles.chartVisual}>{points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
       <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
       <line x1="0" x2="620" y1="66" y2="66" stroke={theme.borderGlass} strokeWidth="1" strokeDasharray="4 8" />
       <path d={areaPath} fill="url(#market-wave-fill)" /><path d={linePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={620} cy={188 - (current / MAX_MARKET_PERCENT) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
+      <circle cx={620} cy={188 - ((current + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
     </svg> : <LoadingDots />}
-    <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(2)}%` : <LoadingDots />}</span></p>
+      <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(2)}%` : <LoadingDots />}</span></p>
+    </div>
+    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(6)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(2)}% today` : 'Loading…'}</p></div>
   </div>;
 };
 
@@ -104,8 +112,8 @@ const MarketPage = () => {
     };
   }, []);
 
-  const high = Math.max(...marketPoints.map((point) => point.percent));
-  const low = Math.min(...marketPoints.map((point) => point.percent));
+  const high = marketPoints.length ? Math.max(...marketPoints.map((point) => point.percent)) : 0;
+  const low = marketPoints.length ? Math.min(...marketPoints.map((point) => point.percent)) : 0;
   const formatUsdt = (amount: number) => `${amount.toFixed(2)} USDT`;
   const handleBuy = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -121,7 +129,7 @@ const MarketPage = () => {
     try {
       await api.post('/api/market/points/buy', { points: pointsAmount });
       setPoints('');
-      setBuyStatus({ tone: 'success', message: 'Points purchased. They begin following market performance tomorrow.' });
+      setBuyStatus({ tone: 'success', message: 'Points purchased at the current market value.' });
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setBuyStatus({ tone: 'error', message: message || 'Unable to purchase points right now.' });
@@ -162,11 +170,11 @@ const MarketPage = () => {
           <button type="button" role="tab" aria-selected={tradeMode === 'buy'} style={{ ...styles.modeButton, ...(tradeMode === 'buy' ? styles.activeModeButton : {}) }} onClick={() => { setTradeMode('buy'); setBuyStatus(null); setSellStatus(null); }}>Buy</button>
           <button type="button" role="tab" aria-selected={tradeMode === 'sell'} style={{ ...styles.modeButton, ...(tradeMode === 'sell' ? styles.activeModeButton : {}) }} onClick={() => { setTradeMode('sell'); setBuyStatus(null); setSellStatus(null); }}>Sell</button>
         </div>
-        <label style={styles.inputGroup}><span style={styles.metricLabel}>{tradeMode === 'buy' ? 'Points to buy · 1 point = 1 USDT' : 'Points to sell at current market value'}</span><input style={styles.input} type="number" min="1" step="0.01" value={points} onChange={(event) => setPoints(event.target.value)} placeholder="e.g. 100" /></label>
-        {tradeMode === 'sell' && Number.isFinite(Number(points)) && Number(points) > 0 ? <p style={styles.sellPreview}>Estimated payout: <strong>{formatUsdt(Number(points) * (1 + (marketPoints[marketPoints.length - 1]?.percent ?? 0) / 100))}</strong></p> : null}
+        <label style={styles.inputGroup}><span style={styles.metricLabel}>{tradeMode === 'buy' ? 'Points to buy · current value applies' : 'Points to sell at current market value'}</span><input style={styles.input} type="number" min="1" step="0.01" value={points} onChange={(event) => setPoints(event.target.value)} placeholder="e.g. 100" /></label>
+        {Number.isFinite(Number(points)) && Number(points) > 0 ? <p style={styles.sellPreview}>{tradeMode === 'sell' ? 'Estimated payout' : 'Estimated cost'}: <strong>{formatUsdt(Number(points) * (marketPoints[marketPoints.length - 1]?.value ?? 1))}</strong></p> : null}
         <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{tradeMode === 'buy' ? (buying ? 'Buying…' : 'Buy points') : (selling ? 'Selling…' : 'Sell points')}</button>
       </form>
-      {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : <p style={styles.status}>New purchases start following the market from the next UTC day. Unsold points reset to their original value at the next daily reset.</p>}
+      {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : <p style={styles.status}>Point value is persistent. Daily movement is limited to +3% or -3% from the UTC opening value.</p>}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
       <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
