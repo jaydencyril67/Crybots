@@ -259,7 +259,7 @@ const parentRoutes = [
   '/options',
   '/store',
   '/about',
-  '/developer',
+  '/dev',
   '/logout',
 ];
 
@@ -271,7 +271,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
-  { routes: ['/developer/api-keys', '/developer/webhooks', '/developer/configure'] },
+  { routes: ['/dev/api-keys', '/dev/webhooks', '/dev/configure'] },
   { routes: ['/nowbar-color', '/nowbar-button-color'] },
   { routes: ['/faq'] },
 ];
@@ -305,10 +305,10 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/options') return 'OPTION';
   if (path === '/store') return 'STORE';
   if (path === '/about') return 'ABOUT';
-  if (path === '/developer') return 'DEV';
-  if (path === '/developer/api-keys') return 'API KEYS';
-  if (path === '/developer/webhooks') return 'WEBHOOKS';
-  if (path === '/developer/configure') return 'CONFIGURE';
+  if (path === '/dev') return 'DEV';
+  if (path === '/dev/api-keys') return 'API KEYS';
+  if (path === '/dev/webhooks') return 'WEBHOOKS';
+  if (path === '/dev/configure') return 'CONFIGURE';
   if (path === '/logout') return 'LOGOUT';
   if (path === '/asset') return 'ASSETS';
   if (path === '/danger') return 'DANGER';
@@ -411,9 +411,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'DEV',
     icon: <Code2 size={18} />,
     onClick: () => {
-      navigate('/developer');
+      navigate('/dev');
     },
-    active: getActivePath() === '/developer',
+    active: getActivePath() === '/dev',
   },
   {
     label: 'EXIT',

@@ -35,7 +35,7 @@ const pageLabels: Record<string, string> = {
   '/information': 'Information',
   '/privacy-policy': 'Privacy policy',
   '/community-standards': 'Community standards',
-  '/developer': 'Developer',
+  '/dev': 'Dev',
   '/asset': 'Asset',
   '/danger': 'Danger zone',
   '/pending-deletion': 'Pending deletion',

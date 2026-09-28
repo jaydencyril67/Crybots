@@ -12,7 +12,7 @@ import { navigate } from '../utils/navigate';
 type ApiKey = { id: string; name: string; prefix: string; scopes: string[]; expiresAt?: string; revokedAt?: string; createdAt: string };
 const scopes = ['read', 'trade', 'transfers'];
 
-const DeveloperApiKeysPage = () => {
+const DevApiKeysPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -62,7 +62,7 @@ const DeveloperApiKeysPage = () => {
   const row: React.CSSProperties = { padding: '13px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: 15, background: theme.surfaceMuted, boxSizing: 'border-box' };
 
   return <HybridTheme mode={themeMode}><main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}><div style={{ maxWidth: 920, margin: '0 auto', padding: '24px 16px' }}>
-    <button type="button" onClick={() => navigate('/developer')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', width: 'fit-content', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: 12 }}><ArrowLeft size={15} /> Developer</button>
+    <button type="button" onClick={() => navigate('/dev')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', width: 'fit-content', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: 12 }}><ArrowLeft size={15} /> Dev</button>
 
     {error && <p role="alert" style={{ color: theme.danger }}>{error}</p>}
     {secret && <section style={{ ...rowList, marginBottom: 14, borderColor: theme.primary }}><div style={row}><strong>Copy your new API key now</strong><p style={{ color: theme.textMuted }}>For security, this secret cannot be shown again.</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, background: theme.surfaceMuted }}>{secret}</code><button type="button" onClick={() => void navigator.clipboard?.writeText(secret)} style={{ ...button, marginTop: 12 }}>Copy secret</button><button type="button" onClick={() => setSecret('')} style={{ ...button, marginLeft: 8, background: theme.surfaceMuted, color: theme.text }}>Dismiss</button></div></section>}
@@ -70,4 +70,4 @@ const DeveloperApiKeysPage = () => {
     <section style={{ ...rowList, marginTop: 18 }}><div style={row}><h3 style={{ margin: 0 }}>Your keys</h3></div>{loading ? <div style={{ ...row, textAlign: 'center' }}><LoadingDots /></div> : !keys.length ? <div style={{ ...row, color: theme.textMuted }}>No API keys yet.</div> : keys.map((key) => <article key={key.id} style={row}><strong>{key.name}</strong><p style={{ margin: '6px 0', color: theme.textMuted }}>{key.prefix}… · {key.scopes.join(', ')} · {key.revokedAt ? 'Revoked' : 'Active'}</p>{!key.revokedAt && <button type="button" onClick={() => void revokeKey(key.id)} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Revoke</button>}</article>)}</section>
   </div><NowBar /></main></HybridTheme>;
 };
-export default DeveloperApiKeysPage;
+export default DevApiKeysPage;
