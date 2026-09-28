@@ -133,15 +133,17 @@ export const normalizeVoiceText = (value: string) => value.toLowerCase().replace
 
 export const navigateFromVoice = (transcript: string) => {
   const normalized = normalizeVoiceText(transcript);
-  if (normalized === 'command' || normalized.startsWith('command ') || normalized.endsWith(' command') || normalized.includes(' command ')) {
-    navigate('/voice-commands');
-    return true;
-  }
+  const normalizedTranscript = ` ${normalized} `;
+  const commandsBySpecificity = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES]
+    .map((command) => ({
+      ...command,
+      normalizedLabel: normalizeVoiceText(command.label),
+    }))
+    .sort((first, second) => second.normalizedLabel.length - first.normalizedLabel.length);
+  const command = commandsBySpecificity.find(({ normalizedLabel }) =>
+    normalizedTranscript.includes(` ${normalizedLabel} `),
+  );
 
-  const command = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES].find(({ label }) => {
-    const normalizedLabel = normalizeVoiceText(label);
-    return normalized === normalizedLabel || normalized.includes(normalizedLabel);
-  });
   if (!command) return false;
   navigate(command.route);
   return true;
