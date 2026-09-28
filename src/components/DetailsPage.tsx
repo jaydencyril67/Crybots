@@ -193,6 +193,12 @@ type ProfileDetails = {
   usdtBalance?: number;
   profilePicture?: string;
   accountStatus?: 'active' | 'disabled' | 'self_excluded' | 'pending_delete';
+  securityFunctions?: {
+    emailConfirmed?: boolean;
+    securityCode?: boolean;
+    twoFactor?: boolean;
+    passkey?: boolean;
+  };
 };
 
 type MeResponse = {
@@ -200,8 +206,7 @@ type MeResponse = {
 };
 
 
-const accountStatusLabels: Record<NonNullable<ProfileDetails['accountStatus']>, string> = {
-  active: 'Protected',
+const accountStatusLabels: Record<Exclude<NonNullable<ProfileDetails['accountStatus']>, 'active'>, string> = {
   disabled: 'Disabled',
   self_excluded: 'Restricted',
   pending_delete: 'Pending deletion',
@@ -346,7 +351,20 @@ const DetailsPage = () => {
   const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim();
   const email = profileDetails?.email;
   const uid = profileDetails?.uid;
-  const accountStatus = profileDetails?.accountStatus ? accountStatusLabels[profileDetails.accountStatus] : 'Protected';
+  const securityFunctions = profileDetails?.securityFunctions;
+  const allSecurityFunctionsEnabled = Boolean(
+    securityFunctions?.emailConfirmed
+    && securityFunctions.securityCode
+    && securityFunctions.twoFactor
+    && securityFunctions.passkey,
+  );
+  const accountStatus = profileLoading
+    ? null
+    : profileDetails?.accountStatus === 'active'
+      ? allSecurityFunctionsEnabled ? 'Protected' : 'Active'
+      : profileDetails?.accountStatus
+        ? accountStatusLabels[profileDetails.accountStatus]
+        : 'Active';
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : null;
 
 
