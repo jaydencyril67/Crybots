@@ -268,7 +268,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
-  { routes: ['/theme', '/nowbar-settings', '/alert'] },
+  { routes: ['/theme', '/nowbar', '/alert'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
   { routes: ['/api-keys', '/webhooks', '/configure'] },
@@ -283,7 +283,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme') return 'THEME';
-  if (path === '/nowbar-settings') return 'NOWBAR SETTINGS';
+  if (path === '/nowbar') return 'NOWBAR';
   if (path === '/nowbar-color') return 'EDGE LIGHTING';
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
   if (path === '/statistics') return 'STATISTICS';

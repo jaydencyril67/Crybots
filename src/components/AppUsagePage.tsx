@@ -15,7 +15,7 @@ const pageLabels: Record<string, string> = {
   '/details': 'Details',
   '/manage': 'Manage account',
   '/theme': 'Theme',
-  '/nowbar-settings': 'NowBar settings',
+  '/nowbar': 'NowBar',
   '/nowbar-color': 'NowBar color',
   '/nowbar-button-color': 'NowBar button color',
   '/profile': 'Profile',

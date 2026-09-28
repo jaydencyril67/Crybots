@@ -3,7 +3,7 @@ import ParentPageLayout, { ParentPageCard } from './ParentPageLayout';
 
 const destinations: ParentPageCard[] = [
   { label: 'Theme', description: 'Choose your preferred app theme.', route: '/theme' },
-  { label: 'Nowbar Settings', description: 'Manage the NowBar experience.', route: '/nowbar-settings' },
+  { label: 'NowBar', description: 'Manage the NowBar experience.', route: '/nowbar' },
   { label: 'Alert', description: 'Choose notification topics and delivery methods.', route: '/alert' },
 ];
 
