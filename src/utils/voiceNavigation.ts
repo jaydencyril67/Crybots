@@ -134,6 +134,11 @@ export const normalizeVoiceText = (value: string) => value.toLowerCase().replace
 export const navigateFromVoice = (transcript: string) => {
   const normalized = normalizeVoiceText(transcript);
   const normalizedTranscript = ` ${normalized} `;
+
+  if (normalizedTranscript.includes(' back ')) {
+    window.history.back();
+    return true;
+  }
   const commandsBySpecificity = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES]
     .map((command) => ({
       ...command,
