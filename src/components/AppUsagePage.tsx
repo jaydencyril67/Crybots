@@ -14,8 +14,8 @@ const pageLabels: Record<string, string> = {
   '/home': 'Home',
   '/details': 'Details',
   '/manage': 'Manage account',
-  '/theme-settings': 'Theme settings',
-  '/nowbar-settings': 'NowBar settings',
+  '/theme': 'Theme',
+  '/nowbar': 'NowBar',
   '/nowbar-color': 'NowBar color',
   '/nowbar-button-color': 'NowBar button color',
   '/profile': 'Profile',
@@ -49,7 +49,7 @@ const pageLabels: Record<string, string> = {
   '/deposit': 'Deposit',
   '/transactions': 'Transactions',
   '/notifications': 'Notifications',
-  '/alert-settings': 'Alert settings',
+  '/alert': 'Alert',
   '/app-usage': 'App Usage',
 };
 

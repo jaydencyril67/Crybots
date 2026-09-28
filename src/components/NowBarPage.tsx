@@ -44,7 +44,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   modeLabel: { margin: 0, fontWeight: 750, fontSize: '0.88rem' },
 });
 
-const NowBarSettingsPage = () => {
+const NowBarPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
@@ -131,7 +131,7 @@ const NowBarSettingsPage = () => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
-          <h1 style={styles.title}>NowBar Settings</h1>
+          <h1 style={styles.title}>NowBar</h1>
           <p style={styles.text}>Manage the NowBar experience, including its edge lighting and visual behavior.</p>
           <section style={styles.card}>
             <h2 style={styles.cardHeading}>⚡ Edge lighting</h2>
@@ -224,4 +224,4 @@ const NowBarSettingsPage = () => {
   );
 };
 
-export default NowBarSettingsPage;
+export default NowBarPage;

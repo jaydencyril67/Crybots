@@ -155,8 +155,8 @@ const NowBarButtonColorPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.backButton} onClick={() => navigate('/nowbar-settings')}>
-            <ArrowLeft size={18} /> Back to Nowbar settings
+          <button type="button" style={styles.backButton} onClick={() => navigate('/nowbar')}>
+            <ArrowLeft size={18} /> Back to NowBar
           </button>
           <h1 style={styles.heading}>NowBar button color</h1>
           <p style={styles.intro}>Choose the color used by your NowBar navigation buttons. Your selection is saved immediately.</p>
