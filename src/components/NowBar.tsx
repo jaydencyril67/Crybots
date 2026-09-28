@@ -264,7 +264,7 @@ const parentRoutes = [
 ];
 
 const childNavigationGroups: NavigationGroup[] = [
-  { routes: ['/details', '/profile/statistics', '/security', '/danger'] },
+  { routes: ['/details', '/statistics', '/security', '/danger'] },
   { routes: ['/agent/stats', '/agent/tools', '/agent/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
@@ -286,7 +286,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/nowbar-settings') return 'NOWBAR SETTINGS';
   if (path === '/nowbar-color') return 'EDGE LIGHTING';
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
-  if (path === '/profile/statistics') return 'ACCOUNT STATISTICS';
+  if (path === '/statistics') return 'STATISTICS';
   if (path === '/profile') return 'PROFILE';
   if (path === '/logout') return 'EXIT';
   if (path === '/auto-logout') return 'AUTO LOGOUT';

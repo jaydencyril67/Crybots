@@ -44,7 +44,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const formatDate = (value: string | null) => value ? new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not available';
 
-const PortfolioStatisticsPage = () => {
+const StatisticsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
@@ -55,11 +55,11 @@ const PortfolioStatisticsPage = () => {
     let active = true;
     api.get<StatData>('/api/statistics/me')
       .then((response) => { if (active) setData(response.data); })
-      .catch(() => { if (active) setError('Unable to load your account statistics.'); });
+      .catch(() => { if (active) setError('Unable to load your statistics.'); });
     return () => { active = false; };
   }, []);
 
-  return <HybridTheme><Helmet><title>Account statistics | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
+  return <HybridTheme><Helmet><title>Statistics | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <div style={styles.header}><button type="button" style={styles.back} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button></div>
     {error ? <div style={styles.card}>{error}</div> : null}
     <section style={styles.section}><h2 style={styles.sectionTitle}>Account activity</h2><div style={styles.listCard}><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Account created</p></div><CalendarDays size={19} color={theme.primary} /><p style={styles.value}>{data ? formatDate(data.account.createdAt) : <LoadingDots />}</p></div><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Total logins</p><p style={styles.small}>{data ? `${data.account.activeSessions} active sessions` : <LoadingDots />}</p></div><LogIn size={19} color={theme.primary} /><p style={styles.value}>{data ? data.account.totalLogins.toLocaleString() : <LoadingDots />}</p></div><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Email confirmation</p></div><CheckCircle2 size={19} color={theme.primary} /><p style={styles.value}>{data ? formatDate(data.account.confirmedAt) : <LoadingDots />}</p></div></div></section>
@@ -67,4 +67,4 @@ const PortfolioStatisticsPage = () => {
   </div><NowBar /></div></HybridTheme>;
 };
 
-export default PortfolioStatisticsPage;
+export default StatisticsPage;

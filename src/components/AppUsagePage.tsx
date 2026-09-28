@@ -19,7 +19,7 @@ const pageLabels: Record<string, string> = {
   '/nowbar-color': 'NowBar color',
   '/nowbar-button-color': 'NowBar button color',
   '/profile': 'Profile',
-  '/profile/statistics': 'Profile statistics',
+  '/statistics': 'Statistics',
   '/agent': 'Agent',
   '/agent/tools': 'Agent tools',
   '/agent/stats': 'Agent statistics',
