@@ -56,7 +56,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 });
 
-const AlertSettingsPage = () => {
+const AlertPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
@@ -135,7 +135,7 @@ const AlertSettingsPage = () => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
-          <h1 style={styles.heading}>Alert settings</h1>
+          <h1 style={styles.heading}>Alert</h1>
           <p style={styles.intro}>Choose which updates you receive and where KingsHall Exchange should deliver them.</p>
           {loading ? <NotificationBanner tone="info" title="Loading preferences" message="Retrieving your saved alert settings." /> : null}
           {saved ? <NotificationBanner tone="success" title="Preferences saved" message="Your alert settings have been updated." /> : null}
@@ -187,4 +187,4 @@ const AlertSettingsPage = () => {
   );
 };
 
-export default AlertSettingsPage;
+export default AlertPage;

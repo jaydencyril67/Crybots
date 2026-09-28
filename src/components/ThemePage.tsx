@@ -25,7 +25,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   rowContentWithPreview: { display: 'flex', alignItems: 'center', gap: '11px', minWidth: 0 },
 });
 
-const ThemeSettingsPage = () => {
+const ThemePage = () => {
   const { themeMode, themePreference, setThemePreference } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
@@ -41,7 +41,7 @@ const ThemeSettingsPage = () => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
-          <h1 style={styles.title}>Theme Settings</h1>
+          <h1 style={styles.title}>Theme</h1>
           <p style={styles.text}>Choose how KingsHall Exchange should look. System follows your device theme; Shift uses Light from 6 AM to 6 PM and Dark overnight.</p>
           <section style={styles.card}>
             <h2 style={styles.cardHeading}>Appearance theme</h2>
@@ -75,4 +75,4 @@ const ThemeSettingsPage = () => {
   );
 };
 
-export default ThemeSettingsPage;
+export default ThemePage;

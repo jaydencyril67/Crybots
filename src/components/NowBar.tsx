@@ -268,7 +268,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
-  { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
+  { routes: ['/theme', '/nowbar-settings', '/alert'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
   { routes: ['/api-keys', '/webhooks', '/configure'] },
@@ -282,7 +282,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/home') return 'HOME';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
-  if (path === '/theme-settings') return 'THEME SETTINGS';
+  if (path === '/theme') return 'THEME';
   if (path === '/nowbar-settings') return 'NOWBAR SETTINGS';
   if (path === '/nowbar-color') return 'EDGE LIGHTING';
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
@@ -318,7 +318,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/deposit') return 'DEPOSIT';
   if (path === '/transactions') return 'TRANSACTIONS';
   if (path === '/notifications') return 'NOTIFICATIONS';
-  if (path === '/alert-settings') return 'ALERT SETTINGS';
+  if (path === '/alert') return 'ALERT';
   if (path === '/app-usage') return 'APP USAGE';
   if (path === '/privacy-policy') return 'PRIVACY POLICY';
   if (path === '/information') return 'INFORMATION';
