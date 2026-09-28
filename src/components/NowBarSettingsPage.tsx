@@ -166,8 +166,8 @@ const NowBarSettingsPage = () => {
               </div>
               <div style={styles.row}>
                 <div style={styles.rowContent}>
-                  <p style={styles.label}>Expand mode</p>
-                  <p style={styles.description}>Allow holding the NowBar to expand its navigation buttons.</p>
+                  <p style={styles.label}>Expanded mode</p>
+                  <p style={styles.description}>Allow holding the NowBar to expand its navigation buttons. Enabled by default.</p>
                 </div>
                 <button type="button" style={{ ...styles.button, ...(expandModeEnabled ? styles.active : {}) }} onClick={toggleExpandMode} aria-pressed={expandModeEnabled}>{expandModeEnabled ? 'Enabled' : 'Enable'}</button>
               </div>
