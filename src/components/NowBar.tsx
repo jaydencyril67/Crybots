@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, HandCoins, History, Home, Info, LogOut, SlidersHorizontal, Store, Terminal, UserRound } from 'lucide-react';
+import { CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, SlidersHorizontal, Store, Terminal, UserRound } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { PAGE_ROUTES } from '../utils/voiceNavigation';
 
@@ -437,7 +437,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'EXIT',
-    icon: <LogOut size={18} />,
+    icon: <DoorOpen size={18} />,
     onClick: () => {
       navigate('/exit');
     },
