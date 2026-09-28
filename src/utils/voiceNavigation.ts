@@ -135,8 +135,21 @@ export const navigateFromVoice = (transcript: string) => {
   const normalized = normalizeVoiceText(transcript);
   const normalizedTranscript = ` ${normalized} `;
 
+  if (normalizedTranscript.includes(' off ') || normalizedTranscript.includes(' of ')) {
+    window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
+    window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
+    return true;
+  }
   if (normalizedTranscript.includes(' back ')) {
     window.history.back();
+    return true;
+  }
+  if (normalizedTranscript.includes(' up ') || normalizedTranscript.includes(' scroll up ')) {
+    window.scrollBy({ top: -Math.round(window.innerHeight * 0.8), behavior: 'smooth' });
+    return true;
+  }
+  if (normalizedTranscript.includes(' down ') || normalizedTranscript.includes(' scroll down ')) {
+    window.scrollBy({ top: Math.round(window.innerHeight * 0.8), behavior: 'smooth' });
     return true;
   }
   const commandsBySpecificity = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES]
