@@ -159,7 +159,7 @@ const styles = {
   },
   button: {
     width: '100%',
-    minHeight: '58px',
+    minHeight: '54px',
     padding: '7px 6px 6px',
     border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '12px',
