@@ -500,7 +500,7 @@ const LandingPage = () => {
                   Get started
                 </button>
                 <button type="button" onClick={handleHomeClick} style={{ ...styles.buttonSecondary, cursor: 'pointer' }}>
-                  Home
+                  Signin
                 </button>
               </div>
 
