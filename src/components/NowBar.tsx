@@ -174,7 +174,7 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
-    width: 'calc(100% + 4px)',
+    width: 'calc(100% + 12px)',
     minHeight: '40px',
     padding: '7px 6px 6px',
     borderRadius: '18px',
