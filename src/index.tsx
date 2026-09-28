@@ -10,7 +10,7 @@ import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import DashboardPage from './components/DashboardPage';
-import ProfilePage from './components/ProfilePage';
+import DetailsPage from './components/DetailsPage';
 import ManagePage from './components/ManagePage';
 import ThemeSettingsPage from './components/ThemeSettingsPage';
 import NowBarSettingsPage from './components/NowBarSettingsPage';
@@ -92,15 +92,15 @@ const getRouteKey = () => {
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
   if (pathname === '/forgot-password' || hash === '#/forgot-password') return 'forgot-password';
   if (pathname === '/dashboard' || hash === '#/dashboard') return 'dashboard';
-  if (pathname === '/profile' || hash === '#/profile') return 'profile';
+  if (pathname === '/details' || hash === '#/details') return 'details';
   if (pathname === '/manage' || hash === '#/manage') return 'manage';
   if (pathname === '/theme-settings' || hash === '#/theme-settings') return 'theme-settings';
   if (pathname === '/nowbar-settings' || hash === '#/nowbar-settings') return 'nowbar-settings';
   if (pathname === '/voice-commands' || hash === '#/voice-commands') return 'voice-commands';
   if (pathname === '/nowbar-color' || hash === '#/nowbar-color') return 'nowbar-color';
   if (pathname === '/nowbar-button-color' || hash === '#/nowbar-button-color') return 'nowbar-button-color';
-  if (pathname === '/portfolio/statistics' || hash === '#/portfolio/statistics') return 'portfolio-statistics';
-  if (pathname === '/portfolio' || hash === '#/portfolio') return 'portfolio';
+  if (pathname === '/profile/statistics' || hash === '#/profile/statistics') return 'profile-statistics';
+  if (pathname === '/profile' || hash === '#/profile') return 'profile';
   if (pathname === '/logout' || hash === '#/logout') return 'logout';
   if (pathname === '/auto-logout' || hash === '#/auto-logout') return 'auto-logout';
   if (pathname === '/manual-logout' || hash === '#/manual-logout') return 'manual-logout';
@@ -148,15 +148,15 @@ const routeToKey = (path: string) => {
   if (path === '/signin' || path === '#/signin') return 'signin';
   if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
   if (path === '/dashboard' || path === '#/dashboard') return 'dashboard';
-  if (path === '/profile' || path === '#/profile') return 'profile';
+  if (path === '/details' || path === '#/details') return 'details';
   if (path === '/manage' || path === '#/manage') return 'manage';
   if (path === '/theme-settings' || path === '#/theme-settings') return 'theme-settings';
   if (path === '/nowbar-settings' || path === '#/nowbar-settings') return 'nowbar-settings';
   if (path === '/voice-commands' || path === '#/voice-commands') return 'voice-commands';
   if (path === '/nowbar-color' || path === '#/nowbar-color') return 'nowbar-color';
   if (path === '/nowbar-button-color' || path === '#/nowbar-button-color') return 'nowbar-button-color';
-  if (path === '/portfolio/statistics' || path === '#/portfolio/statistics') return 'portfolio-statistics';
-  if (path === '/portfolio' || path === '#/portfolio') return 'portfolio';
+  if (path === '/profile/statistics' || path === '#/profile/statistics') return 'profile-statistics';
+  if (path === '/profile' || path === '#/profile') return 'profile';
   if (path === '/logout' || path === '#/logout') return 'logout';
   if (path === '/auto-logout' || path === '#/auto-logout') return 'auto-logout';
   if (path === '/manual-logout' || path === '#/manual-logout') return 'manual-logout';
@@ -435,18 +435,18 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'signin') return <SigninPage />;
     if (displayedRouteKey === 'forgot-password') return <ForgotPasswordPage />;
     if (displayedRouteKey === 'dashboard') return <ProtectedRoute><DashboardPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
+    if (displayedRouteKey === 'details') return <ProtectedRoute><DetailsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'manage') return <ProtectedRoute><ManagePage /></ProtectedRoute>;
     if (displayedRouteKey === 'theme-settings') return <ProtectedRoute><ThemeSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-settings') return <ProtectedRoute><NowBarSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'voice-commands') return <ProtectedRoute><VoiceCommandsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-color') return <ProtectedRoute><NowBarColorPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-button-color') return <ProtectedRoute><NowBarButtonColorPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'portfolio') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'profile') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
     if (displayedRouteKey === 'logout') return <ProtectedRoute><LogoutPage /></ProtectedRoute>;
     if (displayedRouteKey === 'auto-logout') return <ProtectedRoute><AutoLogoutPage /></ProtectedRoute>;
     if (displayedRouteKey === 'manual-logout') return <ProtectedRoute><ManualLogoutPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'portfolio-statistics') return <ProtectedRoute><PortfolioStatisticsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'profile-statistics') return <ProtectedRoute><PortfolioStatisticsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'agent') return <ProtectedRoute><AgentPage /></ProtectedRoute>;
     if (displayedRouteKey === 'agent-tools') return <ProtectedRoute><AgentToolsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'agent-stats') return <ProtectedRoute><AgentStatsPage /></ProtectedRoute>;
@@ -481,16 +481,16 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'alert-settings') return <ProtectedRoute><AlertSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'app-usage') return <ProtectedRoute><AppUsagePage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['dashboard', 'profile', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'portfolio', 'logout', 'auto-logout', 'manual-logout', 'portfolio-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['dashboard', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'logout', 'auto-logout', 'manual-logout', 'profile-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'profile' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'logout' || displayedRouteKey === 'auto-logout' || displayedRouteKey === 'manual-logout' || displayedRouteKey === 'portfolio-statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'agent-tools' || displayedRouteKey === 'agent-stats' || displayedRouteKey === 'agent-menu' || displayedRouteKey === 'exchange' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'developer-api-keys' || displayedRouteKey === 'developer-webhooks' || displayedRouteKey === 'developer-configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['dashboard', 'profile', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'portfolio', 'logout', 'auto-logout', 'manual-logout', 'portfolio-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'information', 'privacy-policy', 'community-standards', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
-  const usagePagePath = displayedRouteKey === 'logout' ? '/logout' : displayedRouteKey === 'portfolio-statistics' ? '/portfolio/statistics' : displayedRouteKey === 'agent-tools' ? '/agent/tools' : displayedRouteKey === 'agent-stats' ? '/agent/stats' : displayedRouteKey === 'agent-menu' ? '/agent/menu' : displayedRouteKey === 'nowbar-settings' ? '/nowbar-settings' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
+  const showNowBar = displayedRouteKey === 'dashboard' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'logout' || displayedRouteKey === 'auto-logout' || displayedRouteKey === 'manual-logout' || displayedRouteKey === 'profile-statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'agent-tools' || displayedRouteKey === 'agent-stats' || displayedRouteKey === 'agent-menu' || displayedRouteKey === 'exchange' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'records' || displayedRouteKey === 'contact' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'library' || displayedRouteKey === 'about' || displayedRouteKey === 'developer' || displayedRouteKey === 'developer-api-keys' || displayedRouteKey === 'developer-webhooks' || displayedRouteKey === 'developer-configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
+  const isProtectedPage = ['dashboard', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'logout', 'auto-logout', 'manual-logout', 'profile-statistics', 'agent', 'agent-tools', 'agent-stats', 'agent-menu', 'exchange', 'my-space', 'market', 'control-center', 'records', 'contact', 'faq', 'options', 'library', 'about', 'information', 'privacy-policy', 'community-standards', 'developer', 'developer-api-keys', 'developer-webhooks', 'developer-configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
+  const usagePagePath = displayedRouteKey === 'logout' ? '/logout' : displayedRouteKey === 'profile-statistics' ? '/profile/statistics' : displayedRouteKey === 'agent-tools' ? '/agent/tools' : displayedRouteKey === 'agent-stats' ? '/agent/stats' : displayedRouteKey === 'agent-menu' ? '/agent/menu' : displayedRouteKey === 'nowbar-settings' ? '/nowbar-settings' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   const trackedUsagePage = useRef('');
 

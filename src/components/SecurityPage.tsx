@@ -794,7 +794,7 @@ const SecurityPage = () => {
           </Helmet>
           
           <div style={styles.content}>
-            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
+            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.rowList}>
               <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>

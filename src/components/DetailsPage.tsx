@@ -199,7 +199,7 @@ type MeResponse = {
 };
 
 
-const ProfilePage = () => {
+const DetailsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = useMemo(() => ({
@@ -383,7 +383,7 @@ const ProfilePage = () => {
           <div style={styles.shell}>
             
 
-            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
+            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.content}>
               <div style={styles.rowList}>
                 <div style={{ ...styles.row, ...styles.profileIdentity }}>
@@ -445,4 +445,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default DetailsPage;

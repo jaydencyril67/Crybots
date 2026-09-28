@@ -12,14 +12,14 @@ type UsageResponse = { usage?: Record<string, number> };
 
 const pageLabels: Record<string, string> = {
   '/dashboard': 'Dashboard',
-  '/profile': 'Profile',
+  '/details': 'Details',
   '/manage': 'Manage account',
   '/theme-settings': 'Theme settings',
   '/nowbar-settings': 'NowBar settings',
   '/nowbar-color': 'NowBar color',
   '/nowbar-button-color': 'NowBar button color',
-  '/portfolio': 'Portfolio',
-  '/portfolio/statistics': 'Portfolio statistics',
+  '/profile': 'Profile',
+  '/profile/statistics': 'Profile statistics',
   '/agent': 'Agent',
   '/agent/tools': 'Agent tools',
   '/agent/stats': 'Agent statistics',
