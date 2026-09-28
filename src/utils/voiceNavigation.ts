@@ -139,6 +139,14 @@ export const navigateFromVoice = (transcript: string) => {
     window.history.back();
     return true;
   }
+  if (normalizedTranscript.includes(' up ') || normalizedTranscript.includes(' scroll up ')) {
+    window.scrollBy({ top: -Math.round(window.innerHeight * 0.8), behavior: 'smooth' });
+    return true;
+  }
+  if (normalizedTranscript.includes(' down ') || normalizedTranscript.includes(' scroll down ')) {
+    window.scrollBy({ top: Math.round(window.innerHeight * 0.8), behavior: 'smooth' });
+    return true;
+  }
   const commandsBySpecificity = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES]
     .map((command) => ({
       ...command,
