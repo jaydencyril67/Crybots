@@ -174,7 +174,7 @@ const MarketPage = () => {
         {Number.isFinite(Number(points)) && Number(points) > 0 ? <p style={styles.sellPreview}>{tradeMode === 'sell' ? 'Estimated payout' : 'Estimated cost'}: <strong>{formatUsdt(Number(points) * (marketPoints[marketPoints.length - 1]?.value ?? 1))}</strong></p> : null}
         <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{tradeMode === 'buy' ? (buying ? 'Buying…' : 'Buy points') : (selling ? 'Selling…' : 'Sell points')}</button>
       </form>
-      {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : <p style={styles.status}>Point value is persistent. Daily movement is limited to +3% or -3% from the UTC opening value.</p>}
+      {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : null}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
       <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
