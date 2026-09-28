@@ -192,12 +192,25 @@ type ProfileDetails = {
   uid?: string;
   usdtBalance?: number;
   profilePicture?: string;
+  accountStatus?: 'active' | 'disabled' | 'self_excluded' | 'pending_delete';
+  securityFunctions?: {
+    emailConfirmed?: boolean;
+    securityCode?: boolean;
+    twoFactor?: boolean;
+    passkey?: boolean;
+  };
 };
 
 type MeResponse = {
   user?: ProfileDetails;
 };
 
+
+const accountStatusLabels: Record<Exclude<NonNullable<ProfileDetails['accountStatus']>, 'active'>, string> = {
+  disabled: 'Disabled',
+  self_excluded: 'Restricted',
+  pending_delete: 'Pending deletion',
+};
 
 const DetailsPage = () => {
   const { themeMode } = useAppTheme();
@@ -338,6 +351,20 @@ const DetailsPage = () => {
   const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim();
   const email = profileDetails?.email;
   const uid = profileDetails?.uid;
+  const securityFunctions = profileDetails?.securityFunctions;
+  const allSecurityFunctionsEnabled = Boolean(
+    securityFunctions?.emailConfirmed
+    && securityFunctions.securityCode
+    && securityFunctions.twoFactor
+    && securityFunctions.passkey,
+  );
+  const accountStatus = profileLoading
+    ? null
+    : profileDetails?.accountStatus === 'active'
+      ? allSecurityFunctionsEnabled ? 'Protected' : 'Active'
+      : profileDetails?.accountStatus
+        ? accountStatusLabels[profileDetails.accountStatus]
+        : 'Active';
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : null;
 
 
@@ -419,7 +446,7 @@ const DetailsPage = () => {
                 </div>
                 <div style={styles.row}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> Account status</p>
-                  <p style={styles.infoValue}>Protected</p>
+                  <p style={styles.infoValue}>{profileLoading ? <LoadingDots /> : accountStatus}</p>
                 </div>
                 <div style={styles.row}>
                   <p style={styles.infoLabel}><ShieldCheck size={16} /> UID</p>
