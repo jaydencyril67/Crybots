@@ -79,6 +79,15 @@ const styles = {
     color: '#ffffff',
     whiteSpace: 'nowrap',
   },
+  voiceTranscript: {
+    margin: 0,
+    maxWidth: 'min(70vw, 420px)',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    fontSize: '11px',
+    color: 'rgba(255,255,255,0.72)',
+    whiteSpace: 'nowrap',
+  },
   logoutButton: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -105,17 +114,22 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [voiceModeEnabled, setVoiceModeEnabled] = useState(getVoiceModeEnabled);
   const [isListening, setIsListening] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
   const previousCount = useRef(0);
   const hasLoadedCount = useRef(false);
   const alertTimeout = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const handleVoiceStatus = (event: Event) => {
-      const detail = (event as CustomEvent<{ listening?: boolean }>).detail;
+      const detail = (event as CustomEvent<{ listening?: boolean; transcript?: string }>).detail;
       setIsListening(Boolean(detail?.listening));
+      setVoiceTranscript(detail?.transcript || '');
       setVoiceModeEnabled(getVoiceModeEnabled());
     };
-    const handleVoiceMode = () => setVoiceModeEnabled(getVoiceModeEnabled());
+    const handleVoiceMode = () => {
+      setVoiceModeEnabled(getVoiceModeEnabled());
+      if (!getVoiceModeEnabled()) setVoiceTranscript('');
+    };
     window.addEventListener(VOICE_STATUS_EVENT, handleVoiceStatus);
     window.addEventListener(VOICE_MODE_CHANGED_EVENT, handleVoiceMode);
     return () => {
@@ -237,6 +251,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     }
     : styles.header;
   const headerTitle = voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
+  const headerSubtitle = voiceModeEnabled && voiceTranscript ? `“${voiceTranscript}”` : null;
   const artworkStyle = {
     ...styles.unreadArtwork,
     color: theme.textInverse,
@@ -270,6 +285,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       <div style={styles.brand}>
         <div style={styles.brandCopy}>
           <p style={styles.brandTitle}>{headerTitle}</p>
+          {headerSubtitle ? <p style={styles.voiceTranscript}>{headerSubtitle}</p> : null}
         </div>
       </div>
 

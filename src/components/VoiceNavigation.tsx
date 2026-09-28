@@ -1,11 +1,16 @@
 import { useEffect } from 'react';
 import { getVoiceModeEnabled, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
+type SpeechRecognitionResultLike = {
+  isFinal?: boolean;
+  0?: { transcript: string };
+};
+
 type SpeechRecognitionLike = {
   continuous: boolean;
   interimResults: boolean;
   lang: string;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  onresult: ((event: { results: ArrayLike<SpeechRecognitionResultLike> }) => void) | null;
   onend: (() => void) | null;
   onerror: (() => void) | null;
   start: () => void;
@@ -25,8 +30,8 @@ const VoiceNavigation = () => {
     let enabled = getVoiceModeEnabled();
     let stopped = false;
 
-    const setStatus = (listening: boolean) => {
-      window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening } }));
+    const setStatus = (listening: boolean, transcript = '') => {
+      window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening, transcript } }));
     };
 
     const start = () => {
@@ -48,12 +53,15 @@ const VoiceNavigation = () => {
       }
       recognition = new Recognition();
       recognition.continuous = true;
-      recognition.interimResults = false;
+      recognition.interimResults = true;
       recognition.lang = 'en-US';
       recognition.onresult = (event) => {
         const result = event.results[event.results.length - 1];
         const transcript = result?.[0]?.transcript;
-        if (transcript) navigateFromVoice(transcript);
+        if (transcript) {
+          setStatus(true, transcript);
+          if (result?.isFinal) navigateFromVoice(transcript);
+        }
       };
       recognition.onend = () => {
         setStatus(false);
