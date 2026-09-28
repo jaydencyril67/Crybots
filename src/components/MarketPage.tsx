@@ -56,7 +56,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
   const current = points[points.length - 1]?.percent ?? 0;
   const currentValue = points[points.length - 1]?.value ?? 1;
-  const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, value: Number(currentValue.toFixed(4)), percent: current }, ...points];
+  const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, value: Number(currentValue.toFixed(6)), percent: current }, ...points];
   const linePath = chartPoints.map((point, index) => {
     const x = (index / Math.max(1, chartPoints.length - 1)) * 620;
     const y = 188 - ((point.percent + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122;
@@ -65,7 +65,7 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   const areaPath = `${linePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(4)} USDT per point, ${current.toFixed(4)} percent today`} style={styles.chartWave}>
+  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(6)} USDT per point, ${current.toFixed(2)} percent today`} style={styles.chartWave}>
     <div style={styles.chartVisual}>{points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
       <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
@@ -73,9 +73,9 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
       <path d={areaPath} fill="url(#market-wave-fill)" /><path d={linePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx={620} cy={188 - ((current + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
     </svg> : <LoadingDots />}
-      <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(4)}%` : <LoadingDots />}</span></p>
+      <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(2)}%` : <LoadingDots />}</span></p>
     </div>
-    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(4)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(4)}% today` : 'Loading…'}</p></div>
+    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(6)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(2)}% today` : 'Loading…'}</p></div>
   </div>;
 };
 
@@ -114,7 +114,7 @@ const MarketPage = () => {
 
   const high = marketPoints.length ? Math.max(...marketPoints.map((point) => point.percent)) : 0;
   const low = marketPoints.length ? Math.min(...marketPoints.map((point) => point.percent)) : 0;
-  const formatUsdt = (amount: number) => `${amount.toFixed(4)} USDT`;
+  const formatUsdt = (amount: number) => `${amount.toFixed(6)} USDT`;
   const handleBuy = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const pointsAmount = Number(points);
@@ -152,7 +152,7 @@ const MarketPage = () => {
     try {
       const response = await api.post<{ value: number }>('/api/market/points/sell', { points: pointsAmount });
       setPoints('');
-      setSellStatus({ tone: 'success', message: `${pointsAmount.toFixed(4)} points sold for ${formatUsdt(response.data.value)}.` });
+      setSellStatus({ tone: 'success', message: `${pointsAmount.toFixed(6)} points sold for ${formatUsdt(response.data.value)}.` });
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setSellStatus({ tone: 'error', message: message || 'Unable to sell points right now.' });
@@ -177,8 +177,8 @@ const MarketPage = () => {
       {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : null}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(4)}%` : <LoadingDots />}</p></div>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(4)}%` : <LoadingDots />}</p></div>
+      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
+      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p></div>
     </div></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
