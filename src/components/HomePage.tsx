@@ -409,7 +409,7 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: value < 1 ? 4 : 2,
   }).format(value);
 
-const formatChange = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+const formatChange = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(4)}%`;
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -659,7 +659,7 @@ const HomePage = () => {
                 <div style={styles.featureItem}>
                   <CandlestickChart style={styles.icon} />
                   <p style={styles.featureText}>
-                    Average move across this watchlist is {marketSummary.avgMove >= 0 ? '+' : ''}{marketSummary.avgMove.toFixed(2)}% — steady enough for trend-traders, but still active.
+                    Average move across this watchlist is {marketSummary.avgMove >= 0 ? '+' : ''}{marketSummary.avgMove.toFixed(4)}% — steady enough for trend-traders, but still active.
                   </p>
                 </div>
                 <div style={styles.featureItem}>
