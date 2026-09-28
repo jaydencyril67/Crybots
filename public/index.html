@@ -10,6 +10,14 @@
         -webkit-tap-highlight-color: transparent;
       }
 
+      html {
+        background: #e7e4de;
+      }
+
+      html[data-theme='dark'] {
+        background: #000000;
+      }
+
       .initial-splash {
         position: fixed;
         inset: 0;
@@ -24,6 +32,14 @@
       html[data-theme='dark'] .initial-splash {
         background: #000000;
         color: #ffffff;
+      }
+
+      body {
+        background: #e7e4de;
+      }
+
+      html[data-theme='dark'] body {
+        background: #000000;
       }
 
       .initial-splash-card {
@@ -62,9 +78,36 @@
       }
     </style>
 
-    <!-- Set theme before React loads to prevent flicker -->
+    <!-- Set theme before the first paint to prevent the splash from flashing light. -->
     <script>
-      document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+      (() => {
+        const root = document.documentElement;
+        const preferenceKey = 'kingshall_app_theme_preference';
+        const legacyKey = 'kingshall_app_theme';
+        let preference = null;
+
+        try {
+          preference = localStorage.getItem(preferenceKey);
+          if (!preference) {
+            preference = localStorage.getItem(legacyKey);
+          }
+        } catch (error) {
+          // Use the dark default when storage is unavailable (for example, in private browsing).
+        }
+
+        let mode = preference === 'light' || preference === 'dark' ? preference : 'dark';
+        if (preference === 'system') {
+          mode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        } else if (preference === 'shift') {
+          const hour = new Date().getHours();
+          mode = hour >= 6 && hour < 18 ? 'light' : 'dark';
+        }
+
+        root.setAttribute('data-theme', mode);
+        root.style.colorScheme = mode;
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', mode === 'dark' ? '#000000' : '#e7e4de');
+      })();
+
       window.__kingshallRefreshSplash = performance.getEntriesByType('navigation')[0]?.type === 'reload';
     </script>
 
