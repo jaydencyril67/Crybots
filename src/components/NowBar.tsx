@@ -125,7 +125,7 @@ const styles = {
     display: 'grid',
     width: 'fit-content',
     maxWidth: '100%',
-    gridTemplateColumns: 'repeat(4, minmax(112px, max-content))',
+    gridTemplateColumns: 'repeat(3, minmax(112px, max-content))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     alignSelf: 'flex-end',
