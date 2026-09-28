@@ -279,7 +279,7 @@ const childNavigationGroups: NavigationGroup[] = [
 const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
 
 const getCurrentPageTitle = (path: string) => {
-  if (path === '/dashboard') return 'DASHBOARD';
+  if (path === '/dashboard') return 'HOME';
   if (path === '/profile') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme-settings') return 'THEME SETTINGS';
@@ -287,7 +287,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/nowbar-color') return 'EDGE LIGHTING';
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
   if (path === '/portfolio/statistics') return 'ACCOUNT STATISTICS';
-  if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/portfolio') return 'PROFILE';
   if (path === '/logout') return 'LOGOUT';
   if (path === '/auto-logout') return 'AUTO LOGOUT';
   if (path === '/manual-logout') return 'MANUAL LOGOUT';
@@ -295,22 +295,22 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/agent/stats') return 'AGENT STATS';
   if (path === '/agent/tools') return 'AGENT TOOLS';
   if (path === '/agent/menu') return 'AGENT MENU';
-  if (path === '/exchange') return 'EXCHANGE';
+  if (path === '/exchange') return 'TRADE';
   if (path === '/control-center') return 'CONTROL CENTER';
   if (path === '/my-space') return 'MY SPACE';
   if (path === '/market') return 'MARKET';
-  if (path === '/records') return 'RECORDS';
-  if (path === '/contact') return 'CONTACT';
+  if (path === '/records') return 'LOGS';
+  if (path === '/contact') return 'HELP';
   if (path === '/faq') return 'FAQ';
-  if (path === '/options') return 'OPTIONS';
-  if (path === '/library') return 'LIBRARY';
+  if (path === '/options') return 'OPTION';
+  if (path === '/library') return 'STORE';
   if (path === '/about') return 'ABOUT';
-  if (path === '/developer') return 'DEVELOPER';
+  if (path === '/developer') return 'DEV';
   if (path === '/developer/api-keys') return 'API KEYS';
   if (path === '/developer/webhooks') return 'WEBHOOKS';
   if (path === '/developer/configure') return 'CONFIGURE';
   if (path === '/logout') return 'LOGOUT';
-  if (path === '/asset') return 'ASSET';
+  if (path === '/asset') return 'ASSETS';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
   if (path === '/withdrawals') return 'WITHDRAW';

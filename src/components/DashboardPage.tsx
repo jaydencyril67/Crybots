@@ -551,7 +551,7 @@ const DashboardPage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <Helmet>
-        <title>KingsHall Exchange | Dashboard</title>
+        <title>KingsHall Exchange | Home</title>
       </Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>
