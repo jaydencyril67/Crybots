@@ -289,13 +289,13 @@ const DepositPage = () => {
 
   const fixedAddressContent = (
     <div style={styles.mutedCard}>
-      <strong>Fixed USDT deposit address</strong>
-      <p style={{ margin: '8px 0 0' }}>Send USDT only on the displayed network to this address. Your balance is credited after Bitget marks the deposit successful. Sending through another network may permanently lose your funds.</p>
+      <strong>Your USDT deposit address</strong>
+      <p style={{ margin: '8px 0 0' }}>Send USDT only on the displayed network to this address. Your balance is credited after the deposit is confirmed. Sending through another network may permanently lose your funds.</p>
       {fixedAddressLoading ? <div style={{ padding: '12px 0' }}><LoadingDots /></div> : fixedAddress ? <>
         <p style={styles.address}>{fixedAddress.address}</p>
         <p style={{ margin: '8px 0', fontWeight: 700 }}>{fixedAddress.asset} · {fixedAddress.network}</p>
         <button type="button" style={styles.secondaryButton} onClick={copyFixedAddress}>{copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy address</>}</button>
-      </> : <p style={{ margin: '8px 0 0' }}>A fixed deposit address is not available yet. Please use the one-time payment option or contact support.</p>}
+      </> : <p style={{ margin: '8px 0 0' }}>A deposit address is not available yet. Please use the one-time payment option or contact support.</p>}
     </div>
   );
 
@@ -354,9 +354,9 @@ const DepositPage = () => {
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'completed' ? <NotificationBanner tone="success" title="Deposit confirmed" message="Your USDT deposit has been confirmed and your balance will reflect it shortly." /> : null}
           {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'pending' ? <NotificationBanner tone="info" title="Deposit awaiting confirmation" message="Send the requested amount to the address above. We will update this page when the network confirms it." /> : null}
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button type="button" style={{ ...styles.secondaryButton, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Fixed address</button>
-            <button type="button" style={{ ...styles.secondaryButton, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
+          <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
+            <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Deposit address</button>
+            <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
           </div>
           {cryptoContent}
           <div style={styles.mutedCard}>
