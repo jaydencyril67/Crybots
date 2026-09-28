@@ -260,7 +260,7 @@ const parentRoutes = [
   '/store',
   '/about',
   '/dev',
-  '/logout',
+  '/exit',
 ];
 
 const childNavigationGroups: NavigationGroup[] = [
@@ -288,9 +288,9 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
   if (path === '/statistics') return 'STATISTICS';
   if (path === '/profile') return 'PROFILE';
-  if (path === '/logout') return 'EXIT';
-  if (path === '/auto-logout') return 'AUTO LOGOUT';
-  if (path === '/manual-logout') return 'MANUAL LOGOUT';
+  if (path === '/exit') return 'EXIT';
+  if (path === '/auto-exit') return 'AUTO EXIT';
+  if (path === '/manual-exit') return 'MANUAL EXIT';
   if (path === '/agent') return 'AGENT';
   if (path === '/stats') return 'STATS';
   if (path === '/tools') return 'TOOLS';
@@ -309,7 +309,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/dev/api-keys') return 'API KEYS';
   if (path === '/dev/webhooks') return 'WEBHOOKS';
   if (path === '/dev/configure') return 'CONFIGURE';
-  if (path === '/logout') return 'LOGOUT';
+  if (path === '/exit') return 'EXIT';
   if (path === '/asset') return 'ASSETS';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -419,9 +419,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'EXIT',
     icon: <LogOut size={18} />,
     onClick: () => {
-      navigate('/logout');
+      navigate('/exit');
     },
-    active: getActivePath() === '/logout',
+    active: getActivePath() === '/exit',
   },
 ];
 
@@ -510,13 +510,13 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.clearTimeout(idleTimer);
     }
 
-    if (getActivePath() === '/nowbar-button-color' || getActivePath() === '/logout') {
+    if (getActivePath() === '/nowbar-button-color' || getActivePath() === '/exit') {
       setIdleTimer(null);
       return;
     }
 
     const timer = window.setTimeout(() => {
-      if (getActivePath() !== '/nowbar-button-color' && getActivePath() !== '/logout') {
+      if (getActivePath() !== '/nowbar-button-color' && getActivePath() !== '/exit') {
         setView('title');
       }
     }, 10000);

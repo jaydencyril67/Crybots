@@ -96,7 +96,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
 });
 
-const LogoutPage = () => {
+const ExitPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
@@ -106,20 +106,20 @@ const LogoutPage = () => {
         <div style={styles.shell}>
           <div style={styles.content}>
             <section style={styles.section}>
-              <h2 style={styles.sectionTitle}>Logout</h2>
+              <h2 style={styles.sectionTitle}>Exit</h2>
               <p style={styles.sectionText}>Choose how you want to end your session, either automatically when idle or manually when you are ready.</p>
             </section>
 
-            <div style={styles.cardGrid} aria-label="Logout options">
+            <div style={styles.cardGrid} aria-label="Exit options">
               <article style={styles.card}>
-                <h3 style={styles.cardTitle}>Auto Logout</h3>
+                <h3 style={styles.cardTitle}>Auto Exit</h3>
                 <p style={styles.cardSubtext}>Choose idle or scheduled session exits.</p>
-                <button type="button" style={styles.viewButton} onClick={() => navigate('/auto-logout')}>View</button>
+                <button type="button" style={styles.viewButton} onClick={() => navigate('/auto-exit')}>View</button>
               </article>
               <article style={styles.card}>
-                <h3 style={styles.cardTitle}>Manual Logout</h3>
+                <h3 style={styles.cardTitle}>Manual Exit</h3>
                 <p style={styles.cardSubtext}>Review the warning before ending your session.</p>
-                <button type="button" style={styles.viewButton} onClick={() => navigate('/manual-logout')}>View</button>
+                <button type="button" style={styles.viewButton} onClick={() => navigate('/manual-exit')}>View</button>
               </article>
             </div>
           </div>
@@ -130,4 +130,4 @@ const LogoutPage = () => {
   );
 };
 
-export default LogoutPage;
+export default ExitPage;
