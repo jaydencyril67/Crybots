@@ -140,7 +140,7 @@ export const navigateFromVoice = (transcript: string) => {
     window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
     return true;
   }
-  if (normalizedTranscript.includes(' back ')) {
+  if (/(^|\s)(go\s+)?back(\s|$)/.test(normalized) || normalizedTranscript.includes(' previous page ')) {
     window.history.back();
     return true;
   }
