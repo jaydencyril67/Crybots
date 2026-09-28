@@ -7,6 +7,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Android APK', description: 'Download the Android APK directly.' },
 ];
 
-const LibraryPage = () => <ParentPageLayout title="Library" description="Choose a download option for the KingsHall Exchange app." cards={destinations} />;
+const StorePage = () => <ParentPageLayout title="Store" description="Choose a download option for the KingsHall Exchange app." cards={destinations} />;
 
-export default LibraryPage;
+export default StorePage;

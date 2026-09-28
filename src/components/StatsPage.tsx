@@ -11,7 +11,7 @@ type Dashboard = { stats: { referrals: number; totalEarned: number; firstDeposit
 type Analytics = { byEvent: Array<{ _id: string; count: number; earned: number }> };
 type Ranking = { rank: number; code: string; name?: string; referrals: number; earned: number };
 
-const AgentStatsPage = () => {
+const StatsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [data, setData] = useState<Dashboard | null>(null);
@@ -49,4 +49,4 @@ const styles = {
 
 const Metric = ({ theme, icon, label, value, loading }: { theme: typeof HYBRID_THEME_TOKENS.dark; icon: ReactNode; label: string; value: string | number; loading: boolean }) => <div style={styles.card(theme)}><span style={styles.muted(theme)}>{label}</span><div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>{icon}{loading ? <LoadingDots /> : <strong style={styles.value}>{value}</strong>}</div></div>;
 
-export default AgentStatsPage;
+export default StatsPage;

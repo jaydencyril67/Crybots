@@ -252,26 +252,26 @@ const parentRoutes = [
   '/home',
   '/profile',
   '/agent',
-  '/exchange',
-  '/records',
+  '/trade',
+  '/logs',
   '/asset',
-  '/contact',
+  '/help',
   '/options',
-  '/library',
+  '/store',
   '/about',
-  '/developer',
-  '/logout',
+  '/dev',
+  '/exit',
 ];
 
 const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/details', '/statistics', '/security', '/danger'] },
-  { routes: ['/agent/stats', '/agent/tools', '/agent/menu'] },
+  { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/theme-settings', '/nowbar-settings', '/alert-settings'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
-  { routes: ['/developer/api-keys', '/developer/webhooks', '/developer/configure'] },
+  { routes: ['/api-keys', '/webhooks', '/configure'] },
   { routes: ['/nowbar-color', '/nowbar-button-color'] },
   { routes: ['/faq'] },
 ];
@@ -288,28 +288,28 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
   if (path === '/statistics') return 'STATISTICS';
   if (path === '/profile') return 'PROFILE';
-  if (path === '/logout') return 'EXIT';
-  if (path === '/auto-logout') return 'AUTO LOGOUT';
-  if (path === '/manual-logout') return 'MANUAL LOGOUT';
+  if (path === '/exit') return 'EXIT';
+  if (path === '/auto-exit') return 'AUTO EXIT';
+  if (path === '/manual-exit') return 'MANUAL EXIT';
   if (path === '/agent') return 'AGENT';
-  if (path === '/agent/stats') return 'AGENT STATS';
-  if (path === '/agent/tools') return 'AGENT TOOLS';
-  if (path === '/agent/menu') return 'AGENT MENU';
-  if (path === '/exchange') return 'TRADE';
+  if (path === '/stats') return 'STATS';
+  if (path === '/tools') return 'TOOLS';
+  if (path === '/menu') return 'MENU';
+  if (path === '/trade') return 'TRADE';
   if (path === '/control-center') return 'CONTROL CENTER';
   if (path === '/my-space') return 'MY SPACE';
   if (path === '/market') return 'MARKET';
-  if (path === '/records') return 'LOGS';
-  if (path === '/contact') return 'HELP';
+  if (path === '/logs') return 'LOGS';
+  if (path === '/help') return 'HELP';
   if (path === '/faq') return 'FAQ';
   if (path === '/options') return 'OPTION';
-  if (path === '/library') return 'STORE';
+  if (path === '/store') return 'STORE';
   if (path === '/about') return 'ABOUT';
-  if (path === '/developer') return 'DEV';
-  if (path === '/developer/api-keys') return 'API KEYS';
-  if (path === '/developer/webhooks') return 'WEBHOOKS';
-  if (path === '/developer/configure') return 'CONFIGURE';
-  if (path === '/logout') return 'LOGOUT';
+  if (path === '/dev') return 'DEV';
+  if (path === '/api-keys') return 'API KEYS';
+  if (path === '/webhooks') return 'WEBHOOKS';
+  if (path === '/configure') return 'CONFIGURE';
+  if (path === '/exit') return 'EXIT';
   if (path === '/asset') return 'ASSETS';
   if (path === '/danger') return 'DANGER';
   if (path === '/security') return 'SECURITY';
@@ -355,17 +355,17 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'TRADE',
     icon: <ArrowLeftRight size={18} />,
     onClick: () => {
-      navigate('/exchange');
+      navigate('/trade');
     },
-    active: getActivePath() === '/exchange',
+    active: getActivePath() === '/trade',
   },
   {
     label: 'LOGS',
     icon: <CalendarClock size={18} />,
     onClick: () => {
-      navigate('/records');
+      navigate('/logs');
     },
-    active: getActivePath() === '/records',
+    active: getActivePath() === '/logs',
   },
   {
     label: 'ASSETS',
@@ -379,9 +379,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'HELP',
     icon: <LifeBuoy size={18} />,
     onClick: () => {
-      navigate('/contact');
+      navigate('/help');
     },
-    active: getActivePath() === '/contact',
+    active: getActivePath() === '/help',
   },
   {
     label: 'OPTION',
@@ -395,9 +395,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'STORE',
     icon: <BookOpen size={18} />,
     onClick: () => {
-      navigate('/library');
+      navigate('/store');
     },
-    active: getActivePath() === '/library',
+    active: getActivePath() === '/store',
   },
   {
     label: 'ABOUT',
@@ -411,17 +411,17 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'DEV',
     icon: <Code2 size={18} />,
     onClick: () => {
-      navigate('/developer');
+      navigate('/dev');
     },
-    active: getActivePath() === '/developer',
+    active: getActivePath() === '/dev',
   },
   {
     label: 'EXIT',
     icon: <LogOut size={18} />,
     onClick: () => {
-      navigate('/logout');
+      navigate('/exit');
     },
-    active: getActivePath() === '/logout',
+    active: getActivePath() === '/exit',
   },
 ];
 
@@ -510,13 +510,13 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.clearTimeout(idleTimer);
     }
 
-    if (getActivePath() === '/nowbar-button-color' || getActivePath() === '/logout') {
+    if (getActivePath() === '/nowbar-button-color' || getActivePath() === '/exit') {
       setIdleTimer(null);
       return;
     }
 
     const timer = window.setTimeout(() => {
-      if (getActivePath() !== '/nowbar-button-color' && getActivePath() !== '/logout') {
+      if (getActivePath() !== '/nowbar-button-color' && getActivePath() !== '/exit') {
         setView('title');
       }
     }, 10000);

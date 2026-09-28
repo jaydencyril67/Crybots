@@ -20,14 +20,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   danger: { background: theme.primary, borderColor: theme.primary, color: theme.textInverse },
 });
 
-const ManualLogoutPage = () => {
+const ManualExitPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
+  const handleExit = async () => {
+    setIsExiting(true);
     try {
       await api.post('/api/auth/signout');
     } catch {
@@ -41,15 +41,15 @@ const ManualLogoutPage = () => {
       <div style={styles.page}>
         <main style={styles.shell}>
           <div style={styles.content}>
-            <button type="button" style={styles.back} onClick={() => navigate('/logout')}><ArrowLeft size={17} /> Logout</button>
+            <button type="button" style={styles.back} onClick={() => navigate('/exit')}><ArrowLeft size={17} /> Exit</button>
             <div style={styles.rowList}>
               <section style={styles.dangerRow} role="alert">
-                <h3 style={styles.title}>Manual Logout</h3>
+                <h3 style={styles.title}>Manual Exit</h3>
                 <p style={styles.text}>Your token and current session will be terminated immediately, and you will be navigated to the landing page.</p>
-                <p style={styles.text}><strong>Before logging out, finish or save any progress that you do not want to lose.</strong></p>
+                <p style={styles.text}><strong>Before exiting, finish or save any progress that you do not want to lose.</strong></p>
                 <div style={styles.actions}>
-                  <button type="button" style={styles.button} onClick={() => navigate('/logout')}>Keep me signed in</button>
-                  <button type="button" style={{ ...styles.button, ...styles.danger }} disabled={isLoggingOut} onClick={() => { void handleLogout(); }}>{isLoggingOut ? 'Logging out...' : 'Log out now'}</button>
+                  <button type="button" style={styles.button} onClick={() => navigate('/exit')}>Keep me signed in</button>
+                  <button type="button" style={{ ...styles.button, ...styles.danger }} disabled={isExiting} onClick={() => { void handleExit(); }}>{isExiting ? 'Exiting...' : 'Exit now'}</button>
                 </div>
               </section>
             </div>
@@ -61,4 +61,4 @@ const ManualLogoutPage = () => {
   );
 };
 
-export default ManualLogoutPage;
+export default ManualExitPage;

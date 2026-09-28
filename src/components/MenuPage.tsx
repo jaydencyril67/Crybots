@@ -11,7 +11,7 @@ import NotificationBanner from './NotificationBanner';
 type Dashboard = { agent: { code: string | null; link: string | null; availableEarnings: number }; stats: { totalEarned: number } };
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
-const AgentMenuPage = () => {
+const MenuPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [data, setData] = useState<Dashboard>({ agent: { code: '', link: '', availableEarnings: 0 }, stats: { totalEarned: 0 } });
@@ -135,4 +135,4 @@ const styles = {
   loading: { display: 'flex', justifyContent: 'center', padding: 36 },
 };
 
-export default AgentMenuPage;
+export default MenuPage;

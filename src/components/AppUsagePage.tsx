@@ -19,23 +19,27 @@ const pageLabels: Record<string, string> = {
   '/nowbar-color': 'NowBar color',
   '/nowbar-button-color': 'NowBar button color',
   '/profile': 'Profile',
+  '/exit': 'Exit',
   '/statistics': 'Statistics',
   '/agent': 'Agent',
-  '/agent/tools': 'Agent tools',
-  '/agent/stats': 'Agent statistics',
-  '/agent/menu': 'Agent menu',
-  '/exchange': 'Exchange',
+  '/tools': 'Tools',
+  '/stats': 'Stats',
+  '/menu': 'Menu',
+  '/trade': 'Trade',
   '/my-space': 'My Space',
   '/market': 'Market',
-  '/records': 'Records',
-  '/contact': 'Contact',
+  '/logs': 'Logs',
+  '/help': 'Help',
   '/options': 'Options',
-  '/library': 'Library',
+  '/store': 'Store',
   '/about': 'About',
   '/information': 'Information',
   '/privacy-policy': 'Privacy policy',
   '/community-standards': 'Community standards',
-  '/developer': 'Developer',
+  '/dev': 'Dev',
+  '/api-keys': 'API Keys',
+  '/webhooks': 'Webhooks',
+  '/configure': 'Configure',
   '/asset': 'Asset',
   '/danger': 'Danger zone',
   '/pending-deletion': 'Pending deletion',
@@ -133,7 +137,7 @@ const AppUsagePage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" onClick={() => navigate('/records')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Records</button>
+          <button type="button" onClick={() => navigate('/logs')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Logs</button>
           <div style={styles.content}>
             {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
             <div style={styles.rowList} aria-live="polite">

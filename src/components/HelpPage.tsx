@@ -8,6 +8,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Tutorial', description: 'Learn how to use KingsHall Exchange.' },
 ];
 
-const ContactPage = () => <ParentPageLayout title="Contact" description="Find answers and connect with the KingsHall support team." cards={destinations} />;
+const HelpPage = () => <ParentPageLayout title="Help" description="Find answers and connect with the KingsHall support team." cards={destinations} />;
 
-export default ContactPage;
+export default HelpPage;

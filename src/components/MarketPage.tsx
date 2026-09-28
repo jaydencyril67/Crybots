@@ -154,7 +154,7 @@ const MarketPage = () => {
   };
 
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
-    <button type="button" style={styles.back} onClick={() => navigate('/exchange')}><ArrowLeft size={17} /> Exchange</button>
+    <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Buy and sell points</h2><div style={styles.card}><div style={styles.pointsGrid}>
       <form style={styles.buyForm} onSubmit={tradeMode === 'buy' ? handleBuy : handleSell}>

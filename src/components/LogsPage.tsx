@@ -6,6 +6,6 @@ const destinations: ParentPageCard[] = [
   { label: 'App Usage', description: 'See how many times you have opened each protected page.', route: '/app-usage' },
 ];
 
-const RecordsPage = () => <ParentPageLayout title="Records" description="Review your transactions and app usage." cards={destinations} />;
+const LogsPage = () => <ParentPageLayout title="Logs" description="Review your transactions and app usage." cards={destinations} />;
 
-export default RecordsPage;
+export default LogsPage;
