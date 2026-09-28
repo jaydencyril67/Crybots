@@ -268,16 +268,29 @@ const DepositPage = () => {
 
   const copyFixedAddress = async () => {
     if (!fixedAddress?.address) return;
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(fixedAddress.address);
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(fixedAddress.address);
+      } else {
+        const input = document.createElement('textarea');
+        input.value = fixedAddress.address;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+      }
       setCopied(true);
+    } catch {
+      setMessage('Unable to copy the address. Please copy it manually.');
     }
   };
 
   const fixedAddressContent = (
     <div style={styles.mutedCard}>
       <strong>Fixed USDT deposit address</strong>
-      <p style={{ margin: '8px 0 0' }}>Send USDT only on the TRON (TRC-20) network to this address. Your balance is credited after the network deposit is confirmed.</p>
+      <p style={{ margin: '8px 0 0' }}>Send USDT only on the displayed network to this address. Your balance is credited after Bitget marks the deposit successful. Sending through another network may permanently lose your funds.</p>
       {fixedAddressLoading ? <div style={{ padding: '12px 0' }}><LoadingDots /></div> : fixedAddress ? <>
         <p style={styles.address}>{fixedAddress.address}</p>
         <p style={{ margin: '8px 0', fontWeight: 700 }}>{fixedAddress.asset} · {fixedAddress.network}</p>
