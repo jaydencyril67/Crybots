@@ -268,8 +268,10 @@ const DepositPage = () => {
 
   const copyFixedAddress = async () => {
     if (!fixedAddress?.address) return;
-    await navigator.clipboard.writeText(fixedAddress.address);
-    setCopied(true);
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(fixedAddress.address);
+      setCopied(true);
+    }
   };
 
   const fixedAddressContent = (
