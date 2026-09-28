@@ -14,7 +14,7 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'ACCOUNT CONFIRMED', route: '/account-confirmed' },
   { label: 'SIGN IN', route: '/signin' },
   { label: 'FORGOT PASSWORD', route: '/forgot-password' },
-  { label: 'DASHBOARD', route: '/dashboard' },
+  { label: 'HOME', route: '/home' },
   { label: 'DETAILS', route: '/details' },
   { label: 'MANAGE', route: '/manage' },
   { label: 'THEME SETTINGS', route: '/theme-settings' },
@@ -64,8 +64,7 @@ export const PAGE_ROUTES: VoiceCommand[] = [
 
 export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'COMMAND', route: '/voice-commands' },
-  { label: 'HOME', route: '/dashboard' },
-  { label: 'DASHBOARD', route: '/dashboard' },
+  { label: 'HOME', route: '/home' },
   { label: 'PROFILE', route: '/profile' },
   { label: 'DETAILS', route: '/details' },
   { label: 'STATISTICS', route: '/statistics' },

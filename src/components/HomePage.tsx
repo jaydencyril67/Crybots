@@ -460,7 +460,7 @@ const getAdviceIndex = () => {
   return getSeededAdviceOrder(hourKey)[hourKey % advicePool.length];
 };
 
-const DashboardPage = () => {
+const HomePage = () => {
   const [hourlyAdviceIndex, setHourlyAdviceIndex] = useState(getAdviceIndex());
   const [authName, setAuthName] = useState('');
   const [isAuthNameLoaded, setIsAuthNameLoaded] = useState(false);
@@ -714,4 +714,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;
+export default HomePage;

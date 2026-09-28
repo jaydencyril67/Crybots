@@ -249,7 +249,7 @@ type NavigationGroup = {
 };
 
 const parentRoutes = [
-  '/dashboard',
+  '/home',
   '/profile',
   '/agent',
   '/exchange',
@@ -276,10 +276,10 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/faq'] },
 ];
 
-const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/dashboard';
+const getActivePath = () => window.location.pathname || window.location.hash.replace('#', '') || '/home';
 
 const getCurrentPageTitle = (path: string) => {
-  if (path === '/dashboard') return 'HOME';
+  if (path === '/home') return 'HOME';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme-settings') return 'THEME SETTINGS';
@@ -331,9 +331,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'HOME',
     icon: <Home size={18} />,
     onClick: () => {
-      navigate('/dashboard');
+      navigate('/home');
     },
-    active: getActivePath() === '/dashboard',
+    active: getActivePath() === '/home',
   },
   {
     label: 'PROFILE',
