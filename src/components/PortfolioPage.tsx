@@ -93,7 +93,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const pageButtons = [
   { label: 'Details', description: 'Manage your details.', route: '/details' },
-  { label: 'Statistics', description: 'Review your account activity and totals.', route: '/profile/statistics' },
+  { label: 'Statistics', description: 'Review your account activity and totals.', route: '/statistics' },
   { label: 'Security', description: 'Manage your password and security controls.', route: '/security' },
   { label: 'Danger', description: 'Access recovery and account actions.', route: '/danger' },
 ];
