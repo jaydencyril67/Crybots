@@ -217,7 +217,7 @@ const DangerPage = () => {
         <div style={styles.shell}>
           
           <div style={styles.content}>
-            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/portfolio')}><ArrowLeft size={17} /> Portfolio</button>
+            <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.rowList}>
               <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Disable Account</h3>

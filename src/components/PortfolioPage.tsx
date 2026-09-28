@@ -93,7 +93,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const pageButtons = [
   { label: 'Details', description: 'Manage your details.', route: '/details' },
-  { label: 'Statistics', description: 'Review your account activity and totals.', route: '/portfolio/statistics' },
+  { label: 'Statistics', description: 'Review your account activity and totals.', route: '/profile/statistics' },
   { label: 'Security', description: 'Manage your password and security controls.', route: '/security' },
   { label: 'Danger', description: 'Access recovery and account actions.', route: '/danger' },
 ];
@@ -111,7 +111,7 @@ const PortfolioPage = () => {
           
           <div style={styles.content}>
             <section style={styles.section}>
-              <h2 style={styles.sectionTitle}>Portfolio</h2>
+              <h2 style={styles.sectionTitle}>Profile</h2>
               <p style={styles.sectionText}>Explore your account sections from focused pages with the controls and details you need.</p>
             </section>
 

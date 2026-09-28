@@ -250,7 +250,7 @@ type NavigationGroup = {
 
 const parentRoutes = [
   '/dashboard',
-  '/portfolio',
+  '/profile',
   '/agent',
   '/exchange',
   '/records',
@@ -264,7 +264,7 @@ const parentRoutes = [
 ];
 
 const childNavigationGroups: NavigationGroup[] = [
-  { routes: ['/details', '/portfolio/statistics', '/security', '/danger'] },
+  { routes: ['/details', '/profile/statistics', '/security', '/danger'] },
   { routes: ['/agent/stats', '/agent/tools', '/agent/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
@@ -286,8 +286,8 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/nowbar-settings') return 'NOWBAR SETTINGS';
   if (path === '/nowbar-color') return 'EDGE LIGHTING';
   if (path === '/nowbar-button-color') return 'BUTTON COLOR';
-  if (path === '/portfolio/statistics') return 'ACCOUNT STATISTICS';
-  if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/profile/statistics') return 'ACCOUNT STATISTICS';
+  if (path === '/profile') return 'PROFILE';
   if (path === '/logout') return 'EXIT';
   if (path === '/auto-logout') return 'AUTO LOGOUT';
   if (path === '/manual-logout') return 'MANUAL LOGOUT';
@@ -339,9 +339,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'PROFILE',
     icon: <BarChart3 size={18} />,
     onClick: () => {
-      navigate('/portfolio');
+      navigate('/profile');
     },
-    active: getActivePath() === '/portfolio',
+    active: getActivePath() === '/profile',
   },
   {
     label: 'AGENT',
