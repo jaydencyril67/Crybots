@@ -3,12 +3,21 @@ name: Build Production Android APK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   build-release:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      - name: Download release keystore artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download "$(gh run list --workflow generate-release-keystore.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')" --name kingshall-release-signing-files --dir signing
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -66,17 +75,15 @@ jobs:
 
       - name: Configure release signing
         env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          test -n "$ANDROID_KEYSTORE_BASE64"
           test -n "$ANDROID_KEYSTORE_PASSWORD"
           test -n "$ANDROID_KEY_ALIAS"
           test -n "$ANDROID_KEY_PASSWORD"
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/kingshall-release.keystore
+          cp signing/kingshall-release.keystore android/app/kingshall-release.keystore
           cat >> android/gradle.properties <<EOF
           KINGS_HALL_KEYSTORE_FILE=kingshall-release.keystore
           KINGS_HALL_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD
