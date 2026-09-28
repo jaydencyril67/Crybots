@@ -96,7 +96,7 @@ const styles = {
     transform: 'translateX(-50%)',
   },
   dockExpanded: {
-    width: 'min(560px, calc(100vw - 16px))',
+    width: 'min(560px, calc(100vw - 32px))',
     height: 'calc(2.5 * 72px)',
     boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
   },
@@ -122,7 +122,7 @@ const styles = {
   },
   barExpanded: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     alignSelf: 'flex-end',
@@ -174,10 +174,10 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
-    width: 'calc(100% + 12px)',
+    width: '100%',
     minHeight: '40px',
-    padding: '7px 6px 6px',
-    borderRadius: '18px',
+    padding: '9px 10px 8px',
+    borderRadius: '12px',
     flexDirection: 'column' as const,
     alignItems: 'center',
     justifyContent: 'center',
