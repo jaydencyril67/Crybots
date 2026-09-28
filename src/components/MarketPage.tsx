@@ -57,9 +57,20 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   const current = points[points.length - 1]?.percent ?? 0;
   const currentValue = points[points.length - 1]?.value ?? 1;
   const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, value: Number(currentValue.toFixed(6)), percent: current }, ...points];
-  const linePath = chartPoints.map((point, index) => {
-    const x = (index / Math.max(1, chartPoints.length - 1)) * 620;
-    const y = 188 - ((point.percent + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122;
+  const chartCoordinates = chartPoints.map((point, index) => ({
+    x: (index / Math.max(1, chartPoints.length - 1)) * 620,
+    y: 188 - ((point.percent + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122,
+  }));
+  const linePath = chartCoordinates.reduce((path, point, index, coordinates) => {
+    if (index === 0) return `M ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+    const previous = coordinates[index - 1];
+    const midpointX = ((previous.x + point.x) / 2).toFixed(2);
+    const midpointY = ((previous.y + point.y) / 2).toFixed(2);
+    return `${path} Q ${previous.x.toFixed(2)} ${previous.y.toFixed(2)} ${midpointX} ${midpointY}`;
+  }, '') + ` T ${chartCoordinates[chartCoordinates.length - 1].x.toFixed(2)} ${chartCoordinates[chartCoordinates.length - 1].y.toFixed(2)}`;
+  const wavePath = Array.from({ length: 64 }, (_, index) => {
+    const x = (index / 63) * 620;
+    const y = 150 + Math.sin(index * 0.42) * 20 + Math.sin(index * 0.16) * 11;
     return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
   }).join(' ');
   const areaPath = `${linePath} L 620 230 L 0 230 Z`;
@@ -73,6 +84,8 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
       </defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
       <line x1="0" x2="620" y1="66" y2="66" stroke={theme.borderGlass} strokeWidth="1" strokeDasharray="4 8" />
+      <path d={wavePath} fill="none" stroke={theme.primary} strokeOpacity="0.2" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="30 18" filter="url(#market-wave-glow)"><animate attributeName="stroke-dashoffset" from="0" to="-96" dur="2.8s" repeatCount="indefinite" /><animate attributeName="transform" values="translate(0 0);translate(0 -8);translate(0 0)" dur="3.2s" repeatCount="indefinite" /></path>
+      <path d={wavePath} fill="none" stroke={theme.primary} strokeOpacity="0.55" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><animate attributeName="stroke-dashoffset" from="0" to="-96" dur="2.8s" repeatCount="indefinite" /></path>
       <path d={areaPath} fill="url(#market-wave-fill)"><animate attributeName="opacity" values="0.72;1;0.72" dur="4s" repeatCount="indefinite" /></path>
       <path d={linePath} fill="none" stroke={theme.primary} strokeOpacity="0.28" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" filter="url(#market-wave-glow)" />
       <path d={linePath} fill="none" stroke={theme.primary} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="12 10"><animate attributeName="stroke-dashoffset" from="0" to="-44" dur="2.4s" repeatCount="indefinite" /></path>
