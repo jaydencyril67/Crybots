@@ -82,7 +82,11 @@ const getHash = () => window.location.hash;
 
 const InitialSplashCleanup = () => {
   useEffect(() => {
-    document.getElementById('initial-splash')?.remove();
+    const timer = window.setTimeout(() => {
+      document.getElementById('initial-splash')?.remove();
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   return null;
