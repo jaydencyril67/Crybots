@@ -67,11 +67,18 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
 
   return <div role="img" aria-label={`Market value: ${currentValue.toFixed(6)} USDT per point, ${current.toFixed(2)} percent today`} style={styles.chartWave}>
     <div style={styles.chartVisual}>{points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
-      <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
+      <defs>
+        <linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.38" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient>
+        <filter id="market-wave-glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+      </defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
       <line x1="0" x2="620" y1="66" y2="66" stroke={theme.borderGlass} strokeWidth="1" strokeDasharray="4 8" />
-      <path d={areaPath} fill="url(#market-wave-fill)" /><path d={linePath} fill="none" stroke={theme.primary} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={620} cy={188 - ((current + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4" />
+      <path d={areaPath} fill="url(#market-wave-fill)"><animate attributeName="opacity" values="0.72;1;0.72" dur="4s" repeatCount="indefinite" /></path>
+      <path d={linePath} fill="none" stroke={theme.primary} strokeOpacity="0.28" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" filter="url(#market-wave-glow)" />
+      <path d={linePath} fill="none" stroke={theme.primary} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="12 10"><animate attributeName="stroke-dashoffset" from="0" to="-44" dur="2.4s" repeatCount="indefinite" /></path>
+      <path d={linePath} fill="none" stroke={theme.primary} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={620} cy={188 - ((current + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122} r="13" fill="none" stroke={theme.primary} strokeWidth="2" opacity="0.35"><animate attributeName="r" values="8;18;8" dur="2.2s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.55;0;0.55" dur="2.2s" repeatCount="indefinite" /></circle>
+      <circle cx={620} cy={188 - ((current + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4"><animate attributeName="r" values="6.5;8;6.5" dur="1.6s" repeatCount="indefinite" /></circle>
     </svg> : <LoadingDots />}
       <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(2)}%` : <LoadingDots />}</span></p>
     </div>
