@@ -12,7 +12,7 @@ type UsageResponse = { usage?: Record<string, number> };
 
 const pageLabels: Record<string, string> = {
   '/dashboard': 'Dashboard',
-  '/profile': 'Profile',
+  '/details': 'Details',
   '/manage': 'Manage account',
   '/theme-settings': 'Theme settings',
   '/nowbar-settings': 'NowBar settings',

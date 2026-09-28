@@ -199,7 +199,7 @@ type MeResponse = {
 };
 
 
-const ProfilePage = () => {
+const DetailsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = useMemo(() => ({
@@ -445,4 +445,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default DetailsPage;
