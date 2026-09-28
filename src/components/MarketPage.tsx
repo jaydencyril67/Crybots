@@ -65,7 +65,7 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   const areaPath = `${linePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(6)} USDT per point, ${current.toFixed(2)} percent today`} style={styles.chartWave}>
+  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(2)} USDT per point, ${current.toFixed(2)} percent today`} style={styles.chartWave}>
     <div style={styles.chartVisual}>{points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
       <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
@@ -75,7 +75,7 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
     </svg> : <LoadingDots />}
       <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(2)}%` : <LoadingDots />}</span></p>
     </div>
-    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(6)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(2)}% today` : 'Loading…'}</p></div>
+    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(2)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(2)}% today` : 'Loading…'}</p></div>
   </div>;
 };
 
