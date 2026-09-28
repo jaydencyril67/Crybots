@@ -7,10 +7,12 @@ export const VOICE_STATUS_EVENT = 'nowbar-voice-status-changed';
 export type VoiceCommand = { label: string; route: string };
 
 export const VOICE_COMMANDS: VoiceCommand[] = [
+  { label: 'COMMAND', route: '/voice-commands' },
   { label: 'HOME', route: '/dashboard' },
   { label: 'DASHBOARD', route: '/dashboard' },
-  { label: 'PROFILE', route: '/portfolio' },
-  { label: 'PORTFOLIO', route: '/portfolio' },
+  { label: 'PROFILE', route: '/profile' },
+  { label: 'DETAILS', route: '/details' },
+  { label: 'STATISTICS', route: '/statistics' },
   { label: 'AGENT', route: '/agent' },
   { label: 'TRADE', route: '/exchange' },
   { label: 'EXCHANGE', route: '/exchange' },

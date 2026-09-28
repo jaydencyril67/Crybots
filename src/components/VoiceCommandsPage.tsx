@@ -16,7 +16,7 @@ const VoiceCommandsPage = () => {
           <h1 style={{ margin: '20px 0 8px', fontSize: '1.15rem', fontWeight: 900 }}>Voice Commands</h1>
           <p style={{ margin: 0, color: theme.textMuted, lineHeight: 1.6 }}>Say any NowBar label to navigate. Say “Command” to open this page.</p>
           <section style={{ marginTop: '22px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, display: 'grid', gap: '10px' }}>
-            {commands.map((command) => <button key={command.label} type="button" onClick={() => navigate(command.route)} style={{ textAlign: 'left', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 }}>{command.label}</button>)}
+            {commands.map((command) => <button key={command.label} type="button" onClick={() => navigate(command.route)} style={{ display: 'grid', gap: '4px', textAlign: 'left', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 }}><span>{command.label}</span><small style={{ color: theme.textMuted, fontWeight: 600 }}>{command.route}</small></button>)}
           </section>
         </div>
       </main>
