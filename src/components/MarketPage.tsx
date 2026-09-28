@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -22,8 +22,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   section: { display: 'grid', gap: '10px', marginTop: '16px' },
   sectionTitle: { margin: 0, fontSize: '0.96rem', fontWeight: 900 },
-  card: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
-  chart: { width: '100%', minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateRows: 'minmax(0, 1fr)', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
+  card: { ...createHybridCardStyles(theme).card, display: 'grid', gap: 0, overflow: 'hidden' },
+  chart: { width: '100%', minHeight: 'clamp(380px, 72vw, 600px)', display: 'grid', gridTemplateRows: 'minmax(0, 1fr)', gap: '12px', padding: '14px', borderRadius: 0, border: 0, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
   chartWave: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '16px', padding: '18px 12px 10px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
   chartVisual: { display: 'grid', gridTemplateRows: 'minmax(0, 1fr) auto', gap: '12px', minWidth: 0 },
   chartSvg: { display: 'block', width: '100%', height: '100%', minHeight: 0, overflow: 'visible' as const },
@@ -34,12 +34,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   chartFooter: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
   chartValue: { color: theme.text, fontWeight: 900 },
   note: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.45 },
-  movementGrid: { width: '100%', display: 'grid', gap: '8px', padding: '10px', boxSizing: 'border-box' as const },
-  movementInner: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, padding: '12px 13px', border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', background: theme.surfaceMuted, boxSizing: 'border-box' as const },
+  movementGrid: { width: '100%', display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px', padding: '2px 0 0', boxSizing: 'border-box' as const },
+  movementInner: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minWidth: 0, padding: '11px 13px', border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', background: theme.surfaceMuted, boxSizing: 'border-box' as const },
   movementSubject: { display: 'grid', gap: '3px', minWidth: 0 },
   movementLabel: { display: 'flex', alignItems: 'center', gap: '7px', margin: 0, fontSize: '0.82rem', fontWeight: 850 },
   movementValue: { margin: 0, fontSize: 'clamp(0.96rem, 2.5vw, 1.12rem)', fontWeight: 900, textAlign: 'right' as const, flexShrink: 0 },
-  pointsGrid: { width: '100%', display: 'grid', gap: '12px', padding: '14px', boxSizing: 'border-box' as const },
+  pointsGrid: { width: '100%', display: 'grid', gap: '12px', padding: '18px', borderTop: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const },
   metricLabel: { margin: 0, color: theme.textMuted, fontSize: '0.75rem' },
   buyForm: { display: 'grid', gap: '10px' },
   switcher: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', padding: '4px', borderRadius: '10px', background: theme.surfaceMuted },
@@ -112,8 +112,6 @@ const MarketPage = () => {
     };
   }, []);
 
-  const high = marketPoints.length ? Math.max(...marketPoints.map((point) => point.percent)) : 0;
-  const low = marketPoints.length ? Math.min(...marketPoints.map((point) => point.percent)) : 0;
   const formatUsdt = (amount: number) => `${amount.toFixed(2)} USDT`;
   const handleBuy = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -163,8 +161,7 @@ const MarketPage = () => {
 
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Buy and sell points</h2><div style={styles.card}><div style={styles.pointsGrid}>
+    <section style={styles.section}><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div><div style={styles.pointsGrid}>
       <form style={styles.buyForm} onSubmit={tradeMode === 'buy' ? handleBuy : handleSell}>
         <div style={styles.switcher} role="tablist" aria-label="Market points action">
           <button type="button" role="tab" aria-selected={tradeMode === 'buy'} style={{ ...styles.modeButton, ...(tradeMode === 'buy' ? styles.activeModeButton : {}) }} onClick={() => { setTradeMode('buy'); setBuyStatus(null); setSellStatus(null); }}>Buy</button>
@@ -175,10 +172,6 @@ const MarketPage = () => {
         <button type="submit" style={{ ...styles.buyButton, ...(buying || selling ? styles.disabledButton : {}) }} disabled={buying || selling}>{tradeMode === 'buy' ? (buying ? 'Buying…' : 'Buy points') : (selling ? 'Selling…' : 'Sell points')}</button>
       </form>
       {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : <p style={styles.status}>Point value is persistent. Daily movement is limited to +3% or -3% from the UTC opening value.</p>}
-    </div></div></section>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(2)}%` : <LoadingDots />}</p></div>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(2)}%` : <LoadingDots />}</p></div>
     </div></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
