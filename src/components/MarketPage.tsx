@@ -56,7 +56,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof HYBRID_THEME_TOKENS.dark }) => {
   const current = points[points.length - 1]?.percent ?? 0;
   const currentValue = points[points.length - 1]?.value ?? 1;
-  const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, value: Number(currentValue.toFixed(3)), percent: current }, ...points];
+  const chartPoints = points.length > 1 ? points : [{ timestamp: Date.now() - UPDATE_INTERVAL_MS, value: Number(currentValue.toFixed(4)), percent: current }, ...points];
   const linePath = chartPoints.map((point, index) => {
     const x = (index / Math.max(1, chartPoints.length - 1)) * 620;
     const y = 188 - ((point.percent + MAX_MARKET_PERCENT) / (MAX_MARKET_PERCENT * 2)) * 122;
@@ -65,7 +65,7 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   const areaPath = `${linePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(3)} USDT per point, ${current.toFixed(4)} percent today`} style={styles.chartWave}>
+  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(4)} USDT per point, ${current.toFixed(4)} percent today`} style={styles.chartWave}>
     <div style={styles.chartVisual}>{points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
       <defs><linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.35" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient></defs>
       <line x1="0" x2="620" y1="188" y2="188" stroke={theme.borderGlass} strokeWidth="1" />
@@ -75,7 +75,7 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
     </svg> : <LoadingDots />}
       <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(4)}%` : <LoadingDots />}</span></p>
     </div>
-    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(3)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(4)}% today` : 'Loading…'}</p></div>
+    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(4)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(4)}% today` : 'Loading…'}</p></div>
   </div>;
 };
 
@@ -114,7 +114,7 @@ const MarketPage = () => {
 
   const high = marketPoints.length ? Math.max(...marketPoints.map((point) => point.percent)) : 0;
   const low = marketPoints.length ? Math.min(...marketPoints.map((point) => point.percent)) : 0;
-  const formatUsdt = (amount: number) => `${amount.toFixed(2)} USDT`;
+  const formatUsdt = (amount: number) => `${amount.toFixed(4)} USDT`;
   const handleBuy = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const pointsAmount = Number(points);
@@ -152,7 +152,7 @@ const MarketPage = () => {
     try {
       const response = await api.post<{ value: number }>('/api/market/points/sell', { points: pointsAmount });
       setPoints('');
-      setSellStatus({ tone: 'success', message: `${pointsAmount.toFixed(2)} points sold for ${formatUsdt(response.data.value)}.` });
+      setSellStatus({ tone: 'success', message: `${pointsAmount.toFixed(4)} points sold for ${formatUsdt(response.data.value)}.` });
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setSellStatus({ tone: 'error', message: message || 'Unable to sell points right now.' });
