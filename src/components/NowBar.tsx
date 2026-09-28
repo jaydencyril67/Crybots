@@ -174,7 +174,7 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
-    width: 'calc(100% + 4px)',
+    width: 'calc(100% + 12px)',
     minHeight: '40px',
     padding: '7px 6px 6px',
     borderRadius: '18px',
@@ -205,12 +205,12 @@ const styles = {
   },
   labelExpanded: {
     minWidth: 0,
-    fontSize: '0.92rem',
+    fontSize: '0.58rem',
     fontWeight: 700,
-    letterSpacing: '0.01em',
+    letterSpacing: '0.04em',
     textAlign: 'center' as const,
     whiteSpace: 'nowrap' as const,
-    lineHeight: 1.1,
+    lineHeight: 1,
     overflow: 'hidden' as const,
   },
   marqueeViewport: {
