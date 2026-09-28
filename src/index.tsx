@@ -42,9 +42,9 @@ import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import CommunityStandardsPage from './components/CommunityStandardsPage';
 import InformationPage from './components/InformationPage';
 import DevPage from './components/DevPage';
-import DevApiKeysPage from './components/DevApiKeysPage';
-import DevWebhooksPage from './components/DevWebhooksPage';
-import DevConfigurePage from './components/DevConfigurePage';
+import ApiKeysPage from './components/ApiKeysPage';
+import WebhooksPage from './components/WebhooksPage';
+import ConfigurePage from './components/ConfigurePage';
 import AssetPage from './components/AssetPage';
 import DangerPage from './components/DangerPage';
 import PendingDeletionPage from './components/PendingDeletionPage';
@@ -121,9 +121,9 @@ const getRouteKey = () => {
   if (pathname === '/information' || hash === '#/information') return 'information';
   if (pathname === '/privacy-policy' || hash === '#/privacy-policy') return 'privacy-policy';
   if (pathname === '/community-standards' || hash === '#/community-standards') return 'community-standards';
-  if (pathname === '/dev/api-keys' || hash === '#/dev/api-keys') return 'dev-api-keys';
-  if (pathname === '/dev/webhooks' || hash === '#/dev/webhooks') return 'dev-webhooks';
-  if (pathname === '/dev/configure' || hash === '#/dev/configure') return 'dev-configure';
+  if (pathname === '/api-keys' || hash === '#/api-keys') return 'api-keys';
+  if (pathname === '/webhooks' || hash === '#/webhooks') return 'webhooks';
+  if (pathname === '/configure' || hash === '#/configure') return 'configure';
   if (pathname === '/dev' || hash === '#/dev') return 'dev';
   if (pathname === '/asset' || hash === '#/asset') return 'asset';
   if (pathname === '/danger' || hash === '#/danger') return 'danger';
@@ -177,9 +177,9 @@ const routeToKey = (path: string) => {
   if (path === '/information' || path === '#/information') return 'information';
   if (path === '/privacy-policy' || path === '#/privacy-policy') return 'privacy-policy';
   if (path === '/community-standards' || path === '#/community-standards') return 'community-standards';
-  if (path === '/dev/api-keys' || path === '#/dev/api-keys') return 'dev-api-keys';
-  if (path === '/dev/webhooks' || path === '#/dev/webhooks') return 'dev-webhooks';
-  if (path === '/dev/configure' || path === '#/dev/configure') return 'dev-configure';
+  if (path === '/api-keys' || path === '#/api-keys') return 'api-keys';
+  if (path === '/webhooks' || path === '#/webhooks') return 'webhooks';
+  if (path === '/configure' || path === '#/configure') return 'configure';
   if (path === '/dev' || path === '#/dev') return 'dev';
   if (path === '/asset' || path === '#/asset') return 'asset';
   if (path === '/danger' || path === '#/danger') return 'danger';
@@ -464,9 +464,9 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'information') return <ProtectedRoute><InformationPage /></ProtectedRoute>;
     if (displayedRouteKey === 'privacy-policy') return <ProtectedRoute><PrivacyPolicyPage /></ProtectedRoute>;
     if (displayedRouteKey === 'community-standards') return <ProtectedRoute><CommunityStandardsPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'dev-api-keys') return <ProtectedRoute><DevApiKeysPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'dev-webhooks') return <ProtectedRoute><DevWebhooksPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'dev-configure') return <ProtectedRoute><DevConfigurePage /></ProtectedRoute>;
+    if (displayedRouteKey === 'api-keys') return <ProtectedRoute><ApiKeysPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'webhooks') return <ProtectedRoute><WebhooksPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'configure') return <ProtectedRoute><ConfigurePage /></ProtectedRoute>;
     if (displayedRouteKey === 'dev') return <ProtectedRoute><DevPage /></ProtectedRoute>;
     if (displayedRouteKey === 'asset') return <ProtectedRoute><AssetPage /></ProtectedRoute>;
     if (displayedRouteKey === 'danger') return <ProtectedRoute><DangerPage /></ProtectedRoute>;
@@ -481,15 +481,15 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'alert-settings') return <ProtectedRoute><AlertSettingsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'app-usage') return <ProtectedRoute><AppUsagePage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'dev', 'dev-api-keys', 'dev-webhooks', 'dev-configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'dev-api-keys' || displayedRouteKey === 'dev-webhooks' || displayedRouteKey === 'dev-configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'dev-api-keys', 'dev-webhooks', 'dev-configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
+  const showNowBar = displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme-settings' || displayedRouteKey === 'nowbar-settings' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'api-keys' || displayedRouteKey === 'webhooks' || displayedRouteKey === 'configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert-settings' || displayedRouteKey === 'app-usage';
+  const isProtectedPage = ['home', 'details', 'manage', 'theme-settings', 'nowbar-settings', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert-settings', 'app-usage'].includes(displayedRouteKey);
   const usagePagePath = displayedRouteKey === 'exit' ? '/exit' : displayedRouteKey === 'statistics' ? '/statistics' : displayedRouteKey === 'tools' ? '/tools' : displayedRouteKey === 'stats' ? '/stats' : displayedRouteKey === 'menu' ? '/menu' : displayedRouteKey === 'nowbar-settings' ? '/nowbar-settings' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   const trackedUsagePage = useRef('');

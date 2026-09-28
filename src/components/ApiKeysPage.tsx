@@ -12,7 +12,7 @@ import { navigate } from '../utils/navigate';
 type ApiKey = { id: string; name: string; prefix: string; scopes: string[]; expiresAt?: string; revokedAt?: string; createdAt: string };
 const scopes = ['read', 'trade', 'transfers'];
 
-const DevApiKeysPage = () => {
+const ApiKeysPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -70,4 +70,4 @@ const DevApiKeysPage = () => {
     <section style={{ ...rowList, marginTop: 18 }}><div style={row}><h3 style={{ margin: 0 }}>Your keys</h3></div>{loading ? <div style={{ ...row, textAlign: 'center' }}><LoadingDots /></div> : !keys.length ? <div style={{ ...row, color: theme.textMuted }}>No API keys yet.</div> : keys.map((key) => <article key={key.id} style={row}><strong>{key.name}</strong><p style={{ margin: '6px 0', color: theme.textMuted }}>{key.prefix}… · {key.scopes.join(', ')} · {key.revokedAt ? 'Revoked' : 'Active'}</p>{!key.revokedAt && <button type="button" onClick={() => void revokeKey(key.id)} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Revoke</button>}</article>)}</section>
   </div><NowBar /></main></HybridTheme>;
 };
-export default DevApiKeysPage;
+export default ApiKeysPage;
