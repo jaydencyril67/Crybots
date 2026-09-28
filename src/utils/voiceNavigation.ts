@@ -18,6 +18,8 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'DETAILS', route: '/details' },
   { label: 'MANAGE', route: '/manage' },
   { label: 'THEME', route: '/theme' },
+  { label: 'EDGE LIGHTING', route: '/nowbar-color' },
+  { label: 'BUTTON COLOR', route: '/nowbar-button-color' },
   { label: 'NOWBAR', route: '/nowbar' },
   { label: 'COMMANDS', route: '/voice-commands' },
   { label: 'NOWBAR COLOR', route: '/nowbar-color' },
@@ -84,6 +86,7 @@ export const AUTHENTICATED_NOWBAR_PAGE_ROUTES = PAGE_ROUTES.filter(({ route }) =
 
 export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'COMMAND', route: '/voice-commands' },
+  { label: 'COMMANDS', route: '/voice-commands' },
   { label: 'HOME', route: '/home' },
   { label: 'PROFILE', route: '/profile' },
   { label: 'DETAILS', route: '/details' },
@@ -106,6 +109,7 @@ export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'CONTROL CENTER', route: '/control-center' },
   { label: 'DEPOSIT', route: '/deposit' },
   { label: 'WITHDRAW', route: '/withdrawals' },
+  { label: 'WITHDRAWALS', route: '/withdrawals' },
   { label: 'TRANSFER', route: '/transfer' },
   { label: 'SECURITY', route: '/security' },
   { label: 'TRANSACTIONS', route: '/transactions' },
