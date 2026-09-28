@@ -59,7 +59,6 @@ import AppUsagePage from './components/AppUsagePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppHeader from './components/AppHeader';
-import AppSplashOverlay from './components/AppSplashOverlay';
 import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { forceLogout } from './api/axios';
 import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
@@ -83,7 +82,11 @@ const getHash = () => window.location.hash;
 
 const InitialSplashCleanup = () => {
   useEffect(() => {
-    document.getElementById('initial-splash')?.remove();
+    const timer = window.setTimeout(() => {
+      document.getElementById('initial-splash')?.remove();
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   return null;
@@ -540,7 +543,6 @@ root.render(
       <AppThemeProvider>
         <InitialSplashCleanup />
         <VoiceNavigation />
-        <AppSplashOverlay />
         <RouteTransition />
       </AppThemeProvider>
     </HelmetProvider>
