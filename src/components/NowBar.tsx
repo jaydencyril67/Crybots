@@ -175,7 +175,7 @@ const styles = {
   },
   buttonExpanded: {
     width: '100%',
-    minHeight: '54px',
+    minHeight: '40px',
     padding: '9px 10px 8px',
     borderRadius: '12px',
     flexDirection: 'column' as const,
