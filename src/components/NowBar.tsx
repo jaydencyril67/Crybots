@@ -125,7 +125,7 @@ const styles = {
     display: 'grid',
     width: 'fit-content',
     maxWidth: '100%',
-    gridTemplateColumns: 'repeat(3, max-content)',
+    gridTemplateColumns: 'repeat(4, minmax(112px, max-content))',
     gridAutoRows: 'minmax(54px, auto)',
     alignItems: 'stretch',
     alignSelf: 'flex-end',
@@ -177,7 +177,8 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
-    width: 'max-content',
+    width: '100%',
+    minWidth: '112px',
     maxWidth: '100%',
     minHeight: '40px',
     padding: '9px 10px 8px',
