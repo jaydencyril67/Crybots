@@ -59,7 +59,6 @@ import AppUsagePage from './components/AppUsagePage';
 import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppHeader from './components/AppHeader';
-import AppSplashOverlay from './components/AppSplashOverlay';
 import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { forceLogout } from './api/axios';
 import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
@@ -540,7 +539,6 @@ root.render(
       <AppThemeProvider>
         <InitialSplashCleanup />
         <VoiceNavigation />
-        <AppSplashOverlay />
         <RouteTransition />
       </AppThemeProvider>
     </HelmetProvider>
