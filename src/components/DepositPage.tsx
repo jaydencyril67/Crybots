@@ -104,6 +104,7 @@ const DepositPage = () => {
   }, [theme]);
 
   type DepositPayment = { id?: string; paymentId?: string; status?: string; paymentStatus?: string; amount?: number; priceAmount?: number; currency?: string; priceCurrency?: string; payCurrency?: string; payAmount?: number; payAddress?: string; createdAt?: string; };
+  type FixedDepositAddress = { address: string; asset: string; network: string; status: string };
   type DepositHistoryRecord = { id?: string; type?: string; status?: string; amountValue?: number; amount?: string; currency?: string; date?: string; time?: string; reference?: string; };
 
   const normalizeDeposit = (deposit: DepositPayment): DepositPayment => ({
@@ -114,6 +115,9 @@ const DepositPage = () => {
   });
   const [amount, setAmount] = useState('');
   const [network, setNetwork] = useState('usdttrc20');
+  const [depositMethod, setDepositMethod] = useState<'fixed' | 'now'>('fixed');
+  const [fixedAddress, setFixedAddress] = useState<FixedDepositAddress | null>(null);
+  const [fixedAddressLoading, setFixedAddressLoading] = useState(true);
   const [isNetworkMenuOpen, setIsNetworkMenuOpen] = useState(false);
   const networkMenuRef = useRef<HTMLDivElement | null>(null);
   const [payment, setPayment] = useState<DepositPayment | null>(null);
@@ -131,6 +135,21 @@ const DepositPage = () => {
     };
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  useEffect(() => {
+    const loadFixedAddress = async () => {
+      try {
+        const response = await api.get<{ address?: FixedDepositAddress | null }>('/api/deposits/fixed-address');
+        setFixedAddress(response.data.address || null);
+      } catch {
+        setFixedAddress(null);
+      } finally {
+        setFixedAddressLoading(false);
+      }
+    };
+
+    void loadFixedAddress();
   }, []);
 
   useEffect(() => {
@@ -247,7 +266,25 @@ const DepositPage = () => {
     }
   };
 
-  const cryptoContent = payment ? (
+  const copyFixedAddress = async () => {
+    if (!fixedAddress?.address) return;
+    await navigator.clipboard.writeText(fixedAddress.address);
+    setCopied(true);
+  };
+
+  const fixedAddressContent = (
+    <div style={styles.mutedCard}>
+      <strong>Fixed USDT deposit address</strong>
+      <p style={{ margin: '8px 0 0' }}>Send USDT only on the TRON (TRC-20) network to this address. Your balance is credited after the network deposit is confirmed.</p>
+      {fixedAddressLoading ? <div style={{ padding: '12px 0' }}><LoadingDots /></div> : fixedAddress ? <>
+        <p style={styles.address}>{fixedAddress.address}</p>
+        <p style={{ margin: '8px 0', fontWeight: 700 }}>{fixedAddress.asset} · {fixedAddress.network}</p>
+        <button type="button" style={styles.secondaryButton} onClick={copyFixedAddress}>{copied ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy address</>}</button>
+      </> : <p style={{ margin: '8px 0 0' }}>A fixed deposit address is not available yet. Please use the one-time payment option or contact support.</p>}
+    </div>
+  );
+
+  const cryptoContent = depositMethod === 'fixed' ? fixedAddressContent : payment ? (
     <div style={styles.mutedCard}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
         <strong>Send USDT to this address</strong>
@@ -302,6 +339,10 @@ const DepositPage = () => {
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'completed' ? <NotificationBanner tone="success" title="Deposit confirmed" message="Your USDT deposit has been confirmed and your balance will reflect it shortly." /> : null}
           {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'pending' ? <NotificationBanner tone="info" title="Deposit awaiting confirmation" message="Send the requested amount to the address above. We will update this page when the network confirms it." /> : null}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <button type="button" style={{ ...styles.secondaryButton, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Fixed address</button>
+            <button type="button" style={{ ...styles.secondaryButton, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
+          </div>
           {cryptoContent}
           <div style={styles.mutedCard}>
             <strong>Recent deposits</strong>
