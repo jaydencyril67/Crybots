@@ -438,7 +438,7 @@ const SigninPage = () => {
       return;
     }
 
-    navigate('/dashboard');
+    navigate('/home');
   };
 
   const canContinue = useMemo(() => form.email.trim().length > 0, [form.email]);
@@ -507,7 +507,7 @@ const SigninPage = () => {
     if (window.history.length > 1) {
       window.history.back();
     } else {
-      navigate('/dashboard');
+      navigate('/home');
     }
   };
 
@@ -540,7 +540,7 @@ const SigninPage = () => {
           notifyAuthChanged();
         }
         if (response.data?.user) localStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate('/dashboard');
+        navigate('/home');
       } catch (error) {
         const response = (error as { response?: { data?: { message?: string } } })?.response;
         setSubmitError(response?.data?.message || (error as Error)?.message || 'Unable to authenticate with your passkey.');
@@ -604,7 +604,7 @@ const SigninPage = () => {
         }
       }
 
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
       const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
@@ -652,7 +652,7 @@ const SigninPage = () => {
         }
       }
 
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
       const message = response?.data?.message || 'Unable to verify code right now. Please try again.';

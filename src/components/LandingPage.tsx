@@ -452,9 +452,9 @@ const LandingPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
 
-  const handleDashboardClick = () => {
+  const handleHomeClick = () => {
     const token = window.localStorage.getItem('token') || '';
-    navigate(token && isTokenValid(token) ? '/dashboard' : '/signin');
+    navigate(token && isTokenValid(token) ? '/home' : '/signin');
   };
 
   const handleGetStartedClick = () => {
@@ -499,8 +499,8 @@ const LandingPage = () => {
                 <button type="button" onClick={handleGetStartedClick} style={{ ...styles.buttonPrimary, cursor: 'pointer' }}>
                   Get started
                 </button>
-                <button type="button" onClick={handleDashboardClick} style={{ ...styles.buttonSecondary, cursor: 'pointer' }}>
-                  Dashboard
+                <button type="button" onClick={handleHomeClick} style={{ ...styles.buttonSecondary, cursor: 'pointer' }}>
+                  Home
                 </button>
               </div>
 

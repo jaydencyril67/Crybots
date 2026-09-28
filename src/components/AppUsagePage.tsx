@@ -11,7 +11,7 @@ import { navigate } from '../utils/navigate';
 type UsageResponse = { usage?: Record<string, number> };
 
 const pageLabels: Record<string, string> = {
-  '/dashboard': 'Dashboard',
+  '/home': 'Home',
   '/details': 'Details',
   '/manage': 'Manage account',
   '/theme-settings': 'Theme settings',
