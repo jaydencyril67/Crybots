@@ -8,6 +8,19 @@
       /* Prevent mobile browsers from showing a tap highlight on interactions. */
       * {
         -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      input,
+      textarea,
+      select,
+      [contenteditable='true'],
+      [contenteditable=''] {
+        -webkit-touch-callout: default;
+        -webkit-user-select: text;
+        user-select: text;
       }
 
       html {
@@ -109,6 +122,14 @@
       })();
 
       window.__kingshallRefreshSplash = performance.getEntriesByType('navigation')[0]?.type === 'reload';
+
+      document.addEventListener('contextmenu', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        if (target.closest('input, textarea, select, [contenteditable="true"], [contenteditable=""]')) return;
+        event.preventDefault();
+      });
     </script>
 
     <!-- 🔥 SEO & Branding Meta -->
