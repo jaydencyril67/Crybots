@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeftRight, BarChart3, BookOpen, CalendarClock, ChevronDown, CircleUserRound, Code2, Home, Info, LifeBuoy, LogOut, Bot, Settings2, WalletCards } from 'lucide-react';
+import { CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, HandCoins, History, Home, Info, LogOut, SlidersHorizontal, Store, Terminal, UserRound } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { PAGE_ROUTES } from '../utils/voiceNavigation';
 
@@ -159,22 +159,25 @@ const styles = {
   },
   button: {
     width: '100%',
-    minHeight: '44px',
-    padding: '10px',
+    minHeight: '58px',
+    padding: '7px 6px 6px',
     border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '12px',
     background: 'linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(8,14,26,0.92) 100%)',
     color: '#e5eefc',
     cursor: 'pointer',
     display: 'inline-flex',
+    flexDirection: 'column' as const,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: '4px',
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
     minHeight: '48px',
     padding: '10px 12px',
     borderRadius: '18px',
+    flexDirection: 'row' as const,
     justifyContent: 'flex-start',
     gap: '10px',
   },
@@ -187,6 +190,16 @@ const styles = {
     height: '20px',
     display: 'grid',
     placeItems: 'center',
+  },
+  labelCompact: {
+    maxWidth: '100%',
+    fontSize: '0.58rem',
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    lineHeight: 1,
+    overflow: 'hidden' as const,
+    textOverflow: 'ellipsis' as const,
+    whiteSpace: 'nowrap' as const,
   },
   labelExpanded: {
     minWidth: 0,
@@ -344,7 +357,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'PROFILE',
-    icon: <BarChart3 size={18} />,
+    icon: <UserRound size={18} />,
     onClick: () => {
       navigate('/profile');
     },
@@ -352,7 +365,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'AGENT',
-    icon: <Bot size={18} />,
+    icon: <HandCoins size={18} />,
     onClick: () => {
       navigate('/agent');
     },
@@ -360,7 +373,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'TRADE',
-    icon: <ArrowLeftRight size={18} />,
+    icon: <CandlestickChart size={18} />,
     onClick: () => {
       navigate('/trade');
     },
@@ -368,7 +381,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'LOGS',
-    icon: <CalendarClock size={18} />,
+    icon: <History size={18} />,
     onClick: () => {
       navigate('/logs');
     },
@@ -376,7 +389,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'ASSETS',
-    icon: <WalletCards size={18} />,
+    icon: <Coins size={18} />,
     onClick: () => {
       navigate('/asset');
     },
@@ -384,7 +397,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'HELP',
-    icon: <LifeBuoy size={18} />,
+    icon: <CircleHelp size={18} />,
     onClick: () => {
       navigate('/help');
     },
@@ -392,7 +405,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'OPTION',
-    icon: <Settings2 size={18} />,
+    icon: <SlidersHorizontal size={18} />,
     onClick: () => {
       navigate('/options');
     },
@@ -400,7 +413,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'STORE',
-    icon: <BookOpen size={18} />,
+    icon: <Store size={18} />,
     onClick: () => {
       navigate('/store');
     },
@@ -416,7 +429,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
   {
     label: 'DEV',
-    icon: <Code2 size={18} />,
+    icon: <Terminal size={18} />,
     onClick: () => {
       navigate('/dev');
     },
@@ -674,6 +687,7 @@ const NowBar = ({ actions }: NowBarProps) => {
                 }}
               >
                 <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
+                {!isExpanded && <span style={styles.labelCompact}>{action.label.toUpperCase()}</span>}
                 {isExpanded ? (
                   action.label.length > 12 ? (
                     <span style={{ ...styles.labelExpanded, ...styles.marqueeViewport }}>
