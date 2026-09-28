@@ -10,10 +10,16 @@ import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
 const UPDATE_INTERVAL_MS = 60_000;
+const PERCENT_PRECISION = 1_000_000;
 
 type MarketPoint = { timestamp: number; value: number; percent: number };
 
 type MarketNotification = { tone: NotificationTone; message: string };
+
+const formatPercent = (value: number, includeSign = true) => {
+  const truncatedValue = Math.trunc(value * PERCENT_PRECISION) / PERCENT_PRECISION;
+  return `${includeSign && truncatedValue >= 0 ? '+' : ''}${truncatedValue.toFixed(6)}%`;
+};
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
@@ -74,7 +80,7 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
   const areaPath = `${linePath} L 620 230 L 0 230 Z`;
   const styles = getStyles(theme);
 
-  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(6)} USDT per point, ${current.toFixed(6)} percent today`} style={styles.chartWave}>
+  return <div role="img" aria-label={`Market value: ${currentValue.toFixed(6)} USDT per point, ${formatPercent(current, false).replace('%', '')} percent today`} style={styles.chartWave}>
     <div style={styles.chartVisual}>{points.length ? <svg viewBox="0 0 620 240" preserveAspectRatio="none" aria-hidden="true" style={styles.chartSvg}>
       <defs>
         <linearGradient id="market-wave-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor={theme.primary} stopOpacity="0.38" /><stop offset="100%" stopColor={theme.primary} stopOpacity="0" /></linearGradient>
@@ -89,9 +95,9 @@ const MarketChart = ({ points, theme }: { points: MarketPoint[]; theme: typeof H
       <circle cx={620} cy={yForPercent(current)} r="13" fill="none" stroke={theme.primary} strokeWidth="2" opacity="0.35"><animate attributeName="r" values="8;18;8" dur="2.2s" repeatCount="indefinite" /><animate attributeName="opacity" values="0.55;0;0.55" dur="2.2s" repeatCount="indefinite" /></circle>
       <circle cx={620} cy={yForPercent(current)} r="7" fill={theme.primary} stroke={theme.surfaceMuted} strokeWidth="4"><animate attributeName="r" values="6.5;8;6.5" dur="1.6s" repeatCount="indefinite" /></circle>
     </svg> : <LoadingDots />}
-      <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? `${current.toFixed(6)}%` : <LoadingDots />}</span></p>
+      <p style={styles.chartFooter}><span>Live market · updates every minute</span><span style={styles.chartValue}>{points.length ? formatPercent(current) : <LoadingDots />}</span></p>
     </div>
-    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(6)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${current >= 0 ? '+' : ''}${current.toFixed(6)}% today` : 'Loading…'}</p></div>
+    <div style={styles.pricePanel}><p style={styles.priceLabel}>Point value</p><p style={styles.priceValue}>{points.length ? `${currentValue.toFixed(6)} USDT` : <LoadingDots />}</p><p style={{ ...styles.priceChange, color: current >= 0 ? theme.primary : theme.danger }}>{points.length ? `${formatPercent(current)} today` : 'Loading…'}</p></div>
   </div>;
 };
 
@@ -193,8 +199,8 @@ const MarketPage = () => {
       {buyStatus || sellStatus ? <NotificationBanner tone={(buyStatus || sellStatus)?.tone} title="Market points update" message={(buyStatus || sellStatus)?.message || ''} /> : null}
     </div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Market movement</h2><div style={styles.card}><div style={styles.movementGrid}>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? `${high.toFixed(6)}%` : <LoadingDots />}</p></div>
-      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p></div><p style={styles.movementValue}>{marketPoints.length ? `${low.toFixed(6)}%` : <LoadingDots />}</p></div>
+      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingUp size={17} /> Session high</p></div><p style={styles.movementValue}>{marketPoints.length ? formatPercent(high) : <LoadingDots />}</p></div>
+      <div style={styles.movementInner}><div style={styles.movementSubject}><p style={styles.movementLabel}><TrendingDown size={17} /> Session low</p></div><p style={styles.movementValue}>{marketPoints.length ? formatPercent(low) : <LoadingDots />}</p></div>
     </div></div></section>
   </div><NowBar /></div></HybridTheme>;
 };
