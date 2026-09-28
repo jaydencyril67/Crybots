@@ -328,7 +328,7 @@ const getCurrentPageTitle = (path: string) => {
 
 const createDefaultActions = (): NowBarAction[] => [
   {
-    label: 'Dashboard',
+    label: 'HOME',
     icon: <Home size={18} />,
     onClick: () => {
       navigate('/dashboard');
@@ -336,7 +336,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/dashboard',
   },
   {
-    label: 'Portfolio',
+    label: 'PROFILE',
     icon: <BarChart3 size={18} />,
     onClick: () => {
       navigate('/portfolio');
@@ -352,7 +352,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/agent',
   },
   {
-    label: 'EXCHANGE',
+    label: 'TRADE',
     icon: <ArrowLeftRight size={18} />,
     onClick: () => {
       navigate('/exchange');
@@ -360,7 +360,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/exchange',
   },
   {
-    label: 'RECORDS',
+    label: 'LOGS',
     icon: <CalendarClock size={18} />,
     onClick: () => {
       navigate('/records');
@@ -368,7 +368,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/records',
   },
   {
-    label: 'Asset',
+    label: 'ASSETS',
     icon: <WalletCards size={18} />,
     onClick: () => {
       navigate('/asset');
@@ -376,7 +376,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/asset',
   },
   {
-    label: 'CONTACT',
+    label: 'HELP',
     icon: <LifeBuoy size={18} />,
     onClick: () => {
       navigate('/contact');
@@ -384,7 +384,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/contact',
   },
   {
-    label: 'OPTIONS',
+    label: 'OPTION',
     icon: <Settings2 size={18} />,
     onClick: () => {
       navigate('/options');
@@ -392,7 +392,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/options',
   },
   {
-    label: 'LIBRARY',
+    label: 'STORE',
     icon: <BookOpen size={18} />,
     onClick: () => {
       navigate('/library');
@@ -408,7 +408,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/about',
   },
   {
-    label: 'DEVELOPER',
+    label: 'DEV',
     icon: <Code2 size={18} />,
     onClick: () => {
       navigate('/developer');
@@ -416,7 +416,7 @@ const createDefaultActions = (): NowBarAction[] => [
     active: getActivePath() === '/developer',
   },
   {
-    label: 'LOGOUT',
+    label: 'EXIT',
     icon: <LogOut size={18} />,
     onClick: () => {
       navigate('/logout');
