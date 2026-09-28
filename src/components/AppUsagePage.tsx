@@ -28,7 +28,7 @@ const pageLabels: Record<string, string> = {
   '/my-space': 'My Space',
   '/market': 'Market',
   '/logs': 'Logs',
-  '/contact': 'Contact',
+  '/help': 'Help',
   '/options': 'Options',
   '/library': 'Library',
   '/about': 'About',

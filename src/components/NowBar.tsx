@@ -255,7 +255,7 @@ const parentRoutes = [
   '/trade',
   '/logs',
   '/asset',
-  '/contact',
+  '/help',
   '/options',
   '/library',
   '/about',
@@ -300,7 +300,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/my-space') return 'MY SPACE';
   if (path === '/market') return 'MARKET';
   if (path === '/logs') return 'LOGS';
-  if (path === '/contact') return 'HELP';
+  if (path === '/help') return 'HELP';
   if (path === '/faq') return 'FAQ';
   if (path === '/options') return 'OPTION';
   if (path === '/library') return 'STORE';
@@ -379,9 +379,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'HELP',
     icon: <LifeBuoy size={18} />,
     onClick: () => {
-      navigate('/contact');
+      navigate('/help');
     },
-    active: getActivePath() === '/contact',
+    active: getActivePath() === '/help',
   },
   {
     label: 'OPTION',
