@@ -27,7 +27,7 @@ const pageLabels: Record<string, string> = {
   '/trade': 'Trade',
   '/my-space': 'My Space',
   '/market': 'Market',
-  '/records': 'Records',
+  '/logs': 'Logs',
   '/contact': 'Contact',
   '/options': 'Options',
   '/library': 'Library',
@@ -133,7 +133,7 @@ const AppUsagePage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" onClick={() => navigate('/records')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Records</button>
+          <button type="button" onClick={() => navigate('/logs')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Logs</button>
           <div style={styles.content}>
             {error ? <NotificationBanner tone="error" title="App usage unavailable" message={error} /> : null}
             <div style={styles.rowList} aria-live="polite">

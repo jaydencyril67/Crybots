@@ -357,7 +357,7 @@ const TransactionHistoryPage = () => {
       <div style={styles.shell}>
         
         <div style={styles.content}>
-          <button type="button" style={styles.back} onClick={() => navigate('/records')}><ArrowLeft size={17} /> Records</button>
+          <button type="button" style={styles.back} onClick={() => navigate('/logs')}><ArrowLeft size={17} /> Logs</button>
           <div style={styles.rowList}>
             <section style={{ ...styles.card, position: 'relative', zIndex: 3, overflow: 'visible' }}>
                 <h2 style={styles.cardTitle}><Filter size={18} /> Filters</h2>

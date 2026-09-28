@@ -51,7 +51,7 @@ const faqSections: FAQSection[] = [
       { question: 'Are trade prices guaranteed?', answer: 'No. Digital-asset prices and displayed market data can move quickly. Review the current quote and confirmation details before submitting a trade.' },
       { question: 'What is shown in my portfolio?', answer: 'Portfolio shows your current balances and related value information. Market values are estimates based on available pricing and can change as markets move.' },
       { question: 'How do I send funds to another user?', answer: 'Open Transfer, enter the recipient details and amount, carefully review the destination, and complete the security checks. Transfers are different from blockchain withdrawals.' },
-      { question: 'Where can I find my transaction history?', answer: 'Open Transactions or Records to review account activity, including deposits, withdrawals, trades, and transfers with their current status.' },
+      { question: 'Where can I find my transaction history?', answer: 'Open Transactions or Logs to review account activity, including deposits, withdrawals, trades, and transfers with their current status.' },
     ],
   },
   {

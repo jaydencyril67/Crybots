@@ -253,7 +253,7 @@ const parentRoutes = [
   '/profile',
   '/agent',
   '/trade',
-  '/records',
+  '/logs',
   '/asset',
   '/contact',
   '/options',
@@ -299,7 +299,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/control-center') return 'CONTROL CENTER';
   if (path === '/my-space') return 'MY SPACE';
   if (path === '/market') return 'MARKET';
-  if (path === '/records') return 'LOGS';
+  if (path === '/logs') return 'LOGS';
   if (path === '/contact') return 'HELP';
   if (path === '/faq') return 'FAQ';
   if (path === '/options') return 'OPTION';
@@ -363,9 +363,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'LOGS',
     icon: <CalendarClock size={18} />,
     onClick: () => {
-      navigate('/records');
+      navigate('/logs');
     },
-    active: getActivePath() === '/records',
+    active: getActivePath() === '/logs',
   },
   {
     label: 'ASSETS',
