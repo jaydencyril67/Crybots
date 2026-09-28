@@ -69,7 +69,8 @@ const AUTHENTICATED_ROUTES = new Set([
   '/my-space', '/market', '/control-center', '/logs', '/help', '/faq', '/options',
   '/store', '/about', '/dev', '/api-keys', '/webhooks', '/configure', '/asset',
   '/danger', '/security', '/withdrawals', '/transfer', '/deposit', '/transactions',
-  '/notifications', '/alert', '/app-usage',
+  '/notifications', '/alert', '/app-usage', '/information', '/privacy-policy',
+  '/community-standards',
 ]);
 
 // These are the authenticated routes represented by the NowBar.
