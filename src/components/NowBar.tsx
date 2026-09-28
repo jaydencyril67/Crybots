@@ -97,7 +97,7 @@ const styles = {
   },
   dockExpanded: {
     width: 'min(560px, calc(100vw - 16px))',
-    height: 'calc(3 * 72px)',
+    height: 'calc(2.5 * 72px)',
     boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 0 24px var(--edge-light), 0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)',
   },
   bar: {
@@ -174,6 +174,7 @@ const styles = {
     transition: 'transform 180ms ease, background 180ms ease, border-color 180ms ease',
   },
   buttonExpanded: {
+    width: 'calc(100% + 4px)',
     minHeight: '40px',
     padding: '7px 6px 6px',
     borderRadius: '18px',
