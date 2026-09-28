@@ -105,7 +105,10 @@ jobs:
               }
           '''
           text = text.replace('    buildTypes {', signing + '\n    buildTypes {', 1)
-          text = text.replace('        release {', '        release {\n            signingConfig signingConfigs.release', 1)
+          build_types_start = text.index('    buildTypes {')
+          release_start = text.index('        release {', build_types_start)
+          signing_line = '        release {\n            signingConfig signingConfigs.release'
+          text = text[:release_start] + text[release_start:].replace('        release {', signing_line, 1)
           path.write_text(text)
           PY
 
