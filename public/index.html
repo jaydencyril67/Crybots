@@ -9,6 +9,57 @@
       * {
         -webkit-tap-highlight-color: transparent;
       }
+
+      .initial-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e7e4de;
+        color: #151515;
+      }
+
+      html[data-theme='dark'] .initial-splash {
+        background: #000000;
+        color: #ffffff;
+      }
+
+      .initial-splash-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        text-align: center;
+      }
+
+      .initial-splash-logo {
+        width: 130px;
+        height: auto;
+        display: block;
+      }
+
+      .initial-splash-title {
+        margin: 0;
+        color: inherit;
+        font: 13px/1.4 sans-serif;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .initial-splash-shimmer {
+        width: 180px;
+        height: 3px;
+        border-radius: 999px;
+        background: currentColor;
+        animation: initial-splash-shimmer 1.4s ease-in-out infinite;
+      }
+
+      @keyframes initial-splash-shimmer {
+        0%, 100% { transform: scaleX(0.72); opacity: 0.45; }
+        50% { transform: scaleX(1); opacity: 1; }
+      }
     </style>
 
     <!-- Set theme before React loads to prevent flicker -->
@@ -63,19 +114,14 @@
     <!-- End TrustBox script -->
   </head>
   <body style="margin: 0; overflow-x: hidden;">
-    <script>
-      if (window.__kingshallRefreshSplash) {
-        document.documentElement.style.visibility = 'hidden';
-      }
-    </script>
-
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="initial-splash" class="initial-splash" aria-label="Loading KingsHall Exchange">
+      <div class="initial-splash-card">
+        <img class="initial-splash-logo" src="%PUBLIC_URL%/icons/ke-icon.svg" alt="KingsHall" />
+        <p class="initial-splash-title">KingsHall Exchange</p>
+        <div class="initial-splash-shimmer" aria-hidden="true"></div>
+      </div>
+    </div>
     <div id="root" style="min-height: 100vh;"></div>
-    <script>
-      if (window.__kingshallRefreshSplash) {
-        requestAnimationFrame(() => {
-          document.documentElement.style.visibility = 'visible';
-        });
-      }
-    </script>  </body>
+  </body>
 </html>

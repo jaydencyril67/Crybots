@@ -81,6 +81,14 @@ const root = ReactDOM.createRoot(container);
 const getPathname = () => window.location.pathname;
 const getHash = () => window.location.hash;
 
+const InitialSplashCleanup = () => {
+  useEffect(() => {
+    document.getElementById('initial-splash')?.remove();
+  }, []);
+
+  return null;
+};
+
 const getRouteKey = () => {
   const pathname = getPathname();
   const hash = getHash();
@@ -530,6 +538,7 @@ root.render(
   <React.StrictMode>
     <HelmetProvider>
       <AppThemeProvider>
+        <InitialSplashCleanup />
         <VoiceNavigation />
         <AppSplashOverlay />
         <RouteTransition />
