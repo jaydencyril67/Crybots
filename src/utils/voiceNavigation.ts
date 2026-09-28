@@ -18,6 +18,8 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'DETAILS', route: '/details' },
   { label: 'MANAGE', route: '/manage' },
   { label: 'THEME', route: '/theme' },
+  { label: 'EDGE LIGHTING', route: '/nowbar-color' },
+  { label: 'BUTTON COLOR', route: '/nowbar-button-color' },
   { label: 'NOWBAR', route: '/nowbar' },
   { label: 'COMMANDS', route: '/voice-commands' },
   { label: 'NOWBAR COLOR', route: '/nowbar-color' },
@@ -62,8 +64,29 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'APP USAGE', route: '/app-usage' },
 ];
 
+const AUTHENTICATED_ROUTES = new Set([
+  '/home', '/details', '/manage', '/theme', '/nowbar', '/voice-commands',
+  '/nowbar-color', '/nowbar-button-color', '/profile', '/exit', '/auto-exit',
+  '/manual-exit', '/statistics', '/agent', '/tools', '/stats', '/menu', '/trade',
+  '/my-space', '/market', '/control-center', '/logs', '/help', '/faq', '/options',
+  '/store', '/about', '/dev', '/api-keys', '/webhooks', '/configure', '/asset',
+  '/danger', '/security', '/withdrawals', '/transfer', '/deposit', '/transactions',
+  '/notifications', '/alert', '/app-usage', '/information', '/privacy-policy',
+  '/community-standards',
+]);
+
+// These are the authenticated routes represented by the NowBar.
+export const NOWBAR_ROUTES = new Set([
+  ...AUTHENTICATED_ROUTES,
+]);
+
+export const AUTHENTICATED_NOWBAR_PAGE_ROUTES = PAGE_ROUTES.filter(({ route }) =>
+  AUTHENTICATED_ROUTES.has(route) && NOWBAR_ROUTES.has(route),
+);
+
 export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'COMMAND', route: '/voice-commands' },
+  { label: 'COMMANDS', route: '/voice-commands' },
   { label: 'HOME', route: '/home' },
   { label: 'PROFILE', route: '/profile' },
   { label: 'DETAILS', route: '/details' },
@@ -86,6 +109,7 @@ export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'CONTROL CENTER', route: '/control-center' },
   { label: 'DEPOSIT', route: '/deposit' },
   { label: 'WITHDRAW', route: '/withdrawals' },
+  { label: 'WITHDRAWALS', route: '/withdrawals' },
   { label: 'TRANSFER', route: '/transfer' },
   { label: 'SECURITY', route: '/security' },
   { label: 'TRANSACTIONS', route: '/transactions' },
@@ -114,7 +138,7 @@ export const navigateFromVoice = (transcript: string) => {
     return true;
   }
 
-  const command = VOICE_COMMANDS.find(({ label }) => {
+  const command = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES].find(({ label }) => {
     const normalizedLabel = normalizeVoiceText(label);
     return normalized === normalizedLabel || normalized.includes(normalizedLabel);
   });

@@ -1,13 +1,13 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { navigate } from '../utils/navigate';
-import { PAGE_ROUTES } from '../utils/voiceNavigation';
+import { AUTHENTICATED_NOWBAR_PAGE_ROUTES } from '../utils/voiceNavigation';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 const VoiceCommandsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const commands = PAGE_ROUTES;
+  const commands = AUTHENTICATED_NOWBAR_PAGE_ROUTES;
   return (
     <HybridTheme mode={themeMode}>
       <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' }}>
