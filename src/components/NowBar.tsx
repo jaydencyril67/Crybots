@@ -205,12 +205,12 @@ const styles = {
   },
   labelExpanded: {
     minWidth: 0,
-    fontSize: '0.92rem',
+    fontSize: '0.58rem',
     fontWeight: 700,
-    letterSpacing: '0.01em',
+    letterSpacing: '0.04em',
     textAlign: 'center' as const,
     whiteSpace: 'nowrap' as const,
-    lineHeight: 1.1,
+    lineHeight: 1,
     overflow: 'hidden' as const,
   },
   marqueeViewport: {
