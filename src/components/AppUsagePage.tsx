@@ -30,7 +30,7 @@ const pageLabels: Record<string, string> = {
   '/logs': 'Logs',
   '/help': 'Help',
   '/options': 'Options',
-  '/library': 'Library',
+  '/store': 'Store',
   '/about': 'About',
   '/information': 'Information',
   '/privacy-policy': 'Privacy policy',

@@ -257,7 +257,7 @@ const parentRoutes = [
   '/asset',
   '/help',
   '/options',
-  '/library',
+  '/store',
   '/about',
   '/developer',
   '/logout',
@@ -303,7 +303,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/help') return 'HELP';
   if (path === '/faq') return 'FAQ';
   if (path === '/options') return 'OPTION';
-  if (path === '/library') return 'STORE';
+  if (path === '/store') return 'STORE';
   if (path === '/about') return 'ABOUT';
   if (path === '/developer') return 'DEV';
   if (path === '/developer/api-keys') return 'API KEYS';
@@ -395,9 +395,9 @@ const createDefaultActions = (): NowBarAction[] => [
     label: 'STORE',
     icon: <BookOpen size={18} />,
     onClick: () => {
-      navigate('/library');
+      navigate('/store');
     },
-    active: getActivePath() === '/library',
+    active: getActivePath() === '/store',
   },
   {
     label: 'ABOUT',
