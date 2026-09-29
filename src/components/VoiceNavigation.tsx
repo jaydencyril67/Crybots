@@ -18,7 +18,8 @@ type SpeechRecognitionLike = {
 };
 
 type NativeSpeechRecognition = {
-  start: (options: { language: string; maxResults: number; promptMessage: string }) => Promise<{ matches?: string[] }>;
+  available?: () => Promise<{ available: boolean }>;
+  start: (options: { language: string; maxResults: number; prompt: string; popup: boolean }) => Promise<{ matches?: string[] }>;
   stop?: () => Promise<void>;
 };
 
@@ -49,7 +50,7 @@ const VoiceNavigation = () => {
         if (nativeListening) return;
         nativeListening = true;
         setStatus(true);
-        void nativeRecognition.start({ language: 'en-US', maxResults: 3, promptMessage: 'Say a KingsHall page or say Kings for help.' })
+        void nativeRecognition.start({ language: 'en-US', maxResults: 3, prompt: 'Say a KingsHall page or say Kings for help.', popup: true })
           .then((result) => {
             const transcript = result.matches?.[0]?.trim();
             if (transcript) {
@@ -86,10 +87,25 @@ const VoiceNavigation = () => {
 
     function setup() {
       if (nativeRecognition && !nativeUnavailable) {
-        if (enabled) void requestVoiceMicrophoneAccess().then((granted) => {
-          if (granted) start();
-          else setStatus(false);
-        });
+        const useNativeRecognition = (available: boolean) => {
+          if (!available) {
+            nativeUnavailable = true;
+            nativeRecognition = null;
+            setup();
+            return;
+          }
+          if (enabled) void requestVoiceMicrophoneAccess().then((granted) => {
+            if (granted) start();
+            else setStatus(false);
+          });
+        };
+        if (nativeRecognition.available) {
+          void nativeRecognition.available()
+            .then(({ available }) => useNativeRecognition(available))
+            .catch(() => useNativeRecognition(false));
+        } else {
+          useNativeRecognition(true);
+        }
         return;
       }
       const speechWindow = window as SpeechWindow;
