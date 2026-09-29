@@ -64,9 +64,23 @@ jobs:
         env:
           REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL || 'https://kingshalls.onrender.com' }}
 
+      - name: Download offline Sherpa-ONNX model
+        run: |
+          set -euo pipefail
+          model_root="$RUNNER_TEMP/sherpa-model"
+          archive="$RUNNER_TEMP/sherpa-model.tar.bz2"
+          curl --fail --location --retry 3 "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17.tar.bz2" --output "$archive"
+          mkdir -p "$model_root"
+          tar -xjf "$archive" -C "$model_root"
+          model_dir="$(find "$model_root" -type f -name tokens.txt -printf '%h\\n' | head -n 1)"
+          test -n "$model_dir"
+          echo "SHERPA_ONNX_MODEL_DIR=$model_dir" >> "$GITHUB_ENV"
+
       - name: Create Android project and generate splash assets
         run: |
           npx cap add android
+          node scripts/install-sherpa-android.js
+          node scripts/prepare-sherpa-model.js
           node <<'NODE'
           const fs = require('fs');
           const file = 'android/app/src/main/AndroidManifest.xml';

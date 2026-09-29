@@ -133,7 +133,8 @@ export const getVoiceModeEnabled = () => {
 
 type CapacitorPlugin = {
   requestPermissions?: () => Promise<{ speechRecognition?: string }>;
-  start?: (options: { language: string; maxResults: number; promptMessage: string }) => Promise<{ matches?: string[] }>;
+  available?: () => Promise<{ available: boolean }>;
+  start?: (options: { language: string; maxResults: number; prompt: string; popup: boolean }) => Promise<{ matches?: string[] }>;
   stop?: () => Promise<void>;
   speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number }) => Promise<void>;
 };
