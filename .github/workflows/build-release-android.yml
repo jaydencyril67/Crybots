@@ -81,8 +81,8 @@ jobs:
           const permissions = ['android.permission.INTERNET', 'android.permission.RECORD_AUDIO', 'android.permission.MODIFY_AUDIO_SETTINGS'];
           const missing = permissions.filter(permission => !manifest.includes(permission));
           if (missing.length) {
-            const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\\n');
-            manifest = manifest.replace(/(<manifest[^>]*>\\n)/, `$1${lines}\\n`);
+            const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\n');
+            manifest = manifest.replace(/(<manifest[^>]*>\n)/, `$1${lines}\n`);
             fs.writeFileSync(file, manifest);
           }
           NODE
