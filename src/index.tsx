@@ -8,6 +8,7 @@ import SignupConfirmationSentPage from './components/SignupConfirmationSentPage'
 import AccountConfirmedPage from './components/AccountConfirmedPage';
 import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
+import AdminHomePage from './components/AdminHomePage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import HomePage from './components/HomePage';
 import DetailsPage from './components/DetailsPage';
@@ -102,6 +103,7 @@ const getRouteKey = () => {
   if (pathname === '/verify-email' || hash === '#/verify-email') return 'verify-email';
   if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'account-confirmed';
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
+  if (pathname === '/admin-home' || hash === '#/admin-home') return 'admin-home';
   if (pathname === '/forgot-password' || hash === '#/forgot-password') return 'forgot-password';
   if (pathname === '/home' || hash === '#/home') return 'home';
   if (pathname === '/details' || hash === '#/details') return 'details';
@@ -158,6 +160,7 @@ const routeToKey = (path: string) => {
   if (path === '/verify-email' || path === '#/verify-email') return 'verify-email';
   if (path === '/account-confirmed' || path === '#/account-confirmed') return 'account-confirmed';
   if (path === '/signin' || path === '#/signin') return 'signin';
+  if (path === '/admin-home' || path === '#/admin-home') return 'admin-home';
   if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
   if (path === '/home' || path === '#/home') return 'home';
   if (path === '/details' || path === '#/details') return 'details';
@@ -445,6 +448,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'verify-email') return <VerifyEmailPage />;
     if (displayedRouteKey === 'account-confirmed') return <AccountConfirmedPage />;
     if (displayedRouteKey === 'signin') return <SigninPage />;
+    if (displayedRouteKey === 'admin-home') return <AdminHomePage />;
     if (displayedRouteKey === 'forgot-password') return <ForgotPasswordPage />;
     if (displayedRouteKey === 'home') return <ProtectedRoute><HomePage /></ProtectedRoute>;
     if (displayedRouteKey === 'details') return <ProtectedRoute><DetailsPage /></ProtectedRoute>;

@@ -604,7 +604,7 @@ const SigninPage = () => {
         }
       }
 
-      navigate('/home');
+      navigate(response.data?.isAdmin ? '/admin-home' : '/home');
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
       const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
@@ -652,7 +652,7 @@ const SigninPage = () => {
         }
       }
 
-      navigate('/home');
+      navigate(response.data?.isAdmin ? '/admin-home' : '/home');
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
       const message = response?.data?.message || 'Unable to verify code right now. Please try again.';
