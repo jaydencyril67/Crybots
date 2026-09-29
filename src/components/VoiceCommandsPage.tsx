@@ -1,13 +1,18 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { navigate } from '../utils/navigate';
-import { AUTHENTICATED_NOWBAR_PAGE_ROUTES } from '../utils/voiceNavigation';
+import { AUTHENTICATED_NOWBAR_PAGE_ROUTES, NOWBAR_COMMAND_EVENT } from '../utils/voiceNavigation';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 const VoiceCommandsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const commands = AUTHENTICATED_NOWBAR_PAGE_ROUTES;
+  const commands = [
+    ...AUTHENTICATED_NOWBAR_PAGE_ROUTES.map((command) => ({ ...command, action: () => navigate(command.route) })),
+    { label: 'EXPAND', description: 'Expand the compact NowBar', action: () => window.dispatchEvent(new CustomEvent(NOWBAR_COMMAND_EVENT, { detail: { command: 'expand' } })) },
+    { label: 'SCROLL LEFT', description: 'Scroll the compact NowBar left', action: () => window.dispatchEvent(new CustomEvent(NOWBAR_COMMAND_EVENT, { detail: { command: 'left' } })) },
+    { label: 'SCROLL RIGHT', description: 'Scroll the compact NowBar right', action: () => window.dispatchEvent(new CustomEvent(NOWBAR_COMMAND_EVENT, { detail: { command: 'right' } })) },
+  ];
   return (
     <HybridTheme mode={themeMode}>
       <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' }}>
@@ -16,7 +21,7 @@ const VoiceCommandsPage = () => {
           <h1 style={{ margin: '20px 0 8px', fontSize: '1.15rem', fontWeight: 900 }}>Voice Commands</h1>
           <p style={{ margin: 0, color: theme.textMuted, lineHeight: 1.6 }}>Say any NowBar label to navigate. Say “Up” or “Down” to scroll the page. Say “Off” or “Of” to turn voice mode off. Say “Command” to open this page.</p>
           <section style={{ marginTop: '22px', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, display: 'grid', gap: '10px' }}>
-            {commands.map((command) => <button key={command.label} type="button" onClick={() => navigate(command.route)} style={{ display: 'grid', gap: '4px', textAlign: 'left', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 }}><span>{command.label}</span><small style={{ color: theme.textMuted, fontWeight: 600 }}>{command.route}</small></button>)}
+            {commands.map((command) => <button key={command.label} type="button" onClick={command.action} style={{ display: 'grid', gap: '4px', textAlign: 'left', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 }}><span>{command.label}</span><small style={{ color: theme.textMuted, fontWeight: 600 }}>{'route' in command ? command.route : command.description}</small></button>)}
           </section>
         </div>
       </main>
