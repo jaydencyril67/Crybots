@@ -143,7 +143,7 @@ const VOICE_PROMPTS = [
   'Where would you like to navigate today?',
   'What is your interest today?',
   'What is on your mind today?',
-  'Which part of KingsHall would you like to explore?',
+  'Which part of Kings Hall would you like to explore?',
   'How may I help with your navigation journey today?',
   'What would you like to discover next?',
   'Which page may I open for you?',
