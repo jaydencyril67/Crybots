@@ -138,6 +138,50 @@ export const disableVoiceMode = () => {
 
 export const normalizeVoiceText = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
+const VOICE_PROMPTS = [
+  'Where would you like to navigate today?',
+  'What is your interest today?',
+  'What is on your mind today?',
+  'Which part of KingsHall would you like to explore?',
+  'How may I help with your navigation journey today?',
+  'What would you like to discover next?',
+  'Which page may I open for you?',
+  'Where shall we go from here?',
+];
+
+const getVoiceTitle = () => {
+  if (typeof window === 'undefined') return 'friend';
+  try {
+    const user = JSON.parse(window.localStorage.getItem('user') || '{}') as { gender?: string };
+    const gender = user.gender?.toLowerCase();
+    if (gender === 'male' || gender === 'man' || gender === 'm') return 'Sir';
+    if (gender === 'female' || gender === 'woman' || gender === 'f') return 'Mrs';
+  } catch {
+    // Use a neutral form when the stored profile cannot be read.
+  }
+  return 'friend';
+};
+
+const getTimeGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+};
+
+export const isVoiceWakeWord = (transcript: string) => /(^|\s)kings?(?=\s|$)/i.test(transcript.trim());
+
+export const speakVoiceGreeting = () => {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  const lastPrompt = window.sessionStorage.getItem('kingshall_voice_prompt');
+  const availablePrompts = VOICE_PROMPTS.filter((prompt) => prompt !== lastPrompt);
+  const prompt = availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+  window.sessionStorage.setItem('kingshall_voice_prompt', prompt);
+  const message = `${getTimeGreeting()} ${getVoiceTitle()}. ${prompt} If you need help, kindly say Command and I will display the full page menu for you.`;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(new SpeechSynthesisUtterance(message));
+};
+
 type NowBarCommand = 'expand' | 'collapse' | 'left' | 'right';
 
 const dispatchNowBarCommand = (command: NowBarCommand) => {
@@ -146,6 +190,10 @@ const dispatchNowBarCommand = (command: NowBarCommand) => {
 
 export const navigateFromVoice = (transcript: string) => {
   const normalized = normalizeVoiceText(transcript);
+  if (isVoiceWakeWord(transcript)) {
+    speakVoiceGreeting();
+    return true;
+  }
   const normalizedTranscript = ` ${normalized} `;
 
   if (normalizedTranscript.includes(' off ') || normalizedTranscript.includes(' of ')) {
