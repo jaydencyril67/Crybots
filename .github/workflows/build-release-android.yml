@@ -106,8 +106,12 @@ jobs:
           if (missing.length) {
             const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\n');
             manifest = manifest.replace(/(<manifest[^>]*>\n)/, `$1${lines}\n`);
-            fs.writeFileSync(file, manifest);
           }
+          if (!manifest.includes('android.speech.RecognitionService')) {
+            const queries = '    <queries>\n        <intent>\n            <action android:name="android.speech.RecognitionService" />\n        </intent>\n    </queries>\n';
+            manifest = manifest.replace(/(<manifest[^>]*>\n)/, `$1${queries}`);
+          }
+          fs.writeFileSync(file, manifest);
           NODE
           npx capacitor-assets generate --android
           npx cap sync android
