@@ -464,6 +464,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   const edgeLightColor = edgeLight.color;
   const [view, setView] = useState<NowBarView>('title');
   const [mode, setMode] = useState<NowBarMode>('compact');
+  const modeRef = React.useRef<NowBarMode>('compact');
   const [holdTimer, setHoldTimer] = useState<number | null>(null);
   const [idleTimer, setIdleTimer] = useState<number | null>(null);
   const [pressing, setPressing] = useState(false);
@@ -475,6 +476,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
   const isExpanded = expandModeEnabled && mode === 'expanded';
+  modeRef.current = mode;
 
   useEffect(() => {
     if (!expandModeEnabled && mode === 'expanded') {
@@ -507,14 +509,8 @@ const NowBar = ({ actions }: NowBarProps) => {
 
       handleInteraction();
       if (command === 'expand') {
-        setView((currentView) => {
-          if (currentView === 'title') {
-            setMode('compact');
-            return 'actions';
-          }
-          setMode('expanded');
-          return currentView;
-        });
+        setMode('compact');
+        setView('actions');
       } else if (command === 'collapse') {
         setMode((currentMode) => {
           if (currentMode === 'expanded') return 'compact';
@@ -522,6 +518,14 @@ const NowBar = ({ actions }: NowBarProps) => {
           return currentMode;
         });
       } else if (command === 'left' || command === 'right') {
+        if (modeRef.current === 'compact') {
+          barRef.current?.scrollBy({
+            left: command === 'right' ? Math.round(barRef.current.clientWidth * 0.8) : -Math.round(barRef.current.clientWidth * 0.8),
+            behavior: 'smooth',
+          });
+          return;
+        }
+
         const path = getActivePath();
         const currentIndex = parentRoutes.indexOf(path);
         const childGroup = childNavigationGroups.find((group) => group.routes.includes(path));
