@@ -3,6 +3,7 @@ import { navigate } from './navigate';
 export const VOICE_MODE_STORAGE_KEY = 'nowbar_voice_navigation_enabled';
 export const VOICE_MODE_CHANGED_EVENT = 'nowbar-voice-mode-changed';
 export const VOICE_STATUS_EVENT = 'nowbar-voice-status-changed';
+export const NOWBAR_COMMAND_EVENT = 'nowbar-voice-command';
 
 export type VoiceCommand = { label: string; route: string };
 
@@ -137,6 +138,12 @@ export const disableVoiceMode = () => {
 
 export const normalizeVoiceText = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
+type NowBarCommand = 'expand' | 'collapse' | 'left' | 'right';
+
+const dispatchNowBarCommand = (command: NowBarCommand) => {
+  window.dispatchEvent(new CustomEvent(NOWBAR_COMMAND_EVENT, { detail: { command } }));
+};
+
 export const navigateFromVoice = (transcript: string) => {
   const normalized = normalizeVoiceText(transcript);
   const normalizedTranscript = ` ${normalized} `;
@@ -156,6 +163,13 @@ export const navigateFromVoice = (transcript: string) => {
   }
   if (normalizedTranscript.includes(' down ') || normalizedTranscript.includes(' scroll down ')) {
     window.scrollBy({ top: Math.round(window.innerHeight * 0.8), behavior: 'smooth' });
+    return true;
+  }
+  const nowBarCommand = (['expand', 'collapse', 'left', 'right'] as NowBarCommand[]).find((command) =>
+    normalizedTranscript.includes(` ${command} `),
+  );
+  if (nowBarCommand) {
+    dispatchNowBarCommand(nowBarCommand);
     return true;
   }
   const commandsBySpecificity = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES]
