@@ -78,7 +78,8 @@ jobs:
             /<svg[^>]*>/,
             '<svg width="400" height="400" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">',
           );
-          const splash = `<svg width="2732" height="2732" viewBox="0 0 2732 2732" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#111827"/><g transform="translate(1366 1366) scale(0.55) translate(-256 -256)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
+          const crown = logo.replace(/<rect[^>]*\/>/, '');
+          const splash = `<svg width="2732" height="2732" viewBox="0 0 2732 2732" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#000000"/><circle cx="1366" cy="1366" r="185" fill="#111827"/><g transform="translate(1366 1366) scale(0.64) translate(-256 -256)">${crown.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
           fs.writeFileSync('assets/splash.svg', splash);
           fs.writeFileSync('assets/crown.svg', logo);
           sharp('public/icons/ke-icon.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-only.png')
