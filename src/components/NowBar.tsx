@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, SlidersHorizontal, Store, Terminal, UserRound } from 'lucide-react';
 import { navigate } from '../utils/navigate';
-import { PAGE_ROUTES } from '../utils/voiceNavigation';
+import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES } from '../utils/voiceNavigation';
 
 const EDGE_LIGHT_COLORS = {
   blue: '#38bdf8',
@@ -501,6 +501,38 @@ const NowBar = ({ actions }: NowBarProps) => {
       setFeatureSettingsVersion((current) => current + 1);
     };
 
+    const handleVoiceCommand = (event: Event) => {
+      const command = (event as CustomEvent<{ command?: string }>).detail?.command;
+      if (!command) return;
+
+      handleInteraction();
+      if (command === 'expand') {
+        setView((currentView) => {
+          if (currentView === 'title') {
+            setMode('compact');
+            return 'actions';
+          }
+          setMode('expanded');
+          return currentView;
+        });
+      } else if (command === 'collapse') {
+        setMode((currentMode) => {
+          if (currentMode === 'expanded') return 'compact';
+          setView('title');
+          return currentMode;
+        });
+      } else if (command === 'left' || command === 'right') {
+        const path = getActivePath();
+        const currentIndex = parentRoutes.indexOf(path);
+        const childGroup = childNavigationGroups.find((group) => group.routes.includes(path));
+        const routes = childGroup ? childGroup.routes : currentIndex >= 0 ? parentRoutes : [];
+        const routeIndex = routes.indexOf(path);
+        const nextIndex = routeIndex + (command === 'right' ? 1 : -1);
+        const nextRoute = routes[nextIndex];
+        if (nextRoute) navigate(nextRoute);
+      }
+    };
+
     window.addEventListener('popstate', syncPath);
     window.addEventListener('hashchange', syncPath);
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
@@ -509,6 +541,7 @@ const NowBar = ({ actions }: NowBarProps) => {
     window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
     window.addEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
     window.addEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
+    window.addEventListener(NOWBAR_COMMAND_EVENT, handleVoiceCommand);
 
     return () => {
       window.removeEventListener('popstate', syncPath);
@@ -519,6 +552,7 @@ const NowBar = ({ actions }: NowBarProps) => {
       window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
       window.removeEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
       window.removeEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
+      window.removeEventListener(NOWBAR_COMMAND_EVENT, handleVoiceCommand);
 
     };
   }, []);
