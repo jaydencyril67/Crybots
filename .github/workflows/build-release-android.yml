@@ -56,7 +56,7 @@ jobs:
             /<svg[^>]*>/,
             '<svg width="520" height="520" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">',
           );
-          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#000000"/><g transform="translate(1106 560)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g><text x="1366" y="1260" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="42" letter-spacing="5.88" text-transform="uppercase">KINGSHALL EXCHANGE</text><rect x="1276" y="1340" width="180" height="9" rx="4.5" fill="#ffffff" opacity="0.8"/></svg>`;
+          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#000000"/><g transform="translate(1106 972)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g><text x="1366" y="1672" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="42" letter-spacing="5.88" text-transform="uppercase">KINGSHALL EXCHANGE</text><rect x="1276" y="1752" width="180" height="9" rx="4.5" fill="#ffffff" opacity="0.8"/></svg>`;
           fs.writeFileSync('assets/splash.svg', splash);
           fs.writeFileSync('assets/crown.svg', logo);
           sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')
