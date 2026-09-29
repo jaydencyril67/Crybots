@@ -4,11 +4,15 @@ const config: CapacitorConfig = {
   appId: 'com.kingshall.exchange',
   appName: 'KingsHall Exchange',
   webDir: 'build',
+  server: {
+    // Keep the Android WebView on a secure origin so API requests use HTTPS.
+    androidScheme: 'https',
+  },
   plugins: {
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 1200,
-      backgroundColor: '#111827',
+      backgroundColor: '#000000',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_INSIDE',
       showSpinner: false,

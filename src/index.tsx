@@ -60,7 +60,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import NowBar from './components/NowBar';
 import AppHeader from './components/AppHeader';
 import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
-import api, { forceLogout } from './api/axios';
+import api, { API_BASE_URL, forceLogout } from './api/axios';
 import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
 
 const DEFAULT_IDLE_LOGOUT_MINUTES = 10;
@@ -387,7 +387,7 @@ const RouteTransition = () => {
         return null;
       }
 
-      const stream = new EventSource(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/force-logout/stream`, {
+      const stream = new EventSource(`${API_BASE_URL}/api/auth/force-logout/stream`, {
         withCredentials: true,
       });
 

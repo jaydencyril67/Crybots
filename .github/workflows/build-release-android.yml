@@ -52,15 +52,16 @@ jobs:
           const fs = require('fs');
           const sharp = require('sharp');
           const source = fs.readFileSync('public/icons/ke-icon.svg', 'utf8');
-          const crown = source
-            .replace(/<rect[^>]*fill="#111827"\s*\/>/, '')
-            .replace(/<svg[^>]*>/, '<svg width="700" height="700" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">');
-          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#111827"/><g transform="translate(1366 1366) scale(.7) translate(-256 -256)">${crown.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
+          const logo = source.replace(
+            /<svg[^>]*>/,
+            '<svg width="520" height="520" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">',
+          );
+          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#000000"/><g transform="translate(1106 560)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g><text x="1366" y="1260" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="42" letter-spacing="5.88" text-transform="uppercase">KINGSHALL EXCHANGE</text><rect x="1276" y="1340" width="180" height="9" rx="4.5" fill="#ffffff" opacity="0.8"/></svg>`;
           fs.writeFileSync('assets/splash.svg', splash);
-          fs.writeFileSync('assets/crown.svg', crown);
+          fs.writeFileSync('assets/crown.svg', logo);
           sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')
-            .then(() => sharp('assets/crown.svg').resize(640, 640).extend({ top: 192, bottom: 192, left: 192, right: 192, background: { r: 17, g: 24, b: 39, alpha: 0 } }).png().toFile('assets/icon-foreground.png'))
-            .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#111827' } }).png().toFile('assets/icon-background.png'))
+            .then(() => sharp('assets/crown.svg').resize(640, 640).extend({ top: 192, bottom: 192, left: 192, right: 192, background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toFile('assets/icon-foreground.png'))
+            .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#000000' } }).png().toFile('assets/icon-background.png'))
             .then(() => sharp('assets/splash.svg').png().toFile('assets/splash.png'))
             .catch(error => { console.error(error); process.exit(1); });
           NODE
@@ -73,6 +74,7 @@ jobs:
       - name: Create Android project and generate branding
         run: |
           npx cap add android
+          node -e "const fs = require('fs'); const file = 'android/app/src/main/AndroidManifest.xml'; let manifest = fs.readFileSync(file, 'utf8'); const permission = '    <uses-permission android:name=\"android.permission.INTERNET\" />\\n'; if (!manifest.includes('android.permission.INTERNET')) { manifest = manifest.replace(/(<manifest[^>]*>\\n)/, '$1' + permission); fs.writeFileSync(file, manifest); }"
           npx capacitor-assets generate --android
           npx cap sync android
 
