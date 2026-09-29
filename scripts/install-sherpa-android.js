@@ -172,7 +172,7 @@ if (!rootGradle.includes('kotlin-gradle-plugin')) {
 
 let gradle = fs.readFileSync(gradlePath, 'utf8');
 if (!gradle.includes("org.jetbrains.kotlin.android")) {
-  gradle = `${gradle}\n\napply plugin: "org.jetbrains.kotlin.android"\n\nkotlinOptions {\n    jvmTarget = "21"\n}\n`;
+  gradle = `${gradle}\n\napply plugin: "org.jetbrains.kotlin.android"\n\nandroid {\n    kotlinOptions {\n        jvmTarget = "21"\n    }\n}\n`;
 }
 if (!gradle.includes('sherpa-onnx.aar')) {
   gradle = gradle.replace(/(repositories \{)/, '$1\n        flatDir { dirs "libs" }');
