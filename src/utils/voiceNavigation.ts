@@ -129,6 +129,12 @@ export const getVoiceModeEnabled = () => {
   return window.localStorage.getItem(VOICE_MODE_STORAGE_KEY) === 'true';
 };
 
+export const disableVoiceMode = () => {
+  if (typeof window === 'undefined' || !getVoiceModeEnabled()) return;
+  window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
+  window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
+};
+
 export const normalizeVoiceText = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
 export const navigateFromVoice = (transcript: string) => {
