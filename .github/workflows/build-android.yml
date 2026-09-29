@@ -70,7 +70,7 @@ jobs:
           const fs = require('fs');
           const file = 'android/app/src/main/AndroidManifest.xml';
           let manifest = fs.readFileSync(file, 'utf8');
-          const permissions = ['android.permission.INTERNET', 'android.permission.RECORD_AUDIO'];
+          const permissions = ['android.permission.INTERNET', 'android.permission.RECORD_AUDIO', 'android.permission.MODIFY_AUDIO_SETTINGS'];
           const missing = permissions.filter(permission => !manifest.includes(permission));
           if (missing.length) {
             const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\\n');

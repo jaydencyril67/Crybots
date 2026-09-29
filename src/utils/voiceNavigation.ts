@@ -131,6 +131,17 @@ export const getVoiceModeEnabled = () => {
   return window.localStorage.getItem(VOICE_MODE_STORAGE_KEY) === 'true';
 };
 
+export const requestVoiceMicrophoneAccess = async () => {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return true;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach((track) => track.stop());
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const disableVoiceMode = () => {
   if (typeof window === 'undefined' || !getVoiceModeEnabled()) return;
   window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
