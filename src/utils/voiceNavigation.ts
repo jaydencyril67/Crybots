@@ -138,10 +138,15 @@ type CapacitorPlugin = {
   speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number }) => Promise<void>;
 };
 
+type CapacitorBridge = {
+  Plugins?: Record<string, CapacitorPlugin>;
+  registerPlugin?: (name: string) => CapacitorPlugin;
+};
+
 const getCapacitorPlugin = (name: 'SpeechRecognition' | 'TextToSpeech'): CapacitorPlugin | null => {
   if (typeof window === 'undefined') return null;
-  const capacitor = (window as Window & { Capacitor?: { Plugins?: Record<string, CapacitorPlugin> } }).Capacitor;
-  return capacitor?.Plugins?.[name] || null;
+  const capacitor = (window as Window & { Capacitor?: CapacitorBridge }).Capacitor;
+  return capacitor?.Plugins?.[name] || capacitor?.registerPlugin?.(name) || null;
 };
 
 export const getNativeSpeechRecognition = () => getCapacitorPlugin('SpeechRecognition');
