@@ -21,10 +21,11 @@ jobs:
           set -euo pipefail
           mkdir -p signing
           run_id="$(gh run list --workflow generate-release-keystore.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
-          if [ -n "$run_id" ]; then
-            gh run download "$run_id" --name kingshall-release-signing-files --dir signing
+          if [ -n "$run_id" ] && gh run download "$run_id" --name kingshall-release-signing-files --dir signing \\
+            && [ -f signing/kingshall-release.keystore ]; then
+            echo "Downloaded the latest release signing artifact."
           else
-            echo "No previous signing artifact found; generating a temporary release keystore."
+            echo "Release signing artifact unavailable; generating a temporary release keystore."
             keystore_password="$(openssl rand -hex 24)"
             key_password="$keystore_password"
             keytool -genkeypair \\
