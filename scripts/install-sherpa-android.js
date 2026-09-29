@@ -15,6 +15,7 @@ const pluginPath = path.join(sourceDir, 'SherpaOnnxPlugin.kt');
 const activityJavaPath = path.join(sourceDir, 'MainActivity.java');
 const activityKotlinPath = path.join(app, 'src/main/java/com/kingshall/exchange/MainActivity.kt');
 const gradlePath = path.join(app, 'build.gradle');
+const rootGradlePath = path.join(android, 'build.gradle');
 const manifestPath = path.join(app, 'src/main/AndroidManifest.xml');
 const aarPath = path.join(libsDir, 'sherpa-onnx.aar');
 const aarUrl = process.env.SHERPA_ONNX_AAR_URL
@@ -160,7 +161,24 @@ if (fs.existsSync(activityPath)) {
   }
 }
 
+let rootGradle = fs.readFileSync(rootGradlePath, 'utf8');
+if (!rootGradle.includes('kotlin-gradle-plugin')) {
+  const kotlinDependency = "        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21'\n";
+  if (!rootGradle.includes('buildscript {')) {
+    rootGradle = `buildscript {\n    repositories {\n        google()\n        mavenCentral()\n    }\n    dependencies {\n${kotlinDependency}    }\n}\n\n${rootGradle}`;
+  } else if (rootGradle.includes('dependencies {')) {
+    rootGradle = rootGradle.replace(/(dependencies \{)/, `$1\n${kotlinDependency}`);
+  } else {
+    throw new Error('Unable to add the Kotlin Gradle plugin: buildscript dependencies block not found.');
+  }
+  fs.writeFileSync(rootGradlePath, rootGradle);
+}
+
 let gradle = fs.readFileSync(gradlePath, 'utf8');
+if (!gradle.includes("org.jetbrains.kotlin.android")) {
+  gradle += "\napply plugin: 'org.jetbrains.kotlin.android'\n";
+  fs.writeFileSync(gradlePath, gradle);
+}
 if (!gradle.includes('sherpa-onnx.aar')) {
   gradle = gradle.replace(/(repositories \{)/, '$1\n        flatDir { dirs "libs" }');
   gradle = gradle.replace(/(dependencies \{)/, '$1\n    implementation(name: "sherpa-onnx", ext: "aar")');
