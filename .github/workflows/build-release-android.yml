@@ -112,19 +112,15 @@ jobs:
           npx cap sync android
 
       - name: Configure release signing
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           set -euo pipefail
-          if [ -z "$ANDROID_KEYSTORE_PASSWORD" ] && [ -f signing/kingshall-signing-credentials.txt ]; then
-            # Use credentials generated alongside the keystore when repository secrets are unavailable.
-            source signing/kingshall-signing-credentials.txt
-          fi
-          test -n "$ANDROID_KEYSTORE_PASSWORD"
-          test -n "$ANDROID_KEY_ALIAS"
-          test -n "$ANDROID_KEY_PASSWORD"
+          # Always use credentials distributed with the keystore. Using repository secrets
+          # here can pair a stale password with a newly downloaded signing artifact.
+          test -f signing/kingshall-signing-credentials.txt
+          source signing/kingshall-signing-credentials.txt
+          test -n "${ANDROID_KEYSTORE_PASSWORD:-}"
+          test -n "${ANDROID_KEY_ALIAS:-}"
+          test -n "${ANDROID_KEY_PASSWORD:-}"
           cp signing/kingshall-release.keystore android/app/kingshall-release.keystore
           cat >> android/gradle.properties <<EOF
           KINGS_HALL_KEYSTORE_FILE=kingshall-release.keystore
