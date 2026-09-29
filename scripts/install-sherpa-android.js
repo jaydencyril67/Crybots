@@ -15,6 +15,7 @@ const pluginPath = path.join(sourceDir, 'SherpaOnnxPlugin.kt');
 const activityJavaPath = path.join(sourceDir, 'MainActivity.java');
 const activityKotlinPath = path.join(app, 'src/main/java/com/kingshall/exchange/MainActivity.kt');
 const gradlePath = path.join(app, 'build.gradle');
+const rootGradlePath = path.join(android, 'build.gradle');
 const manifestPath = path.join(app, 'src/main/AndroidManifest.xml');
 const aarPath = path.join(libsDir, 'sherpa-onnx.aar');
 const aarUrl = process.env.SHERPA_ONNX_AAR_URL
@@ -160,12 +161,24 @@ if (fs.existsSync(activityPath)) {
   }
 }
 
+let rootGradle = fs.readFileSync(rootGradlePath, 'utf8');
+if (!rootGradle.includes('kotlin-gradle-plugin')) {
+  rootGradle = rootGradle.replace(
+    /(dependencies \{)/,
+    '$1\n        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21"',
+  );
+  fs.writeFileSync(rootGradlePath, rootGradle);
+}
+
 let gradle = fs.readFileSync(gradlePath, 'utf8');
+if (!gradle.includes("org.jetbrains.kotlin.android")) {
+  gradle = `${gradle}\n\napply plugin: "org.jetbrains.kotlin.android"\n\nkotlinOptions {\n    jvmTarget = "21"\n}\n`;
+}
 if (!gradle.includes('sherpa-onnx.aar')) {
   gradle = gradle.replace(/(repositories \{)/, '$1\n        flatDir { dirs "libs" }');
   gradle = gradle.replace(/(dependencies \{)/, '$1\n    implementation(name: "sherpa-onnx", ext: "aar")');
-  fs.writeFileSync(gradlePath, gradle);
 }
+fs.writeFileSync(gradlePath, gradle);
 
 if (!fs.existsSync(manifestPath)) {
   throw new Error(`Android manifest not found: ${manifestPath}`);
