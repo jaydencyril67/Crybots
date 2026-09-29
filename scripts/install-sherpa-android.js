@@ -44,6 +44,7 @@ import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
+import com.k2fsa.sherpa.onnx.FeatureConfig
 import com.k2fsa.sherpa.onnx.OnlineModelConfig
 import com.k2fsa.sherpa.onnx.OnlineRecognizer
 import com.k2fsa.sherpa.onnx.OnlineRecognizerConfig
@@ -94,7 +95,10 @@ class SherpaOnnxPlugin : Plugin() {
                     joiner = "$dir/joiner.onnx"
                 )
             )
-            val config = OnlineRecognizerConfig(modelConfig = model, sampleRate = 16000)
+            val config = OnlineRecognizerConfig(
+                featConfig = FeatureConfig(sampleRate = 16000, featureDim = 80),
+                modelConfig = model
+            )
             recognizer = OnlineRecognizer(context.assets, config)
             stream = recognizer!!.createStream()
             val buffer = AudioRecord.getMinBufferSize(16000, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
