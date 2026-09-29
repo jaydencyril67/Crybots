@@ -10,6 +10,15 @@ import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
+
+const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  return isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail)
+    ? '/admin-home'
+    : '/home';
+};
+
 const supportedEmailDomains = new Set([
   'gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'kingshall.online',
   'yahoo.com', 'yahoo.co.uk', 'icloud.com', 'me.com', 'mac.com', 'proton.me',
@@ -540,7 +549,7 @@ const SigninPage = () => {
           notifyAuthChanged();
         }
         if (response.data?.user) localStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate('/home');
+        navigate(getPostSigninRoute(response.data?.user?.email || form.email, response.data?.isAdmin === true));
       } catch (error) {
         const response = (error as { response?: { data?: { message?: string } } })?.response;
         setSubmitError(response?.data?.message || (error as Error)?.message || 'Unable to authenticate with your passkey.');
@@ -604,7 +613,7 @@ const SigninPage = () => {
         }
       }
 
-      navigate(response.data?.isAdmin ? '/admin-home' : '/home');
+      navigate(getPostSigninRoute(response.data?.user?.email || form.email, response.data?.isAdmin === true));
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
       const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
@@ -652,7 +661,7 @@ const SigninPage = () => {
         }
       }
 
-      navigate(response.data?.isAdmin ? '/admin-home' : '/home');
+      navigate(getPostSigninRoute(response.data?.user?.email || form.email, response.data?.isAdmin === true));
     } catch (error) {
       const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
       const message = response?.data?.message || 'Unable to verify code right now. Please try again.';
