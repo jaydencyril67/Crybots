@@ -390,7 +390,7 @@ const SignupPage = () => {
   };
 
   const emailInputStyle =
-    form.email && !/[^\s@]+@[^\s@]+\.[^\s@]+/.test(form.email)
+    form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
       ? { ...styles.input, borderColor: theme.danger, background: theme.surface }
       : styles.input;
 

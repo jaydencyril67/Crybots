@@ -11,7 +11,7 @@ import { navigate } from '../utils/navigate';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const supportedEmailDomains = new Set([
-  'gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'msn.com',
+  'gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'kingshall.online',
   'yahoo.com', 'yahoo.co.uk', 'icloud.com', 'me.com', 'mac.com', 'proton.me',
   'protonmail.com', 'aol.com', 'zoho.com', 'gmx.com', 'gmx.net', 'yandex.com',
   'mail.com', 'fastmail.com', 'tuta.com', 'tutanota.com',
