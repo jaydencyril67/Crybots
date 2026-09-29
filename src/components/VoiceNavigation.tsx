@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { getNativeSpeechRecognition, getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { getSherpaOnnxPlugin, SHERPA_ONNX_LANGUAGE, SHERPA_ONNX_MODEL_PATH, SHERPA_ONNX_SAMPLE_RATE } from '../utils/sherpaOnnx';
 
 type SpeechRecognitionResultLike = {
   isFinal?: boolean;
@@ -23,6 +24,8 @@ type NativeSpeechRecognition = {
   stop?: () => Promise<void>;
 };
 
+type SherpaListener = { remove: () => Promise<void> };
+
 type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
 
 type SpeechWindow = Window & typeof globalThis & {
@@ -36,6 +39,10 @@ const VoiceNavigation = () => {
     let nativeRecognition = getNativeSpeechRecognition() as NativeSpeechRecognition | null;
     let nativeListening = false;
     let nativeUnavailable = false;
+    let sherpaRecognition = getSherpaOnnxPlugin();
+    let sherpaListening = false;
+    let sherpaUnavailable = false;
+    let sherpaListeners: SherpaListener[] = [];
     let enabled = getVoiceModeEnabled();
     let stopped = false;
     let voiceOutputActive = isVoiceOutputActive();
@@ -44,8 +51,32 @@ const VoiceNavigation = () => {
       window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening, transcript } }));
     };
 
+    const removeSherpaListeners = () => {
+      const listeners = sherpaListeners;
+      sherpaListeners = [];
+      listeners.forEach((listener) => { void listener.remove(); });
+    };
+
     const start = () => {
       if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive()) return;
+      if (sherpaRecognition && !sherpaUnavailable) {
+        if (sherpaListening) return;
+        sherpaListening = true;
+        setStatus(true);
+        void sherpaRecognition.start({
+          language: SHERPA_ONNX_LANGUAGE,
+          modelPath: SHERPA_ONNX_MODEL_PATH,
+          sampleRate: SHERPA_ONNX_SAMPLE_RATE,
+        }).catch(() => {
+          sherpaUnavailable = true;
+          sherpaRecognition = null;
+          sherpaListening = false;
+          removeSherpaListeners();
+          setStatus(false);
+          setup();
+        });
+        return;
+      }
       if (nativeRecognition && !nativeUnavailable) {
         if (nativeListening) return;
         nativeListening = true;
@@ -86,6 +117,48 @@ const VoiceNavigation = () => {
     };
 
     function setup() {
+      if (sherpaRecognition && !sherpaUnavailable) {
+        if (!sherpaRecognition.addListener) {
+          sherpaUnavailable = true;
+          sherpaRecognition = null;
+          setup();
+          return;
+        }
+        const handleSherpaPartialResult = (result: { text?: string }) => {
+          const transcript = result.text?.trim();
+          if (transcript && !voiceOutputActive && !isVoiceOutputActive()) setStatus(true, transcript);
+        };
+        const handleSherpaResult = (result: { text?: string }) => {
+          const transcript = result.text?.trim();
+          if (!transcript || voiceOutputActive || isVoiceOutputActive()) return;
+          setStatus(true, transcript);
+          navigateFromVoice(transcript);
+        };
+        const handleSherpaError = () => {
+          sherpaUnavailable = true;
+          sherpaRecognition = null;
+          sherpaListening = false;
+          removeSherpaListeners();
+          setStatus(false);
+          setup();
+        };
+        void Promise.all([
+          sherpaRecognition.addListener('partialResult', handleSherpaPartialResult),
+          sherpaRecognition.addListener('result', handleSherpaResult),
+          sherpaRecognition.addListener('error', handleSherpaError),
+        ]).then((listeners) => {
+          sherpaListeners = listeners.filter((listener): listener is SherpaListener => Boolean(listener));
+          if (enabled) void requestVoiceMicrophoneAccess().then((granted) => {
+            if (granted) start();
+            else setStatus(false);
+          });
+        }).catch(() => {
+          sherpaUnavailable = true;
+          sherpaRecognition = null;
+          setup();
+        });
+        return;
+      }
       if (nativeRecognition && !nativeUnavailable) {
         const useNativeRecognition = (available: boolean) => {
           if (!available) {
@@ -144,6 +217,8 @@ const VoiceNavigation = () => {
       voiceOutputActive = (event as CustomEvent<{ active?: boolean }>).detail?.active === true;
       if (voiceOutputActive) {
         recognition?.stop();
+        sherpaListening = false;
+        void sherpaRecognition?.stop();
         void nativeRecognition?.stop?.();
       } else if (enabled && !stopped) window.setTimeout(start, 350);
     };
@@ -151,11 +226,17 @@ const VoiceNavigation = () => {
     const handleModeChange = () => {
       enabled = getVoiceModeEnabled();
       if (enabled && nativeUnavailable) nativeUnavailable = false;
+      if (enabled && sherpaUnavailable) {
+        sherpaUnavailable = false;
+        sherpaRecognition = getSherpaOnnxPlugin();
+      }
       if (enabled) {
         if (!recognition) setup();
         else start();
       } else {
         recognition?.stop();
+        sherpaListening = false;
+        void sherpaRecognition?.stop();
         void nativeRecognition?.stop?.();
         setStatus(false);
       }
@@ -167,7 +248,10 @@ const VoiceNavigation = () => {
     return () => {
       stopped = true;
       recognition?.stop();
+      sherpaListening = false;
+      void sherpaRecognition?.stop();
       void nativeRecognition?.stop?.();
+      removeSherpaListeners();
       setStatus(false);
       window.removeEventListener(VOICE_MODE_CHANGED_EVENT, handleModeChange);
       window.removeEventListener(VOICE_OUTPUT_EVENT, handleVoiceOutput);
