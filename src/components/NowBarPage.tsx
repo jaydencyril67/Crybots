@@ -4,7 +4,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
-import { VOICE_MODE_CHANGED_EVENT, VOICE_MODE_STORAGE_KEY } from '../utils/voiceNavigation';
+import { requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_MODE_STORAGE_KEY } from '../utils/voiceNavigation';
 
 type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse-light' | 'pulse' | 'color-light' | 'color';
 
@@ -110,9 +110,19 @@ const NowBarPage = () => {
 
   const toggleVoiceMode = () => {
     const nextEnabled = !voiceModeEnabled;
-    setVoiceModeEnabled(nextEnabled);
-    window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, String(nextEnabled));
-    window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
+    if (!nextEnabled) {
+      setVoiceModeEnabled(false);
+      window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
+      window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
+      return;
+    }
+
+    void requestVoiceMicrophoneAccess().then((granted) => {
+      if (!granted) return;
+      setVoiceModeEnabled(true);
+      window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'true');
+      window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
+    });
   };
 
   const toggle = () => {

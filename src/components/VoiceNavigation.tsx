@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type SpeechRecognitionResultLike = {
   isFinal?: boolean;
@@ -33,18 +33,6 @@ const VoiceNavigation = () => {
 
     const setStatus = (listening: boolean, transcript = '') => {
       window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening, transcript } }));
-    };
-
-    const requestMicrophoneAccess = async () => {
-      if (!navigator.mediaDevices?.getUserMedia) return true;
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach((track) => track.stop());
-        return true;
-      } catch {
-        setStatus(false);
-        return false;
-      }
     };
 
     const start = () => {
@@ -83,7 +71,8 @@ const VoiceNavigation = () => {
       };
       recognition.onerror = () => setStatus(false);
       if (enabled) {
-        void requestMicrophoneAccess().then((granted) => {
+        void requestVoiceMicrophoneAccess().then((granted) => {
+          if (!granted) setStatus(false);
           if (granted) start();
         });
       }

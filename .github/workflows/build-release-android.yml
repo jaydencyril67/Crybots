@@ -56,12 +56,12 @@ jobs:
             /<svg[^>]*>/,
             '<svg width="400" height="400" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">',
           );
-          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#000000"/><g transform="translate(1166 1166)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
+          const splash = `<svg width="2732" height="2732" viewBox="0 0 2732 2732" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#111827"/><g transform="translate(1036 1036) scale(1.65)">${logo.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
           fs.writeFileSync('assets/splash.svg', splash);
           fs.writeFileSync('assets/crown.svg', logo);
-          sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')
-            .then(() => sharp('assets/crown.svg').resize(640, 640).extend({ top: 192, bottom: 192, left: 192, right: 192, background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toFile('assets/icon-foreground.png'))
-            .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#000000' } }).png().toFile('assets/icon-background.png'))
+          sharp('public/icons/ke-icon.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-only.png')
+            .then(() => sharp('assets/crown.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-foreground.png'))
+            .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#111827' } }).png().toFile('assets/icon-background.png'))
             .then(() => sharp('assets/splash.svg').png().toFile('assets/splash.png'))
             .catch(error => { console.error(error); process.exit(1); });
           NODE
@@ -74,7 +74,18 @@ jobs:
       - name: Create Android project and generate branding
         run: |
           npx cap add android
-          node -e "const fs = require('fs'); const file = 'android/app/src/main/AndroidManifest.xml'; let manifest = fs.readFileSync(file, 'utf8'); const permission = '    <uses-permission android:name=\"android.permission.INTERNET\" />\\n'; if (!manifest.includes('android.permission.INTERNET')) { manifest = manifest.replace(/(<manifest[^>]*>\\n)/, '$1' + permission); fs.writeFileSync(file, manifest); }"
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'android/app/src/main/AndroidManifest.xml';
+          let manifest = fs.readFileSync(file, 'utf8');
+          const permissions = ['android.permission.INTERNET', 'android.permission.RECORD_AUDIO', 'android.permission.MODIFY_AUDIO_SETTINGS'];
+          const missing = permissions.filter(permission => !manifest.includes(permission));
+          if (missing.length) {
+            const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\\n');
+            manifest = manifest.replace(/(<manifest[^>]*>\\n)/, `$1${lines}\\n`);
+            fs.writeFileSync(file, manifest);
+          }
+          NODE
           npx capacitor-assets generate --android
           npx cap sync android
 
