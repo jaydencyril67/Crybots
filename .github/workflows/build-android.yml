@@ -47,7 +47,7 @@ jobs:
           const crown = source
             .replace(/<rect[^>]*fill="#111827"\s*\/>/, '')
             .replace(/<svg[^>]*>/, '<svg width="700" height="700" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">');
-          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#111827"/><g transform="translate(1016 1016) scale(.7)">${crown.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
+          const splash = `<svg width="2732" height="2732" xmlns="http://www.w3.org/2000/svg"><rect width="2732" height="2732" fill="#111827"/><g transform="translate(1366 1366) scale(.7) translate(-256 -256)">${crown.replace('<svg', '<g').replace('</svg>', '</g>')}</g></svg>`;
           fs.writeFileSync('assets/splash.svg', splash);
           fs.writeFileSync('assets/crown.svg', crown);
           sharp('public/icons/ke-icon.svg').resize(1024, 1024).png().toFile('assets/icon-only.png')
