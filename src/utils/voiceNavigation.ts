@@ -174,6 +174,19 @@ const getTimeGreeting = () => {
 
 export const isVoiceWakeWord = (transcript: string) => /(^|\s)kings?(?=\s|$)/i.test(transcript.trim());
 
+const getPreferredMasculineVoice = (voices: SpeechSynthesisVoice[]) => {
+  const masculineVoicePattern = /(^|[\s_-])(alex|daniel|david|fred|george|james|mark|michael|oliver|thomas)([\s_-]|$)/i;
+  const englishVoicePattern = /^(en|en[-_])/i;
+
+  return voices
+    .filter((voice) => masculineVoicePattern.test(voice.name))
+    .sort((first, second) => {
+      const firstScore = (englishVoicePattern.test(first.lang) ? 2 : 0) + (first.localService ? 1 : 0);
+      const secondScore = (englishVoicePattern.test(second.lang) ? 2 : 0) + (second.localService ? 1 : 0);
+      return secondScore - firstScore;
+    })[0];
+};
+
 export const speakVoiceGreeting = () => {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   const lastPrompt = window.sessionStorage.getItem('kingshall_voice_prompt');
@@ -183,10 +196,9 @@ export const speakVoiceGreeting = () => {
   const address = title ? `${name}, ${title}` : name;
   const message = `${getTimeGreeting()} ${address}. ${prompt} If you need help, kindly say Command and I will display the full page menu for you.`;
   const utterance = new SpeechSynthesisUtterance(message);
-  const voices = window.speechSynthesis.getVoices();
-  const maleVoice = voices.find((voice) => /male|david|alex|daniel|fred|mark|george/i.test(voice.name));
-  if (maleVoice) utterance.voice = maleVoice;
-  utterance.pitch = 1.08;
+  const preferredMasculineVoice = getPreferredMasculineVoice(window.speechSynthesis.getVoices());
+  if (preferredMasculineVoice) utterance.voice = preferredMasculineVoice;
+  utterance.pitch = 0.95;
   utterance.rate = 1.02;
   const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
   window.speechSynthesis.cancel();
