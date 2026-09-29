@@ -102,8 +102,9 @@ jobs:
           curl --fail --location --retry 3 "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17.tar.bz2" --output "$archive"
           mkdir -p "$model_root"
           tar -xjf "$archive" -C "$model_root"
-          model_dir="$(find "$model_root" -type f -name tokens.txt -printf '%h\\n' | head -n 1)"
-          test -n "$model_dir"
+          token_file="$(find "$model_root" -type f -name tokens.txt -print -quit)"
+          test -n "$token_file"
+          model_dir="$(dirname "$token_file")"
           echo "SHERPA_ONNX_MODEL_DIR=$model_dir" >> "$GITHUB_ENV"
 
       - name: Create Android project and generate branding
