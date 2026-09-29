@@ -3,6 +3,7 @@ import { navigate } from './navigate';
 export const VOICE_MODE_STORAGE_KEY = 'nowbar_voice_navigation_enabled';
 export const VOICE_MODE_CHANGED_EVENT = 'nowbar-voice-mode-changed';
 export const VOICE_STATUS_EVENT = 'nowbar-voice-status-changed';
+export const VOICE_OUTPUT_EVENT = 'nowbar-voice-output-changed';
 export const NOWBAR_COMMAND_EVENT = 'nowbar-voice-command';
 
 export type VoiceCommand = { label: string; route: string };
@@ -149,17 +150,19 @@ const VOICE_PROMPTS = [
   'Where shall we go from here?',
 ];
 
-const getVoiceTitle = () => {
-  if (typeof window === 'undefined') return 'friend';
+const getVoiceIdentity = () => {
+  if (typeof window === 'undefined') return { name: 'there', title: '' };
   try {
-    const user = JSON.parse(window.localStorage.getItem('user') || '{}') as { gender?: string };
+    const user = JSON.parse(window.localStorage.getItem('user') || '{}') as { firstName?: string; gender?: string };
+    const name = window.localStorage.getItem('firstName')?.trim() || user.firstName?.trim() || 'there';
     const gender = user.gender?.toLowerCase();
-    if (gender === 'male' || gender === 'man' || gender === 'm') return 'Sir';
-    if (gender === 'female' || gender === 'woman' || gender === 'f') return 'Mrs';
+    const title = gender === 'male' || gender === 'man' || gender === 'm'
+      ? 'Sir'
+      : gender === 'female' || gender === 'woman' || gender === 'f' ? 'Mrs' : '';
+    return { name, title };
   } catch {
-    // Use a neutral form when the stored profile cannot be read.
+    return { name: 'there', title: '' };
   }
-  return 'friend';
 };
 
 const getTimeGreeting = () => {
@@ -176,11 +179,25 @@ export const speakVoiceGreeting = () => {
   const lastPrompt = window.sessionStorage.getItem('kingshall_voice_prompt');
   const availablePrompts = VOICE_PROMPTS.filter((prompt) => prompt !== lastPrompt);
   const prompt = availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
-  window.sessionStorage.setItem('kingshall_voice_prompt', prompt);
-  const message = `${getTimeGreeting()} ${getVoiceTitle()}. ${prompt} If you need help, kindly say Command and I will display the full page menu for you.`;
+  const { name, title } = getVoiceIdentity();
+  const address = title ? `${name}, ${title}` : name;
+  const message = `${getTimeGreeting()} ${address}. ${prompt} If you need help, kindly say Command and I will display the full page menu for you.`;
+  const utterance = new SpeechSynthesisUtterance(message);
+  const voices = window.speechSynthesis.getVoices();
+  const maleVoice = voices.find((voice) => /male|david|alex|daniel|fred|mark|george/i.test(voice.name));
+  if (maleVoice) utterance.voice = maleVoice;
+  utterance.pitch = 1.08;
+  utterance.rate = 1.02;
+  const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
   window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(new SpeechSynthesisUtterance(message));
+  window.sessionStorage.setItem('kingshall_voice_prompt', prompt);
+  window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
+  utterance.onend = finish;
+  utterance.onerror = finish;
+  window.speechSynthesis.speak(utterance);
 };
+
+export const isVoiceOutputActive = () => typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking;
 
 type NowBarCommand = 'expand' | 'collapse' | 'left' | 'right';
 

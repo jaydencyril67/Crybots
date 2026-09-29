@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getVoiceModeEnabled, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type SpeechRecognitionResultLike = {
   isFinal?: boolean;
@@ -29,6 +29,7 @@ const VoiceNavigation = () => {
     let recognition: SpeechRecognitionLike | null = null;
     let enabled = getVoiceModeEnabled();
     let stopped = false;
+    let voiceOutputActive = isVoiceOutputActive();
 
     const setStatus = (listening: boolean, transcript = '') => {
       window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening, transcript } }));
@@ -47,7 +48,7 @@ const VoiceNavigation = () => {
     };
 
     const start = () => {
-      if (!enabled || stopped || !recognition) return;
+      if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive() || !recognition) return;
       try {
         recognition.start();
         setStatus(true);
@@ -68,6 +69,7 @@ const VoiceNavigation = () => {
       recognition.interimResults = true;
       recognition.lang = 'en-US';
       recognition.onresult = (event) => {
+        if (voiceOutputActive || isVoiceOutputActive()) return;
         const result = event.results[event.results.length - 1];
         const transcript = result?.[0]?.transcript;
         if (transcript) {
@@ -77,7 +79,7 @@ const VoiceNavigation = () => {
       };
       recognition.onend = () => {
         setStatus(false);
-        if (enabled && !stopped) window.setTimeout(start, 250);
+        if (enabled && !stopped && !voiceOutputActive && !isVoiceOutputActive()) window.setTimeout(start, 250);
       };
       recognition.onerror = () => setStatus(false);
       if (enabled) {
@@ -85,6 +87,12 @@ const VoiceNavigation = () => {
           if (granted) start();
         });
       }
+    };
+
+    const handleVoiceOutput = (event: Event) => {
+      voiceOutputActive = (event as CustomEvent<{ active?: boolean }>).detail?.active === true;
+      if (voiceOutputActive) recognition?.stop();
+      else if (enabled && !stopped) window.setTimeout(start, 350);
     };
 
     const handleModeChange = () => {
@@ -100,11 +108,13 @@ const VoiceNavigation = () => {
 
     setup();
     window.addEventListener(VOICE_MODE_CHANGED_EVENT, handleModeChange);
+    window.addEventListener(VOICE_OUTPUT_EVENT, handleVoiceOutput);
     return () => {
       stopped = true;
       recognition?.stop();
       setStatus(false);
       window.removeEventListener(VOICE_MODE_CHANGED_EVENT, handleModeChange);
+      window.removeEventListener(VOICE_OUTPUT_EVENT, handleVoiceOutput);
     };
   }, []);
 
