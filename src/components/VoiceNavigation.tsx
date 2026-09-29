@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { getNativeSpeechRecognition, getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
-import { getSherpaOnnxPlugin, SHERPA_ONNX_LANGUAGE, SHERPA_ONNX_MODEL_PATH, SHERPA_ONNX_SAMPLE_RATE } from '../utils/sherpaOnnx';
+import { getSherpaOnnxPlugin, SHERPA_ONNX_LANGUAGE, SHERPA_ONNX_MODEL_PATH, SHERPA_ONNX_SAMPLE_RATE, SherpaOnnxResult } from '../utils/sherpaOnnx';
 
 type SpeechRecognitionResultLike = {
   isFinal?: boolean;
@@ -124,12 +124,12 @@ const VoiceNavigation = () => {
           setup();
           return;
         }
-        const handleSherpaPartialResult = (result: { text?: string }) => {
-          const transcript = result.text?.trim();
+        const handleSherpaPartialResult = (result: SherpaOnnxResult | { message?: string }) => {
+          const transcript = ('text' in result ? result.text : undefined)?.trim();
           if (transcript && !voiceOutputActive && !isVoiceOutputActive()) setStatus(true, transcript);
         };
-        const handleSherpaResult = (result: { text?: string }) => {
-          const transcript = result.text?.trim();
+        const handleSherpaResult = (result: SherpaOnnxResult | { message?: string }) => {
+          const transcript = ('text' in result ? result.text : undefined)?.trim();
           if (!transcript || voiceOutputActive || isVoiceOutputActive()) return;
           setStatus(true, transcript);
           navigateFromVoice(transcript);
