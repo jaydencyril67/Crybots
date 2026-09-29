@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { getNativeSpeechRecognition, getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type SpeechRecognitionResultLike = {
   isFinal?: boolean;
@@ -17,6 +17,11 @@ type SpeechRecognitionLike = {
   stop: () => void;
 };
 
+type NativeSpeechRecognition = {
+  start: (options: { language: string; maxResults: number; promptMessage: string }) => Promise<{ matches?: string[] }>;
+  stop?: () => Promise<void>;
+};
+
 type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
 
 type SpeechWindow = Window & typeof globalThis & {
@@ -27,6 +32,8 @@ type SpeechWindow = Window & typeof globalThis & {
 const VoiceNavigation = () => {
   useEffect(() => {
     let recognition: SpeechRecognitionLike | null = null;
+    const nativeRecognition = getNativeSpeechRecognition() as NativeSpeechRecognition | null;
+    let nativeListening = false;
     let enabled = getVoiceModeEnabled();
     let stopped = false;
     let voiceOutputActive = isVoiceOutputActive();
@@ -36,7 +43,28 @@ const VoiceNavigation = () => {
     };
 
     const start = () => {
-      if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive() || !recognition) return;
+      if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive()) return;
+      if (nativeRecognition) {
+        if (nativeListening) return;
+        nativeListening = true;
+        setStatus(true);
+        void nativeRecognition.start({ language: 'en-US', maxResults: 3, promptMessage: 'Say a KingsHall page or say Kings for help.' })
+          .then((result) => {
+            const transcript = result.matches?.[0]?.trim();
+            if (transcript) {
+              setStatus(true, transcript);
+              navigateFromVoice(transcript);
+            }
+          })
+          .catch(() => setStatus(false))
+          .finally(() => {
+            nativeListening = false;
+            setStatus(false);
+            if (enabled && !stopped && !voiceOutputActive && !isVoiceOutputActive()) window.setTimeout(start, 250);
+          });
+        return;
+      }
+      if (!recognition) return;
       try {
         recognition.start();
         setStatus(true);
@@ -46,6 +74,13 @@ const VoiceNavigation = () => {
     };
 
     const setup = () => {
+      if (nativeRecognition) {
+        if (enabled) void requestVoiceMicrophoneAccess().then((granted) => {
+          if (granted) start();
+          else setStatus(false);
+        });
+        return;
+      }
       const speechWindow = window as SpeechWindow;
       const Recognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
       if (!Recognition) {
@@ -80,8 +115,10 @@ const VoiceNavigation = () => {
 
     const handleVoiceOutput = (event: Event) => {
       voiceOutputActive = (event as CustomEvent<{ active?: boolean }>).detail?.active === true;
-      if (voiceOutputActive) recognition?.stop();
-      else if (enabled && !stopped) window.setTimeout(start, 350);
+      if (voiceOutputActive) {
+        recognition?.stop();
+        void nativeRecognition?.stop?.();
+      } else if (enabled && !stopped) window.setTimeout(start, 350);
     };
 
     const handleModeChange = () => {
@@ -91,6 +128,7 @@ const VoiceNavigation = () => {
         else start();
       } else {
         recognition?.stop();
+        void nativeRecognition?.stop?.();
         setStatus(false);
       }
     };
@@ -101,6 +139,7 @@ const VoiceNavigation = () => {
     return () => {
       stopped = true;
       recognition?.stop();
+      void nativeRecognition?.stop?.();
       setStatus(false);
       window.removeEventListener(VOICE_MODE_CHANGED_EVENT, handleModeChange);
       window.removeEventListener(VOICE_OUTPUT_EVENT, handleVoiceOutput);

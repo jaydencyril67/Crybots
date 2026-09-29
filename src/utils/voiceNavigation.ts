@@ -131,8 +131,32 @@ export const getVoiceModeEnabled = () => {
   return window.localStorage.getItem(VOICE_MODE_STORAGE_KEY) === 'true';
 };
 
+type CapacitorPlugin = {
+  requestPermissions?: () => Promise<{ speechRecognition?: string }>;
+  start?: (options: { language: string; maxResults: number; promptMessage: string }) => Promise<{ matches?: string[] }>;
+  stop?: () => Promise<void>;
+  speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number }) => Promise<void>;
+};
+
+const getCapacitorPlugin = (name: 'SpeechRecognition' | 'TextToSpeech'): CapacitorPlugin | null => {
+  if (typeof window === 'undefined') return null;
+  const capacitor = (window as Window & { Capacitor?: { Plugins?: Record<string, CapacitorPlugin> } }).Capacitor;
+  return capacitor?.Plugins?.[name] || null;
+};
+
+export const getNativeSpeechRecognition = () => getCapacitorPlugin('SpeechRecognition');
+
 export const requestVoiceMicrophoneAccess = async () => {
-  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return true;
+  const nativeSpeechRecognition = getNativeSpeechRecognition();
+  if (nativeSpeechRecognition?.requestPermissions) {
+    try {
+      const permission = await nativeSpeechRecognition.requestPermissions();
+      return permission.speechRecognition === 'granted';
+    } catch {
+      return false;
+    }
+  }
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return false;
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     stream.getTracks().forEach((track) => track.stop());
@@ -199,13 +223,25 @@ const getPreferredMasculineVoice = (voices: SpeechSynthesisVoice[]) => {
 };
 
 export const speakVoiceGreeting = () => {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-  const lastPrompt = window.sessionStorage.getItem('kingshall_voice_prompt');
-  const availablePrompts = VOICE_PROMPTS.filter((prompt) => prompt !== lastPrompt);
-  const prompt = availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
+  const nativeTextToSpeech = getCapacitorPlugin('TextToSpeech');
   const { name, title } = getVoiceIdentity();
   const address = title ? `${name}, ${title}` : name;
+  const lastPrompt = typeof window !== 'undefined' ? window.sessionStorage.getItem('kingshall_voice_prompt') : null;
+  const availablePrompts = VOICE_PROMPTS.filter((prompt) => prompt !== lastPrompt);
+  const prompt = availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
   const message = `${getTimeGreeting()} ${address}. ${prompt} If you need help, kindly say Command and I will display the full page menu for you.`;
+
+  if (nativeTextToSpeech?.speak) {
+    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
+    void nativeTextToSpeech.speak({ text: message, lang: 'en-US', rate: 1.02, pitch: 0.95, volume: 1 })
+      .catch(() => undefined)
+      .finally(() => {
+        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
+      });
+    return;
+  }
+
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(message);
   const preferredMasculineVoice = getPreferredMasculineVoice(window.speechSynthesis.getVoices());
   if (preferredMasculineVoice) utterance.voice = preferredMasculineVoice;
