@@ -32,8 +32,9 @@ type SpeechWindow = Window & typeof globalThis & {
 const VoiceNavigation = () => {
   useEffect(() => {
     let recognition: SpeechRecognitionLike | null = null;
-    const nativeRecognition = getNativeSpeechRecognition() as NativeSpeechRecognition | null;
+    let nativeRecognition = getNativeSpeechRecognition() as NativeSpeechRecognition | null;
     let nativeListening = false;
+    let nativeUnavailable = false;
     let enabled = getVoiceModeEnabled();
     let stopped = false;
     let voiceOutputActive = isVoiceOutputActive();
@@ -44,7 +45,7 @@ const VoiceNavigation = () => {
 
     const start = () => {
       if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive()) return;
-      if (nativeRecognition) {
+      if (nativeRecognition && !nativeUnavailable) {
         if (nativeListening) return;
         nativeListening = true;
         setStatus(true);
@@ -56,11 +57,21 @@ const VoiceNavigation = () => {
               navigateFromVoice(transcript);
             }
           })
-          .catch(() => setStatus(false))
+          .catch(() => {
+            // Some Android devices expose the native bridge but have no installed
+            // speech engine. Fall back to the Web Speech API instead of retrying
+            // the failing Google recognizer indefinitely.
+            nativeUnavailable = true;
+            nativeRecognition = null;
+            setStatus(false);
+            setup();
+          })
           .finally(() => {
             nativeListening = false;
-            setStatus(false);
-            if (enabled && !stopped && !voiceOutputActive && !isVoiceOutputActive()) window.setTimeout(start, 250);
+            if (!nativeUnavailable) {
+              setStatus(false);
+              if (enabled && !stopped && !voiceOutputActive && !isVoiceOutputActive()) window.setTimeout(start, 250);
+            }
           });
         return;
       }
@@ -73,8 +84,8 @@ const VoiceNavigation = () => {
       }
     };
 
-    const setup = () => {
-      if (nativeRecognition) {
+    function setup() {
+      if (nativeRecognition && !nativeUnavailable) {
         if (enabled) void requestVoiceMicrophoneAccess().then((granted) => {
           if (granted) start();
           else setStatus(false);
@@ -111,7 +122,7 @@ const VoiceNavigation = () => {
           if (granted) start();
         });
       }
-    };
+    }
 
     const handleVoiceOutput = (event: Event) => {
       voiceOutputActive = (event as CustomEvent<{ active?: boolean }>).detail?.active === true;
@@ -123,6 +134,7 @@ const VoiceNavigation = () => {
 
     const handleModeChange = () => {
       enabled = getVoiceModeEnabled();
+      if (enabled && nativeUnavailable) nativeUnavailable = false;
       if (enabled) {
         if (!recognition) setup();
         else start();
