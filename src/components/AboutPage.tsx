@@ -1,5 +1,6 @@
 import React from 'react';
 import ParentPageLayout, { ParentPageCard } from './ParentPageLayout';
+import NowBar from './NowBar';
 
 const destinations: ParentPageCard[] = [
   { label: 'Information', description: 'Learn more about KingsHall Exchange and its services.', route: '/information' },
@@ -7,6 +8,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Community Standards', description: 'Explore the standards that help keep our community safe.', route: '/community-standards' },
 ];
 
-const AboutPage = () => <ParentPageLayout title="About" description="Learn more about KingsHall Exchange, our policies, and the standards that guide our community." cards={destinations} />;
+const AboutPage = () => <><ParentPageLayout title="About" description="Learn more about KingsHall Exchange, our policies, and the standards that guide our community." cards={destinations} /><NowBar /></>;
 
 export default AboutPage;
