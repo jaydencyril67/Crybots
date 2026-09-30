@@ -21,8 +21,14 @@ const AdminWithdrawalsPage = () => {
 
   useEffect(() => {
     if (!isAdminToken(localStorage.getItem('token'))) { navigate('/signin'); return; }
-    api.get<Response>('/api/admin/withdrawals', { params: { limit: 100 } })
-      .then(({ data }) => { setWithdrawals(data.withdrawals); setError(''); })
+    Promise.all([
+      api.get<Response>('/api/admin/withdrawals', { params: { limit: 100, status: 'pending' } }),
+      api.get<Response>('/api/admin/withdrawals', { params: { limit: 100, status: 'processing' } }),
+    ])
+      .then(([pendingResponse, processingResponse]) => {
+        setWithdrawals([...pendingResponse.data.withdrawals, ...processingResponse.data.withdrawals]);
+        setError('');
+      })
       .catch(() => setError('Unable to load withdrawals. Please try again.'))
       .finally(() => setLoading(false));
   }, []);
