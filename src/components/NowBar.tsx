@@ -495,7 +495,13 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
   const swipeStartRef = React.useRef<{ x: number; y: number } | null>(null);
   const swipeHandledRef = React.useRef(false);
   const [currentPath, setCurrentPath] = useState(getActivePath());
-  const resolvedActions = useMemo(() => actions || (admin ? createAdminActions() : createDefaultActions()), [actions, admin]);
+  const resolvedActions = useMemo(() => {
+    const availableActions = actions || (admin ? createAdminActions() : createDefaultActions());
+    if (admin && currentPath.startsWith('/admin/deposit-stats/')) {
+      return availableActions.filter((action) => action.label !== 'DEPOSITS');
+    }
+    return availableActions;
+  }, [actions, admin, currentPath]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
   const isExpanded = expandModeEnabled && mode === 'expanded';
   modeRef.current = mode;
