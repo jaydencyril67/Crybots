@@ -289,7 +289,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/details', '/statistics', '/security', '/danger'] },
   { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
-  { routes: ['/transactions', '/app-usage'] },
+  { routes: ['/transactions', '/notifications', '/app-usage'] },
   { routes: ['/theme', '/nowbar', '/alert'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
@@ -313,6 +313,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/admin/withdrawals') return 'WITHDRAW';
   if (path.startsWith('/admin/withdrawal-stats/')) return 'WITHDRAWAL STATS';
   if (path.startsWith('/admin/user-stats/')) return 'USER-STATS';
+  if (path.startsWith('/notifications/')) return 'NOTIFICATION';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme') return 'THEME';
