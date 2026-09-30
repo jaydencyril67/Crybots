@@ -6,6 +6,7 @@ import { isAdminToken } from '../utils/adminAuth';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
+import NotificationBanner from './NotificationBanner';
 
 type UserDetails = Record<string, unknown> & { email?: string };
 
@@ -67,8 +68,7 @@ const AdminUserStatsPage = () => {
             <p style={{ margin: 0, fontSize: '0.92rem', color: theme.textMuted }}>{user?.email || 'Account details'}</p>
           </section>
           <section style={{ display: 'grid', gap: 8 }}>
-            {error && <p style={{ margin: 0, color: theme.danger, fontSize: '0.86rem' }}>{error}</p>}
-            {!user && !error ? <p style={{ color: theme.textMuted }}>Loading user details…</p> : user && <>
+            {error ? <NotificationBanner tone="error" title="Unable to load user" message={error} /> : !user ? <NotificationBanner title="Loading user details" message="Loading the selected user account…" /> : <>
               {entries.filter(([key]) => key !== 'sessions').map(([key, value]) => <label key={key} style={{ display: 'grid', gridTemplateColumns: 'minmax(130px, 0.35fr) minmax(0, 1fr)', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
                 <strong style={{ fontSize: '0.82rem', overflowWrap: 'anywhere' }}>{key}</strong>
                 {isStructuredValue(value) ? <textarea value={draft[key] || ''} onChange={(event) => updateDraft(key, event.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', border: `1px solid ${theme.border}`, borderRadius: 8, padding: 8, background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.8rem' }} /> : <input value={draft[key] || ''} onChange={(event) => updateDraft(key, key === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)} maxLength={key === 'uid' ? 5 : undefined} inputMode={key === 'uid' ? 'numeric' : undefined} style={{ width: '100%', boxSizing: 'border-box', border: `1px solid ${theme.border}`, borderRadius: 8, padding: '8px 9px', background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.84rem' }} />}
