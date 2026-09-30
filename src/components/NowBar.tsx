@@ -309,6 +309,8 @@ const getCurrentPageTitle = (path: string) => {
   if (catalogEntry) return catalogEntry.label;
   if (path === '/home') return 'HOME';
   if (path === '/admin-home') return 'ADMIN';
+  if (path === '/admin/users') return 'USERS';
+  if (path.startsWith('/admin/user-stats/')) return 'USER-STATS';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme') return 'THEME';
@@ -357,7 +359,7 @@ const getCurrentPageTitle = (path: string) => {
 
 const createAdminActions = (): NowBarAction[] => [
   { label: 'DASHBOARD', icon: <ShieldCheck size={18} />, onClick: () => {}, active: getActivePath() === '/admin-home' },
-  { label: 'USERS', icon: <Users size={18} />, onClick: () => {} },
+  { label: 'USERS', icon: <Users size={18} />, onClick: () => navigate('/admin/users'), active: getActivePath() === '/admin/users' },
   { label: 'STATS', icon: <BarChart3 size={18} />, onClick: () => {} },
   { label: 'TOOLS', icon: <Wrench size={18} />, onClick: () => {} },
   { label: 'SETTINGS', icon: <Settings size={18} />, onClick: () => {} },

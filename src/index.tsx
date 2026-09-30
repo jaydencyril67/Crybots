@@ -9,6 +9,8 @@ import AccountConfirmedPage from './components/AccountConfirmedPage';
 import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
 import AdminHomePage from './components/AdminHomePage';
+import AdminUsersPage from './components/AdminUsersPage';
+import AdminUserStatsPage from './components/AdminUserStatsPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import HomePage from './components/HomePage';
 import DetailsPage from './components/DetailsPage';
@@ -103,6 +105,8 @@ const getRouteKey = () => {
   if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'account-confirmed';
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
   if (pathname === '/admin-home' || hash === '#/admin-home') return 'admin-home';
+  if (pathname === '/admin/users' || hash === '#/admin/users') return 'admin-users';
+  if (pathname.startsWith('/admin/user-stats/') || hash.startsWith('#/admin/user-stats/')) return 'admin-user-stats';
   if (pathname === '/forgot-password' || hash === '#/forgot-password') return 'forgot-password';
   if (pathname === '/home' || hash === '#/home') return 'home';
   if (pathname === '/details' || hash === '#/details') return 'details';
@@ -160,6 +164,8 @@ const routeToKey = (path: string) => {
   if (path === '/account-confirmed' || path === '#/account-confirmed') return 'account-confirmed';
   if (path === '/signin' || path === '#/signin') return 'signin';
   if (path === '/admin-home' || path === '#/admin-home') return 'admin-home';
+  if (path === '/admin/users' || path === '#/admin/users') return 'admin-users';
+  if (path.startsWith('/admin/user-stats/') || path.startsWith('#/admin/user-stats/')) return 'admin-user-stats';
   if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
   if (path === '/home' || path === '#/home') return 'home';
   if (path === '/details' || path === '#/details') return 'details';
@@ -448,6 +454,8 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'account-confirmed') return <AccountConfirmedPage />;
     if (displayedRouteKey === 'signin') return <SigninPage />;
     if (displayedRouteKey === 'admin-home') return <AdminHomePage />;
+    if (displayedRouteKey === 'admin-users') return <AdminUsersPage />;
+    if (displayedRouteKey === 'admin-user-stats') return <AdminUserStatsPage />;
     if (displayedRouteKey === 'forgot-password') return <ForgotPasswordPage />;
     if (displayedRouteKey === 'home') return <ProtectedRoute><HomePage /></ProtectedRoute>;
     if (displayedRouteKey === 'details') return <ProtectedRoute><DetailsPage /></ProtectedRoute>;
@@ -503,8 +511,8 @@ const RouteTransition = () => {
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme' || displayedRouteKey === 'nowbar' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'api-keys' || displayedRouteKey === 'webhooks' || displayedRouteKey === 'configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['home', 'details', 'manage', 'theme', 'nowbar', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert', 'app-usage'].includes(displayedRouteKey);
+  const showNowBar = displayedRouteKey === 'admin-users' || displayedRouteKey === 'admin-user-stats' || displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme' || displayedRouteKey === 'nowbar' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'api-keys' || displayedRouteKey === 'webhooks' || displayedRouteKey === 'configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'alert' || displayedRouteKey === 'app-usage';
+  const isProtectedPage = ['admin-users', 'admin-user-stats', 'home', 'details', 'manage', 'theme', 'nowbar', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'alert', 'app-usage'].includes(displayedRouteKey);
   const usagePagePath = displayedRouteKey === 'exit' ? '/exit' : displayedRouteKey === 'statistics' ? '/statistics' : displayedRouteKey === 'tools' ? '/tools' : displayedRouteKey === 'stats' ? '/stats' : displayedRouteKey === 'menu' ? '/menu' : displayedRouteKey === 'nowbar' ? '/nowbar' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   useEffect(() => {
