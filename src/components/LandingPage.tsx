@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
 import InstallAppButton from './InstallAppButton';
 import { isTokenValid } from '../utils/auth';
+import { isAdminToken } from '../utils/adminAuth';
 import { navigate } from '../utils/navigate';
 
 const stats = [
@@ -453,8 +454,8 @@ const LandingPage = () => {
   const styles = getStyles(theme);
 
   const handleHomeClick = () => {
-    const token = window.localStorage.getItem('token') || '';
-    navigate(token && isTokenValid(token) ? '/home' : '/signin');
+    const token = window.localStorage.getItem('token');
+    navigate(isAdminToken(token) ? '/admin-home' : token && isTokenValid(token) ? '/home' : '/signin');
   };
 
   const handleGetStartedClick = () => {
