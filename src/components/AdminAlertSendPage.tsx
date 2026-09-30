@@ -9,7 +9,7 @@ import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
 
 type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string };
-type UserResponse = { users: UserSummary[] };
+type UserResponse = { user: UserSummary };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', overflowX: 'hidden' as const, paddingBottom: '132px', background: theme.background, color: theme.text },
@@ -47,8 +47,8 @@ const AdminAlertSendPage = () => {
   useEffect(() => {
     if (!isAdminToken(localStorage.getItem('token'))) { navigate('/signin'); return; }
     if (!isEveryone) {
-      api.get<UserResponse>('/api/admin/users', { params: { search: targetUserId, limit: 50 } })
-        .then(({ data }) => setUser(data.users.find((item) => item._id === targetUserId) || null))
+      api.get<UserResponse>(`/api/admin/users/${targetUserId}`)
+        .then(({ data }) => setUser(data.user))
         .catch(() => setError('Unable to load the selected user.'));
     }
   }, [isEveryone, targetUserId]);
