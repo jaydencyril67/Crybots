@@ -127,7 +127,7 @@ const HybridTheme = ({ mode = 'dark', children }: HybridThemeProps) => {
         color: theme.text,
       }}
     >
-      <style>{`input, textarea, select, [contenteditable="true"] { font-family: inherit !important; }`}</style>
+      <style>{`html, body, #root, *, *::before, *::after { font-family: inherit !important; }`}</style>
       {children}
     </div>
   );
