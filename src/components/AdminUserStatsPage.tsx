@@ -39,6 +39,7 @@ const AdminUserStatsPage = () => {
     try {
       const updates: Record<string, unknown> = {};
       entries.forEach(([key, value]) => {
+        if (key === 'sessions') return;
         const raw = draft[key] ?? '';
         if (isStructuredValue(value)) {
           try { updates[key] = JSON.parse(raw); } catch { throw new Error(`Use valid JSON for ${key}.`); }
@@ -68,9 +69,9 @@ const AdminUserStatsPage = () => {
           <section style={{ display: 'grid', gap: 8 }}>
             {error && <p style={{ margin: 0, color: theme.danger, fontSize: '0.86rem' }}>{error}</p>}
             {!user && !error ? <p style={{ color: theme.textMuted }}>Loading user details…</p> : user && <>
-              {entries.map(([key, value]) => <label key={key} style={{ display: 'grid', gridTemplateColumns: 'minmax(130px, 0.35fr) minmax(0, 1fr)', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
+              {entries.filter(([key]) => key !== 'sessions').map(([key, value]) => <label key={key} style={{ display: 'grid', gridTemplateColumns: 'minmax(130px, 0.35fr) minmax(0, 1fr)', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
                 <strong style={{ fontSize: '0.82rem', overflowWrap: 'anywhere' }}>{key}</strong>
-                {isStructuredValue(value) ? <textarea value={draft[key] || ''} onChange={(event) => updateDraft(key, event.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', border: `1px solid ${theme.border}`, borderRadius: 8, padding: 8, background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.8rem' }} /> : <input value={draft[key] || ''} onChange={(event) => updateDraft(key, event.target.value)} style={{ width: '100%', boxSizing: 'border-box', border: `1px solid ${theme.border}`, borderRadius: 8, padding: '8px 9px', background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.84rem' }} />}
+                {isStructuredValue(value) ? <textarea value={draft[key] || ''} onChange={(event) => updateDraft(key, event.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', border: `1px solid ${theme.border}`, borderRadius: 8, padding: 8, background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.8rem' }} /> : <input value={draft[key] || ''} onChange={(event) => updateDraft(key, key === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)} maxLength={key === 'uid' ? 5 : undefined} inputMode={key === 'uid' ? 'numeric' : undefined} style={{ width: '100%', boxSizing: 'border-box', border: `1px solid ${theme.border}`, borderRadius: 8, padding: '8px 9px', background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.84rem' }} />}
               </label>)}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}><button type="button" onClick={saveChanges} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.primary, color: theme.textInverse, cursor: saving ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}><Save size={15} /> {saving ? 'Saving…' : 'Save changes'}</button>{saved && <span style={{ color: theme.success, fontSize: '0.82rem' }}>Saved</span>}</div>
             </>}
