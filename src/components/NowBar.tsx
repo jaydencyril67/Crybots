@@ -313,6 +313,8 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/admin/deposits') return 'DEPOSITS';
   if (path.startsWith('/admin/deposit-stats/')) return 'DEPOSIT STATS';
   if (path.startsWith('/admin/alert/send/')) return 'SEND ALERT';
+  if (path.startsWith('/admin/funds/send/')) return 'SEND FUNDS';
+  if (path === '/admin/funds') return 'FUNDS';
   if (path === '/admin/alert') return 'ALERT';
   if (path === '/admin/withdrawals') return 'WITHDRAW';
   if (path.startsWith('/admin/withdrawal-stats/')) return 'WITHDRAWAL STATS';
@@ -369,6 +371,7 @@ const createAdminActions = (): NowBarAction[] => [
   { label: 'USERS', icon: <Users size={18} />, onClick: () => navigate('/admin/users'), active: getActivePath() === '/admin/users' },
   { label: 'DEPOSITS', icon: <Coins size={18} />, onClick: () => navigate('/admin/deposits'), active: getActivePath() === '/admin/deposits' },
   { label: 'ALERT', icon: <Bell size={18} />, onClick: () => navigate('/admin/alert'), active: getActivePath() === '/admin/alert' },
+  { label: 'FUNDS', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/funds'), active: getActivePath() === '/admin/funds' },
   { label: 'WITHDRAW', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/withdrawals'), active: getActivePath() === '/admin/withdrawals' },
   { label: 'STATS', icon: <BarChart3 size={18} />, onClick: () => {} },
   { label: 'TOOLS', icon: <Wrench size={18} />, onClick: () => {} },

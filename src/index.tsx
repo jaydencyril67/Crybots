@@ -14,6 +14,8 @@ import AdminDepositsPage from './components/AdminDepositsPage';
 import AdminDepositStatsPage from './components/AdminDepositStatsPage';
 import AdminAlertPage from './components/AdminAlertPage';
 import AdminAlertSendPage from './components/AdminAlertSendPage';
+import AdminFundsPage from './components/AdminFundsPage';
+import AdminFundsSendPage from './components/AdminFundsSendPage';
 import AdminUserStatsPage from './components/AdminUserStatsPage';
 import AdminWithdrawalsPage from './components/AdminWithdrawalsPage';
 import AdminWithdrawalStatsPage from './components/AdminWithdrawalStatsPage';
@@ -116,6 +118,8 @@ const getRouteKey = () => {
   if (pathname === '/admin/deposits' || hash === '#/admin/deposits') return 'admin-deposits';
   if (pathname.startsWith('/admin/deposit-stats/') || hash.startsWith('#/admin/deposit-stats/')) return 'admin-deposit-stats';
   if (pathname.startsWith('/admin/alert/send/') || hash.startsWith('#/admin/alert/send/')) return 'admin-alert-send';
+  if (pathname.startsWith('/admin/funds/send/') || hash.startsWith('#/admin/funds/send/')) return 'admin-funds-send';
+  if (pathname === '/admin/funds' || hash === '#/admin/funds') return 'admin-funds';
   if (pathname === '/admin/alert' || hash === '#/admin/alert') return 'admin-alert';
   if (pathname === '/admin/withdrawals' || hash === '#/admin/withdrawals') return 'admin-withdrawals';
   if (pathname.startsWith('/admin/withdrawal-stats/') || hash.startsWith('#/admin/withdrawal-stats/')) return 'admin-withdrawal-stats';
@@ -480,6 +484,8 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'admin-deposit-stats') return <AdminDepositStatsPage />;
     if (displayedRouteKey === 'admin-alert') return <AdminAlertPage />;
     if (displayedRouteKey === 'admin-alert-send') return <AdminAlertSendPage />;
+    if (displayedRouteKey === 'admin-funds') return <AdminFundsPage />;
+    if (displayedRouteKey === 'admin-funds-send') return <AdminFundsSendPage />;
     if (displayedRouteKey === 'admin-user-stats') return <AdminUserStatsPage />;
     if (displayedRouteKey === 'admin-withdrawals') return <AdminWithdrawalsPage />;
     if (displayedRouteKey === 'admin-withdrawal-stats') return <AdminWithdrawalStatsPage />;
