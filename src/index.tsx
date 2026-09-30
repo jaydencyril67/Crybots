@@ -11,6 +11,8 @@ import SigninPage from './components/SigninPage';
 import AdminHomePage from './components/AdminHomePage';
 import AdminUsersPage from './components/AdminUsersPage';
 import AdminUserStatsPage from './components/AdminUserStatsPage';
+import AdminWithdrawalsPage from './components/AdminWithdrawalsPage';
+import AdminWithdrawalStatsPage from './components/AdminWithdrawalStatsPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import HomePage from './components/HomePage';
 import DetailsPage from './components/DetailsPage';
@@ -106,6 +108,8 @@ const getRouteKey = () => {
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
   if (pathname === '/admin-home' || hash === '#/admin-home') return 'admin-home';
   if (pathname === '/admin/users' || hash === '#/admin/users') return 'admin-users';
+  if (pathname === '/admin/withdrawals' || hash === '#/admin/withdrawals') return 'admin-withdrawals';
+  if (pathname.startsWith('/admin/withdrawal-stats/') || hash.startsWith('#/admin/withdrawal-stats/')) return 'admin-withdrawal-stats';
   if (pathname.startsWith('/admin/user-stats/') || hash.startsWith('#/admin/user-stats/')) return 'admin-user-stats';
   if (pathname === '/forgot-password' || hash === '#/forgot-password') return 'forgot-password';
   if (pathname === '/home' || hash === '#/home') return 'home';
@@ -165,6 +169,8 @@ const routeToKey = (path: string) => {
   if (path === '/signin' || path === '#/signin') return 'signin';
   if (path === '/admin-home' || path === '#/admin-home') return 'admin-home';
   if (path === '/admin/users' || path === '#/admin/users') return 'admin-users';
+  if (path === '/admin/withdrawals' || path === '#/admin/withdrawals') return 'admin-withdrawals';
+  if (path.startsWith('/admin/withdrawal-stats/') || path.startsWith('#/admin/withdrawal-stats/')) return 'admin-withdrawal-stats';
   if (path.startsWith('/admin/user-stats/') || path.startsWith('#/admin/user-stats/')) return 'admin-user-stats';
   if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
   if (path === '/home' || path === '#/home') return 'home';
@@ -456,6 +462,8 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'admin-home') return <AdminHomePage />;
     if (displayedRouteKey === 'admin-users') return <AdminUsersPage />;
     if (displayedRouteKey === 'admin-user-stats') return <AdminUserStatsPage />;
+    if (displayedRouteKey === 'admin-withdrawals') return <AdminWithdrawalsPage />;
+    if (displayedRouteKey === 'admin-withdrawal-stats') return <AdminWithdrawalStatsPage />;
     if (displayedRouteKey === 'forgot-password') return <ForgotPasswordPage />;
     if (displayedRouteKey === 'home') return <ProtectedRoute><HomePage /></ProtectedRoute>;
     if (displayedRouteKey === 'details') return <ProtectedRoute><DetailsPage /></ProtectedRoute>;
