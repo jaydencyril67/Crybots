@@ -1,5 +1,6 @@
 import React from 'react';
 import ParentPageLayout, { ParentPageCard } from './ParentPageLayout';
+import NowBar from './NowBar';
 
 const destinations: ParentPageCard[] = [
   { label: 'FAQ', description: 'Find answers to frequently asked questions.', route: '/faq' },
@@ -8,6 +9,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Tutorial', description: 'Learn how to use KingsHall Exchange.' },
 ];
 
-const HelpPage = () => <ParentPageLayout title="Help" description="Find answers and connect with the KingsHall support team." cards={destinations} />;
+const HelpPage = () => <><ParentPageLayout title="Help" description="Find answers and connect with the KingsHall support team." cards={destinations} /><NowBar /></>;
 
 export default HelpPage;
