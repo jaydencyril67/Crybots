@@ -105,8 +105,8 @@ const InitialSplashCleanup = () => {
 };
 
 const getRouteKey = () => {
-  const pathname = getPathname();
-  const hash = getHash();
+  const pathname = getPathname().split(/[?#]/)[0].replace(/\/+$/, '') || '/';
+  const hash = getHash().split(/[?#]/)[0].replace(/\/+$/, '') || '';
 
   if (pathname === '/signup' || hash === '#/signup') return 'signup';
   if (pathname === '/signup-confirmation-sent' || hash === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
@@ -176,19 +176,20 @@ const getRouteKey = () => {
 };
 
 const routeToKey = (path: string) => {
-  if (path === '/signup' || path === '#/signup') return 'signup';
-  if (path === '/signup-confirmation-sent' || path === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
-  if (path === '/verify-email' || path === '#/verify-email') return 'verify-email';
-  if (path === '/account-confirmed' || path === '#/account-confirmed') return 'account-confirmed';
-  if (path === '/signin' || path === '#/signin') return 'signin';
-  if (path === '/admin-home' || path === '#/admin-home') return 'admin-home';
-  if (path === '/admin/users' || path === '#/admin/users') return 'admin-users';
-  if (path === '/admin/deposits' || path === '#/admin/deposits') return 'admin-deposits';
-  if (path.startsWith('/admin/deposit-stats/') || path.startsWith('#/admin/deposit-stats/')) return 'admin-deposit-stats';
-  if (path.startsWith('/admin/alert/send/') || path.startsWith('#/admin/alert/send/')) return 'admin-alert-send';
-  if (path.startsWith('/admin/funds/send/') || path.startsWith('#/admin/funds/send/')) return 'admin-funds-send';
-  if (path === '/admin/funds' || path === '#/admin/funds') return 'admin-funds';
-  if (path === '/admin/alert' || path === '#/admin/alert') return 'admin-alert';
+  const normalizedPath = path.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
+  if (normalizedPath === '/signup' || normalizedPath === '#/signup') return 'signup';
+  if (normalizedPath === '/signup-confirmation-sent' || normalizedPath === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
+  if (normalizedPath === '/verify-email' || normalizedPath === '#/verify-email') return 'verify-email';
+  if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'account-confirmed';
+  if (normalizedPath === '/signin' || normalizedPath === '#/signin') return 'signin';
+  if (normalizedPath === '/admin-home' || normalizedPath === '#/admin-home') return 'admin-home';
+  if (normalizedPath === '/admin/users' || normalizedPath === '#/admin/users') return 'admin-users';
+  if (normalizedPath === '/admin/deposits' || normalizedPath === '#/admin/deposits') return 'admin-deposits';
+  if (normalizedPath.startsWith('/admin/deposit-stats/') || normalizedPath.startsWith('#/admin/deposit-stats/')) return 'admin-deposit-stats';
+  if (normalizedPath.startsWith('/admin/alert/send/') || normalizedPath.startsWith('#/admin/alert/send/')) return 'admin-alert-send';
+  if (normalizedPath.startsWith('/admin/funds/send/') || normalizedPath.startsWith('#/admin/funds/send/')) return 'admin-funds-send';
+  if (normalizedPath === '/admin/funds' || normalizedPath === '#/admin/funds') return 'admin-funds';
+  if (normalizedPath === '/admin/alert' || normalizedPath === '#/admin/alert') return 'admin-alert';
   if (path === '/admin/withdrawals' || path === '#/admin/withdrawals') return 'admin-withdrawals';
   if (path.startsWith('/admin/withdrawal-stats/') || path.startsWith('#/admin/withdrawal-stats/')) return 'admin-withdrawal-stats';
   if (path.startsWith('/admin/user-stats/') || path.startsWith('#/admin/user-stats/')) return 'admin-user-stats';
