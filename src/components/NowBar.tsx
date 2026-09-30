@@ -289,7 +289,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/details', '/statistics', '/security', '/danger'] },
   { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
-  { routes: ['/transactions', '/notifications', '/app-usage'] },
+  { routes: ['/transactions', '/app-usage'] },
   { routes: ['/theme', '/nowbar', '/alert'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
