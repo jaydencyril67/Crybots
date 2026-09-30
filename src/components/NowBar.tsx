@@ -313,6 +313,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/admin/withdrawals') return 'WITHDRAW';
   if (path.startsWith('/admin/withdrawal-stats/')) return 'WITHDRAWAL STATS';
   if (path.startsWith('/admin/user-stats/')) return 'USER-STATS';
+  if (path.startsWith('/notifications/')) return 'NOTIFICATION';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme') return 'THEME';

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Bell, Info, ShieldAlert, WalletCards } from 'lucide-react';
+import { ArrowLeft, Eye, Bell, Info, ShieldAlert, WalletCards } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
@@ -7,6 +7,7 @@ import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import api from '../api/axios';
 import { AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
+import { navigate } from '../utils/navigate';
 
 type NotificationItem = {
   id: string;
@@ -24,13 +25,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   heading: { margin: '20px 0 8px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
-  list: { display: 'grid', gap: '10px', padding: '10px', borderRadius: '18px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
-  item: { display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '14px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, textAlign: 'left' as const, cursor: 'pointer', width: '100%', boxSizing: 'border-box' as const },
+  section: { display: 'grid', gap: '10px' },
+  list: { display: 'grid', gap: 10, marginTop: 6 },
+  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box' as const, backdropFilter: 'blur(24px) saturate(1.15)' },
   unread: { border: `1px solid ${theme.primary}`, background: theme.primarySoft },
-  icon: { width: '20px', height: '20px', color: theme.primary, flexShrink: 0, marginTop: '2px' },
-  title: { margin: 0, fontSize: '0.98rem', fontWeight: 800 },
-  message: { margin: '5px 0 7px', color: theme.textMuted, lineHeight: 1.55, fontSize: '0.9rem' },
+  icon: { width: '20px', height: '20px', color: theme.primary, flexShrink: 0 },
+  title: { margin: 0, fontSize: '0.95rem', fontWeight: 850, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
+  view: { borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '7px 12px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 },
   empty: { padding: '28px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceMuted },
 });
 
@@ -119,14 +121,10 @@ const NotificationsPage = () => {
             {notifications.map((notification) => {
               const Icon = iconForType(notification.type);
               return (
-                <div key={notification.id} style={{ ...styles.item, ...(notification.readAt ? {} : styles.unread) }}>
-                  <Icon style={styles.icon} />
-                  <span>
-                    <h2 style={styles.title}>{notification.title}</h2>
-                    <p style={styles.message}>{notification.message}</p>
-                    <p style={styles.date}>{new Date(notification.createdAt).toLocaleString()}</p>
-                  </span>
-                </div>
+                <article key={notification.id} style={{ ...styles.item, ...(notification.readAt ? {} : styles.unread) }}>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}><Icon style={styles.icon} /><div style={{ minWidth: 0 }}><h2 style={styles.title}>{notification.title}</h2><p style={styles.date}>{new Date(notification.createdAt).toLocaleString()}</p></div></div>
+                  <button type="button" style={styles.view} onClick={() => navigate(`/notifications/${notification.id}`)}><Eye size={15} /> View</button>
+                </article>
               );
             })}
           </div>
