@@ -94,7 +94,7 @@ const DepositPage = () => {
     primaryButton: { border: `1px solid ${theme.primary}`, borderRadius: '999px', padding: '12px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 700, width: '100%', maxWidth: '100%', opacity: 1 },
     primaryButtonDisabled: { opacity: 0.55, cursor: 'not-allowed' },
     secondaryButton: { border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' },
-    address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontFamily: 'monospace', fontSize: '0.8rem' },
+    address: { wordBreak: 'break-all' as const, margin: '6px 0 0', padding: '10px', borderRadius: '9px', background: theme.surfaceGlass, fontSize: '0.8rem' },
     recentList: { display: 'grid', gap: '8px', marginTop: '10px' },
     recentItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', padding: '10px 12px', border: `1px solid ${theme.border}`, borderRadius: '10px', background: theme.surface, color: theme.text },
     recentItemClickable: { cursor: 'pointer', transition: 'border-color 0.15s ease, background 0.15s ease' },
