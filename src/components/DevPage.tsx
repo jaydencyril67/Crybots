@@ -1,5 +1,6 @@
 import React from 'react';
 import ParentPageLayout, { ParentPageCard } from './ParentPageLayout';
+import NowBar from './NowBar';
 
 const destinations: ParentPageCard[] = [
   { label: 'API Keys', description: 'Create and manage keys for secure API access.', route: '/api-keys' },
@@ -7,6 +8,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Configure', description: 'Adjust dev tools and integration preferences.', route: '/configure' },
 ];
 
-const DevPage = () => <ParentPageLayout title="Dev" description="Manage dev tools and integrations for your KingsHall Exchange account." cards={destinations} />;
+const DevPage = () => <><ParentPageLayout title="Dev" description="Manage dev tools and integrations for your KingsHall Exchange account." cards={destinations} /><NowBar /></>;
 
 export default DevPage;
