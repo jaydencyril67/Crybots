@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronDown, Send } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Send } from 'lucide-react';
 import api from '../api/axios';
 import { isAdminToken } from '../utils/adminAuth';
 import { navigate } from '../utils/navigate';
@@ -69,7 +69,7 @@ const AdminAlertSendPage = () => {
   const typeLabel = type === 'account' ? 'Account' : type === 'security' ? 'Security' : type === 'transaction' ? 'Transaction' : 'System';
   return <HybridTheme mode={themeMode}>
     <div style={styles.page}><div style={styles.shell}><div style={styles.content}>
-      <section style={styles.section}><h2 style={styles.title}>Send Alert</h2><p style={styles.text}>Send an in-app notification to {recipient}.</p></section>
+      <section style={styles.section}><button type="button" onClick={() => navigate('/admin/alert')} style={{ justifySelf: 'start', border: 0, padding: 0, background: 'transparent', color: theme.textMuted, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 800 }}><ArrowLeft size={15} /> Back to alerts</button><h2 style={styles.title}>Send Alert</h2><p style={styles.text}>Send an in-app notification to {recipient}.</p></section>
       {error ? <NotificationBanner tone="error" title="Unable to send alert" message={error} /> : null}
       {status ? <NotificationBanner tone="success" title="Alert sent" message={status} /> : null}
       <form style={styles.card} onSubmit={(event) => void sendAlert(event)}>
