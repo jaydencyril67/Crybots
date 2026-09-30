@@ -310,6 +310,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/home') return 'HOME';
   if (path === '/admin-home') return 'ADMIN';
   if (path === '/admin/users') return 'USERS';
+  if (path.startsWith('/admin/alert/send/')) return 'SEND ALERT';
   if (path === '/admin/alert') return 'ALERT';
   if (path === '/admin/withdrawals') return 'WITHDRAW';
   if (path.startsWith('/admin/withdrawal-stats/')) return 'WITHDRAWAL STATS';
