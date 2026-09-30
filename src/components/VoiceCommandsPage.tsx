@@ -4,6 +4,7 @@ import { navigate } from '../utils/navigate';
 import { AUTHENTICATED_NOWBAR_PAGE_ROUTES, NOWBAR_COMMAND_EVENT } from '../utils/voiceNavigation';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import NowBar from './NowBar';
 const VoiceCommandsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
@@ -25,6 +26,7 @@ const VoiceCommandsPage = () => {
           </section>
         </div>
       </main>
+      <NowBar />
     </HybridTheme>
   );
 };
