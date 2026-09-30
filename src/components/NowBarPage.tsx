@@ -49,7 +49,7 @@ const NowBarPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [enabled, setEnabled] = useState(false);
-  const [buttonColorEnabled, setButtonColorEnabled] = useState(true);
+  const [buttonColorEnabled, setButtonColorEnabled] = useState(false);
   const [swipeNavigationEnabled, setSwipeNavigationEnabled] = useState(true);
   const [expandModeEnabled, setExpandModeEnabled] = useState(true);
   const [voiceModeEnabled, setVoiceModeEnabled] = useState(false);
