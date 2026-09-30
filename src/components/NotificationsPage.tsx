@@ -6,7 +6,7 @@ import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import api from '../api/axios';
-import { AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
+import { AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
 import { navigate } from '../utils/navigate';
 
 type NotificationItem = {
@@ -65,18 +65,6 @@ const NotificationsPage = () => {
       setNotifications(nextNotifications);
       setError('');
 
-      if (nextNotifications.some((notification: NotificationItem) => !notification.readAt)) {
-        try {
-          await api.post('/api/notifications/read-all');
-          setNotifications((current) => current.map((notification) => ({
-            ...notification,
-            readAt: notification.readAt || new Date().toISOString(),
-          })));
-          notifyNotificationsChanged();
-        } catch {
-          // Keep the notifications visible if marking them read fails.
-        }
-      }
     } catch {
       if (localStorage.getItem('token')) {
         setError('Unable to load notifications right now.');
