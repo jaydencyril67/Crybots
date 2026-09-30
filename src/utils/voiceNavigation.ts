@@ -270,6 +270,11 @@ const dispatchNowBarCommand = (command: NowBarCommand) => {
   window.dispatchEvent(new CustomEvent(NOWBAR_COMMAND_EVENT, { detail: { command } }));
 };
 
+// A recognition session can deliver the same final result more than once while it
+// restarts. Keep one utterance from moving back multiple history entries.
+const BACK_COMMAND_DEBOUNCE_MS = 1000;
+let lastBackCommandAt = 0;
+
 export const navigateFromVoice = (transcript: string) => {
   const normalized = normalizeVoiceText(transcript);
   if (isVoiceWakeWord(transcript)) {
@@ -284,6 +289,9 @@ export const navigateFromVoice = (transcript: string) => {
     return true;
   }
   if (/(^|\s)(go\s+)?back(\s|$)/.test(normalized) || normalizedTranscript.includes(' previous page ')) {
+    const now = Date.now();
+    if (now - lastBackCommandAt < BACK_COMMAND_DEBOUNCE_MS) return true;
+    lastBackCommandAt = now;
     window.history.back();
     return true;
   }
