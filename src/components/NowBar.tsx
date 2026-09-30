@@ -47,13 +47,13 @@ const getFeatureEnabled = (key: string) => {
 };
 
 const getButtonColorEnabled = () => {
-  if (typeof window === 'undefined') return true;
+  if (typeof window === 'undefined') return false;
 
   try {
     const stored = window.localStorage.getItem(BUTTON_COLOR_ENABLED_STORAGE_KEY);
-    return stored === null ? true : stored === 'true';
+    return stored === null ? false : stored === 'true';
   } catch {
-    return true;
+    return false;
   }
 };
 
