@@ -71,7 +71,7 @@ const NotificationPage = () => {
 
   return <HybridTheme mode={themeMode}>
     <main style={styles.page}><div style={styles.shell}>
-      <button type="button" style={styles.back} onClick={() => navigate('/notifications')}><ArrowLeft size={17} /> Back</button>
+      <button type="button" style={styles.back} onClick={() => navigate('/notifications')}><ArrowLeft size={17} /> Notifications</button>
       <section style={styles.section}>
         <h1 style={styles.title}>Notification</h1>
         {error ? <NotificationBanner tone="error" title="Notification unavailable" message={error} /> : null}
