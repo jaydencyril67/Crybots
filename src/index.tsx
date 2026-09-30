@@ -59,7 +59,6 @@ import NotificationsPage from './components/NotificationsPage';
 import AlertPage from './components/AlertPage';
 import AppUsagePage from './components/AppUsagePage';
 import ProtectedRoute from './components/ProtectedRoute';
-import NowBar from './components/NowBar';
 import AppHeader from './components/AppHeader';
 import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { API_BASE_URL, forceLogout } from './api/axios';
@@ -541,7 +540,6 @@ const RouteTransition = () => {
         <AppHeader isPublicPage={!isProtectedPage} />
         {appContent}
       </div>
-      {showNowBar ? <NowBar /> : null}
     </div>
   );
 };
