@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, Search, Users } from 'lucide-react';
+import { Eye, Search } from 'lucide-react';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import { isAdminToken } from '../utils/adminAuth';
@@ -20,7 +20,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   search: { display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass, backdropFilter: 'blur(24px) saturate(1.15)' },
   input: { width: '100%', border: 0, outline: 0, background: 'transparent', color: theme.text, fontSize: '0.92rem' },
   cardGrid: { display: 'grid', gap: 10, marginTop: 6 },
-  card: { display: 'grid', gridTemplateColumns: 'minmax(110px, 0.35fr) minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box' as const, backdropFilter: 'blur(24px) saturate(1.15)' },
+  card: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box' as const, backdropFilter: 'blur(24px) saturate(1.15)' },
   title: { margin: 0, fontSize: '0.95rem', fontWeight: 850, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
   subtext: { margin: 0, color: theme.textMuted, fontSize: '0.84rem', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
   button: { borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '7px 12px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 },
@@ -59,7 +59,7 @@ const AdminUsersPage = () => {
           <section style={styles.section}>
             <div style={styles.search}><Search size={18} color={theme.textMuted} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search users by email" aria-label="Search users by email" style={styles.input} /></div>
             {error && <p style={{ ...styles.sectionText, color: theme.danger }}>{error}</p>}
-            {loading ? <p style={styles.sectionText}>Loading users…</p> : users.length === 0 ? <p style={styles.sectionText}>No users found.</p> : <div style={styles.cardGrid}>{users.map((user) => <article key={user._id} style={styles.card}><Users size={18} color={theme.primary} /><div><h3 style={styles.title}>{user.email}</h3><p style={styles.subtext}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/user-stats/${user._id}`)} style={styles.button}><Eye size={15} /> View</button></article>)}</div>}
+            {loading ? <p style={styles.sectionText}>Loading users…</p> : users.length === 0 ? <p style={styles.sectionText}>No users found.</p> : <div style={styles.cardGrid}>{users.map((user) => <article key={user._id} style={styles.card}><div><h3 style={styles.title}>{user.email}</h3><p style={styles.subtext}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/user-stats/${user._id}`)} style={styles.button}><Eye size={15} /> View</button></article>)}</div>}
           </section>
         </div>
       </div>
