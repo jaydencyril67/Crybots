@@ -31,9 +31,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   delete: { borderRadius: 999, border: `1px solid ${theme.danger || theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.danger || theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: 6 },
   deleteMenu: { display: 'grid', gap: 10, padding: 12, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, maxWidth: 360 },
   deletePrompt: { margin: 0, color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.45 },
-  deleteActions: { display: 'flex', gap: 8, flexWrap: 'wrap' as const },
-  cancel: { borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceGlass, cursor: 'pointer' },
-  confirmDelete: { borderRadius: 999, border: `1px solid ${theme.danger || theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.danger || theme.text, background: theme.surfaceGlass, cursor: 'pointer' },
+  deleteActions: { display: 'flex', gap: 8, width: '100%' },
+  cancel: { flex: 1, borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceGlass, cursor: 'pointer' },
+  confirmDelete: { flex: 1, borderRadius: 999, border: `1px solid ${theme.danger || theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.danger || theme.text, background: theme.surfaceGlass, cursor: 'pointer' },
   empty: { padding: 28, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceMuted },
 });
 
