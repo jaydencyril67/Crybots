@@ -31,8 +31,8 @@ const AdminAlertPage = () => {
   const styles = getStyles(theme);
   const [users, setUsers] = useState<UserSummary[]>([]);
   const [targetUserId, setTargetUserId] = useState('all');
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
+  const [subject, setSubject] = useState('');
+  const [details, setDetails] = useState('');
   const [type, setType] = useState('system');
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
@@ -49,9 +49,9 @@ const AdminAlertPage = () => {
     event.preventDefault();
     setSending(true); setError(''); setStatus('');
     try {
-      const response = await api.post<{ sent: number }>('/api/admin/notifications', { targetUserId, title, message, type });
+      const response = await api.post<{ sent: number }>('/api/admin/notifications', { targetUserId, subject, details, type });
       setStatus(`Notification sent to ${response.data.sent} user${response.data.sent === 1 ? '' : 's'}.`);
-      setTitle(''); setMessage('');
+      setSubject(''); setDetails('');
     } catch { setError('Unable to send the notification. Please check the form and try again.'); }
     finally { setSending(false); }
   };
@@ -65,8 +65,8 @@ const AdminAlertPage = () => {
       <form style={styles.card} onSubmit={(event) => void sendAlert(event)}>
         <label style={styles.label}>Recipient<select value={targetUserId} onChange={(event) => setTargetUserId(event.target.value)} style={styles.input}><option value="all">All users</option>{users.map((user) => <option key={user._id} value={user._id}>{user.email}{user.firstName ? ` — ${user.firstName} ${user.lastName || ''}` : ''}</option>)}</select></label>
         <label style={styles.label}>Notification type<select value={type} onChange={(event) => setType(event.target.value)} style={styles.input}><option value="system">System</option><option value="account">Account</option><option value="security">Security</option><option value="transaction">Transaction</option></select></label>
-        <label style={styles.label}>Title<input required maxLength={120} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Enter an alert title" style={styles.input} /></label>
-        <label style={styles.label}>Message<textarea required maxLength={2000} value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Write the notification message" style={{ ...styles.input, ...styles.textarea }} /></label>
+        <label style={styles.label}>Subject<input required maxLength={120} value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Enter the notification subject" style={styles.input} /></label>
+        <label style={styles.label}>Details<textarea required maxLength={2000} value={details} onChange={(event) => setDetails(event.target.value)} placeholder="Write the notification details" style={{ ...styles.input, ...styles.textarea }} /></label>
         <button type="submit" disabled={sending} style={{ ...styles.button, opacity: sending ? 0.65 : 1 }}><Send size={16} /> {sending ? 'Sending…' : 'Send notification'}</button>
       </form>
     </div></div><NowBar admin /></div>
