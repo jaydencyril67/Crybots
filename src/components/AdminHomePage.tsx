@@ -2,48 +2,32 @@ import React, { useEffect } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { isAdminToken } from '../utils/adminAuth';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 
 const AdminHomePage = () => {
   const { themeMode } = useAppTheme();
-
-  useEffect(() => {
-    if (!isAdminToken(localStorage.getItem('token'))) {
-      navigate('/signin');
-    }
-  }, []);
-
+  const theme = HYBRID_THEME_TOKENS[themeMode];
+  useEffect(() => { if (!isAdminToken(localStorage.getItem('token'))) navigate('/signin'); }, []);
   if (!isAdminToken(localStorage.getItem('token'))) return null;
-
-  const isDark = themeMode === 'dark';
-  const background = isDark ? '#10131a' : '#f4f7fb';
-  const surface = isDark ? '#191f2b' : '#ffffff';
-  const text = isDark ? '#f5f7fb' : '#172033';
-  const muted = isDark ? '#aab4c5' : '#62708a';
-
-  return (
-    <>
-      <main style={{ minHeight: '100vh', background, color: text, padding: 'clamp(24px, 5vw, 64px)', paddingBottom: '132px' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <header style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36 }}>
-          <div style={{ display: 'grid', placeItems: 'center', width: 52, height: 52, borderRadius: 16, background: '#2563eb', color: '#fff' }}>
-            <ShieldCheck size={28} />
-          </div>
-          <div>
-            <p style={{ margin: 0, color: '#2563eb', fontSize: 12, fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase' }}>KingsHall Admin</p>
-            <h1 style={{ margin: '6px 0 0', fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>Admin-Home</h1>
-          </div>
-        </header>
-        <section style={{ padding: 28, borderRadius: 24, background: surface, boxShadow: '0 18px 50px rgba(15, 23, 42, 0.12)' }}>
-          <h2 style={{ marginTop: 0 }}>Welcome to the admin system</h2>
-          <p style={{ marginBottom: 0, color: muted, lineHeight: 1.7 }}>Your administrator sign-in is active. This dashboard is ready for the next admin features.</p>
-        </section>
+  return <HybridTheme mode={themeMode}>
+    <div style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}>
+      <div style={{ width: '100%', maxWidth: 1160, margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' }}>
+        <div style={{ display: 'grid', gap: 18, marginTop: 18 }}>
+          <section style={{ display: 'grid', gap: 10 }}>
+            <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900 }}>Admin Home</h2>
+            <p style={{ margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7 }}>Manage platform users and administrator tools.</p>
+          </section>
+          <section style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'blur(24px) saturate(1.15)' }}>
+            <ShieldCheck size={22} color={theme.primary} />
+            <div><strong style={{ fontSize: '0.95rem' }}>Administrator access active</strong><p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.84rem' }}>Use the admin navigation below to manage the platform.</p></div>
+          </section>
+        </div>
       </div>
-      </main>
       <NowBar admin />
-    </>
-  );
+    </div>
+  </HybridTheme>;
 };
 
 export default AdminHomePage;
