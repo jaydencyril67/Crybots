@@ -59,12 +59,8 @@ const AdminUserStatsPage = () => {
   return <HybridTheme mode={themeMode}>
     <div style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}>
       <div style={{ width: '100%', maxWidth: 1160, margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' }}>
-        <div style={{ display: 'grid', gap: 14, marginTop: 18 }}>
-          <section style={{ display: 'grid', gap: 8 }}>
-            <button type="button" onClick={() => navigate('/admin/users')} style={{ justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: 6, border: 0, padding: 0, background: 'transparent', color: theme.textMuted, cursor: 'pointer', fontSize: '0.84rem', fontWeight: 800 }}><ArrowLeft size={15} /> Back to users</button>
-            <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900 }}>User-Stats</h2>
-            <p style={{ margin: 0, fontSize: '0.92rem', color: theme.textMuted }}>{user?.email || 'Account details'}</p>
-          </section>
+        <div style={{ display: 'grid', gap: 14 }}>
+          <button type="button" onClick={() => navigate('/admin/users')} style={{ justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={16} /> Back to users</button>
           <section style={{ display: 'grid', gap: 8 }}>
             {error && <p style={{ margin: 0, color: theme.danger, fontSize: '0.86rem' }}>{error}</p>}
             {!user && !error ? <p style={{ color: theme.textMuted }}>Loading user details…</p> : user && <>

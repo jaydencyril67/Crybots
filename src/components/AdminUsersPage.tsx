@@ -15,7 +15,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '18px', marginTop: '18px' },
   section: { display: 'grid', gap: '10px' },
-  sectionTitle: { margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em' },
   sectionText: { margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7 },
   search: { display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass, backdropFilter: 'blur(24px) saturate(1.15)' },
   input: { width: '100%', border: 0, outline: 0, background: 'transparent', color: theme.text, fontSize: '0.92rem' },
@@ -52,10 +51,6 @@ const AdminUsersPage = () => {
     <div style={styles.page}>
       <div style={styles.shell}>
         <div style={styles.content}>
-          <section style={styles.section}>
-            <h2 style={styles.sectionTitle}>Admin Users</h2>
-            <p style={styles.sectionText}>Search and view registered user accounts.</p>
-          </section>
           <section style={styles.section}>
             <div style={styles.search}><Search size={18} color={theme.textMuted} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search users by email" aria-label="Search users by email" style={styles.input} /></div>
             {error && <p style={{ ...styles.sectionText, color: theme.danger }}>{error}</p>}
