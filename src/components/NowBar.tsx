@@ -365,7 +365,7 @@ const getCurrentPageTitle = (path: string) => {
 const createAdminActions = (): NowBarAction[] => [
   { label: 'DASHBOARD', icon: <ShieldCheck size={18} />, onClick: () => navigate('/admin-home'), active: getActivePath() === '/admin-home' },
   { label: 'USERS', icon: <Users size={18} />, onClick: () => navigate('/admin/users'), active: getActivePath() === '/admin/users' },
-  { label: 'ALERT', icon: <Bell size={18} />, onClick: () => navigate('/admin/alert'), active: getActivePath() === '/admin/alert' || getActivePath().startsWith('/admin/alert/send/') },
+  { label: 'ALERT', icon: <Bell size={18} />, onClick: () => navigate('/admin/alert'), active: getActivePath() === '/admin/alert' },
   { label: 'WITHDRAW', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/withdrawals'), active: getActivePath() === '/admin/withdrawals' },
   { label: 'STATS', icon: <BarChart3 size={18} />, onClick: () => {} },
   { label: 'TOOLS', icon: <Wrench size={18} />, onClick: () => {} },
