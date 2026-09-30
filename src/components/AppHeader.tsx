@@ -97,7 +97,8 @@ const styles = {
   },
   marqueeTrack: {
     display: 'inline-block',
-    paddingLeft: '100%',
+    whiteSpace: 'nowrap',
+    transform: 'translateX(100%)',
     animationName: 'ke-notification-marquee',
     animationTimingFunction: 'linear' as const,
     animationFillMode: 'forwards' as const,
@@ -310,7 +311,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
         50% { opacity: 0.9; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.78), 0 0 22px rgba(239, 68, 68, 0.62), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.48)); }
       }
       @keyframes ke-notification-marquee {
-        from { transform: translateX(0); }
+        from { transform: translateX(100%); }
         to { transform: translateX(-100%); }
       }`}</style>
       <header
