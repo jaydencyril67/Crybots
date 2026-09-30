@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronDown } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import NowBar from './NowBar';
 
 type FAQItem = {
   question: string;
@@ -114,6 +115,7 @@ const FAQPage = () => {
           </div>
         </div>
       </div>
+      <NowBar />
     </HybridTheme>
   );
 };

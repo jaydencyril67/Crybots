@@ -7,6 +7,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NotificationBanner, { type NotificationTone } from './NotificationBanner';
 import LoadingDots from './LoadingDots';
+import NowBar from './NowBar';
 
 type PercentValue = number | '';
 type AutoSellRule = { enabled: boolean; minPercent: PercentValue; maxPercent: PercentValue; points: number };
@@ -89,7 +90,7 @@ const ControlCenterPage = () => {
     {renderSection('autoSell', 'Auto-sell points', 'When the market is inside the selected range, withdraw the chosen number of active points into your USDT balance. The rule triggers once per market entry.', autoSell, (field, value) => updateRule(setAutoSell, field, value), true)}
     {renderSection('marketNotification', 'Market range notifications', 'Get notified when the market enters the selected range. This rule only sends alerts and never sells or withdraws points.', marketNotification, (field, value) => updateRule(setMarketNotification, field, value))}
     {renderSection('takeProfit', 'Take profits', 'Take-profit rules sell only points earned above your original capital. Your initial points bought stay invested.', takeProfit, (field, value) => updateRule(setTakeProfit, field, value))}
-  </div></div></HybridTheme>;
+  </div><NowBar /></div></HybridTheme>;
 };
 
 export default ControlCenterPage;

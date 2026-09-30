@@ -7,6 +7,7 @@ import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
+import NowBar from './NowBar';
 
 const preferenceTopics = [
   { key: 'account', label: 'Account activity', description: 'Profile changes, sign-ins and account updates.' },
@@ -183,6 +184,7 @@ const AlertPage = () => {
           </section>
         </div>
       </main>
+      <NowBar />
     </HybridTheme>
   );
 };
