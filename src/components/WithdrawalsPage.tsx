@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
+import { ArrowLeft, CalendarClock, ChevronDown, Coins, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
@@ -125,7 +125,9 @@ const WithdrawPage = () => {
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
   const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
+  const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
   const methodMenuRef = useRef<HTMLDivElement | null>(null);
+  const walletMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
   const [destinationValue, setDestinationValue] = useState('');
   const [wallets, setWallets] = useState<WithdrawalWallet[]>([]);
@@ -148,6 +150,9 @@ const WithdrawPage = () => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (methodMenuRef.current && !methodMenuRef.current.contains(event.target as Node)) {
         setIsMethodMenuOpen(false);
+      }
+      if (walletMenuRef.current && !walletMenuRef.current.contains(event.target as Node)) {
+        setIsWalletMenuOpen(false);
       }
     };
 
@@ -273,12 +278,18 @@ const WithdrawPage = () => {
               <input style={styles.input} type="number" min="1" step="1" inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="1 USDT" />
             </div>
             <div style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Withdrawal wallet</span>
-              {wallets.length ? <select style={styles.input} value={selectedWalletId} onChange={(event) => setSelectedWalletId(event.target.value)}>
-                {wallets.map((wallet) => <option key={wallet.id} value={wallet.id}>{wallet.description || wallet.network} · {wallet.address.slice(0, 8)}…{wallet.address.slice(-6)}</option>)}
-              </select> : <input style={styles.input} value={availableDestination} readOnly />}
-              <span style={styles.helper}>{wallets.length ? 'Select one of your validated wallets.' : 'Bind a wallet in Manage before withdrawing.'}</span>
+              <span style={styles.label}>Bound wallets</span>
+              {!wallets.length ? <input style={styles.input} value={availableDestination} readOnly /> : null}
+              <span style={styles.helper}>{wallets.length ? 'Choose a bound wallet from the selector below.' : 'Bind a wallet in Manage before withdrawing.'}</span>
             </div>
+            {wallets.length ? <div ref={walletMenuRef} style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Wallet selection</span>
+              <button type="button" style={styles.selectTrigger} onClick={() => setIsWalletMenuOpen((current) => !current)}>
+                <span>{wallets.find((wallet) => wallet.id === selectedWalletId)?.description || wallets.find((wallet) => wallet.id === selectedWalletId)?.network || 'Choose a wallet'}</span>
+                <ChevronDown size={17} style={{ transform: isWalletMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+              </button>
+              {isWalletMenuOpen ? <div style={styles.selectMenu}>{wallets.map((wallet) => <button key={wallet.id} type="button" style={styles.selectOption} onClick={() => { setSelectedWalletId(wallet.id || ''); setIsWalletMenuOpen(false); }}><strong>{wallet.description || wallet.network}</strong><br /><span style={styles.helper}>{wallet.address.slice(0, 12)}…{wallet.address.slice(-8)}</span></button>)}</div> : null}
+            </div> : null}
             {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Security code</span>
