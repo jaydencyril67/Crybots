@@ -105,8 +105,8 @@ const InitialSplashCleanup = () => {
 };
 
 const getRouteKey = () => {
-  const pathname = getPathname();
-  const hash = getHash();
+  const pathname = getPathname().split(/[?#]/)[0].replace(/\/+$/, '') || '/';
+  const hash = getHash().split(/[?#]/)[0].replace(/\/+$/, '') || '';
 
   if (pathname === '/signup' || hash === '#/signup') return 'signup';
   if (pathname === '/signup-confirmation-sent' || hash === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
@@ -176,17 +176,20 @@ const getRouteKey = () => {
 };
 
 const routeToKey = (path: string) => {
-  if (path === '/signup' || path === '#/signup') return 'signup';
-  if (path === '/signup-confirmation-sent' || path === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
-  if (path === '/verify-email' || path === '#/verify-email') return 'verify-email';
-  if (path === '/account-confirmed' || path === '#/account-confirmed') return 'account-confirmed';
-  if (path === '/signin' || path === '#/signin') return 'signin';
-  if (path === '/admin-home' || path === '#/admin-home') return 'admin-home';
-  if (path === '/admin/users' || path === '#/admin/users') return 'admin-users';
-  if (path === '/admin/deposits' || path === '#/admin/deposits') return 'admin-deposits';
-  if (path.startsWith('/admin/deposit-stats/') || path.startsWith('#/admin/deposit-stats/')) return 'admin-deposit-stats';
-  if (path.startsWith('/admin/alert/send/') || path.startsWith('#/admin/alert/send/')) return 'admin-alert-send';
-  if (path === '/admin/alert' || path === '#/admin/alert') return 'admin-alert';
+  const normalizedPath = path.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
+  if (normalizedPath === '/signup' || normalizedPath === '#/signup') return 'signup';
+  if (normalizedPath === '/signup-confirmation-sent' || normalizedPath === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
+  if (normalizedPath === '/verify-email' || normalizedPath === '#/verify-email') return 'verify-email';
+  if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'account-confirmed';
+  if (normalizedPath === '/signin' || normalizedPath === '#/signin') return 'signin';
+  if (normalizedPath === '/admin-home' || normalizedPath === '#/admin-home') return 'admin-home';
+  if (normalizedPath === '/admin/users' || normalizedPath === '#/admin/users') return 'admin-users';
+  if (normalizedPath === '/admin/deposits' || normalizedPath === '#/admin/deposits') return 'admin-deposits';
+  if (normalizedPath.startsWith('/admin/deposit-stats/') || normalizedPath.startsWith('#/admin/deposit-stats/')) return 'admin-deposit-stats';
+  if (normalizedPath.startsWith('/admin/alert/send/') || normalizedPath.startsWith('#/admin/alert/send/')) return 'admin-alert-send';
+  if (normalizedPath.startsWith('/admin/funds/send/') || normalizedPath.startsWith('#/admin/funds/send/')) return 'admin-funds-send';
+  if (normalizedPath === '/admin/funds' || normalizedPath === '#/admin/funds') return 'admin-funds';
+  if (normalizedPath === '/admin/alert' || normalizedPath === '#/admin/alert') return 'admin-alert';
   if (path === '/admin/withdrawals' || path === '#/admin/withdrawals') return 'admin-withdrawals';
   if (path.startsWith('/admin/withdrawal-stats/') || path.startsWith('#/admin/withdrawal-stats/')) return 'admin-withdrawal-stats';
   if (path.startsWith('/admin/user-stats/') || path.startsWith('#/admin/user-stats/')) return 'admin-user-stats';
@@ -545,8 +548,8 @@ const RouteTransition = () => {
     return <LandingPage />;
   }, [displayedRouteKey, isAuthenticated]);
 
-  const showNowBar = displayedRouteKey === 'admin-users' || displayedRouteKey === 'admin-deposits' || displayedRouteKey === 'admin-deposit-stats' || displayedRouteKey === 'admin-alert' || displayedRouteKey === 'admin-alert-send' || displayedRouteKey === 'admin-user-stats' || displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme' || displayedRouteKey === 'nowbar' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'api-keys' || displayedRouteKey === 'webhooks' || displayedRouteKey === 'configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'notification' || displayedRouteKey === 'alert' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['admin-users', 'admin-deposits', 'admin-deposit-stats', 'admin-alert', 'admin-alert-send', 'admin-user-stats', 'home', 'details', 'manage', 'theme', 'nowbar', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'notification', 'alert', 'app-usage'].includes(displayedRouteKey);
+  const showNowBar = displayedRouteKey === 'admin-users' || displayedRouteKey === 'admin-deposits' || displayedRouteKey === 'admin-deposit-stats' || displayedRouteKey === 'admin-alert' || displayedRouteKey === 'admin-alert-send' || displayedRouteKey === 'admin-funds' || displayedRouteKey === 'admin-funds-send' || displayedRouteKey === 'admin-user-stats' || displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'voice-commands' || displayedRouteKey === 'theme' || displayedRouteKey === 'nowbar' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'my-space' || displayedRouteKey === 'market' || displayedRouteKey === 'control-center' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'api-keys' || displayedRouteKey === 'webhooks' || displayedRouteKey === 'configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'notification' || displayedRouteKey === 'alert' || displayedRouteKey === 'app-usage';
+  const isProtectedPage = ['admin-users', 'admin-deposits', 'admin-deposit-stats', 'admin-alert', 'admin-alert-send', 'admin-funds', 'admin-funds-send', 'admin-user-stats', 'home', 'details', 'manage', 'theme', 'nowbar', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'my-space', 'market', 'control-center', 'logs', 'help', 'faq', 'options', 'store', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'notification', 'alert', 'app-usage'].includes(displayedRouteKey);
   const usagePagePath = displayedRouteKey === 'exit' ? '/exit' : displayedRouteKey === 'statistics' ? '/statistics' : displayedRouteKey === 'tools' ? '/tools' : displayedRouteKey === 'stats' ? '/stats' : displayedRouteKey === 'menu' ? '/menu' : displayedRouteKey === 'nowbar' ? '/nowbar' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   useEffect(() => {
