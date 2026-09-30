@@ -310,6 +310,8 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/home') return 'HOME';
   if (path === '/admin-home') return 'ADMIN';
   if (path === '/admin/users') return 'USERS';
+  if (path === '/admin/withdrawals') return 'WITHDRAW';
+  if (path.startsWith('/admin/withdrawal-stats/')) return 'WITHDRAWAL STATS';
   if (path.startsWith('/admin/user-stats/')) return 'USER-STATS';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
@@ -360,7 +362,7 @@ const getCurrentPageTitle = (path: string) => {
 const createAdminActions = (): NowBarAction[] => [
   { label: 'DASHBOARD', icon: <ShieldCheck size={18} />, onClick: () => navigate('/admin-home'), active: getActivePath() === '/admin-home' },
   { label: 'USERS', icon: <Users size={18} />, onClick: () => navigate('/admin/users'), active: getActivePath() === '/admin/users' },
-  { label: 'WITHDRAWALS', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/withdrawals'), active: getActivePath().startsWith('/admin/withdrawals') || getActivePath().startsWith('/admin/withdrawal-stats/') },
+  { label: 'WITHDRAW', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/withdrawals'), active: getActivePath() === '/admin/withdrawals' },
   { label: 'STATS', icon: <BarChart3 size={18} />, onClick: () => {} },
   { label: 'TOOLS', icon: <Wrench size={18} />, onClick: () => {} },
   { label: 'SETTINGS', icon: <Settings size={18} />, onClick: () => {} },
