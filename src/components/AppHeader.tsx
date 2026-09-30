@@ -88,6 +88,20 @@ const styles = {
     color: 'rgba(255,255,255,0.72)',
     whiteSpace: 'nowrap',
   },
+  marqueeViewport: {
+    width: 'min(70vw, 420px)',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    fontSize: '11px',
+    color: 'rgba(255,255,255,0.82)',
+  },
+  marqueeTrack: {
+    display: 'inline-block',
+    paddingLeft: '100%',
+    animationName: 'ke-notification-marquee',
+    animationTimingFunction: 'linear' as const,
+    animationFillMode: 'forwards' as const,
+  },
   logoutButton: {
     display: 'inline-flex',
     alignItems: 'center',
@@ -115,9 +129,13 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const [voiceModeEnabled, setVoiceModeEnabled] = useState(getVoiceModeEnabled);
   const [isListening, setIsListening] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [marqueeText, setMarqueeText] = useState('');
+  const [marqueeDuration, setMarqueeDuration] = useState(12);
+  const [marqueeKey, setMarqueeKey] = useState(0);
   const previousCount = useRef(0);
   const hasLoadedCount = useRef(false);
   const alertTimeout = useRef<number | undefined>(undefined);
+  const marqueeTimeout = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const handleVoiceStatus = (event: Event) => {
@@ -145,9 +163,11 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       previousCount.current = 0;
       hasLoadedCount.current = false;
       window.clearTimeout(alertTimeout.current);
+      window.clearTimeout(marqueeTimeout.current);
       if (mounted) {
         setUnreadCount(0);
         setIsAlertActive(false);
+        setMarqueeText('');
       }
     };
 
@@ -156,6 +176,18 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       setIsAlertActive(true);
       window.clearTimeout(alertTimeout.current);
       alertTimeout.current = window.setTimeout(() => setIsAlertActive(false), 10000);
+    };
+
+    const showNotificationMarquee = (notification?: { title?: string; message?: string }) => {
+      if (!mounted || !notification) return;
+      const text = [notification.title, notification.message].filter(Boolean).join(' — ');
+      if (!text) return;
+      window.clearTimeout(marqueeTimeout.current);
+      const duration = Math.min(30, Math.max(10, 7 + text.length * 0.08));
+      setMarqueeText(text);
+      setMarqueeDuration(duration);
+      setMarqueeKey((current) => current + 1);
+      marqueeTimeout.current = window.setTimeout(() => setMarqueeText(''), duration * 1000);
     };
 
     const loadUnreadCount = async () => {
@@ -170,8 +202,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
           return;
         }
         const nextCount = Number(response.data?.unreadCount || 0);
+        const newestUnread = (response.data?.notifications || []).find((notification: { readAt?: string | null }) => !notification.readAt);
         if (hasLoadedCount.current && nextCount > previousCount.current) {
           activateAlert();
+          showNotificationMarquee(newestUnread);
         }
         if (mounted) {
           previousCount.current = nextCount;
@@ -202,6 +236,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
           // unread-count comparison, because another tab can mark it as read
           // before this header processes the event.
           activateAlert();
+          showNotificationMarquee(payload.notification);
           previousCount.current = nextCount;
           hasLoadedCount.current = true;
           setUnreadCount(nextCount);
@@ -224,7 +259,9 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       mounted = false;
       eventSource?.close();
       window.clearTimeout(alertTimeout.current);
+      window.clearTimeout(marqueeTimeout.current);
       alertTimeout.current = undefined;
+      marqueeTimeout.current = undefined;
       window.removeEventListener('ke:force-logout', clearNotificationState);
       window.removeEventListener(NOTIFICATIONS_CHANGED_EVENT, handleNotificationsChanged);
       window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
@@ -271,6 +308,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       <style>{`@keyframes ke-header-alert {
         0%, 100% { opacity: 1; box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.72), 0 0 16px rgba(239, 68, 68, 0.48), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px rgba(239, 68, 68, 0.34)); }
         50% { opacity: 0.9; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.78), 0 0 22px rgba(239, 68, 68, 0.62), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.48)); }
+      }
+      @keyframes ke-notification-marquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-100%); }
       }`}</style>
       <header
         style={headerStyle}
@@ -285,7 +326,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       <div style={styles.brand}>
         <div style={styles.brandCopy}>
           <p style={styles.brandTitle}>{headerTitle}</p>
-          {headerSubtitle ? <p style={styles.voiceTranscript}>{headerSubtitle}</p> : null}
+          {marqueeText && !voiceModeEnabled ? <div style={styles.marqueeViewport} aria-live="polite"><span key={marqueeKey} style={{ ...styles.marqueeTrack, animationDuration: `${marqueeDuration}s` }}>{marqueeText}</span></div> : headerSubtitle ? <p style={styles.voiceTranscript}>{headerSubtitle}</p> : null}
         </div>
       </div>
 
