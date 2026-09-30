@@ -120,7 +120,7 @@ const NotificationsPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => window.history.back()}><ArrowLeft size={17} /> Back</button>
+          <button type="button" style={styles.back} onClick={() => navigate('/home')}><ArrowLeft size={17} /> Home</button>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
           {notifications.some((notification) => !notification.readAt) ? <button type="button" style={styles.markAll} onClick={() => void markAllAsRead()} disabled={markingAllRead}><CheckCheck size={15} /> {markingAllRead ? 'Marking...' : 'Mark all as read'}</button> : null}
