@@ -179,9 +179,9 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       alertTimeout.current = window.setTimeout(() => setIsAlertActive(false), 10000);
     };
 
-    const showNotificationMarquee = (notification?: { title?: string; message?: string }) => {
+    const showNotificationMarquee = (notification?: { title?: string }) => {
       if (!mounted || !notification) return;
-      const text = [notification.title, notification.message].filter(Boolean).join(' — ');
+      const text = notification.title?.trim() || '';
       if (!text) return;
       window.clearTimeout(marqueeTimeout.current);
       const duration = Math.min(30, Math.max(10, 7 + text.length * 0.08));
