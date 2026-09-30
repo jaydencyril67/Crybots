@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BarChart3, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards, Wrench } from 'lucide-react';
+import { BarChart3, Bell, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards, Wrench } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES } from '../utils/voiceNavigation';
 
@@ -310,6 +310,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/home') return 'HOME';
   if (path === '/admin-home') return 'ADMIN';
   if (path === '/admin/users') return 'USERS';
+  if (path === '/admin/alert') return 'ALERT';
   if (path === '/admin/withdrawals') return 'WITHDRAW';
   if (path.startsWith('/admin/withdrawal-stats/')) return 'WITHDRAWAL STATS';
   if (path.startsWith('/admin/user-stats/')) return 'USER-STATS';
@@ -363,6 +364,7 @@ const getCurrentPageTitle = (path: string) => {
 const createAdminActions = (): NowBarAction[] => [
   { label: 'DASHBOARD', icon: <ShieldCheck size={18} />, onClick: () => navigate('/admin-home'), active: getActivePath() === '/admin-home' },
   { label: 'USERS', icon: <Users size={18} />, onClick: () => navigate('/admin/users'), active: getActivePath() === '/admin/users' },
+  { label: 'ALERT', icon: <Bell size={18} />, onClick: () => navigate('/admin/alert'), active: getActivePath() === '/admin/alert' },
   { label: 'WITHDRAW', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/withdrawals'), active: getActivePath() === '/admin/withdrawals' },
   { label: 'STATS', icon: <BarChart3 size={18} />, onClick: () => {} },
   { label: 'TOOLS', icon: <Wrench size={18} />, onClick: () => {} },
