@@ -103,7 +103,7 @@ const NotificationsPage = () => {
       await api.post('/api/notifications/read-all');
       const readAt = new Date().toISOString();
       setNotifications((current) => current.map((notification) => ({ ...notification, readAt: notification.readAt || readAt })));
-      notifyNotificationsChanged();
+      notifyNotificationsChanged({ unreadCount: 0 });
       setError('');
     } catch {
       setError('Unable to mark notifications as read right now.');

@@ -250,7 +250,19 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       };
     }
     window.addEventListener('ke:force-logout', clearNotificationState);
-    const handleNotificationsChanged = () => {
+    const handleNotificationsChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ unreadCount?: number }>).detail;
+      if (typeof detail?.unreadCount === 'number' && mounted) {
+        previousCount.current = detail.unreadCount;
+        hasLoadedCount.current = true;
+        setUnreadCount(detail.unreadCount);
+        if (detail.unreadCount === 0) {
+          window.clearTimeout(marqueeTimeout.current);
+          setMarqueeText('');
+          setIsAlertActive(false);
+        }
+        return;
+      }
       void loadUnreadCount();
     };
     const handleAuthChanged = () => { void loadUnreadCount(); };
