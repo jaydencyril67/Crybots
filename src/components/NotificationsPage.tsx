@@ -51,12 +51,14 @@ const NotificationsPage = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hasLoadedNotifications, setHasLoadedNotifications] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [markingAllRead, setMarkingAllRead] = useState(false);
 
   const loadNotifications = useCallback(async (showLoader = false) => {
     if (showLoader) setRefreshing(true);
     if (!localStorage.getItem('token')) {
+      setHasLoadedNotifications(true);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -65,6 +67,7 @@ const NotificationsPage = () => {
       const response = await api.get('/api/notifications');
       const nextNotifications = response.data.notifications || [];
       setNotifications(nextNotifications);
+      setHasLoadedNotifications(true);
       setError('');
 
     } catch {
@@ -81,6 +84,7 @@ const NotificationsPage = () => {
     const clearNotifications = () => {
       setNotifications([]);
       setLoading(false);
+      setHasLoadedNotifications(true);
       setError('');
     };
     const refreshNotifications = () => { void loadNotifications(true); };
@@ -124,7 +128,7 @@ const NotificationsPage = () => {
           {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}
           <div style={styles.list}>
             {loading ? <div style={styles.empty}><LoadingDots /></div> : null}
-            {!loading && !notifications.length ? <div style={styles.empty}>You are all caught up.</div> : null}
+            {!loading && hasLoadedNotifications && !error && !notifications.length ? <div style={styles.empty}>No notifications yet.</div> : null}
             {notifications.map((notification) => {
               const Icon = iconForType(notification.type);
               return (
