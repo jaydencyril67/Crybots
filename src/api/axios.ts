@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { navigate } from '../utils/navigate';
 
 // Create an axios instance with the base URL set to production API server
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://kingshalls.onrender.com';
@@ -14,13 +15,12 @@ const clearAuthData = () => {
   localStorage.removeItem('kingshall_user');
   localStorage.removeItem('firstName');
   localStorage.removeItem('kingshall_first_name');
-  window.dispatchEvent(new Event('ke:force-logout'));
 };
 
 export const forceLogout = () => {
   clearAuthData();
   window.dispatchEvent(new Event('ke:force-logout'));
-  window.location.href = '/';
+  navigate('/');
 };
 
 // Create axios instance with base URL

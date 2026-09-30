@@ -54,6 +54,7 @@ const NotificationPage = () => {
       try {
         const response = await api.get(`/api/notifications/${id}`);
         setNotification(response.data.notification);
+        notifyNotificationsChanged({ unreadCount: response.data.unreadCount });
         setError('');
       } catch {
         setError('Unable to load this notification.');

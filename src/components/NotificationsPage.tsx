@@ -51,12 +51,14 @@ const NotificationsPage = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [hasLoadedNotifications, setHasLoadedNotifications] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [markingAllRead, setMarkingAllRead] = useState(false);
 
   const loadNotifications = useCallback(async (showLoader = false) => {
     if (showLoader) setRefreshing(true);
     if (!localStorage.getItem('token')) {
+      setHasLoadedNotifications(true);
       setLoading(false);
       setRefreshing(false);
       return;
@@ -65,6 +67,7 @@ const NotificationsPage = () => {
       const response = await api.get('/api/notifications');
       const nextNotifications = response.data.notifications || [];
       setNotifications(nextNotifications);
+      setHasLoadedNotifications(true);
       setError('');
 
     } catch {
@@ -81,6 +84,7 @@ const NotificationsPage = () => {
     const clearNotifications = () => {
       setNotifications([]);
       setLoading(false);
+      setHasLoadedNotifications(true);
       setError('');
     };
     const refreshNotifications = () => { void loadNotifications(true); };
@@ -103,7 +107,7 @@ const NotificationsPage = () => {
       await api.post('/api/notifications/read-all');
       const readAt = new Date().toISOString();
       setNotifications((current) => current.map((notification) => ({ ...notification, readAt: notification.readAt || readAt })));
-      notifyNotificationsChanged();
+      notifyNotificationsChanged({ unreadCount: 0 });
       setError('');
     } catch {
       setError('Unable to mark notifications as read right now.');
@@ -116,7 +120,7 @@ const NotificationsPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => window.history.back()}><ArrowLeft size={17} /> Back</button>
+          <button type="button" style={styles.back} onClick={() => navigate('/home')}><ArrowLeft size={17} /> Home</button>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
           {notifications.some((notification) => !notification.readAt) ? <button type="button" style={styles.markAll} onClick={() => void markAllAsRead()} disabled={markingAllRead}><CheckCheck size={15} /> {markingAllRead ? 'Marking...' : 'Mark all as read'}</button> : null}
@@ -124,7 +128,7 @@ const NotificationsPage = () => {
           {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}
           <div style={styles.list}>
             {loading ? <div style={styles.empty}><LoadingDots /></div> : null}
-            {!loading && !notifications.length ? <div style={styles.empty}>You are all caught up.</div> : null}
+            {!loading && hasLoadedNotifications && !error && !notifications.length ? <div style={styles.empty}>No notifications yet.</div> : null}
             {notifications.map((notification) => {
               const Icon = iconForType(notification.type);
               return (
