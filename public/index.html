@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#050816" />
     <style>
+      /* Keep typography consistent across every page and native form control. */
+      html,
+      body,
+      #root,
+      *,
+      *::before,
+      *::after,
+      button,
+      input,
+      textarea,
+      select {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+      }
+
       /* Prevent mobile browsers from showing a tap highlight on interactions. */
       * {
         -webkit-tap-highlight-color: transparent;
@@ -62,6 +76,7 @@
 
       html {
         background: #e7e4de;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       html[data-theme='dark'] {
@@ -115,7 +130,9 @@
       .initial-splash-title {
         margin: 0;
         color: inherit;
-        font: 13px/1.4 sans-serif;
+        font: inherit;
+        font-size: 13px;
+        line-height: 1.4;
         letter-spacing: 0.14em;
         text-transform: uppercase;
       }
