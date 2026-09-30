@@ -80,7 +80,7 @@ const baseStyles = {
   label: { fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surface, color: HYBRID_THEME_TOKENS.dark.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem' },
   selectTrigger: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceMuted, color: HYBRID_THEME_TOKENS.dark.text, borderRadius: '14px', padding: '10px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer' },
-  selectMenu: { position: 'absolute' as const, zIndex: 10, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: HYBRID_THEME_TOKENS.dark.surfaceMuted, border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out' },
+  selectMenu: { position: 'absolute' as const, zIndex: 1000, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: HYBRID_THEME_TOKENS.dark.surfaceMuted, border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, transformOrigin: 'top', animation: 'pickerDropIn 160ms ease-out', maxHeight: '260px', overflowY: 'auto' as const, boxShadow: '0 18px 40px rgba(0, 0, 0, 0.35)' }, 
   selectOption: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, color: HYBRID_THEME_TOKENS.dark.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer', transition: 'background 0.2s ease, border-color 0.2s ease, transform 0.2s ease' },
   helper: { fontSize: '0.85rem', color: HYBRID_THEME_TOKENS.dark.textMuted, lineHeight: 1.5 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
@@ -282,7 +282,7 @@ const WithdrawPage = () => {
               {!wallets.length ? <input style={styles.input} value={availableDestination} readOnly /> : null}
               <span style={styles.helper}>{wallets.length ? 'Choose a bound wallet from the selector below.' : 'Bind a wallet in Manage before withdrawing.'}</span>
             </div>
-            {wallets.length ? <div ref={walletMenuRef} style={styles.field as React.CSSProperties}>
+            {wallets.length ? <div ref={walletMenuRef} style={{ ...styles.field, zIndex: isWalletMenuOpen ? 100 : 1 } as React.CSSProperties}>
               <span style={styles.label}>Wallet selection</span>
               <button type="button" style={styles.selectTrigger} onClick={() => setIsWalletMenuOpen((current) => !current)}>
                 <span>{wallets.find((wallet) => wallet.id === selectedWalletId)?.description || wallets.find((wallet) => wallet.id === selectedWalletId)?.network || 'Choose a wallet'}</span>
