@@ -40,10 +40,10 @@ const hueFromHex = (hex: string) => {
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '118px' },
-  shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 3vw, 20px) clamp(12px, 2.5vw, 24px) 28px', boxSizing: 'border-box' as const, display: 'grid', gap: '12px' },
-  backButton: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  heading: { margin: '18px 0 6px', fontSize: '1.15rem', fontWeight: 900 },
+  page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '132px' },
+  shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
+  heading: { margin: '20px 0 8px', fontSize: '1.15rem', fontWeight: 900 },
   intro: { margin: 0, color: theme.textMuted, lineHeight: 1.5 },
   card: { marginTop: 0, padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, display: 'grid', gap: '12px' },
   preview: { display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '14px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}` },
@@ -158,8 +158,8 @@ const NowBarColorPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.backButton} onClick={() => navigate('/nowbar')}>
-            <ArrowLeft size={18} /> Back to NowBar
+          <button type="button" style={styles.back} onClick={() => navigate('/nowbar')}>
+            <ArrowLeft size={17} /> Back to NowBar
           </button>
           <h1 style={styles.heading}>NowBar light color</h1>
           <p style={styles.intro}>Choose the color used by your NowBar edge lighting. Your selection is saved immediately.</p>
