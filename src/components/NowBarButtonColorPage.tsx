@@ -3,6 +3,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import NowBar from './NowBar';
 
 const BUTTON_COLOR_STORAGE_KEY = 'nowbar_button_color';
 const isHexColor = (value: string) => /^#[0-9a-f]{6}$/i.test(value);
@@ -210,6 +211,7 @@ const NowBarButtonColorPage = () => {
           </section>
         </div>
       </main>
+      <NowBar />
     </HybridTheme>
   );
 };

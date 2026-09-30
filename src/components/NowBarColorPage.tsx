@@ -3,6 +3,7 @@ import { ArrowLeft, Check } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import NowBar from './NowBar';
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
 const isHexColor = (value: string) => /^#[0-9a-f]{6}$/i.test(value);
@@ -212,6 +213,7 @@ const NowBarColorPage = () => {
           </section>
         </div>
       </main>
+      <NowBar />
     </HybridTheme>
   );
 };
