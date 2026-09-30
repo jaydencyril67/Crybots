@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ArrowLeft, Eye, Bell, Info, ShieldAlert, WalletCards } from 'lucide-react';
+import { ArrowLeft, Eye, Bell, Info, ShieldAlert, WalletCards, CheckCheck } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import api from '../api/axios';
-import { AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
+import { AUTH_CHANGED_EVENT, notifyNotificationsChanged } from '../utils/notificationEvents';
 import { navigate } from '../utils/navigate';
 
 type NotificationItem = {
@@ -33,6 +33,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   title: { margin: 0, fontSize: '0.95rem', fontWeight: 850, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
   view: { borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '7px 12px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 },
+  markAll: { borderRadius: 999, border: `1px solid ${theme.primary}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.primary, background: theme.primarySoft, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 },
   empty: { padding: '28px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceMuted },
 });
 
@@ -51,6 +52,7 @@ const NotificationsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
 
   const loadNotifications = useCallback(async (showLoader = false) => {
     if (showLoader) setRefreshing(true);
@@ -94,6 +96,22 @@ const NotificationsPage = () => {
     };
   }, [loadNotifications]);
 
+  const markAllAsRead = async () => {
+    if (markingAllRead || !notifications.some((notification) => !notification.readAt)) return;
+    setMarkingAllRead(true);
+    try {
+      await api.post('/api/notifications/read-all');
+      const readAt = new Date().toISOString();
+      setNotifications((current) => current.map((notification) => ({ ...notification, readAt: notification.readAt || readAt })));
+      notifyNotificationsChanged();
+      setError('');
+    } catch {
+      setError('Unable to mark notifications as read right now.');
+    } finally {
+      setMarkingAllRead(false);
+    }
+  };
+
   return (
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
@@ -101,6 +119,7 @@ const NotificationsPage = () => {
           <button type="button" style={styles.back} onClick={() => window.history.back()}><ArrowLeft size={17} /> Back</button>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
+          {notifications.some((notification) => !notification.readAt) ? <button type="button" style={styles.markAll} onClick={() => void markAllAsRead()} disabled={markingAllRead}><CheckCheck size={15} /> {markingAllRead ? 'Marking...' : 'Mark all as read'}</button> : null}
           {refreshing ? <NotificationBanner tone="info" title="Updating notifications" message="Checking for new in-app alerts." /> : null}
           {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}
           <div style={styles.list}>
