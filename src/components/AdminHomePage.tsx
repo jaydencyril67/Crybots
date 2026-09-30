@@ -3,6 +3,7 @@ import { ShieldCheck } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { isAdminToken } from '../utils/adminAuth';
 import { useAppTheme } from './AppTheme';
+import NowBar from './NowBar';
 
 const AdminHomePage = () => {
   const { themeMode } = useAppTheme();
@@ -22,7 +23,8 @@ const AdminHomePage = () => {
   const muted = isDark ? '#aab4c5' : '#62708a';
 
   return (
-    <main style={{ minHeight: '100vh', background, color: text, padding: 'clamp(24px, 5vw, 64px)' }}>
+    <>
+      <main style={{ minHeight: '100vh', background, color: text, padding: 'clamp(24px, 5vw, 64px)', paddingBottom: '132px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <header style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 36 }}>
           <div style={{ display: 'grid', placeItems: 'center', width: 52, height: 52, borderRadius: 16, background: '#2563eb', color: '#fff' }}>
@@ -38,7 +40,9 @@ const AdminHomePage = () => {
           <p style={{ marginBottom: 0, color: muted, lineHeight: 1.7 }}>Your administrator sign-in is active. This dashboard is ready for the next admin features.</p>
         </section>
       </div>
-    </main>
+      </main>
+      <NowBar admin />
+    </>
   );
 };
 

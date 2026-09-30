@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, SlidersHorizontal, Store, Terminal, UserRound } from 'lucide-react';
+import { BarChart3, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, Wrench } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES } from '../utils/voiceNavigation';
 
@@ -250,7 +250,7 @@ const styles = {
   },
 };
 
-type NowBarAction = {
+export type NowBarAction = {
   label: string;
   onClick: () => void;
   icon?: React.ReactNode;
@@ -259,6 +259,7 @@ type NowBarAction = {
 
 type NowBarProps = {
   actions?: NowBarAction[];
+  admin?: boolean;
 };
 
 type NowBarView = 'title' | 'actions';
@@ -307,6 +308,7 @@ const getCurrentPageTitle = (path: string) => {
   const catalogEntry = PAGE_ROUTES.find((page) => page.route === path);
   if (catalogEntry) return catalogEntry.label;
   if (path === '/home') return 'HOME';
+  if (path === '/admin-home') return 'ADMIN';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
   if (path === '/theme') return 'THEME';
@@ -352,6 +354,14 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/community-standards') return 'COMMUNITY STANDARDS';
   return 'NOWBAR';
 };
+
+const createAdminActions = (): NowBarAction[] => [
+  { label: 'DASHBOARD', icon: <ShieldCheck size={18} />, onClick: () => {}, active: getActivePath() === '/admin-home' },
+  { label: 'USERS', icon: <Users size={18} />, onClick: () => {} },
+  { label: 'STATS', icon: <BarChart3 size={18} />, onClick: () => {} },
+  { label: 'TOOLS', icon: <Wrench size={18} />, onClick: () => {} },
+  { label: 'SETTINGS', icon: <Settings size={18} />, onClick: () => {} },
+];
 
 const createDefaultActions = (): NowBarAction[] => [
   {
@@ -452,7 +462,7 @@ const createDefaultActions = (): NowBarAction[] => [
   },
 ];
 
-const NowBar = ({ actions }: NowBarProps) => {
+const NowBar = ({ actions, admin = false }: NowBarProps) => {
   const [edgeLightVersion, setEdgeLightVersion] = useState(0);
   const [buttonColorVersion, setButtonColorVersion] = useState(0);
   const [featureSettingsVersion, setFeatureSettingsVersion] = useState(0);
@@ -473,7 +483,7 @@ const NowBar = ({ actions }: NowBarProps) => {
   const swipeStartRef = React.useRef<{ x: number; y: number } | null>(null);
   const swipeHandledRef = React.useRef(false);
   const [currentPath, setCurrentPath] = useState(getActivePath());
-  const resolvedActions = useMemo(() => actions || createDefaultActions(), [actions]);
+  const resolvedActions = useMemo(() => actions || (admin ? createAdminActions() : createDefaultActions()), [actions, admin]);
   const currentPageTitle = getCurrentPageTitle(currentPath);
   const isExpanded = expandModeEnabled && mode === 'expanded';
   modeRef.current = mode;
