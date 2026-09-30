@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CalendarClock, Coins, ShieldCheck, TimerReset } from 'lucide-react';
+import { ArrowLeft, CalendarClock, ChevronDown, Coins, ShieldCheck, TimerReset } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
@@ -91,6 +91,10 @@ const baseStyles = {
   customPickerButtonActive: { border: `1px solid ${HYBRID_THEME_TOKENS.dark.borderGlass}`, background: HYBRID_THEME_TOKENS.dark.surfaceGlass },
   customPickerDisplay: { borderRadius: '16px', border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, background: HYBRID_THEME_TOKENS.dark.surfaceGlass, padding: '13px 14px', color: HYBRID_THEME_TOKENS.dark.text, fontSize: '0.92rem', lineHeight: 1.5 },
   customPickerHint: { fontSize: '0.82rem', lineHeight: 1.5 },
+  walletTable: { width: '100%', maxHeight: '260px', overflow: 'auto' as const, border: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, borderRadius: '14px' },
+  walletTableInner: { width: '100%', minWidth: '560px', borderCollapse: 'collapse' as const },
+  walletTableCell: { padding: '10px 12px', borderBottom: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, textAlign: 'left' as const, fontSize: '0.82rem', whiteSpace: 'nowrap' as const },
+  walletTableHeader: { padding: '10px 12px', borderBottom: `1px solid ${HYBRID_THEME_TOKENS.dark.border}`, textAlign: 'left' as const, color: HYBRID_THEME_TOKENS.dark.textMuted, fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em', whiteSpace: 'nowrap' as const },
 };
 
 const WithdrawPage = () => {
@@ -119,13 +123,19 @@ const WithdrawPage = () => {
     customPickerButtonActive: { ...baseStyles.customPickerButtonActive, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
     customPickerDisplay: { ...baseStyles.customPickerDisplay, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
     customPickerHint: { ...baseStyles.customPickerHint, color: theme.textMuted },
+    walletTable: { ...baseStyles.walletTable, border: `1px solid ${theme.border}` },
+    walletTableInner: { ...baseStyles.walletTableInner },
+    walletTableCell: { ...baseStyles.walletTableCell, borderBottom: `1px solid ${theme.border}` },
+    walletTableHeader: { ...baseStyles.walletTableHeader, borderBottom: `1px solid ${theme.border}`, color: theme.textMuted },
   }), [theme]);
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
   const [method, setMethod] = useState<'instant' | 'scheduled'>('instant');
   const [isMethodMenuOpen, setIsMethodMenuOpen] = useState(false);
+  const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
   const methodMenuRef = useRef<HTMLDivElement | null>(null);
+  const walletMenuRef = useRef<HTMLDivElement | null>(null);
   const [amount, setAmount] = useState('');
   const [destinationValue, setDestinationValue] = useState('');
   const [wallets, setWallets] = useState<WithdrawalWallet[]>([]);
@@ -148,6 +158,9 @@ const WithdrawPage = () => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (methodMenuRef.current && !methodMenuRef.current.contains(event.target as Node)) {
         setIsMethodMenuOpen(false);
+      }
+      if (walletMenuRef.current && !walletMenuRef.current.contains(event.target as Node)) {
+        setIsWalletMenuOpen(false);
       }
     };
 
@@ -273,12 +286,28 @@ const WithdrawPage = () => {
               <input style={styles.input} type="number" min="1" step="1" inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="1 USDT" />
             </div>
             <div style={styles.field as React.CSSProperties}>
-              <span style={styles.label}>Withdrawal wallet</span>
-              {wallets.length ? <select style={styles.input} value={selectedWalletId} onChange={(event) => setSelectedWalletId(event.target.value)}>
-                {wallets.map((wallet) => <option key={wallet.id} value={wallet.id}>{wallet.description || wallet.network} · {wallet.address.slice(0, 8)}…{wallet.address.slice(-6)}</option>)}
-              </select> : <input style={styles.input} value={availableDestination} readOnly />}
-              <span style={styles.helper}>{wallets.length ? 'Select one of your validated wallets.' : 'Bind a wallet in Manage before withdrawing.'}</span>
+              <span style={styles.label}>Bound wallets</span>
+              {wallets.length ? <div style={styles.walletTable}>
+                <table style={styles.walletTableInner}>
+                  <thead><tr><th style={styles.walletTableHeader}>Wallet</th><th style={styles.walletTableHeader}>Network</th><th style={styles.walletTableHeader}>Address</th><th style={styles.walletTableHeader}>Selected</th></tr></thead>
+                  <tbody>{wallets.map((wallet) => <tr key={wallet.id} onClick={() => setSelectedWalletId(wallet.id || '')} style={{ cursor: 'pointer', background: wallet.id === selectedWalletId ? theme.surfaceGlass : 'transparent' }}>
+                    <td style={styles.walletTableCell}>{wallet.description || 'Bound wallet'}</td>
+                    <td style={styles.walletTableCell}>{wallet.network}</td>
+                    <td style={styles.walletTableCell}>{wallet.address.slice(0, 12)}…{wallet.address.slice(-8)}</td>
+                    <td style={styles.walletTableCell}>{wallet.id === selectedWalletId ? '✓' : '—'}</td>
+                  </tr>)}</tbody>
+                </table>
+              </div> : <input style={styles.input} value={availableDestination} readOnly />}
+              <span style={styles.helper}>{wallets.length ? 'Select a wallet from the table or use the selector below.' : 'Bind a wallet in Manage before withdrawing.'}</span>
             </div>
+            {wallets.length ? <div ref={walletMenuRef} style={styles.field as React.CSSProperties}>
+              <span style={styles.label}>Wallet selection</span>
+              <button type="button" style={styles.selectTrigger} onClick={() => setIsWalletMenuOpen((current) => !current)}>
+                <span>{wallets.find((wallet) => wallet.id === selectedWalletId)?.description || wallets.find((wallet) => wallet.id === selectedWalletId)?.network || 'Choose a wallet'}</span>
+                <ChevronDown size={17} style={{ transform: isWalletMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+              </button>
+              {isWalletMenuOpen ? <div style={styles.selectMenu}>{wallets.map((wallet) => <button key={wallet.id} type="button" style={styles.selectOption} onClick={() => { setSelectedWalletId(wallet.id || ''); setIsWalletMenuOpen(false); }}><strong>{wallet.description || wallet.network}</strong><br /><span style={styles.helper}>{wallet.address.slice(0, 12)}…{wallet.address.slice(-8)}</span></button>)}</div> : null}
+            </div> : null}
             {method === 'scheduled' ? <div style={styles.field as React.CSSProperties}><span style={styles.label}>Schedule date and time</span><button type="button" style={styles.input as React.CSSProperties} onClick={() => setShowSchedulePage(true)}>{scheduledFor ? new Date(scheduledFor).toLocaleString() : 'Choose date and time'}</button></div> : null}
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Security code</span>
