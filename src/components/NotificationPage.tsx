@@ -29,6 +29,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   message: { margin: 0, color: theme.text, lineHeight: 1.7, whiteSpace: 'pre-wrap' as const },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.82rem' },
   delete: { borderRadius: 999, border: `1px solid ${theme.danger || theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.danger || theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: 6 },
+  deleteMenu: { display: 'grid', gap: 10, padding: 12, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, maxWidth: 360 },
+  deletePrompt: { margin: 0, color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.45 },
+  deleteActions: { display: 'flex', gap: 8, flexWrap: 'wrap' as const },
+  cancel: { borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceGlass, cursor: 'pointer' },
+  confirmDelete: { borderRadius: 999, border: `1px solid ${theme.danger || theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.danger || theme.text, background: theme.surfaceGlass, cursor: 'pointer' },
   empty: { padding: 28, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceMuted },
 });
 
@@ -41,6 +46,7 @@ const NotificationPage = () => {
   const [notification, setNotification] = useState<NotificationItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const id = window.location.pathname.split('/').filter(Boolean).pop() || '';
 
   useEffect(() => {
@@ -59,9 +65,10 @@ const NotificationPage = () => {
   }, [id]);
 
   const deleteNotification = async () => {
-    if (!notification || !window.confirm('Delete this notification?')) return;
+    if (!notification) return;
     try {
       await api.delete(`/api/notifications/${notification.id}`);
+      setShowDeleteConfirm(false);
       notifyNotificationsChanged();
       navigate('/notifications');
     } catch {
@@ -76,7 +83,7 @@ const NotificationPage = () => {
         <h1 style={styles.title}>Notification</h1>
         {error ? <NotificationBanner tone="error" title="Notification unavailable" message={error} /> : null}
         {loading ? <div style={styles.empty}><LoadingDots /></div> : null}
-        {!loading && notification ? (() => { const Icon = iconForType(notification.type); return <article style={styles.card}><Icon style={styles.icon} /><h2 style={styles.title}>{notification.title}</h2><p style={styles.message}>{notification.message}</p><p style={styles.date}>{new Date(notification.createdAt).toLocaleString()}</p><button type="button" style={styles.delete} onClick={() => void deleteNotification()}><Trash2 size={15} /> Delete</button></article>; })() : null}
+        {!loading && notification ? (() => { const Icon = iconForType(notification.type); return <article style={styles.card}><Icon style={styles.icon} /><h2 style={styles.title}>{notification.title}</h2><p style={styles.message}>{notification.message}</p><p style={styles.date}>{new Date(notification.createdAt).toLocaleString()}</p>{showDeleteConfirm ? <div style={styles.deleteMenu} role="alertdialog" aria-label="Confirm notification deletion"><p style={styles.deletePrompt}>Delete this notification permanently?</p><div style={styles.deleteActions}><button type="button" style={styles.cancel} onClick={() => setShowDeleteConfirm(false)}>Cancel</button><button type="button" style={styles.confirmDelete} onClick={() => void deleteNotification()}><Trash2 size={15} /> Delete</button></div></div> : <button type="button" style={styles.delete} onClick={() => setShowDeleteConfirm(true)}><Trash2 size={15} /> Delete</button>}</article>; })() : null}
       </section>
     </div></main><NowBar />
   </HybridTheme>;
