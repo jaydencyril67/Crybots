@@ -65,6 +65,7 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'TICKETS', route: '/tickets' },
   { label: 'ALERT', route: '/alert' },
   { label: 'APP USAGE', route: '/app-usage' },
+  { label: 'ADMIN CHAT', route: '/admin/chat' },
 ];
 
 const AUTHENTICATED_ROUTES = new Set([
@@ -75,7 +76,7 @@ const AUTHENTICATED_ROUTES = new Set([
   '/store', '/about', '/dev', '/api-keys', '/webhooks', '/configure', '/asset',
   '/danger', '/security', '/withdrawals', '/transfer', '/deposit', '/transactions',
   '/notifications', '/alert', '/app-usage', '/information', '/privacy-policy',
-  '/community-standards',
+  '/community-standards', '/admin/chat',
 ]);
 
 // These are the authenticated routes represented by the NowBar.
@@ -125,6 +126,7 @@ export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'INFORMATION', route: '/information' },
   { label: 'PRIVACY POLICY', route: '/privacy-policy' },
   { label: 'COMMUNITY STANDARDS', route: '/community-standards' },
+  { label: 'ADMIN CHAT', route: '/admin/chat' },
 ];
 
 export const getVoiceModeEnabled = () => {
