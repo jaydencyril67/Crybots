@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import { isAdminToken } from '../utils/adminAuth';
@@ -22,6 +22,8 @@ const AdminUserStatsPage = () => {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const id = window.location.pathname.split('/').filter(Boolean).pop();
 
   useEffect(() => {
@@ -34,6 +36,19 @@ const AdminUserStatsPage = () => {
 
   const entries = useMemo(() => user ? Object.entries(user).filter(([key]) => !HIDDEN_USER_FIELDS.has(key)) : [], [user]);
   const updateDraft = (key: string, value: string) => { setSaved(false); setDraft((current) => ({ ...current, [key]: value })); };
+
+  const deleteUser = async () => {
+    if (!id) return;
+    setDeleting(true); setError('');
+    try {
+      await api.delete(`/api/admin/users/${id}`);
+      navigate('/admin/users');
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Unable to delete user.');
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
 
   const saveChanges = async () => {
     if (!id || !user) return;
@@ -73,7 +88,7 @@ const AdminUserStatsPage = () => {
                 <strong style={{ fontSize: '0.82rem', overflowWrap: 'anywhere' }}>{key}</strong>
                 {isStructuredValue(value) ? <textarea value={draft[key] || ''} onChange={(event) => updateDraft(key, event.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', border: `1px solid ${theme.border}`, borderRadius: 8, padding: 8, background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.8rem' }} /> : <input value={draft[key] || ''} onChange={(event) => updateDraft(key, key === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)} maxLength={key === 'uid' ? 5 : undefined} inputMode={key === 'uid' ? 'numeric' : undefined} style={{ width: '100%', boxSizing: 'border-box', border: `1px solid ${theme.border}`, borderRadius: 8, padding: '8px 9px', background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.84rem' }} />}
               </label>)}
-              <div style={{ display: 'grid', gap: 10, marginTop: 4 }}><button type="button" onClick={saveChanges} disabled={saving} style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.primary, color: theme.textInverse, cursor: saving ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}><Save size={15} /> {saving ? 'Saving…' : 'Save changes'}</button>{saved && <span style={{ color: theme.success, fontSize: '0.82rem', textAlign: 'center' }}>Saved</span>}</div>
+              <div style={{ display: 'grid', gap: 10, marginTop: 4 }}><button type="button" onClick={saveChanges} disabled={saving || deleting} style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.primary, color: theme.textInverse, cursor: saving || deleting ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}><Save size={15} /> {saving ? 'Saving…' : 'Save changes'}</button>{saved && <span style={{ color: theme.success, fontSize: '0.82rem', textAlign: 'center' }}>Saved</span>}{showDeleteConfirm ? <div style={{ display: 'grid', gap: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><span style={{ color: theme.danger, fontSize: '0.82rem' }}>Delete this user permanently? This action cannot be undone.</span><div style={{ display: 'flex', gap: 8 }}><button type="button" onClick={() => setShowDeleteConfirm(false)} disabled={deleting} style={{ flex: 1, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.surfaceMuted, color: theme.text, cursor: deleting ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}>Cancel</button><button type="button" onClick={() => void deleteUser()} disabled={deleting} style={{ flex: 1, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.danger, color: theme.textInverse, cursor: deleting ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}><Trash2 size={15} /> {deleting ? 'Deleting…' : 'Confirm delete'}</button></div></div> : <button type="button" onClick={() => setShowDeleteConfirm(true)} disabled={saving || deleting} style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.surfaceMuted, color: theme.danger, cursor: saving || deleting ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}><Trash2 size={15} /> Delete user</button>}</div>
             </>}
           </section>
         </div>
