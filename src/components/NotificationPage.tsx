@@ -28,7 +28,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   icon: { width: 24, height: 24, color: theme.primary },
   message: { margin: 0, color: theme.text, lineHeight: 1.7, whiteSpace: 'pre-wrap' as const },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.82rem' },
-  delete: { borderRadius: 999, border: `1px solid ${theme.danger || theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.danger || theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: 6 },
+  delete: { width: '100%', boxSizing: 'border-box' as const, borderRadius: 999, border: `1px solid ${theme.danger || theme.borderGlass}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.danger || theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'stretch', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 },
   deleteMenu: { display: 'grid', gap: 10, padding: 12, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, maxWidth: 360 },
   deletePrompt: { margin: 0, color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.45 },
   deleteActions: { display: 'flex', gap: 8, width: '100%' },
