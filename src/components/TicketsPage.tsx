@@ -30,9 +30,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   label: { display: 'grid', gap: 6, color: theme.text, fontSize: '0.86rem', fontWeight: 800 },
   input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
   textarea: { width: '100%', minHeight: 170, resize: 'vertical' as const, boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
-  formActions: { display: 'flex', justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap' as const },
-  secondaryButton: { display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 14px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 },
-  submitButton: { display: 'inline-flex', alignItems: 'center', gap: 7, border: 'none', borderRadius: 10, padding: '10px 16px', background: theme.primary, color: '#fff', cursor: 'pointer', fontWeight: 900 },
+  formActions: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 },
+  secondaryButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 14px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 },
+  formButton: { width: '100%' },
+  submitButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '10px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 900 },
   disabled: { opacity: 0.6, cursor: 'not-allowed' },
   tableWrap: { marginTop: 20, overflowX: 'auto' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass },
   table: { width: '100%', minWidth: 520, borderCollapse: 'collapse' as const },
@@ -160,8 +161,8 @@ const TicketsPage = () => {
                   <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={160} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
                   <label style={styles.label}>Body<textarea style={styles.textarea} value={body} maxLength={10000} onChange={(event) => setBody(event.target.value)} placeholder="Write your message or report here..." /></label>
                   <div style={styles.formActions}>
-                    <button type="button" style={styles.secondaryButton} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
-                    <button type="submit" style={{ ...styles.submitButton, ...(saving ? styles.disabled : {}) }} disabled={saving}><Send size={16} /> {saving ? 'Submitting...' : 'Submit Ticket'}</button>
+                    <button type="button" style={{ ...styles.secondaryButton, ...styles.formButton }} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
+                    <button type="submit" style={{ ...styles.submitButton, ...styles.formButton, ...(saving ? styles.disabled : {}) }} disabled={saving}><Send size={16} /> {saving ? 'Submitting...' : 'Submit Ticket'}</button>
                   </div>
                 </form>
               )}
