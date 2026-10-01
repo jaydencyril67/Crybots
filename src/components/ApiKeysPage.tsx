@@ -24,6 +24,7 @@ const ApiKeysPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [revokeId, setRevokeId] = useState<string | null>(null);
 
   const loadKeys = async () => {
     try {
@@ -47,7 +48,6 @@ const ApiKeysPage = () => {
   };
 
   const revokeKey = async (id: string) => {
-    if (!window.confirm('Revoke this API key? Applications using it will stop working.')) return;
     try { await api.post(`/api/developer/api-keys/${id}/revoke`); await loadKeys(); }
     catch (requestError: any) { setError(requestError?.response?.data?.message || 'Unable to revoke API key.'); }
   };
@@ -67,7 +67,7 @@ const ApiKeysPage = () => {
     {error && <p role="alert" style={{ color: theme.danger }}>{error}</p>}
     {secret && <section style={{ ...rowList, marginBottom: 14, borderColor: theme.primary }}><div style={row}><strong>Copy your new API key now</strong><p style={{ color: theme.textMuted }}>For security, this secret cannot be shown again.</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, background: theme.surfaceMuted }}>{secret}</code><button type="button" onClick={() => void navigator.clipboard?.writeText(secret)} style={{ ...button, marginTop: 12 }}>Copy secret</button><button type="button" onClick={() => setSecret('')} style={{ ...button, marginLeft: 8, background: theme.surfaceMuted, color: theme.text }}>Dismiss</button></div></section>}
     <form onSubmit={createKey} style={rowList}><div style={row}><h3 style={{ margin: 0 }}>Create API key</h3></div><div style={row}><label style={{ display: 'grid', gap: 7 }}>Name<input required minLength={2} value={name} onChange={(event) => setName(event.target.value)} style={input} /></label></div><div style={row}><label style={{ display: 'grid', gap: 7 }}>Expires on (optional)<button type="button" onClick={() => setShowExpirationPage(true)} style={{ ...input, textAlign: 'left', cursor: 'pointer' }}>{expiration || 'Choose expiration date'}</button></label></div><div style={row}><fieldset style={{ border: 0, padding: 0, margin: 0 }}><legend>Scopes</legend>{scopes.map((scope) => <label key={scope} style={{ display: 'inline-flex', gap: 6, marginRight: 16 }}><input type="checkbox" checked={selectedScopes.includes(scope)} onChange={() => setSelectedScopes((current) => current.includes(scope) ? current.filter((item) => item !== scope) : [...current, scope])} />{scope}</label>)}</fieldset></div><div style={row}><button disabled={saving || !selectedScopes.length} style={button}>{saving ? <InlineLoadingDots /> : 'Create key'}</button></div></form>
-    <section style={{ ...rowList, marginTop: 18 }}><div style={row}><h3 style={{ margin: 0 }}>Your keys</h3></div>{loading ? <div style={{ ...row, textAlign: 'center' }}><LoadingDots /></div> : !keys.length ? <div style={{ ...row, color: theme.textMuted }}>No API keys yet.</div> : keys.map((key) => <article key={key.id} style={row}><strong>{key.name}</strong><p style={{ margin: '6px 0', color: theme.textMuted }}>{key.prefix}… · {key.scopes.join(', ')} · {key.revokedAt ? 'Revoked' : 'Active'}</p>{!key.revokedAt && <button type="button" onClick={() => void revokeKey(key.id)} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Revoke</button>}</article>)}</section>
+    <section style={{ ...rowList, marginTop: 18 }}><div style={row}><h3 style={{ margin: 0 }}>Your keys</h3></div>{loading ? <div style={{ ...row, textAlign: 'center' }}><LoadingDots /></div> : !keys.length ? <div style={{ ...row, color: theme.textMuted }}>No API keys yet.</div> : keys.map((key) => <article key={key.id} style={row}><strong>{key.name}</strong><p style={{ margin: '6px 0', color: theme.textMuted }}>{key.prefix}… · {key.scopes.join(', ')} · {key.revokedAt ? 'Revoked' : 'Active'}</p>{!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 8, marginTop: 8, padding: 10, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}><span style={{ color: theme.textMuted, fontSize: '0.82rem' }}>Revoke this API key? Applications using it will stop working.</span><div style={{ display: 'flex', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Confirm revoke</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Revoke</button>)}</article>)}</section>
   </div><NowBar /></main></HybridTheme>;
 };
 export default ApiKeysPage;

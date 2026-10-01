@@ -71,6 +71,7 @@ const TicketsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -155,7 +156,7 @@ const TicketsPage = () => {
               {selectedTicket.adminReply ? <div style={styles.reply}><strong>Admin reply</strong><p style={styles.body}>{selectedTicket.adminReply}</p></div> : null}
               <div style={styles.detailActions}>
                 <button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>
-                {selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => { if (window.confirm('Close this ticket?')) void closeTicket(); }} disabled={closing}><Check size={16} /> {closing ? 'Closing...' : 'Close Ticket'}</button> : null}
+                {selectedTicket.status !== 'closed' ? (showCloseConfirm ? <div style={styles.reply}><p style={styles.meta}>Close this ticket permanently?</p><div style={{ display: 'flex', gap: 8 }}><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => setShowCloseConfirm(false)}>Cancel</button><button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => void closeTicket()} disabled={closing}><Check size={16} /> {closing ? 'Closing...' : 'Confirm Close'}</button></div></div> : <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => setShowCloseConfirm(true)} disabled={closing}><Check size={16} /> Close Ticket</button>) : null}
               </div>
             </section>
           ) : (
