@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronLeft, Eye, Plus, Send } from 'lucide-react';
+import { ArrowLeft, Check, ChevronLeft, Eye, Plus, Send } from 'lucide-react';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -67,6 +67,7 @@ const TicketsPage = () => {
   const [body, setBody] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -116,6 +117,21 @@ const TicketsPage = () => {
     }
   };
 
+  const closeTicket = async () => {
+    if (!selectedTicket || selectedTicket.status === 'closed') return;
+    setClosing(true);
+    setError('');
+    try {
+      const response = await api.patch<{ ticket: Ticket }>(`/api/tickets/${selectedTicket.id}/close`);
+      setSelectedTicket(response.data.ticket);
+      setTickets((current) => current.map((ticket) => ticket.id === response.data.ticket.id ? response.data.ticket : ticket));
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to close this ticket right now.');
+    } finally {
+      setClosing(false);
+    }
+  };
+
   return (
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
@@ -135,6 +151,7 @@ const TicketsPage = () => {
               </div>
               <p style={styles.body}>{selectedTicket.body}</p>
               {selectedTicket.adminReply ? <div style={styles.reply}><strong>Admin reply</strong><p style={styles.body}>{selectedTicket.adminReply}</p></div> : null}
+              {selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...(closing ? styles.disabled : {}) }} onClick={() => { if (window.confirm('Close this ticket?')) void closeTicket(); }} disabled={closing}><Check size={16} /> {closing ? 'Closing...' : 'Close Ticket'}</button> : null}
             </section>
           ) : (
             <>
