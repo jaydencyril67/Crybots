@@ -170,7 +170,7 @@ const DangerPage = () => {
         await api.patch('/api/settings/danger/self-exclude', payload, { headers });
       }
 
-      if (action === 'self-exclude') {
+      if (action === 'disable' || action === 'self-exclude') {
         window.localStorage.removeItem('token');
         window.localStorage.removeItem('user');
         window.localStorage.removeItem('kingshall_user');
