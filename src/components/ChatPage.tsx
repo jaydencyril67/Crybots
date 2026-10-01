@@ -4,7 +4,6 @@ import { io, Socket } from 'socket.io-client';
 import { API_BASE_URL } from '../api/axios';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
-import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
 
 type ChatMessage = {
@@ -57,7 +56,7 @@ const ChatPage = () => {
     });
   };
 
-  return <HybridTheme mode={themeMode}><div style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}>
+  return <HybridTheme mode={themeMode}><div style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 32 }}>
     <div style={{ width: '100%', maxWidth: 900, margin: '0 auto', padding: 'clamp(18px, 3vw, 32px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
       <button type="button" onClick={() => navigate('/home')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Back</button>
       <div style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass, overflow: 'hidden' }}>
@@ -67,7 +66,7 @@ const ChatPage = () => {
         {error && <p style={{ margin: '0 16px 10px', color: theme.danger, fontSize: '.84rem' }}>{error}</p>}
         <form onSubmit={sendMessage} style={{ display: 'flex', gap: 8, padding: 12, borderTop: `1px solid ${theme.borderGlass}` }}><textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Write a message…" rows={2} disabled={!connected || sending} style={{ flex: 1, resize: 'none', border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: 10, background: theme.surfaceMuted, color: theme.text, font: 'inherit' }} /><button type="submit" disabled={!connected || sending || !draft.trim()} style={{ alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '0 15px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 800 }}><Send size={16} /> Send</button></form>
       </div>
-    </div><NowBar /></div></HybridTheme>;
+    </div></div></HybridTheme>;
 };
 
 export default ChatPage;
