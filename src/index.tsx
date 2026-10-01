@@ -9,6 +9,7 @@ import AccountConfirmedPage from './components/AccountConfirmedPage';
 import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
 import AdminHomePage from './components/AdminHomePage';
+import AdminSettingsPage from './components/AdminSettingsPage';
 import AdminUsersPage from './components/AdminUsersPage';
 import AdminDepositsPage from './components/AdminDepositsPage';
 import AdminDepositStatsPage from './components/AdminDepositStatsPage';
@@ -120,6 +121,7 @@ const getRouteKey = () => {
   if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'account-confirmed';
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
   if (pathname === '/admin-home' || hash === '#/admin-home') return 'admin-home';
+  if (pathname === '/admin/settings' || hash === '#/admin/settings') return 'admin-settings';
   if (pathname === '/admin/users' || hash === '#/admin/users') return 'admin-users';
   if (pathname === '/admin/deposits' || hash === '#/admin/deposits') return 'admin-deposits';
   if (pathname.startsWith('/admin/deposit-stats/') || hash.startsWith('#/admin/deposit-stats/')) return 'admin-deposit-stats';
@@ -500,6 +502,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'account-confirmed') return <AccountConfirmedPage />;
     if (displayedRouteKey === 'signin') return <SigninPage />;
     if (displayedRouteKey === 'admin-home') return <AdminHomePage />;
+    if (displayedRouteKey === 'admin-settings') return <AdminSettingsPage />;
     if (displayedRouteKey === 'admin-users') return <AdminUsersPage />;
     if (displayedRouteKey === 'admin-deposits') return <AdminDepositsPage />;
     if (displayedRouteKey === 'admin-deposit-stats') return <AdminDepositStatsPage />;
