@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Install Capacitor build tools
-        run: npm install --no-save --package-lock=false @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9 @capacitor/assets@3.0.5 @capacitor/splash-screen@7.0.3 @capacitor-community/speech-recognition@7.0.1 @capacitor-community/text-to-speech@6.0.0 sharp
+        run: npm install --no-save --package-lock=false @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9 @capacitor/assets@3.0.5 @capacitor/splash-screen@7.0.3 @capacitor-community/speech-recognition@7.0.1 @capacitor-community/text-to-speech@6.0.0 @capacitor/camera@7.0.2 sharp
 
       - name: Create app splash assets
         run: |

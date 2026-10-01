@@ -8,6 +8,7 @@ import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
+import ImagePickerButton from './ImagePickerButton';
 
 const baseStyles = {
   page: {
@@ -368,9 +369,7 @@ const DetailsPage = () => {
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : null;
 
 
-  const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleAvatarFileChange = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       setAvatarError('Please choose an image file.');
       return;
@@ -396,7 +395,6 @@ const DetailsPage = () => {
       setAvatarError(error instanceof Error ? error.message : 'Unable to upload image.');
     } finally {
       setAvatarUploading(false);
-      event.target.value = '';
     }
   };
 
@@ -422,14 +420,16 @@ const DetailsPage = () => {
                         <CircleUserRound size={58} strokeWidth={1.6} />
                       </div>
                     )}
-                    <label
+                    <ImagePickerButton
+                      accept="image/*"
+                      onImageSelected={handleAvatarFileChange}
+                      disabled={avatarUploading}
                       style={styles.avatarCameraButton}
                       aria-label={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
                       title={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
                     >
                       {avatarUploading ? <LoadingDots /> : <Camera size={17} strokeWidth={2.2} />}
-                      <input type="file" accept="image/*" onChange={handleAvatarFileChange} style={{ display: 'none' }} disabled={avatarUploading} />
-                    </label>
+                    </ImagePickerButton>
                   </div>
                 </div>
               </div>
