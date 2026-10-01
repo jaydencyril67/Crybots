@@ -85,7 +85,7 @@ const ChatPage = () => {
 
   return <HybridTheme mode={themeMode}><div style={{ height: 'calc(100dvh - 150px)', minHeight: 0, marginBottom: 70, background: theme.background, color: theme.text, overflow: 'hidden' }}>
     <main style={{ width: '100%', height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
-      <button type="button" onClick={() => navigate('/home')} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, border: 0, borderBottom: `1px solid ${theme.borderGlass}`, borderRadius: 0, padding: '12px 16px', background: 'transparent', color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Back</button>
+      <button type="button" onClick={() => navigate('/help')} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '.84rem', marginBottom: 12 }}><ArrowLeft size={17} /> Help</button>
       <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 14px', borderBottom: `1px solid ${theme.borderGlass}`, color: connected ? theme.success : theme.textMuted, fontSize: '.82rem' }}>{connected ? '● Live connection' : '○ Connecting…'}</div>
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16 }}>
