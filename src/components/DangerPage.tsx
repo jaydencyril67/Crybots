@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
-import api from '../api/axios';
+import api, { forceLogout } from '../api/axios';
 import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
 import InlineLoadingDots from './InlineLoadingDots';
@@ -171,13 +171,7 @@ const DangerPage = () => {
       }
 
       if (action === 'disable' || action === 'self-exclude') {
-        window.localStorage.removeItem('token');
-        window.localStorage.removeItem('user');
-        window.localStorage.removeItem('kingshall_user');
-        window.localStorage.removeItem('firstName');
-        window.localStorage.removeItem('kingshall_first_name');
-        window.dispatchEvent(new Event('ke:force-logout'));
-        navigate('/');
+        forceLogout();
         return;
       }
 
