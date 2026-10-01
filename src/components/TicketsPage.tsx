@@ -25,7 +25,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   heading: { margin: '20px 0 8px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
-  createButton: { width: '100%', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, border: 'none', borderRadius: 12, padding: '13px 16px', background: '#16a34a', color: '#fff', cursor: 'pointer', fontWeight: 900, fontSize: '0.95rem' },
+  createButton: { width: '100%', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, border: `1px solid ${theme.primary}`, borderRadius: 12, padding: '13px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 900, fontSize: '0.95rem' },
   form: { display: 'grid', gap: 12, padding: 16, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass },
   label: { display: 'grid', gap: 6, color: theme.text, fontSize: '0.86rem', fontWeight: 800 },
   input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
