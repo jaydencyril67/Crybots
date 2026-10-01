@@ -162,7 +162,7 @@ const TicketsPage = () => {
             <>
               {!showForm ? <button type="button" style={styles.createButton} onClick={() => { setShowForm(true); setError(''); }}><Plus size={18} /> Create New Ticket</button> : (
                 <form style={styles.form} onSubmit={(event) => void submitTicket(event)}>
-                  <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={60} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
+                  <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={80} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
                   <label style={styles.label}>Body<textarea style={styles.textarea} value={body} maxLength={10000} onChange={(event) => setBody(event.target.value)} placeholder="Write your message or report here..." /></label>
                   <div style={styles.formActions}>
                     <button type="button" style={{ ...styles.secondaryButton, ...styles.formButton }} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
