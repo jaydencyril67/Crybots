@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BarChart3, Bell, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, LifeBuoy, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards, Wrench } from 'lucide-react';
+import { Bell, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, LifeBuoy, MessageCircle, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES } from '../utils/voiceNavigation';
 
@@ -373,12 +373,11 @@ const createAdminActions = (): NowBarAction[] => [
   { label: 'DASHBOARD', icon: <ShieldCheck size={18} />, onClick: () => navigate('/admin-home'), active: getActivePath() === '/admin-home' },
   { label: 'USERS', icon: <Users size={18} />, onClick: () => navigate('/admin/users'), active: getActivePath() === '/admin/users' },
   { label: 'TICKETS', icon: <LifeBuoy size={18} />, onClick: () => navigate('/admin/tickets'), active: getActivePath() === '/admin/tickets' || getActivePath().startsWith('/admin/ticket-stats/') },
+  { label: 'CHAT', icon: <MessageCircle size={18} />, onClick: () => navigate('/admin/chat'), active: getActivePath() === '/admin/chat' || getActivePath().startsWith('/admin/chat/') },
   { label: 'DEPOSITS', icon: <Coins size={18} />, onClick: () => navigate('/admin/deposits'), active: getActivePath() === '/admin/deposits' },
   { label: 'ALERT', icon: <Bell size={18} />, onClick: () => navigate('/admin/alert'), active: getActivePath() === '/admin/alert' },
   { label: 'FUNDS', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/funds'), active: getActivePath() === '/admin/funds' },
   { label: 'WITHDRAW', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/withdrawals'), active: getActivePath() === '/admin/withdrawals' },
-  { label: 'STATS', icon: <BarChart3 size={18} />, onClick: () => {} },
-  { label: 'TOOLS', icon: <Wrench size={18} />, onClick: () => {} },
   { label: 'SETTINGS', icon: <Settings size={18} />, onClick: () => {} },
 ];
 
