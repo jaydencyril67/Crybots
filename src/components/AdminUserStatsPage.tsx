@@ -12,7 +12,7 @@ type UserDetails = Record<string, unknown> & { email?: string };
 
 const formatValue = (value: unknown) => typeof value === 'object' && value !== null ? JSON.stringify(value, null, 2) : String(value ?? '');
 const isStructuredValue = (value: unknown) => typeof value === 'object' && value !== null;
-const HIDDEN_USER_FIELDS = new Set(['_id', '__v', 'sessions', 'createdAt', 'updatedAt', 'pageUsage', 'alertPreferences', 'idleLogoutEnabled', 'idleLogoutMinutes', 'autoSellRules', 'takeProfitRules', 'marketRangeNotificationRules', 'marketPointPositions', 'accountStatusReason']);
+const HIDDEN_USER_FIELDS = new Set(['_id', '__v', 'sessions', 'createdAt', 'updatedAt', 'pageUsage', 'alertPreferences', 'idleLogoutEnabled', 'idleLogoutMinutes', 'autoSellRules', 'takeProfitRules', 'marketRangeNotificationRules', 'marketPointPositions', 'accountStatusReason', 'loginCount', 'maxActiveSessions']);
 
 const AdminUserStatsPage = () => {
   const { themeMode } = useAppTheme();
