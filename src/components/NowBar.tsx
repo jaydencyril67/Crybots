@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BarChart3, Bell, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards, Wrench } from 'lucide-react';
+import { BarChart3, Bell, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, LifeBuoy, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards, Wrench } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES } from '../utils/voiceNavigation';
 
@@ -320,6 +320,8 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/admin/withdrawals') return 'WITHDRAW';
   if (path.startsWith('/admin/withdrawal-stats/')) return 'WITHDRAWAL STATS';
   if (path.startsWith('/admin/user-stats/')) return 'USER-STATS';
+  if (path.startsWith('/admin/ticket-stats/')) return 'TICKET STATS';
+  if (path === '/admin/tickets') return 'TICKETS';
   if (path.startsWith('/notifications/')) return 'NOTIFICATION';
   if (path === '/details') return 'DETAILS';
   if (path === '/manage') return 'MANAGE';
@@ -371,6 +373,7 @@ const getCurrentPageTitle = (path: string) => {
 const createAdminActions = (): NowBarAction[] => [
   { label: 'DASHBOARD', icon: <ShieldCheck size={18} />, onClick: () => navigate('/admin-home'), active: getActivePath() === '/admin-home' },
   { label: 'USERS', icon: <Users size={18} />, onClick: () => navigate('/admin/users'), active: getActivePath() === '/admin/users' },
+  { label: 'TICKETS', icon: <LifeBuoy size={18} />, onClick: () => navigate('/admin/tickets'), active: getActivePath() === '/admin/tickets' || getActivePath().startsWith('/admin/ticket-stats/') },
   { label: 'DEPOSITS', icon: <Coins size={18} />, onClick: () => navigate('/admin/deposits'), active: getActivePath() === '/admin/deposits' },
   { label: 'ALERT', icon: <Bell size={18} />, onClick: () => navigate('/admin/alert'), active: getActivePath() === '/admin/alert' },
   { label: 'FUNDS', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/funds'), active: getActivePath() === '/admin/funds' },
