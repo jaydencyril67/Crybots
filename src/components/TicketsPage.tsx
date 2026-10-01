@@ -25,14 +25,17 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   heading: { margin: '20px 0 8px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
-  createButton: { width: '100%', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, border: 'none', borderRadius: 12, padding: '13px 16px', background: '#16a34a', color: '#fff', cursor: 'pointer', fontWeight: 900, fontSize: '0.95rem' },
+  createButton: { width: '100%', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, border: `1px solid ${theme.primary}`, borderRadius: 12, padding: '13px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 900, fontSize: '0.95rem' },
   form: { display: 'grid', gap: 12, padding: 16, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass },
   label: { display: 'grid', gap: 6, color: theme.text, fontSize: '0.86rem', fontWeight: 800 },
   input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
   textarea: { width: '100%', minHeight: 170, resize: 'vertical' as const, boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
-  formActions: { display: 'flex', justifyContent: 'flex-end', gap: 10, flexWrap: 'wrap' as const },
-  secondaryButton: { display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 14px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 },
-  submitButton: { display: 'inline-flex', alignItems: 'center', gap: 7, border: 'none', borderRadius: 10, padding: '10px 16px', background: theme.primary, color: '#fff', cursor: 'pointer', fontWeight: 900 },
+  formActions: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 },
+  detailActions: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 },
+  secondaryButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 14px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 },
+  formButton: { width: '100%' },
+  detailButton: { width: '100%' },
+  submitButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '10px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 900 },
   disabled: { opacity: 0.6, cursor: 'not-allowed' },
   tableWrap: { marginTop: 20, overflowX: 'auto' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass },
   table: { width: '100%', minWidth: 520, borderCollapse: 'collapse' as const },
@@ -136,13 +139,12 @@ const TicketsPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => navigate('/home')}><ArrowLeft size={17} /> Home</button>
+          <button type="button" style={styles.back} onClick={() => navigate('/help')}><ArrowLeft size={17} /> Help</button>
           <h1 style={styles.heading}>Tickets</h1>
           <p style={styles.intro}>Send a message or report to the admin and track your support tickets here.</p>
           {error ? <p style={styles.error}>{error}</p> : null}
           {selectedTicket ? (
             <section style={styles.detail}>
-              <button type="button" style={styles.secondaryButton} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>
               <div>
                 <h2 style={styles.detailHeading}>{selectedTicket.subject}</h2>
                 <p style={styles.meta}>Status: <strong>{selectedTicket.status}</strong></p>
@@ -151,7 +153,10 @@ const TicketsPage = () => {
               </div>
               <p style={styles.body}>{selectedTicket.body}</p>
               {selectedTicket.adminReply ? <div style={styles.reply}><strong>Admin reply</strong><p style={styles.body}>{selectedTicket.adminReply}</p></div> : null}
-              {selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...(closing ? styles.disabled : {}) }} onClick={() => { if (window.confirm('Close this ticket?')) void closeTicket(); }} disabled={closing}><Check size={16} /> {closing ? 'Closing...' : 'Close Ticket'}</button> : null}
+              <div style={styles.detailActions}>
+                <button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>
+                {selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => { if (window.confirm('Close this ticket?')) void closeTicket(); }} disabled={closing}><Check size={16} /> {closing ? 'Closing...' : 'Close Ticket'}</button> : null}
+              </div>
             </section>
           ) : (
             <>
@@ -160,8 +165,8 @@ const TicketsPage = () => {
                   <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={160} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
                   <label style={styles.label}>Body<textarea style={styles.textarea} value={body} maxLength={10000} onChange={(event) => setBody(event.target.value)} placeholder="Write your message or report here..." /></label>
                   <div style={styles.formActions}>
-                    <button type="button" style={styles.secondaryButton} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
-                    <button type="submit" style={{ ...styles.submitButton, ...(saving ? styles.disabled : {}) }} disabled={saving}><Send size={16} /> {saving ? 'Submitting...' : 'Submit Ticket'}</button>
+                    <button type="button" style={{ ...styles.secondaryButton, ...styles.formButton }} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
+                    <button type="submit" style={{ ...styles.submitButton, ...styles.formButton, ...(saving ? styles.disabled : {}) }} disabled={saving}><Send size={16} /> {saving ? 'Submitting...' : 'Submit Ticket'}</button>
                   </div>
                 </form>
               )}
