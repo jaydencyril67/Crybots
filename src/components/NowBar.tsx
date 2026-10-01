@@ -309,6 +309,7 @@ const getCurrentPageTitle = (path: string) => {
   if (catalogEntry) return catalogEntry.label;
   if (path === '/home') return 'HOME';
   if (path === '/admin-home') return 'ADMIN';
+  if (path === '/admin/settings') return 'SETTINGS';
   if (path === '/admin/users') return 'USERS';
   if (path === '/admin/chat') return 'CHAT';
   if (path === '/admin/deposits') return 'DEPOSITS';
@@ -379,7 +380,7 @@ const createAdminActions = (): NowBarAction[] => [
   { label: 'ALERT', icon: <Bell size={18} />, onClick: () => navigate('/admin/alert'), active: getActivePath() === '/admin/alert' },
   { label: 'FUNDS', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/funds'), active: getActivePath() === '/admin/funds' },
   { label: 'WITHDRAW', icon: <WalletCards size={18} />, onClick: () => navigate('/admin/withdrawals'), active: getActivePath() === '/admin/withdrawals' },
-  { label: 'SETTINGS', icon: <Settings size={18} />, onClick: () => {} },
+  { label: 'SETTINGS', icon: <Settings size={18} />, onClick: () => navigate('/admin/settings'), active: getActivePath() === '/admin/settings' },
 ];
 
 const createDefaultActions = (): NowBarAction[] => [
