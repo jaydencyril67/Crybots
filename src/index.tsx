@@ -442,7 +442,7 @@ const RouteTransition = () => {
         return null;
       }
 
-      const stream = new EventSource(`${API_BASE_URL}/api/auth/force-logout/stream`, {
+      const stream = new EventSource(`${API_BASE_URL}/api/auth/force-logout/stream?token=${encodeURIComponent(token)}`, {
         withCredentials: true,
       });
 
