@@ -5,7 +5,7 @@ import NowBar from './NowBar';
 const destinations: ParentPageCard[] = [
   { label: 'FAQ', description: 'Find answers to frequently asked questions.', route: '/faq' },
   { label: 'Live Chat', description: 'Chat with our support team in real time.' },
-  { label: 'Tickets', description: 'Create and manage your support requests.' },
+  { label: 'Tickets', description: 'Create and manage your support requests.', route: '/tickets' },
   { label: 'Tutorial', description: 'Learn how to use KingsHall Exchange.' },
 ];
 
