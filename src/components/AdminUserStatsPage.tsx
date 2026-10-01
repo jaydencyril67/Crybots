@@ -12,6 +12,7 @@ type UserDetails = Record<string, unknown> & { email?: string };
 
 const formatValue = (value: unknown) => typeof value === 'object' && value !== null ? JSON.stringify(value, null, 2) : String(value ?? '');
 const isStructuredValue = (value: unknown) => typeof value === 'object' && value !== null;
+const HIDDEN_USER_FIELDS = new Set(['_id', '__v', 'sessions', 'createdAt', 'updatedAt', 'pageUsage', 'alertPreferences', 'idleLogoutEnabled', 'idleLogoutMinutes', 'autoSellRules', 'takeProfitRules', 'marketRangeNotificationRules']);
 
 const AdminUserStatsPage = () => {
   const { themeMode } = useAppTheme();
@@ -31,7 +32,7 @@ const AdminUserStatsPage = () => {
     }).catch(() => setError('Unable to load this user.'));
   }, [id]);
 
-  const entries = useMemo(() => user ? Object.entries(user).filter(([key]) => key !== '_id' && key !== '__v' && key !== 'sessions' && key !== 'createdAt' && key !== 'updatedAt') : [], [user]);
+  const entries = useMemo(() => user ? Object.entries(user).filter(([key]) => !HIDDEN_USER_FIELDS.has(key)) : [], [user]);
   const updateDraft = (key: string, value: string) => { setSaved(false); setDraft((current) => ({ ...current, [key]: value })); };
 
   const saveChanges = async () => {
@@ -72,7 +73,7 @@ const AdminUserStatsPage = () => {
                 <strong style={{ fontSize: '0.82rem', overflowWrap: 'anywhere' }}>{key}</strong>
                 {isStructuredValue(value) ? <textarea value={draft[key] || ''} onChange={(event) => updateDraft(key, event.target.value)} rows={3} style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', border: `1px solid ${theme.border}`, borderRadius: 8, padding: 8, background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.8rem' }} /> : <input value={draft[key] || ''} onChange={(event) => updateDraft(key, key === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)} maxLength={key === 'uid' ? 5 : undefined} inputMode={key === 'uid' ? 'numeric' : undefined} style={{ width: '100%', boxSizing: 'border-box', border: `1px solid ${theme.border}`, borderRadius: 8, padding: '8px 9px', background: theme.surfaceMuted, color: theme.text, font: 'inherit', fontSize: '0.84rem' }} />}
               </label>)}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}><button type="button" onClick={saveChanges} disabled={saving} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.primary, color: theme.textInverse, cursor: saving ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}><Save size={15} /> {saving ? 'Saving…' : 'Save changes'}</button>{saved && <span style={{ color: theme.success, fontSize: '0.82rem' }}>Saved</span>}</div>
+              <div style={{ display: 'grid', gap: 10, marginTop: 4 }}><button type="button" onClick={saveChanges} disabled={saving} style={{ width: '100%', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, border: 0, borderRadius: 999, padding: '9px 14px', background: theme.primary, color: theme.textInverse, cursor: saving ? 'wait' : 'pointer', fontWeight: 800, fontSize: '0.82rem' }}><Save size={15} /> {saving ? 'Saving…' : 'Save changes'}</button>{saved && <span style={{ color: theme.success, fontSize: '0.82rem', textAlign: 'center' }}>Saved</span>}</div>
             </>}
           </section>
         </div>
