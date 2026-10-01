@@ -49,6 +49,7 @@ const pageLabels: Record<string, string> = {
   '/deposit': 'Deposit',
   '/transactions': 'Transactions',
   '/notifications': 'Notifications',
+  '/tickets': 'Tickets',
   '/alert': 'Alert',
   '/app-usage': 'App Usage',
 };
