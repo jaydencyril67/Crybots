@@ -44,7 +44,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   status: { display: 'inline-flex', borderRadius: 999, padding: '5px 10px', fontSize: '0.76rem', fontWeight: 900, textTransform: 'capitalize' as const },
   viewButton: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 11px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 },
   empty: { padding: '30px 16px', textAlign: 'center' as const, color: theme.textMuted },
-  detail: { display: 'grid', gap: 16, padding: 18, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass },
+  detail: { display: 'grid', gap: 16, maxHeight: 'calc(100vh - 220px)', overflowY: 'auto' as const, padding: 18, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass },
   detailHeading: { margin: 0, fontSize: 'clamp(1.2rem, 3vw, 1.65rem)', fontWeight: 900, overflowWrap: 'anywhere' as const },
   meta: { margin: 0, color: theme.textMuted, fontSize: '0.82rem' },
   body: { margin: 0, whiteSpace: 'pre-wrap' as const, lineHeight: 1.7, overflowWrap: 'anywhere' as const },
@@ -162,7 +162,7 @@ const TicketsPage = () => {
             <>
               {!showForm ? <button type="button" style={styles.createButton} onClick={() => { setShowForm(true); setError(''); }}><Plus size={18} /> Create New Ticket</button> : (
                 <form style={styles.form} onSubmit={(event) => void submitTicket(event)}>
-                  <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={160} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
+                  <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={60} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
                   <label style={styles.label}>Body<textarea style={styles.textarea} value={body} maxLength={10000} onChange={(event) => setBody(event.target.value)} placeholder="Write your message or report here..." /></label>
                   <div style={styles.formActions}>
                     <button type="button" style={{ ...styles.secondaryButton, ...styles.formButton }} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
