@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, MessageCircle, Send } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import { API_BASE_URL } from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -94,7 +94,6 @@ const AdminChatUserPage = () => {
   return <HybridTheme mode={themeMode}><div style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}>
     <main style={{ width: '100%', maxWidth: 900, margin: '0 auto', padding: 'clamp(18px, 3vw, 32px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
       <button type="button" onClick={() => navigate('/admin/chat')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Back to chats</button>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, margin: '20px 0 16px' }}><div><h1 style={{ margin: 0, fontSize: 'clamp(1.45rem, 4vw, 2rem)' }}>User chat</h1><p style={{ margin: '8px 0 0', color: theme.textMuted }}>Respond to this user in real time.</p></div><MessageCircle size={30} /></header>
       <div style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass, overflow: 'hidden' }}>
         <div style={{ padding: '10px 14px', borderBottom: `1px solid ${theme.borderGlass}`, color: connected ? theme.success : theme.textMuted, fontSize: '.82rem' }}>{connected ? '● Live connection' : '○ Connecting…'}</div>
         <div style={{ minHeight: 420, maxHeight: 'calc(100vh - 360px)', overflowY: 'auto', padding: 16 }}>
