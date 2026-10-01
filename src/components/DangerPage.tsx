@@ -5,6 +5,8 @@ import NowBar from './NowBar';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
+import InlineLoadingDots from './InlineLoadingDots';
+import NotificationBanner from './NotificationBanner';
 
 type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
 
@@ -14,6 +16,7 @@ type DangerActionState = {
   reason: string;
   durationDays: string;
   status: string;
+  statusTone: 'error' | 'success';
   loading: DangerActionKey | null;
 };
 
@@ -146,16 +149,16 @@ const DangerPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
 
-  const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', loading: null });
-  const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', loading: null });
-  const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', loading: null });
+  const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
+  const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
+  const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
 
   const submitAction = async (
     action: DangerActionKey,
     state: DangerActionState,
     setState: React.Dispatch<React.SetStateAction<DangerActionState>>,
   ) => {
-    setState((current) => ({ ...current, loading: action, status: '' }));
+    setState((current) => ({ ...current, loading: action, status: '', statusTone: 'error' }));
 
     try {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
@@ -178,17 +181,17 @@ const DangerPage = () => {
         return;
       }
 
-      setState((current) => ({ ...current, status: 'Success: account action completed.' }));
+      setState((current) => ({ ...current, status: 'Account action completed successfully.', statusTone: 'success' }));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to complete the action.';
-      setState((current) => ({ ...current, status: message }));
+      setState((current) => ({ ...current, status: message, statusTone: 'error' }));
     } finally {
       setState((current) => ({ ...current, loading: null }));
     }
   };
 
   const confirmDeleteAccount = async () => {
-    setRemove((current) => ({ ...current, loading: 'delete', status: '' }));
+    setRemove((current) => ({ ...current, loading: 'delete', status: '', statusTone: 'error' }));
 
     try {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
@@ -205,7 +208,7 @@ const DangerPage = () => {
       navigate('/');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to complete the action.';
-      setRemove((current) => ({ ...current, status: message }));
+      setRemove((current) => ({ ...current, status: message, statusTone: 'error' }));
     } finally {
       setRemove((current) => ({ ...current, loading: null }));
     }
@@ -235,9 +238,9 @@ const DangerPage = () => {
                 <input id="danger-disable-reason" style={styles.input} value={disable.reason} onChange={(event) => setDisable((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for disabling" />
               </div>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>Disable Account</button>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>{disable.loading === 'disable' ? <InlineLoadingDots /> : 'Disable Account'}</button>
               </div>
-              {disable.status ? <div style={styles.status}>{disable.status}</div> : null}
+              {disable.status ? <NotificationBanner tone={disable.statusTone} title={disable.statusTone === 'success' ? 'Action completed' : 'Action required'} message={disable.status} /> : null}
               </section>
 
               <section style={styles.dangerRow}>
@@ -260,9 +263,9 @@ const DangerPage = () => {
                 <input id="danger-self-exclude-reason" style={styles.input} value={selfExclude.reason} onChange={(event) => setSelfExclude((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for self exclusion" />
               </div>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null || !selfExclude.durationDays}>Self Exclude Account</button>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null || !selfExclude.durationDays}>{selfExclude.loading === 'self-exclude' ? <InlineLoadingDots /> : 'Self Exclude Account'}</button>
               </div>
-              {selfExclude.status ? <div style={styles.status}>{selfExclude.status}</div> : null}
+              {selfExclude.status ? <NotificationBanner tone={selfExclude.statusTone} title={selfExclude.statusTone === 'success' ? 'Action completed' : 'Action required'} message={selfExclude.status} /> : null}
               </section>
 
               <section style={styles.dangerRow}>
@@ -281,9 +284,9 @@ const DangerPage = () => {
                 <input id="danger-delete-reason" style={styles.input} value={remove.reason} onChange={(event) => setRemove((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for deleting" />
               </div>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? 'Deleting…' : 'Delete Account'}</button>
+                <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? <InlineLoadingDots /> : 'Delete Account'}</button>
               </div>
-              {remove.status ? <div style={styles.status}>{remove.status}</div> : null}
+              {remove.status ? <NotificationBanner tone={remove.statusTone} title={remove.statusTone === 'success' ? 'Action completed' : 'Action required'} message={remove.status} /> : null}
               </section>
             </div>
           </div>
