@@ -35,7 +35,7 @@ import { disableVoiceMode } from './utils/voiceNavigation';
 import NowBarColorPage from './components/NowBarColorPage';
 import NowBarButtonColorPage from './components/NowBarButtonColorPage';
 import DepositPage from './components/DepositPage';
-import PortfolioPage from './components/PortfolioPage';
+import ProfilePage from './components/ProfilePage';
 import StatisticsPage from './components/StatisticsPage';
 import ExitPage from './components/ExitPage';
 import AutoExitPage from './components/AutoExitPage';
@@ -523,7 +523,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'voice-commands') return <ProtectedRoute><VoiceCommandsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-color') return <ProtectedRoute><NowBarColorPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-button-color') return <ProtectedRoute><NowBarButtonColorPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'profile') return <ProtectedRoute><PortfolioPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
     if (displayedRouteKey === 'exit') return <ProtectedRoute><ExitPage /></ProtectedRoute>;
     if (displayedRouteKey === 'auto-exit') return <ProtectedRoute><AutoExitPage /></ProtectedRoute>;
     if (displayedRouteKey === 'manual-exit') return <ProtectedRoute><ManualExitPage /></ProtectedRoute>;
