@@ -16,8 +16,8 @@ type ParentPageLayoutProps = {
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, background: theme.background, color: theme.text },
-  shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
+  page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'hidden' as const, background: theme.background, color: theme.text, boxSizing: 'border-box' as const },
+  shell: { width: '100%', maxWidth: '1160px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 0', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '18px', marginTop: '18px' },
   section: { display: 'grid', gap: '10px' },
   title: { margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em', color: theme.text },

@@ -18,7 +18,7 @@ type TransactionsData = { transactions: TransactionEntry[]; pointSummary: PointS
 const formatUsdt = (value: number) => `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 6, maximumFractionDigits: 6 })} USDT`;
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', paddingBottom: '118px', background: theme.background, color: theme.text },
+  page: { minHeight: '100vh', paddingBottom: '90px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '14px', marginTop: '10px' },
   back: { display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'max-content', maxWidth: '100%', boxSizing: 'border-box' as const, gap: '6px', marginBottom: '16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },

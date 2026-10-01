@@ -20,7 +20,7 @@ type LegalPageProps = {
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', paddingBottom: '132px', background: theme.background, color: theme.text },
+  page: { minHeight: '100vh', paddingBottom: '90px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '1040px', margin: '0 auto', padding: 'clamp(18px, 4vw, 48px) clamp(14px, 3vw, 28px) 48px', boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', gap: '7px', border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', padding: '9px 12px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontWeight: 750 },
   hero: { marginTop: '26px', padding: 'clamp(22px, 4vw, 42px)', border: `1px solid ${theme.borderGlass}`, borderRadius: '26px', background: `linear-gradient(135deg, ${theme.surfaceElevated}, ${theme.surfaceGlass})`, boxShadow: '0 18px 50px rgba(0,0,0,0.16)' },

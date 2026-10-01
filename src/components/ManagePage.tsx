@@ -19,7 +19,7 @@ type BlockPicker = 'startsAt' | 'endsAt' | null;
 type Status = { kind: 'idle' | 'success' | 'error'; message: string };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '132px', background: theme.background, color: theme.text },
+  page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '90px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   card: { width: '100%', boxSizing: 'border-box' as const, margin: '14px auto 0', padding: '18px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, display: 'grid', gap: '12px' },
   innerCard: { width: '100%', boxSizing: 'border-box' as const, padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, display: 'grid', gap: '12px' },

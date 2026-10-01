@@ -19,7 +19,7 @@ type ReusableDatePageProps = {
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', paddingBottom: '118px', color: theme.text },
+  page: { minHeight: '100vh', paddingBottom: '90px', color: theme.text },
   shell: { width: '100%', maxWidth: '760px', margin: '0 auto', padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px', boxSizing: 'border-box' as const },
   card: { borderRadius: '20px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, padding: 'clamp(16px, 3.5vw, 24px)', boxShadow: `0 20px 60px ${theme.borderGlass}` },
   eyebrow: { margin: 0, color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' as const },

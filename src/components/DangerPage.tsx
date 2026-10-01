@@ -22,7 +22,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     minHeight: '100vh',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    paddingBottom: '132px',
+    paddingBottom: '90px',
     background: theme.background,
     color: theme.text,
   },
