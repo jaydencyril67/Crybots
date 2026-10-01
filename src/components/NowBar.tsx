@@ -290,13 +290,12 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/market', '/my-space', '/control-center'] },
   { routes: ['/transactions', '/app-usage'] },
-  { routes: ['/notifications', '/tickets'] },
+  { routes: ['/faq', '/tickets', '/chat'] },
   { routes: ['/theme', '/nowbar', '/alert'] },
   { routes: ['/deposit', '/withdrawals', '/transfer', '/manage'] },
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
   { routes: ['/api-keys', '/webhooks', '/configure'] },
   { routes: ['/nowbar-color', '/nowbar-button-color'] },
-  { routes: ['/faq'] },
 ];
 
 const getActivePath = () => {
