@@ -31,8 +31,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
   textarea: { width: '100%', minHeight: 170, resize: 'vertical' as const, boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
   formActions: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 },
+  detailActions: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 },
   secondaryButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 14px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 },
   formButton: { width: '100%' },
+  detailButton: { width: '100%' },
   submitButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '10px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 900 },
   disabled: { opacity: 0.6, cursor: 'not-allowed' },
   tableWrap: { marginTop: 20, overflowX: 'auto' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass },
@@ -143,7 +145,6 @@ const TicketsPage = () => {
           {error ? <p style={styles.error}>{error}</p> : null}
           {selectedTicket ? (
             <section style={styles.detail}>
-              <button type="button" style={styles.secondaryButton} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>
               <div>
                 <h2 style={styles.detailHeading}>{selectedTicket.subject}</h2>
                 <p style={styles.meta}>Status: <strong>{selectedTicket.status}</strong></p>
@@ -152,7 +153,10 @@ const TicketsPage = () => {
               </div>
               <p style={styles.body}>{selectedTicket.body}</p>
               {selectedTicket.adminReply ? <div style={styles.reply}><strong>Admin reply</strong><p style={styles.body}>{selectedTicket.adminReply}</p></div> : null}
-              {selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...(closing ? styles.disabled : {}) }} onClick={() => { if (window.confirm('Close this ticket?')) void closeTicket(); }} disabled={closing}><Check size={16} /> {closing ? 'Closing...' : 'Close Ticket'}</button> : null}
+              <div style={styles.detailActions}>
+                <button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>
+                {selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => { if (window.confirm('Close this ticket?')) void closeTicket(); }} disabled={closing}><Check size={16} /> {closing ? 'Closing...' : 'Close Ticket'}</button> : null}
+              </div>
             </section>
           ) : (
             <>
