@@ -56,8 +56,8 @@ const ChatPage = () => {
     });
   };
 
-  return <HybridTheme mode={themeMode}><div style={{ minHeight: '100vh', height: '100dvh', background: theme.background, color: theme.text, overflow: 'hidden' }}>
-    <main style={{ width: '100%', height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
+  return <HybridTheme mode={themeMode}><div style={{ height: 'calc(100dvh - 80px)', minHeight: 0, background: theme.background, color: theme.text, overflow: 'hidden' }}>
+    <main style={{ width: '100%', height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
       <button type="button" onClick={() => navigate('/home')} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, border: 0, borderBottom: `1px solid ${theme.borderGlass}`, borderRadius: 0, padding: '12px 16px', background: 'transparent', color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Back</button>
       <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 14px', borderBottom: `1px solid ${theme.borderGlass}`, color: connected ? theme.success : theme.textMuted, fontSize: '.82rem' }}>{connected ? '● Live connection' : '○ Connecting…'}</div>
