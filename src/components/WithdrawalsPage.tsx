@@ -29,7 +29,7 @@ const baseStyles = {
     minHeight: '100vh',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    paddingBottom: '132px',
+    paddingBottom: '90px',
   },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '10px', padding: '7px 10px', cursor: 'pointer', fontSize: '0.84rem' },
   shell: {

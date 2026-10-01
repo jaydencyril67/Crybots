@@ -73,7 +73,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     minHeight: '100vh',
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    paddingBottom: '132px',
+    paddingBottom: '90px',
     background: theme.background,
     color: theme.text,
   },
@@ -222,7 +222,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     ...createHybridCardStyles(theme).card,
   },
   '@media (max-width: 640px)': {
-    page: { paddingBottom: '156px' },
+    page: { paddingBottom: '90px' },
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
     card: { ...createHybridCardStyles(theme).card, ...createHybridCardStyles(theme).cardMobile },

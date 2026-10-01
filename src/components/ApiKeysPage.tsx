@@ -61,7 +61,7 @@ const ApiKeysPage = () => {
   const rowList: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', minWidth: 0, padding: 18, border: `1px solid ${theme.borderGlass}`, borderRadius: 22, background: theme.surfaceGlass, boxSizing: 'border-box' };
   const row: React.CSSProperties = { padding: '13px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: 15, background: theme.surfaceMuted, boxSizing: 'border-box' };
 
-  return <HybridTheme mode={themeMode}><main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 132 }}><div style={{ maxWidth: 920, margin: '0 auto', padding: '24px 16px' }}>
+  return <HybridTheme mode={themeMode}><main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' }}><div style={{ maxWidth: 920, margin: '0 auto', padding: '24px 16px' }}>
     <button type="button" onClick={() => navigate('/dev')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', width: 'fit-content', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: 12 }}><ArrowLeft size={15} /> Dev</button>
 
     {error && <p role="alert" style={{ color: theme.danger }}>{error}</p>}

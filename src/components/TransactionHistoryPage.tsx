@@ -40,7 +40,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.text,
     overflowX: 'hidden' as const,
     overflowY: 'auto' as const,
-    paddingBottom: '132px',
+    paddingBottom: '90px',
   },
   shell: {
     width: '100%',
