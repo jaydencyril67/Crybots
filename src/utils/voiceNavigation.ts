@@ -62,6 +62,7 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'DEPOSIT', route: '/deposit' },
   { label: 'TRANSACTIONS', route: '/transactions' },
   { label: 'NOTIFICATIONS', route: '/notifications' },
+  { label: 'TICKETS', route: '/tickets' },
   { label: 'ALERT', route: '/alert' },
   { label: 'APP USAGE', route: '/app-usage' },
 ];
