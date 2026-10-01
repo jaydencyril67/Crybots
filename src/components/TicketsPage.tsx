@@ -136,7 +136,7 @@ const TicketsPage = () => {
     <HybridTheme mode={themeMode}>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <button type="button" style={styles.back} onClick={() => navigate('/home')}><ArrowLeft size={17} /> Home</button>
+          <button type="button" style={styles.back} onClick={() => navigate('/help')}><ArrowLeft size={17} /> Help</button>
           <h1 style={styles.heading}>Tickets</h1>
           <p style={styles.intro}>Send a message or report to the admin and track your support tickets here.</p>
           {error ? <p style={styles.error}>{error}</p> : null}
