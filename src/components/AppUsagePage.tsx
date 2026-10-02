@@ -26,8 +26,6 @@ const pageLabels: Record<string, string> = {
   '/stats': 'Stats',
   '/menu': 'Menu',
   '/trade': 'Trade',
-  '/my-space': 'My Space',
-  '/market': 'Market',
   '/logs': 'Logs',
   '/help': 'Help',
   '/options': 'Options',
