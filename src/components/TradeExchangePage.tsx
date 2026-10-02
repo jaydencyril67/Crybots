@@ -63,7 +63,14 @@ const TradeExchangePage = () => {
     setSubmitting(true);
     setMessage(null);
     try {
-      await api.post('/api/trading/orders', { symbol, side, type, quantity: Number(quantity), ...(type === 'limit' ? { limitPrice: Number(limitPrice) } : {}) });
+      const enteredAmount = Number(quantity);
+      const executionPrice = side === 'buy' && type === 'limit' ? Number(limitPrice) : account?.price || 0;
+      const orderQuantity = side === 'buy' ? enteredAmount / executionPrice : enteredAmount;
+      if (!Number.isFinite(orderQuantity) || orderQuantity <= 0) {
+        setMessage(side === 'buy' ? 'Enter a valid USDT amount and wait for the live price to load.' : 'Enter a valid KRN quantity.');
+        return;
+      }
+      await api.post('/api/trading/orders', { symbol, side, type, quantity: orderQuantity, ...(type === 'limit' ? { limitPrice: Number(limitPrice) } : {}) });
       setQuantity('');
       setLimitPrice('');
       setMessage('Order accepted and executed or added to open orders.');
@@ -102,7 +109,7 @@ const TradeExchangePage = () => {
           {openSelector === 'type' ? <div style={selectorMenu}>{(['market', 'limit'] as const).map((option) => <button key={option} type="button" style={selectorOption} onClick={() => { setType(option); setOpenSelector(null); }}>{option === 'market' ? 'Market' : 'Limit'}</button>)}</div> : null}
         </div>
       </div>
-      <input required min="0" step="any" type="number" placeholder="Quantity" value={quantity} onChange={(event) => setQuantity(event.target.value)} style={input} />
+      <input required min="0" step="any" type="number" placeholder={side === 'buy' ? 'USDT amount' : 'KRN quantity'} value={quantity} onChange={(event) => setQuantity(event.target.value)} style={input} />
       {type === 'limit' ? <input required min="0" step="any" type="number" placeholder="Limit price" value={limitPrice} onChange={(event) => setLimitPrice(event.target.value)} style={input} /> : null}
       <button type="submit" disabled={submitting} style={{ padding: 11, border: 0, borderRadius: 9, background: side === 'buy' ? theme.primary : theme.danger, color: theme.textInverse, fontWeight: 800 }}>{submitting ? 'Submitting…' : `${side === 'buy' ? 'Buy' : 'Sell'} ${symbol}`}</button>
       {message ? <NotificationBanner tone={message.startsWith('Order') ? 'success' : 'error'} title="Trading" message={message} /> : null}
