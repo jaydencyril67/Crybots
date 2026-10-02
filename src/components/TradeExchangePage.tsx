@@ -20,6 +20,13 @@ const TradeExchangePage = () => {
   const [limitPrice, setLimitPrice] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [openSelector, setOpenSelector] = React.useState<'symbol' | 'side' | 'type' | null>(null);
+
+  React.useEffect(() => {
+    const handleOutsideClick = () => setOpenSelector(null);
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   const submitOrder = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -40,6 +47,11 @@ const TradeExchangePage = () => {
 
   const card: React.CSSProperties = { padding: 16, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass };
   const input: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '10px 11px', borderRadius: 9, border: `1px solid ${theme.borderGlass}`, background: theme.background, color: theme.text };
+  const selectorField: React.CSSProperties = { position: 'relative', display: 'grid', gap: 6 };
+  const selectorTrigger: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: 14, padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, cursor: 'pointer' };
+  const selectorMenu: React.CSSProperties = { position: 'absolute', zIndex: 20, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: 6, padding: 8, borderRadius: 16, background: theme.background, border: `1px solid ${theme.borderGlass}`, transformOrigin: 'top', maxHeight: 260, overflowY: 'auto', boxShadow: '0 18px 40px rgba(0, 0, 0, 0.35)' };
+  const selectorOption: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: 12, padding: '10px 12px', width: '100%', textAlign: 'left', cursor: 'pointer' };
+  const toggleSelector = (selector: 'symbol' | 'side' | 'type') => setOpenSelector((current) => current === selector ? null : selector);
 
   return <HybridTheme><Helmet><title>Exchange | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1180, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
     <button type="button" onClick={() => navigate('/trade')} style={{ marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
@@ -48,10 +60,22 @@ const TradeExchangePage = () => {
     <section style={{ ...card, marginTop: 16 }}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(360px, 62vw, 620px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
     <form onSubmit={submitOrder} style={{ ...card, display: 'grid', gap: 10, marginTop: 16 }}>
       <h2 style={{ margin: 0, fontSize: '1rem' }}>Place order</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-        <select value={symbol} onChange={(event) => setSymbol(event.target.value)} style={input}><option>KRN/USD</option><option>BTC/USDT</option><option>ETH/USDT</option></select>
-        <select value={side} onChange={(event) => setSide(event.target.value as 'buy' | 'sell')} style={input}><option value="buy">Buy</option><option value="sell">Sell</option></select>
-        <select value={type} onChange={(event) => setType(event.target.value as 'market' | 'limit')} style={input}><option value="market">Market</option><option value="limit">Limit</option></select>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+        <div style={selectorField} onMouseDown={(event) => event.stopPropagation()}>
+          <span style={{ color: theme.textMuted, fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Market</span>
+          <button type="button" style={selectorTrigger} onClick={() => toggleSelector('symbol')}><span>{symbol}</span><span style={{ transform: openSelector === 'symbol' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span></button>
+          {openSelector === 'symbol' ? <div style={selectorMenu}>{['KRN/USD', 'BTC/USDT', 'ETH/USDT'].map((option) => <button key={option} type="button" style={selectorOption} onClick={() => { setSymbol(option); setOpenSelector(null); }}>{option}</button>)}</div> : null}
+        </div>
+        <div style={selectorField} onMouseDown={(event) => event.stopPropagation()}>
+          <span style={{ color: theme.textMuted, fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Side</span>
+          <button type="button" style={selectorTrigger} onClick={() => toggleSelector('side')}><span>{side === 'buy' ? 'Buy' : 'Sell'}</span><span style={{ transform: openSelector === 'side' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span></button>
+          {openSelector === 'side' ? <div style={selectorMenu}>{(['buy', 'sell'] as const).map((option) => <button key={option} type="button" style={selectorOption} onClick={() => { setSide(option); setOpenSelector(null); }}>{option === 'buy' ? 'Buy' : 'Sell'}</button>)}</div> : null}
+        </div>
+        <div style={selectorField} onMouseDown={(event) => event.stopPropagation()}>
+          <span style={{ color: theme.textMuted, fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Order type</span>
+          <button type="button" style={selectorTrigger} onClick={() => toggleSelector('type')}><span>{type === 'market' ? 'Market' : 'Limit'}</span><span style={{ transform: openSelector === 'type' ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span></button>
+          {openSelector === 'type' ? <div style={selectorMenu}>{(['market', 'limit'] as const).map((option) => <button key={option} type="button" style={selectorOption} onClick={() => { setType(option); setOpenSelector(null); }}>{option === 'market' ? 'Market' : 'Limit'}</button>)}</div> : null}
+        </div>
       </div>
       <input required min="0" step="any" type="number" placeholder="Quantity" value={quantity} onChange={(event) => setQuantity(event.target.value)} style={input} />
       {type === 'limit' ? <input required min="0" step="any" type="number" placeholder="Limit price" value={limitPrice} onChange={(event) => setLimitPrice(event.target.value)} style={input} /> : null}
