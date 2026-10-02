@@ -8,18 +8,19 @@ import NotificationBanner from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
-const MARKET_SERVICE_URL = process.env.REACT_APP_MARKET_SERVICE_URL || 'https://market-matb.onrender.com';
+const MARKET_SERVICE_URL = process.env.REACT_APP_MARKET_SERVICE_URL || process.env.MARKET_SERVICE_URL || 'https://market-matb.onrender.com';
 
 const TradeExchangePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const symbol = 'KRN/USD';
+  const symbol = 'KRN/USDT';
   const [side, setSide] = React.useState<'buy' | 'sell'>('buy');
   const [type, setType] = React.useState<'market' | 'limit'>('market');
   const [quantity, setQuantity] = React.useState('');
   const [limitPrice, setLimitPrice] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
+  const [account, setAccount] = React.useState<{ price: number; balance: number; feeRate: number; position?: { quantity: number; averageEntryPrice: number; unrealizedPnl: number; marketValue: number; realizedPnl: number; fees: number } | null } | null>(null);
   const [openSelector, setOpenSelector] = React.useState<'side' | 'type' | null>(null);
 
   React.useEffect(() => {
@@ -27,6 +28,35 @@ const TradeExchangePage = () => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
+
+  const loadAccount = React.useCallback(async () => {
+    try {
+      const response = await api.get('/api/trading/account');
+      setAccount(response.data);
+    } catch (error) {
+      const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setMessage(apiMessage || 'Unable to load live trading data.');
+    }
+  }, []);
+
+  React.useEffect(() => {
+    void loadAccount();
+    const timer = window.setInterval(() => { void loadAccount(); }, 15000);
+    return () => window.clearInterval(timer);
+  }, [loadAccount]);
+
+  const closePosition = async () => {
+    setSubmitting(true);
+    setMessage(null);
+    try {
+      await api.post('/api/trading/orders/position/close');
+      setMessage('Position closed successfully.');
+      await loadAccount();
+    } catch (error) {
+      const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setMessage(apiMessage || 'Unable to close the position.');
+    } finally { setSubmitting(false); }
+  };
 
   const submitOrder = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -36,7 +66,8 @@ const TradeExchangePage = () => {
       await api.post('/api/trading/orders', { symbol, side, type, quantity: Number(quantity), ...(type === 'limit' ? { limitPrice: Number(limitPrice) } : {}) });
       setQuantity('');
       setLimitPrice('');
-      setMessage('Order accepted and added to your open orders.');
+      setMessage('Order accepted and executed or added to open orders.');
+      await loadAccount();
     } catch (error) {
       const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setMessage(apiMessage || 'Unable to submit the order.');
@@ -55,8 +86,7 @@ const TradeExchangePage = () => {
 
   return <HybridTheme><Helmet><title>Exchange | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1680, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
     <button type="button" onClick={() => navigate('/trade')} style={{ marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
-    <h1 style={{ margin: 0, fontSize: '1.4rem' }}>Exchange</h1>
-    <p style={{ color: theme.textMuted }}>Live market data from Market. Orders and account records remain managed by KingsHall.</p>
+    {account ? <section style={{ ...card, marginTop: 16, display: 'grid', gap: 8 }}><strong>KRN/USDT ${account.price.toFixed(6)}</strong><span>Available USDT: {account.balance.toFixed(2)} · Fee: {(account.feeRate * 100).toFixed(2)}%</span><span>Position: {account.position?.quantity?.toFixed(6) || '0'} KRN · Unrealized P&L: {account.position?.unrealizedPnl?.toFixed(2) || '0.00'} USDT · Realized P&L: {account.position?.realizedPnl?.toFixed(2) || '0.00'} USDT</span>{account.position && account.position.quantity > 0 ? <button type="button" onClick={closePosition} disabled={submitting} style={{ padding: 11, border: 0, borderRadius: 9, background: theme.danger, color: theme.textInverse, fontWeight: 800 }}>{submitting ? 'Closing…' : 'Close position'}</button> : null}</section> : null}
     <section style={{ ...card, marginTop: 16 }}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(520px, 75vw, 900px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
     <form onSubmit={submitOrder} style={{ ...card, width: '100%', maxWidth: 1180, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 10 }}>
       <h2 style={{ margin: 0, fontSize: '1rem' }}>Place order</h2>
