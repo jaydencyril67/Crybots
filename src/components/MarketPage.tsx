@@ -10,6 +10,7 @@ import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
 const UPDATE_INTERVAL_MS = 60_000;
+const MARKET_SERVICE_URL = 'https://market-matb.onrender.com';
 const PERCENT_PRECISION = 1_000_000;
 
 type MarketPoint = { timestamp: number; value: number; percent: number };
@@ -29,6 +30,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   sectionTitle: { margin: 0, fontSize: '0.96rem', fontWeight: 900 },
   card: { ...createHybridCardStyles(theme).card, display: 'grid', gap: '12px' },
   chart: { width: '100%', minHeight: 'clamp(260px, 58vw, 440px)', display: 'grid', gridTemplateRows: 'minmax(0, 1fr)', gap: '12px', padding: '14px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.textMuted, fontSize: '0.82rem', boxSizing: 'border-box' as const },
+  chartFrame: { width: '100%', height: 'clamp(260px, 58vw, 440px)', display: 'block', border: 0, borderRadius: '12px', background: theme.background },
   chartWave: { position: 'relative' as const, display: 'block', minHeight: 'clamp(260px, 58vw, 440px)', padding: '12px', borderBottom: `1px solid ${theme.borderGlass}`, boxSizing: 'border-box' as const, overflow: 'hidden' },
   chartVisual: { position: 'absolute' as const, inset: '12px', minWidth: 0 },
   chartSvg: { display: 'block', width: '100%', height: '100%', minHeight: 0, overflow: 'visible' as const },
@@ -185,7 +187,7 @@ const MarketPage = () => {
 
   return <HybridTheme><Helmet><title>Market | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
-    <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><MarketChart points={marketPoints} theme={theme} /></div></div></section>
+    <section style={styles.section}><h2 style={styles.sectionTitle}>Market performance</h2><div style={styles.card}><div style={styles.chart}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={styles.chartFrame} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></div></div></section>
     <section style={styles.section}><h2 style={styles.sectionTitle}>Buy and sell points</h2><div style={styles.card}><div style={styles.pointsGrid}>
       <form style={styles.buyForm} onSubmit={tradeMode === 'buy' ? handleBuy : handleSell}>
         <div style={styles.switcher} role="tablist" aria-label="Market points action">
