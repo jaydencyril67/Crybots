@@ -53,12 +53,12 @@ const TradeExchangePage = () => {
   const selectorOption: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: 12, padding: '10px 12px', width: '100%', textAlign: 'left', cursor: 'pointer' };
   const toggleSelector = (selector: 'symbol' | 'side' | 'type') => setOpenSelector((current) => current === selector ? null : selector);
 
-  return <HybridTheme><Helmet><title>Exchange | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1180, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
+  return <HybridTheme><Helmet><title>Exchange | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1680, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
     <button type="button" onClick={() => navigate('/trade')} style={{ marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
     <h1 style={{ margin: 0, fontSize: '1.4rem' }}>Exchange</h1>
     <p style={{ color: theme.textMuted }}>Live market data from Market. Orders and account records remain managed by KingsHall.</p>
     <section style={{ ...card, marginTop: 16 }}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(360px, 62vw, 620px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
-    <form onSubmit={submitOrder} style={{ ...card, display: 'grid', gap: 10, marginTop: 16 }}>
+    <form onSubmit={submitOrder} style={{ ...card, width: '100%', maxWidth: 1180, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 10 }}>
       <h2 style={{ margin: 0, fontSize: '1rem' }}>Place order</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
         <div style={selectorField} onMouseDown={(event) => event.stopPropagation()}>
