@@ -52,7 +52,7 @@ const TradeExchangePage = () => {
       setUsdtAmount('');
       if (orderType === 'limit') setLimitPrice('');
       setMessageTone('success');
-      setMessage(`${orderType === 'market' ? 'Market' : 'Limit'} ${side === 'buy' ? 'buy' : 'sell'} order placed successfully. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. View it in Open trades.`);
+      setMessage(`${orderType === 'market' ? 'Market' : 'Limit'} ${side === 'buy' ? 'buy' : 'sell'} order placed successfully. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. ${orderType === 'market' ? 'View the completed order in Trade history.' : 'View the open order in Open trades.'}`);
     } catch (error) {
       const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setMessageTone('error');
