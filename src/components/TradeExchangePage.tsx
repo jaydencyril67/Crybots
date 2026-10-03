@@ -14,7 +14,7 @@ const DEFAULT_TRADING_FEE_RATE = 0.001;
 const TradeExchangePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const [quantity, setQuantity] = React.useState('');
+  const [usdtAmount, setUsdtAmount] = React.useState('');
   const [orderType, setOrderType] = React.useState<'market' | 'limit'>('market');
   const [limitPrice, setLimitPrice] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
@@ -24,11 +24,11 @@ const TradeExchangePage = () => {
   const [estimatedFee, setEstimatedFee] = React.useState<number | null>(null);
 
   const submitOrder = async (side: 'buy' | 'sell') => {
-    const parsedQuantity = Number(quantity);
+    const parsedUsdtAmount = Number(usdtAmount);
     const parsedLimitPrice = Number(limitPrice);
-    if (!Number.isFinite(parsedQuantity) || parsedQuantity <= 0 || (orderType === 'limit' && (!Number.isFinite(parsedLimitPrice) || parsedLimitPrice <= 0))) {
+    if (!Number.isFinite(parsedUsdtAmount) || parsedUsdtAmount <= 0 || (orderType === 'limit' && (!Number.isFinite(parsedLimitPrice) || parsedLimitPrice <= 0))) {
       setMessageTone('error');
-      setMessage(orderType === 'limit' ? 'Enter a valid KRN quantity and limit price first.' : 'Enter a valid KRN quantity first.');
+      setMessage(orderType === 'limit' ? 'Enter a valid USDT amount and limit price first.' : 'Enter a valid USDT amount first.');
       return;
     }
 
@@ -43,13 +43,13 @@ const TradeExchangePage = () => {
         clientOrderId,
         side,
         type: orderType,
-        quantity: parsedQuantity,
+        usdtAmount: parsedUsdtAmount,
         ...(orderType === 'limit' ? { limitPrice: parsedLimitPrice } : {}),
       });
       const appliedFeeRate = Number(response.data.feeRate);
       if (Number.isFinite(appliedFeeRate) && appliedFeeRate >= 0) setFeeRate(appliedFeeRate);
       setEstimatedFee(Number.isFinite(response.data.estimatedFee) ? response.data.estimatedFee || 0 : null);
-      setQuantity('');
+      setUsdtAmount('');
       if (orderType === 'limit') setLimitPrice('');
       setMessageTone('success');
       setMessage(`${orderType === 'market' ? 'Market' : 'Limit'} ${side === 'buy' ? 'buy' : 'sell'} prediction created: market price is expected to ${response.data.prediction === 'rise' ? 'rise' : 'fall'}. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. View it in Open trades.`);
@@ -70,7 +70,7 @@ const TradeExchangePage = () => {
     <section style={card}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(520px, 75vw, 900px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
     <section style={{ ...card, width: '100%', maxWidth: 620, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 12 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setOrderType('market')} style={{ padding: 10, borderRadius: 8, border: `1px solid ${orderType === 'market' ? theme.primary : theme.borderGlass}`, background: orderType === 'market' ? theme.primary : theme.background, color: orderType === 'market' ? theme.textInverse : theme.text, cursor: 'pointer' }}>Market order</button><button type="button" onClick={() => setOrderType('limit')} style={{ padding: 10, borderRadius: 8, border: `1px solid ${orderType === 'limit' ? theme.primary : theme.borderGlass}`, background: orderType === 'limit' ? theme.primary : theme.background, color: orderType === 'limit' ? theme.textInverse : theme.text, cursor: 'pointer' }}>Limit order</button></div>
-      <input required min="0" step="any" type="number" placeholder="KRN quantity" value={quantity} onChange={(event) => { setQuantity(event.target.value); setEstimatedFee(null); }} style={input} />
+      <input required min="0" step="any" type="number" placeholder="USDT amount to trade" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); setEstimatedFee(null); }} style={input} />
       {orderType === 'limit' ? <input required min="0" step="any" type="number" placeholder="Limit price (USDT per KRN)" value={limitPrice} onChange={(event) => { setLimitPrice(event.target.value); setEstimatedFee(null); }} style={input} /> : null}
       <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Order type: {orderType === 'market' ? 'Market — fills at the current price' : 'Limit — stays open until the target price is reached'}</span><span>Trading fee: {(feeRate * 100).toFixed(2)}% of the executed order value</span>{estimatedFee !== null ? <span>Estimated fee for this order: {estimatedFee.toFixed(6)} USDT</span> : null}</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
