@@ -9,8 +9,6 @@ import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
 const MARKET_SERVICE_URL = process.env.REACT_APP_MARKET_SERVICE_URL || process.env.MARKET_SERVICE_URL || 'https://market-matb.onrender.com';
-const DEFAULT_TRADING_FEE_RATE = 0.001;
-
 const TradeExchangePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
@@ -18,8 +16,6 @@ const TradeExchangePage = () => {
   const [message, setMessage] = React.useState<string | null>(null);
   const [messageTone, setMessageTone] = React.useState<'success' | 'error'>('success');
   const [submittingSide, setSubmittingSide] = React.useState<'buy' | 'sell' | null>(null);
-  const [feeRate, setFeeRate] = React.useState(DEFAULT_TRADING_FEE_RATE);
-  const [estimatedFee, setEstimatedFee] = React.useState<number | null>(null);
 
   const submitOrder = async (side: 'buy' | 'sell') => {
     const parsedUsdtAmount = Number(usdtAmount);
@@ -35,18 +31,15 @@ const TradeExchangePage = () => {
       const clientOrderId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
         : `web-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-      const response = await api.post<{ feeRate?: number; estimatedFee?: number }>('/api/trading/orders', {
+      await api.post('/api/trading/orders', {
         symbol: 'KRN/USDT',
         clientOrderId,
         side,
         usdtAmount: parsedUsdtAmount,
       });
-      const appliedFeeRate = Number(response.data.feeRate);
-      if (Number.isFinite(appliedFeeRate) && appliedFeeRate >= 0) setFeeRate(appliedFeeRate);
-      setEstimatedFee(Number.isFinite(response.data.estimatedFee) ? response.data.estimatedFee || 0 : null);
       setUsdtAmount('');
       setMessageTone('success');
-      setMessage(`Market ${side === 'buy' ? 'buy' : 'sell'} order placed successfully. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. View the completed order in Trade history.`);
+      setMessage(`Market ${side === 'buy' ? 'buy' : 'sell'} order placed successfully. View the completed order in Trade history.`);
     } catch (error) {
       const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setMessageTone('error');
@@ -63,8 +56,8 @@ const TradeExchangePage = () => {
     <button type="button" onClick={() => navigate('/trade')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
     <section style={card}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(520px, 75vw, 900px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
     <section style={{ ...card, width: '100%', maxWidth: 620, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 12 }}>
-      <input required min="0" step="any" type="number" placeholder="USDT amount to trade" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); setEstimatedFee(null); }} style={input} />
-      <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Market order: fills immediately at the current price</span><span>Trading fee: {(feeRate * 100).toFixed(2)}% of the executed order value</span>{estimatedFee !== null ? <span>Estimated fee for this order: {estimatedFee.toFixed(6)} USDT</span> : null}</div>
+      <input required min="0" step="any" type="number" placeholder="USDT amount to trade" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); }} style={input} />
+      <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Market order: fills immediately at the current price</span><span>No additional charge is added to market orders</span></div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
         <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('buy')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'buy' ? 'wait' : 'pointer' }}>{submittingSide === 'buy' ? 'Submitting…' : 'Buy · Rise'}</button>
         <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('sell')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.danger, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'sell' ? 'wait' : 'pointer' }}>{submittingSide === 'sell' ? 'Submitting…' : 'Sell · Fall'}</button>
