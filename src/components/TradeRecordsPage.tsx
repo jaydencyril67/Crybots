@@ -28,7 +28,7 @@ const calculateLivePnl = (position: OpenPosition, currentPrice: number | null) =
 };
 
 const metricRowStyle = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, padding: '10px 0', borderBottom: `1px solid ${theme.borderGlass}` });
-const LIVE_MARKET_REFRESH_MS = 2000;
+const LIVE_MARKET_REFRESH_MS = 1000;
 type Portfolio = { price: number; balance: number; equity: number; unrealizedPnl: number; realizedPnl: number; positions: Position[] };
 
 const TradeRecordsPage = ({ mode }: Props) => {
