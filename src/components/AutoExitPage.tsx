@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import InlineLoadingDots from './InlineLoadingDots';
 import ReusableDatePage from './ReusableDatePage';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
@@ -140,8 +141,8 @@ const AutoExitPage = () => {
                         {[5, 10, 15, 30].map((minutes) => <button key={minutes} type="button" role="option" aria-selected={idleMinutes === minutes} style={{ ...styles.selectorOption, ...(idleMinutes === minutes ? styles.selectedSelectorOption : {}) }} onClick={() => { setIdleMinutes(minutes); setIdlePickerOpen(false); }}>{minutes} minutes</button>)}
                       </div> : null}
                     </div>
-                    {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleExit(true)}>{idleSaving ? 'Saving...' : 'Save timeout'}</button>}
-                    <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? 'Saving...' : idleEnabled ? 'Disable' : 'Enable'}</button>
+                    {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleExit(true)}>{idleSaving ? <InlineLoadingDots /> : 'Save timeout'}</button>}
+                    <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <InlineLoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
                   </div>
                 </div>
                 <div style={styles.dangerRow}>
@@ -149,7 +150,7 @@ const AutoExitPage = () => {
                   <p style={styles.status}>{scheduledExit ? `Set for ${scheduledExit.replace('T', ' ')}` : 'No scheduled exit set.'}</p>
                   <div style={styles.buttonRow}>
                     <button type="button" style={styles.button} disabled={scheduleSaving} onClick={() => setShowDatePicker(true)}>{scheduledExit ? 'Change time' : 'Choose time'}</button>
-                    {scheduledExit && <button type="button" style={styles.button} disabled={scheduleSaving} onClick={cancelSchedule}>{scheduleSaving ? 'Cancelling...' : 'Cancel scheduled exit'}</button>}
+                    {scheduledExit && <button type="button" style={styles.button} disabled={scheduleSaving} onClick={cancelSchedule}>{scheduleSaving ? <InlineLoadingDots /> : 'Cancel scheduled exit'}</button>}
                   </div>
                 </div>
                 <p style={styles.status} aria-live="polite">{status}</p>

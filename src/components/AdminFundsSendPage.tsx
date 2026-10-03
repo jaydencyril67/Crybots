@@ -7,7 +7,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
-
+import InlineLoadingDots from './InlineLoadingDots';
 type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string };
 
 const AdminFundsSendPage = () => {
@@ -45,7 +45,7 @@ const AdminFundsSendPage = () => {
       <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Recipient</span><div style={inputStyle}>{recipient}</div></label>
       <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Amount (USDT)</span><input required min="0.000001" step="0.000001" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="Enter amount" style={inputStyle} /></label>
       <label style={{ display: 'grid', gap: 8 }}><span style={{ fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Transaction description (optional)</span><textarea maxLength={500} value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Describe this funds transfer" style={{ ...inputStyle, minHeight: 120, resize: 'vertical' as const }} /></label>
-      <button type="submit" disabled={sending || (!isEveryone && !user)} style={{ border: 0, borderRadius: 999, padding: '10px 16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, fontWeight: 850, color: theme.textInverse, background: theme.primary, cursor: 'pointer', opacity: sending ? 0.65 : 1 }}><Send size={16} /> {sending ? 'Sending…' : 'Send funds'}</button>
+      <button type="submit" disabled={sending || (!isEveryone && !user)} style={{ border: 0, borderRadius: 999, padding: '10px 16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, fontWeight: 850, color: theme.textInverse, background: theme.primary, cursor: 'pointer', opacity: sending ? 0.65 : 1 }}>{sending ? <InlineLoadingDots /> : <><Send size={16} /> Send funds</>}</button>
     </form>
   </div></div><NowBar admin /></div></HybridTheme>;
 };

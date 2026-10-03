@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
 
@@ -155,7 +156,7 @@ const TicketsPage = () => {
               <p style={styles.body}>{selectedTicket.body}</p>
               {selectedTicket.adminReply ? <div style={styles.reply}><strong>Admin reply</strong><p style={styles.body}>{selectedTicket.adminReply}</p></div> : null}
               <div style={styles.detailActions}>
-                {selectedTicket.status !== 'closed' && showCloseConfirm ? <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => setShowCloseConfirm(false)}>Cancel</button><button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => void closeTicket()} disabled={closing}>{closing ? 'Closing...' : 'Confirm Close'}</button></> : <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>{selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => setShowCloseConfirm(true)} disabled={closing}><Check size={16} /> Close Ticket</button> : null}</>}
+                {selectedTicket.status !== 'closed' && showCloseConfirm ? <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => setShowCloseConfirm(false)}>Cancel</button><button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => void closeTicket()} disabled={closing}>{closing ? <InlineLoadingDots /> : 'Confirm Close'}</button></> : <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>{selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => setShowCloseConfirm(true)} disabled={closing}>{closing ? <InlineLoadingDots /> : <><Check size={16} /> Close Ticket</>}</button> : null}</>}
               </div>
             </section>
           ) : (
@@ -166,7 +167,7 @@ const TicketsPage = () => {
                   <label style={styles.label}>Body<textarea style={styles.textarea} value={body} maxLength={10000} onChange={(event) => setBody(event.target.value)} placeholder="Write your message or report here..." /></label>
                   <div style={styles.formActions}>
                     <button type="button" style={{ ...styles.secondaryButton, ...styles.formButton }} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
-                    <button type="submit" style={{ ...styles.submitButton, ...styles.formButton, ...(saving ? styles.disabled : {}) }} disabled={saving}><Send size={16} /> {saving ? 'Submitting...' : 'Submit Ticket'}</button>
+                    <button type="submit" style={{ ...styles.submitButton, ...styles.formButton, ...(saving ? styles.disabled : {}) }} disabled={saving}>{saving ? <InlineLoadingDots /> : <><Send size={16} /> Submit Ticket</>}</button>
                   </div>
                 </form>
               )}
