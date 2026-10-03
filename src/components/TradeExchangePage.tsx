@@ -38,7 +38,7 @@ const TradeExchangePage = () => {
       const clientOrderId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
         ? crypto.randomUUID()
         : `web-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-      const response = await api.post<{ prediction: 'rise' | 'fall'; feeRate?: number; estimatedFee?: number }>('/api/trading/orders', {
+      const response = await api.post<{ feeRate?: number; estimatedFee?: number }>('/api/trading/orders', {
         symbol: 'KRN/USDT',
         clientOrderId,
         side,
@@ -52,11 +52,11 @@ const TradeExchangePage = () => {
       setUsdtAmount('');
       if (orderType === 'limit') setLimitPrice('');
       setMessageTone('success');
-      setMessage(`${orderType === 'market' ? 'Market' : 'Limit'} ${side === 'buy' ? 'buy' : 'sell'} prediction created: market price is expected to ${response.data.prediction === 'rise' ? 'rise' : 'fall'}. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. View it in Open trades.`);
+      setMessage(`${orderType === 'market' ? 'Market' : 'Limit'} ${side === 'buy' ? 'buy' : 'sell'} order placed successfully. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. View it in Open trades.`);
     } catch (error) {
       const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setMessageTone('error');
-      setMessage(apiMessage || 'Unable to create the prediction order.');
+      setMessage(apiMessage || 'Unable to place the order.');
     } finally {
       setSubmittingSide(null);
     }
