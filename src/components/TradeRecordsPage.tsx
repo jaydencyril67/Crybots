@@ -7,7 +7,7 @@ import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
-import api from '../api/axios';
+import api, { API_BASE_URL } from '../api/axios';
 
 type Props = { mode: 'orders' | 'portfolio' | 'history' };
 
@@ -20,11 +20,15 @@ const formatUsdt = (value: number) => `${value.toFixed(2)} USDT`;
 const formatKrn = (value: number) => `${value.toFixed(6)} KRN`;
 const formatPrice = (value: number) => `${value.toFixed(2)} USDT`;
 const calculateLivePnl = (position: OpenPosition, currentPrice: number | null) => {
-  if (currentPrice === null) return position.unrealizedPnl;
-  const quantity = Math.abs(position.quantity);
-  return position.quantity >= 0
-    ? quantity * (currentPrice - position.averageEntryPrice)
-    : quantity * (position.averageEntryPrice - currentPrice);
+  const quantity = Number(position.quantity);
+  const entryPrice = Number(position.averageEntryPrice);
+  if (currentPrice === null || !Number.isFinite(quantity) || !Number.isFinite(entryPrice)) return Number(position.unrealizedPnl) || 0;
+  const livePrice = Number(currentPrice);
+  if (!Number.isFinite(livePrice)) return Number(position.unrealizedPnl) || 0;
+  const absoluteQuantity = Math.abs(quantity);
+  return quantity >= 0
+    ? absoluteQuantity * (livePrice - entryPrice)
+    : absoluteQuantity * (entryPrice - livePrice);
 };
 
 const metricRowStyle = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, padding: '10px 0', borderBottom: `1px solid ${theme.borderGlass}` });
@@ -95,18 +99,21 @@ const TradeRecordsPage = ({ mode }: Props) => {
       };
     }
 
-    const apiBaseUrl = process.env.REACT_APP_API_URL || 'https://kingshalls.onrender.com';
-    const stream = new EventSource(`${apiBaseUrl}/api/trading/price/stream?token=${encodeURIComponent(token)}`);
-    stream.addEventListener('market-price', (event) => {
+    const stream = new EventSource(`${API_BASE_URL}/api/trading/price/stream?token=${encodeURIComponent(token)}`);
+    const handlePriceEvent = (event: MessageEvent<string>) => {
       try {
-        const payload = JSON.parse(event.data) as { price?: number };
-        if (active.current && typeof payload.price === 'number' && Number.isFinite(payload.price)) {
-          setCurrentPrice(payload.price);
+        const payload = JSON.parse(event.data) as { price?: number | string };
+        const price = Number(payload.price);
+        if (active.current && Number.isFinite(price) && price > 0) {
+          setCurrentPrice(price);
         }
       } catch {
         // Ignore malformed stream messages and keep the current price.
       }
-    });
+    };
+    stream.addEventListener('market-price', handlePriceEvent);
+    // Also accept unnamed messages for compatibility with proxy/server SSE framing.
+    stream.addEventListener('message', handlePriceEvent);
     stream.onerror = () => {
       // EventSource automatically retries after a temporary connection failure.
     };
