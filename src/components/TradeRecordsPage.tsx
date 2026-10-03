@@ -20,6 +20,7 @@ const formatUsdt = (value: number) => `${value.toFixed(2)} USDT`;
 const formatKrn = (value: number) => `${value.toFixed(6)} KRN`;
 
 const metricRowStyle = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, padding: '10px 0', borderBottom: `1px solid ${theme.borderGlass}` });
+const LIVE_MARKET_REFRESH_MS = 2000;
 type Portfolio = { price: number; balance: number; equity: number; unrealizedPnl: number; realizedPnl: number; positions: Position[] };
 
 const TradeRecordsPage = ({ mode }: Props) => {
@@ -68,7 +69,7 @@ const TradeRecordsPage = ({ mode }: Props) => {
     const active = { current: true };
     setLoading(true);
     void loadRecords(active);
-    const timer = window.setInterval(() => { void loadRecords(active); }, 15000);
+    const timer = window.setInterval(() => { void loadRecords(active); }, LIVE_MARKET_REFRESH_MS);
     return () => {
       active.current = false;
       window.clearInterval(timer);
