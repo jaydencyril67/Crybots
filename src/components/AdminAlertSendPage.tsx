@@ -7,7 +7,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
-
+import InlineLoadingDots from './InlineLoadingDots';
 type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string };
 type UserResponse = { user: UserSummary };
 
@@ -77,7 +77,7 @@ const AdminAlertSendPage = () => {
         <div style={styles.field}><span style={styles.label}>Notification type</span><button type="button" style={styles.selectTrigger} onClick={() => setTypeMenuOpen((current) => !current)}><span>{typeLabel}</span><ChevronDown size={17} style={{ transform: typeMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} /></button>{typeMenuOpen ? <div style={styles.selectMenu}>{(['system', 'account', 'security', 'transaction'] as const).map((option) => <button key={option} type="button" style={styles.selectOption} onClick={() => { setType(option); setTypeMenuOpen(false); }}>{option === 'account' ? 'Account' : option === 'security' ? 'Security' : option === 'transaction' ? 'Transaction' : 'System'}</button>)}</div> : null}</div>
         <label style={styles.field}><span style={styles.label}>Subject</span><input required maxLength={120} value={subject} onChange={(event) => setSubject(event.target.value)} placeholder="Enter the notification subject" style={styles.input} /></label>
         <label style={styles.field}><span style={styles.label}>Details</span><textarea required maxLength={2000} value={details} onChange={(event) => setDetails(event.target.value)} placeholder="Write the notification details" style={{ ...styles.input, ...styles.textarea }} /></label>
-        <button type="submit" disabled={sending || (!isEveryone && !user)} style={{ ...styles.button, opacity: sending ? 0.65 : 1 }}><Send size={16} /> {sending ? 'Sending…' : 'Send notification'}</button>
+        <button type="submit" disabled={sending || (!isEveryone && !user)} style={{ ...styles.button, opacity: sending ? 0.65 : 1 }}>{sending ? <InlineLoadingDots /> : <><Send size={16} /> Send notification</>}</button>
       </form>
     </div></div><NowBar admin /></div>
   </HybridTheme>;

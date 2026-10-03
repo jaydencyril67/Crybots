@@ -5,6 +5,7 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
+import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
 
@@ -59,8 +60,8 @@ const TradeExchangePage = () => {
       <input required min="0" step="any" type="number" placeholder="USDT amount to trade" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); }} style={input} />
       <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Market order: fills immediately at the current price</span><span>No additional charge is added to market orders</span></div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
-        <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('buy')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'buy' ? 'wait' : 'pointer' }}>{submittingSide === 'buy' ? 'Submitting…' : 'Buy · Rise'}</button>
-        <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('sell')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.danger, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'sell' ? 'wait' : 'pointer' }}>{submittingSide === 'sell' ? 'Submitting…' : 'Sell · Fall'}</button>
+        <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('buy')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'buy' ? 'wait' : 'pointer' }}>{submittingSide === 'buy' ? <InlineLoadingDots /> : 'Buy'}</button>
+        <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('sell')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.danger, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'sell' ? 'wait' : 'pointer' }}>{submittingSide === 'sell' ? <InlineLoadingDots /> : 'Sell'}</button>
       </div>
       {message ? <NotificationBanner tone={messageTone} title="Trading" message={message} /> : null}
     </section>

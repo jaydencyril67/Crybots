@@ -3,6 +3,7 @@ import { ArrowLeft, Eye, Bell, Info, ShieldAlert, WalletCards, CheckCheck } from
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
+import InlineLoadingDots from './InlineLoadingDots';
 import NotificationBanner from './NotificationBanner';
 import NowBar from './NowBar';
 import api from '../api/axios';
@@ -123,7 +124,7 @@ const NotificationsPage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/home')}><ArrowLeft size={17} /> Home</button>
           <h1 style={styles.heading}>Notifications</h1>
           <p style={styles.intro}>Stay up to date with account, security and transaction activity.</p>
-          {notifications.some((notification) => !notification.readAt) ? <button type="button" style={styles.markAll} onClick={() => void markAllAsRead()} disabled={markingAllRead}><CheckCheck size={15} /> {markingAllRead ? 'Marking...' : 'Mark all as read'}</button> : null}
+          {notifications.some((notification) => !notification.readAt) ? <button type="button" style={styles.markAll} onClick={() => void markAllAsRead()} disabled={markingAllRead}>{markingAllRead ? <InlineLoadingDots /> : <><CheckCheck size={15} /> Mark all as read</>}</button> : null}
           {refreshing ? <NotificationBanner tone="info" title="Updating notifications" message="Checking for new in-app alerts." /> : null}
           {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}
           <div style={styles.list}>
