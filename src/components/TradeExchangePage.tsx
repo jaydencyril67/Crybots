@@ -21,6 +21,7 @@ const TradeExchangePage = () => {
   const [message, setMessage] = React.useState<string | null>(null);
   const [submitting, setSubmitting] = React.useState(false);
   const pendingClientOrderId = React.useRef<string | null>(null);
+  const pendingOrderKey = React.useRef<string | null>(null);
   const [account, setAccount] = React.useState<{ price: number; balance: number; feeRate: number; position?: { quantity: number; averageEntryPrice: number; unrealizedPnl: number; marketValue: number; realizedPnl: number; fees: number } | null } | null>(null);
   const [openSelector, setOpenSelector] = React.useState<'side' | 'type' | null>(null);
 
@@ -71,17 +72,23 @@ const TradeExchangePage = () => {
         setMessage(side === 'buy' ? 'Enter a valid USDT amount and wait for the live price to load.' : 'Enter a valid KRN quantity.');
         return;
       }
+      const orderKey = `${symbol}:${side}:${type}:${quantity}:${limitPrice}`;
+      if (pendingOrderKey.current !== orderKey) {
+        pendingClientOrderId.current = null;
+        pendingOrderKey.current = orderKey;
+      }
       const clientOrderId = pendingClientOrderId.current || (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `web-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
       pendingClientOrderId.current = clientOrderId;
       await api.post('/api/trading/orders', { symbol, clientOrderId, side, type, quantity: orderQuantity, ...(type === 'limit' ? { limitPrice: Number(limitPrice) } : {}) });
       pendingClientOrderId.current = null;
+      pendingOrderKey.current = null;
       setQuantity('');
       setLimitPrice('');
       setMessage('Order accepted and executed or added to open orders.');
       await loadAccount();
     } catch (error) {
       const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setMessage(apiMessage || 'Unable to submit the order.');
+      setMessage(apiMessage || 'Unable to submit the order. You can retry safely.');
     } finally {
       setSubmitting(false);
     }
