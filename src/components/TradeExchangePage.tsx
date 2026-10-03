@@ -19,7 +19,7 @@ const TradeExchangePage = () => {
   const [limitPrice, setLimitPrice] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
   const [messageTone, setMessageTone] = React.useState<'success' | 'error'>('success');
-  const [submitting, setSubmitting] = React.useState(false);
+  const [submittingSide, setSubmittingSide] = React.useState<'buy' | 'sell' | null>(null);
   const [feeRate, setFeeRate] = React.useState(DEFAULT_TRADING_FEE_RATE);
   const [estimatedFee, setEstimatedFee] = React.useState<number | null>(null);
 
@@ -32,7 +32,7 @@ const TradeExchangePage = () => {
       return;
     }
 
-    setSubmitting(true);
+    setSubmittingSide(side);
     setMessage(null);
     try {
       const clientOrderId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
@@ -58,7 +58,7 @@ const TradeExchangePage = () => {
       setMessageTone('error');
       setMessage(apiMessage || 'Unable to create the prediction order.');
     } finally {
-      setSubmitting(false);
+      setSubmittingSide(null);
     }
   };
 
@@ -74,8 +74,8 @@ const TradeExchangePage = () => {
       {orderType === 'limit' ? <input required min="0" step="any" type="number" placeholder="Limit price (USDT per KRN)" value={limitPrice} onChange={(event) => { setLimitPrice(event.target.value); setEstimatedFee(null); }} style={input} /> : null}
       <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Order type: {orderType === 'market' ? 'Market — fills at the current price' : 'Limit — stays open until the target price is reached'}</span><span>Trading fee: {(feeRate * 100).toFixed(2)}% of the executed order value</span>{estimatedFee !== null ? <span>Estimated fee for this order: {estimatedFee.toFixed(6)} USDT</span> : null}</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
-        <button type="button" disabled={submitting} onClick={() => void submitOrder('buy')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: submitting ? 'wait' : 'pointer' }}>{submitting ? 'Submitting…' : 'Buy · Rise'}</button>
-        <button type="button" disabled={submitting} onClick={() => void submitOrder('sell')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.danger, color: theme.textInverse, fontWeight: 800, cursor: submitting ? 'wait' : 'pointer' }}>{submitting ? 'Submitting…' : 'Sell · Fall'}</button>
+        <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('buy')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'buy' ? 'wait' : 'pointer' }}>{submittingSide === 'buy' ? 'Submitting…' : 'Buy · Rise'}</button>
+        <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('sell')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.danger, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'sell' ? 'wait' : 'pointer' }}>{submittingSide === 'sell' ? 'Submitting…' : 'Sell · Fall'}</button>
       </div>
       {message ? <NotificationBanner tone={messageTone} title="Trading" message={message} /> : null}
     </section>
