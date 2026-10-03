@@ -20,9 +20,9 @@ const TradeExchangePage = () => {
 
   const submitOrder = async (side: 'buy' | 'sell') => {
     const parsedUsdtAmount = Number(usdtAmount);
-    if (!Number.isFinite(parsedUsdtAmount) || parsedUsdtAmount <= 0) {
+    if (!Number.isFinite(parsedUsdtAmount) || parsedUsdtAmount < 10) {
       setMessageTone('error');
-      setMessage('Enter a valid USDT amount first.');
+      setMessage('Trade amount must be at least 10 USDT.');
       return;
     }
 
@@ -57,7 +57,7 @@ const TradeExchangePage = () => {
     <button type="button" onClick={() => navigate('/trade')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
     <section style={card}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(520px, 75vw, 900px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
     <section style={{ ...card, width: '100%', maxWidth: 620, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 12 }}>
-      <input required min="0" step="any" type="number" placeholder="USDT amount to trade" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); }} style={input} />
+      <input required min="10" step="any" type="number" placeholder="USDT amount to trade (minimum 10 USDT)" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); }} style={input} />
       <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Market order: fills immediately at the current price</span><span>No additional charge is added to market orders</span></div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
         <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('buy')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'buy' ? 'wait' : 'pointer' }}>{submittingSide === 'buy' ? <InlineLoadingDots /> : 'Buy'}</button>
