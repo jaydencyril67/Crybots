@@ -15,8 +15,6 @@ const TradeExchangePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [usdtAmount, setUsdtAmount] = React.useState('');
-  const [orderType, setOrderType] = React.useState<'market' | 'limit'>('market');
-  const [limitPrice, setLimitPrice] = React.useState('');
   const [message, setMessage] = React.useState<string | null>(null);
   const [messageTone, setMessageTone] = React.useState<'success' | 'error'>('success');
   const [submittingSide, setSubmittingSide] = React.useState<'buy' | 'sell' | null>(null);
@@ -25,10 +23,9 @@ const TradeExchangePage = () => {
 
   const submitOrder = async (side: 'buy' | 'sell') => {
     const parsedUsdtAmount = Number(usdtAmount);
-    const parsedLimitPrice = Number(limitPrice);
-    if (!Number.isFinite(parsedUsdtAmount) || parsedUsdtAmount <= 0 || (orderType === 'limit' && (!Number.isFinite(parsedLimitPrice) || parsedLimitPrice <= 0))) {
+    if (!Number.isFinite(parsedUsdtAmount) || parsedUsdtAmount <= 0) {
       setMessageTone('error');
-      setMessage(orderType === 'limit' ? 'Enter a valid USDT amount and limit price first.' : 'Enter a valid USDT amount first.');
+      setMessage('Enter a valid USDT amount first.');
       return;
     }
 
@@ -42,17 +39,14 @@ const TradeExchangePage = () => {
         symbol: 'KRN/USDT',
         clientOrderId,
         side,
-        type: orderType,
         usdtAmount: parsedUsdtAmount,
-        ...(orderType === 'limit' ? { limitPrice: parsedLimitPrice } : {}),
       });
       const appliedFeeRate = Number(response.data.feeRate);
       if (Number.isFinite(appliedFeeRate) && appliedFeeRate >= 0) setFeeRate(appliedFeeRate);
       setEstimatedFee(Number.isFinite(response.data.estimatedFee) ? response.data.estimatedFee || 0 : null);
       setUsdtAmount('');
-      if (orderType === 'limit') setLimitPrice('');
       setMessageTone('success');
-      setMessage(`${orderType === 'market' ? 'Market' : 'Limit'} ${side === 'buy' ? 'buy' : 'sell'} order placed successfully. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. ${orderType === 'market' ? 'View the completed order in Trade history.' : 'View the open order in Open trades.'}`);
+      setMessage(`Market ${side === 'buy' ? 'buy' : 'sell'} order placed successfully. Trading fee: ${((Number.isFinite(appliedFeeRate) ? appliedFeeRate : feeRate) * 100).toFixed(2)}%. View the completed order in Trade history.`);
     } catch (error) {
       const apiMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setMessageTone('error');
@@ -69,10 +63,8 @@ const TradeExchangePage = () => {
     <button type="button" onClick={() => navigate('/trade')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
     <section style={card}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(520px, 75vw, 900px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
     <section style={{ ...card, width: '100%', maxWidth: 620, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 12 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setOrderType('market')} style={{ padding: 10, borderRadius: 8, border: `1px solid ${orderType === 'market' ? theme.primary : theme.borderGlass}`, background: orderType === 'market' ? theme.primary : theme.background, color: orderType === 'market' ? theme.textInverse : theme.text, cursor: 'pointer' }}>Market order</button><button type="button" onClick={() => setOrderType('limit')} style={{ padding: 10, borderRadius: 8, border: `1px solid ${orderType === 'limit' ? theme.primary : theme.borderGlass}`, background: orderType === 'limit' ? theme.primary : theme.background, color: orderType === 'limit' ? theme.textInverse : theme.text, cursor: 'pointer' }}>Limit order</button></div>
       <input required min="0" step="any" type="number" placeholder="USDT amount to trade" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); setEstimatedFee(null); }} style={input} />
-      {orderType === 'limit' ? <input required min="0" step="any" type="number" placeholder="Limit price (USDT per KRN)" value={limitPrice} onChange={(event) => { setLimitPrice(event.target.value); setEstimatedFee(null); }} style={input} /> : null}
-      <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Order type: {orderType === 'market' ? 'Market — fills at the current price' : 'Limit — stays open until the target price is reached'}</span><span>Trading fee: {(feeRate * 100).toFixed(2)}% of the executed order value</span>{estimatedFee !== null ? <span>Estimated fee for this order: {estimatedFee.toFixed(6)} USDT</span> : null}</div>
+      <div style={{ display: 'grid', gap: 4, color: theme.textMuted, fontSize: '0.85rem' }}><span>Market order: fills immediately at the current price</span><span>Trading fee: {(feeRate * 100).toFixed(2)}% of the executed order value</span>{estimatedFee !== null ? <span>Estimated fee for this order: {estimatedFee.toFixed(6)} USDT</span> : null}</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
         <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('buy')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'buy' ? 'wait' : 'pointer' }}>{submittingSide === 'buy' ? 'Submitting…' : 'Buy · Rise'}</button>
         <button type="button" disabled={submittingSide !== null} onClick={() => void submitOrder('sell')} style={{ padding: 12, border: 0, borderRadius: 9, background: theme.danger, color: theme.textInverse, fontWeight: 800, cursor: submittingSide === 'sell' ? 'wait' : 'pointer' }}>{submittingSide === 'sell' ? 'Submitting…' : 'Sell · Fall'}</button>
