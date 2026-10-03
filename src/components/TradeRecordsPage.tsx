@@ -18,7 +18,7 @@ type OpenPosition = Position & { availableQuantity: number };
 
 const formatUsdt = (value: number) => `${value.toFixed(2)} USDT`;
 const formatKrn = (value: number) => `${value.toFixed(6)} KRN`;
-const formatPrice = (value: number) => `${value.toFixed(6)} USDT`;
+const formatPrice = (value: number) => `${value.toFixed(2)} USDT`;
 const calculateLivePnl = (position: OpenPosition, currentPrice: number | null) => {
   if (currentPrice === null) return position.unrealizedPnl;
   const quantity = Math.abs(position.quantity);
