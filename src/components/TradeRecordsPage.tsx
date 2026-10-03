@@ -28,7 +28,6 @@ const calculateLivePnl = (position: OpenPosition, currentPrice: number | null) =
 };
 
 const metricRowStyle = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, padding: '10px 0', borderBottom: `1px solid ${theme.borderGlass}` });
-const LIVE_MARKET_REFRESH_MS = 1000;
 type Portfolio = { price: number; balance: number; equity: number; unrealizedPnl: number; realizedPnl: number; positions: Position[] };
 
 const TradeRecordsPage = ({ mode }: Props) => {
@@ -83,12 +82,40 @@ const TradeRecordsPage = ({ mode }: Props) => {
     const active = { current: true };
     setLoading(true);
     void loadRecords(active);
-    const timer = window.setInterval(() => { void loadRecords(active); }, LIVE_MARKET_REFRESH_MS);
+    if (mode !== 'orders') {
+      return () => {
+        active.current = false;
+      };
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return () => {
+        active.current = false;
+      };
+    }
+
+    const apiBaseUrl = process.env.REACT_APP_API_URL || 'https://kingshalls.onrender.com';
+    const stream = new EventSource(`${apiBaseUrl}/api/trading/price/stream?token=${encodeURIComponent(token)}`);
+    stream.addEventListener('market-price', (event) => {
+      try {
+        const payload = JSON.parse(event.data) as { price?: number };
+        if (active.current && typeof payload.price === 'number' && Number.isFinite(payload.price)) {
+          setCurrentPrice(payload.price);
+        }
+      } catch {
+        // Ignore malformed stream messages and keep the current price.
+      }
+    });
+    stream.onerror = () => {
+      // EventSource automatically retries after a temporary connection failure.
+    };
+
     return () => {
       active.current = false;
-      window.clearInterval(timer);
+      stream.close();
     };
-  }, [loadRecords]);
+  }, [loadRecords, mode]);
   const cardStyles = createHybridCardStyles(theme);
   return <HybridTheme><Helmet><title>{title} | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ maxWidth: 1100, margin: '0 auto', padding: '18px 14px 28px' }}>
     <button type="button" onClick={() => navigate('/trade')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
