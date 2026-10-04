@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ArrowLeft, Eye, Bell, Info, ShieldAlert, WalletCards, CheckCheck } from 'lucide-react';
-import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
@@ -27,15 +27,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   heading: { margin: '20px 0 8px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
   section: { display: 'grid', gap: '10px' },
-  list: { display: 'grid', gap: 10, marginTop: 6 },
-  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box' as const, backdropFilter: 'blur(24px) saturate(1.15)' },
+  list: { ...createHybridCardStyles(theme).card, display: 'grid', gap: 10, marginTop: 6 },
+  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, boxSizing: 'border-box' as const },
   unread: { border: `1px solid ${theme.primary}`, background: theme.primarySoft },
   icon: { width: '20px', height: '20px', color: theme.primary, flexShrink: 0 },
   title: { margin: 0, fontSize: '0.95rem', fontWeight: 850, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
   view: { borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '7px 12px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 },
   markAll: { borderRadius: 999, border: `1px solid ${theme.primary}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.primary, background: theme.primarySoft, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 },
-  empty: { padding: '28px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '14px', color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceMuted },
+  empty: { padding: '28px 16px', border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceMuted },
 });
 
 const iconForType = (type: NotificationItem['type']) => {
