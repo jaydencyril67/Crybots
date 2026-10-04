@@ -28,7 +28,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
   section: { display: 'grid', gap: '10px' },
   list: { ...createHybridCardStyles(theme).card, display: 'grid', gap: 10, marginTop: 6 },
-  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, boxSizing: 'border-box' as const },
+  item: { ...createHybridCardStyles(theme).panel, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box' as const },
   unread: { border: `1px solid ${theme.primary}`, background: theme.primarySoft },
   icon: { width: '20px', height: '20px', color: theme.primary, flexShrink: 0 },
   title: { margin: 0, fontSize: '0.95rem', fontWeight: 850, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
