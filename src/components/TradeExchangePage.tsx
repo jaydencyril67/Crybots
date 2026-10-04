@@ -6,10 +6,9 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
+import TradingViewChart from './TradingViewChart';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
-
-const MARKET_SERVICE_URL = process.env.REACT_APP_MARKET_SERVICE_URL || process.env.MARKET_SERVICE_URL || 'https://market-matb.onrender.com';
 const TradeExchangePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
@@ -69,7 +68,7 @@ const TradeExchangePage = () => {
 
   return <HybridTheme><Helmet><title>Exchange | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1680, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
     <button type="button" onClick={() => navigate('/trade')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
-    <section style={card}><iframe title="KingsHall live market chart" src={MARKET_SERVICE_URL} style={{ width: '100%', height: 'clamp(520px, 75vw, 900px)', border: 0, borderRadius: 10, display: 'block' }} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" /></section>
+    <section style={card}><TradingViewChart themeMode={themeMode} /></section>
     <section style={{ ...card, width: '100%', maxWidth: 620, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 12 }}>
       <input required min="10" step="any" type="number" placeholder="USDT amount to trade (minimum 10 USDT)" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); }} style={input} />
       <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}><input min="0" step="any" type="number" placeholder="Take-profit price (optional)" value={takeProfitPrice} onChange={(event) => { setTakeProfitPrice(event.target.value); }} style={input} /><input min="0" step="any" type="number" placeholder="Stop-loss price (optional)" value={stopLossPrice} onChange={(event) => { setStopLossPrice(event.target.value); }} style={input} /></div>
