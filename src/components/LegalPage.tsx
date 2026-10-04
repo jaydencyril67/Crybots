@@ -43,7 +43,7 @@ const LegalPage = ({ title, eyebrow, summary, updated, sections }: LegalPageProp
 
   return (
     <HybridTheme>
-      <Helmet><title>{title} | KingsHall Exchange</title><meta name="description" content={summary} /></Helmet>
+      <Helmet><title>{title} | KingsHall</title><meta name="description" content={summary} /></Helmet>
       <div style={styles.page}>
         <main style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/about')}><ArrowLeft size={16} aria-hidden="true" /> About</button>

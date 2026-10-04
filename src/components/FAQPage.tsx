@@ -19,7 +19,7 @@ const faqSections: FAQSection[] = [
   {
     title: 'Getting started',
     items: [
-      { question: 'What is KingsHall Exchange?', answer: 'KingsHall Exchange is a platform for managing your digital-asset portfolio, viewing market performance, exchanging supported assets, and moving funds through deposits, withdrawals, and transfers.' },
+      { question: 'What is KingsHall?', answer: 'KingsHall is a crypto trading bot platform where users can rent ready-made bots, build automated strategies and buy bots to trade crypto markets, while managing funds and reviewing performance.' },
       { question: 'How do I create an account?', answer: 'Choose Sign up, enter your details, and confirm your email using the verification message we send you. After confirmation, sign in to access your account.' },
       { question: 'Why do I need to verify my email?', answer: 'Email verification helps protect your account and makes sure important security, account, and transaction messages reach you.' },
       { question: 'I forgot my password. What should I do?', answer: 'Use Forgot password on the sign-in page and follow the email instructions to create a new password. Never share a password or verification code with anyone.' },
@@ -46,13 +46,13 @@ const faqSections: FAQSection[] = [
     ],
   },
   {
-    title: 'Trade, portfolio, and transfers',
+    title: 'Trading bots, performance, and transfers',
     items: [
-      { question: 'How do I trade assets?', answer: 'Open Trade, choose the asset or market pair, enter the amount, review the displayed rate and total, and confirm the trade. Rates can change before confirmation.' },
-      { question: 'Are trade prices guaranteed?', answer: 'No. Digital-asset prices and displayed market data can move quickly. Review the current quote and confirmation details before submitting a trade.' },
-      { question: 'What is shown in my portfolio?', answer: 'Portfolio shows your current balances and related value information. Market values are estimates based on available pricing and can change as markets move.' },
+      { question: 'How do I use a trading bot?', answer: 'Open the bot marketplace or builder, review the strategy, markets, risk settings and terms, then rent, build or buy a bot and activate it when you are ready. Automated trading results are not guaranteed.' },
+      { question: 'Are bot results or trade prices guaranteed?', answer: 'No. Digital-asset prices, market data, liquidity and bot performance can change quickly. Historical results do not guarantee future performance.' },
+      { question: 'What is shown in bot performance?', answer: 'Performance views can show balances, active positions, bot activity, realized and unrealized results, and related value information. Market values are estimates and can change as markets move.' },
       { question: 'How do I send funds to another user?', answer: 'Open Transfer, enter the recipient details and amount, carefully review the destination, and complete the security checks. Transfers are different from blockchain withdrawals.' },
-      { question: 'Where can I find my transaction history?', answer: 'Open Transactions or Logs to review account activity, including deposits, withdrawals, trades, and transfers with their current status.' },
+      { question: 'Where can I find my bot and transaction history?', answer: 'Open the bot performance, trade history or Transactions and Logs areas to review bot activity, deposits, withdrawals, trades and transfers with their current status.' },
     ],
   },
   {

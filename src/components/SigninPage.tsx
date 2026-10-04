@@ -720,8 +720,8 @@ const SigninPage = () => {
     return (
     <>
       <Helmet>
-        <title>KingsHall Exchange | Sign in</title>
-        <meta name="description" content="Sign in to your KingsHall Exchange account using email and your preferred secure method." />
+        <title>KingsHall | Sign in</title>
+        <meta name="description" content="Sign in to your KingsHall trading bot account using email and your preferred secure method." />
       </Helmet>
 
       <main style={hybridStyles.page}>

@@ -13,7 +13,7 @@ const preferenceTopics = [
   { key: 'account', label: 'Account activity', description: 'Profile changes, sign-ins and account updates.' },
   { key: 'security', label: 'Security alerts', description: 'Password, two-factor authentication and session activity.' },
   { key: 'transactions', label: 'Transactions', description: 'Deposits, withdrawals, transfers and payment updates.' },
-  { key: 'market', label: 'Market updates', description: 'Price movements, staking and investment updates.' },
+  { key: 'market', label: 'Market updates', description: 'Market movements, bot activity and strategy updates.' },
 ] as const;
 
 const deliveryChannels = [
@@ -137,7 +137,7 @@ const AlertPage = () => {
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
           <h1 style={styles.heading}>Alert</h1>
-          <p style={styles.intro}>Choose which updates you receive and where KingsHall Exchange should deliver them.</p>
+          <p style={styles.intro}>Choose which updates you receive about your bots, strategies and account, and where KingsHall should deliver them.</p>
           {loading ? <NotificationBanner tone="info" title="Loading preferences" message="Retrieving your saved alert settings." /> : null}
           {saved ? <NotificationBanner tone="success" title="Preferences saved" message="Your alert settings have been updated." /> : null}
           {error ? <NotificationBanner tone="error" title="Unable to update preferences" message={error} /> : null}
