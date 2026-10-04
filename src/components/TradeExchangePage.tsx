@@ -68,7 +68,7 @@ const TradeExchangePage = () => {
 
   return <HybridTheme><Helmet><title>Exchange | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1680, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
     <button type="button" onClick={() => navigate('/trade')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
-    <section style={card}><TradingViewChart themeMode={themeMode} /></section>
+    <section style={{ ...card, padding: 0, height: 'clamp(540px, 68vw, 860px)', overflow: 'hidden' }}><TradingViewChart themeMode={themeMode} /></section>
     <section style={{ ...card, width: '100%', maxWidth: 620, boxSizing: 'border-box', margin: '16px auto 0', display: 'grid', gap: 12 }}>
       <input required min="10" step="any" type="number" placeholder="USDT amount to trade (minimum 10 USDT)" value={usdtAmount} onChange={(event) => { setUsdtAmount(event.target.value); }} style={input} />
       <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}><input min="0" step="any" type="number" placeholder="Take-profit price (optional)" value={takeProfitPrice} onChange={(event) => { setTakeProfitPrice(event.target.value); }} style={input} /><input min="0" step="any" type="number" placeholder="Stop-loss price (optional)" value={stopLossPrice} onChange={(event) => { setStopLossPrice(event.target.value); }} style={input} /></div>

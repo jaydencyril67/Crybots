@@ -42,7 +42,7 @@ const TradingViewChart = ({ themeMode }: TradingViewChartProps) => {
     };
   }, [themeMode]);
 
-  return <div ref={containerRef} className="tradingview-widget-container" style={{ height: 'clamp(520px, 75vw, 900px)', width: '100%' }} />;
+  return <div ref={containerRef} className="tradingview-widget-container" style={{ height: '100%', width: '100%' }} />;
 };
 
 export default TradingViewChart;
