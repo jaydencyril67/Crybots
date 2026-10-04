@@ -46,10 +46,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   rowList: {
     display: 'grid',
-    gap: '10px',
+    gap: '8px',
     width: '100%',
     minWidth: 0,
-    padding: '18px',
+    padding: '6px',
     borderRadius: '22px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
