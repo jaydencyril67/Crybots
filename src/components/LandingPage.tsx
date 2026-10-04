@@ -22,8 +22,8 @@ const features = [
   },
   {
     icon: TrendingUp,
-    title: 'Smart investing tools',
-    description: 'Trade, stake, and grow with precision dashboards built for confident portfolio decisions.',
+    title: 'Smart bot strategies',
+    description: 'Rent, build, and buy automated trading bots with dashboards for confident crypto strategy decisions.',
   },
   {
     icon: CircleDollarSign,
@@ -466,10 +466,10 @@ const LandingPage = () => {
     <HybridTheme>
       <>
         <Helmet>
-          <title>KingsHall Exchange | Modern Crypto Trading & Investing</title>
+          <title>KingsHall | Crypto Trading Bots</title>
           <meta
             name="description"
-            content="KingsHall Exchange is a sleek crypto exchange and investment app with secure trading, fast transfers, and premium portfolio tools. "
+            content="KingsHall is a crypto trading bot platform where users can rent, build, and buy automated bots, monitor strategies, and manage digital assets. "
           />
         </Helmet>
 
@@ -485,14 +485,14 @@ const LandingPage = () => {
             <div>
               <div style={styles.pill}>
                 <Sparkles style={styles.icon} />
-                Premium trading experience for modern investors
+                Automated crypto trading for modern users
               </div>
               <h2 style={styles.heading}>
-                Trade smarter.
-                <span style={styles.gradientText}>Invest with confidence.</span>
+                Automate smarter.
+                <span style={styles.gradientText}>Trade with a plan.</span>
               </h2>
               <p style={styles.lead}>
-                KingsHall Exchange brings together crypto trading, portfolio growth, staking, and instant transfers in a clean,
+                KingsHall brings together bot rentals, strategy building, bot purchases, crypto market automation, and account tools in a clean,
                 modern experience built for serious users.
               </p>
 
@@ -533,7 +533,7 @@ const LandingPage = () => {
                     <div style={styles.miniCard}>
                       <p style={styles.miniLabel}>Active balance</p>
                       <p style={styles.miniValue}>4.82 BTC</p>
-                      <p style={styles.miniDesc}>Diversified across spot and staking.</p>
+                      <p style={styles.miniDesc}>Managed across automated strategies.</p>
                     </div>
                     <div style={styles.miniCard}>
                       <p style={styles.miniLabel}>Security score</p>

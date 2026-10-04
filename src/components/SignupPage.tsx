@@ -646,10 +646,10 @@ const SignupPage = () => {
   return (
     <>
       <Helmet>
-        <title>KingsHall Exchange | Signup</title>
+        <title>KingsHall | Signup</title>
         <meta
           name="description"
-          content="Create your KingsHall Exchange account with a modern step-by-step signup flow."
+          content="Create your KingsHall trading bot account with a modern step-by-step signup flow."
         />
       </Helmet>
 
