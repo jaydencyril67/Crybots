@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Bot } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
+import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
@@ -116,7 +117,7 @@ const CommercePage = () => {
     <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' }}>
       <div style={{ width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Market</button>
-        <section style={{ marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
+        <section style={{ marginTop: '22px', padding: '10px', borderRadius: '16px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
           <div style={{ padding: '3px 4px 10px' }}><h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 850 }}>Commerce</h2><p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.4 }}>Buy bots with your USDT balance or sell bots you own. Ownership is permanent until sold.</p></div>
           <div style={{ display: 'flex', gap: 8, margin: '4px 0 14px', padding: 4, borderRadius: 12, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
             {(['browse', 'sell'] as const).map((view) => <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, border: 0, borderRadius: 10, padding: '7px 10px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, cursor: 'pointer' }}>{view === 'browse' ? 'Browse' : 'Sell'}</button>)}
