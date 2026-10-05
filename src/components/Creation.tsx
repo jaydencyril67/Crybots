@@ -50,7 +50,6 @@ const Creation = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const selectedSymbol = symbolOptions.find((option) => option.value === symbol) || symbolOptions[0];
   const [tradingViewResults, setTradingViewResults] = useState<TradingViewResult[]>([]);
   const [searchingSymbols, setSearchingSymbols] = useState(false);
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, font: 'inherit' };
