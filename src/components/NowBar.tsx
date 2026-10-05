@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Bell, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, LifeBuoy, MessageCircle, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
-import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES } from '../utils/voiceNavigation';
+import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES, VOICE_NAVIGATION_EVENT } from '../utils/voiceNavigation';
 
 const EDGE_LIGHT_COLORS = {
   blue: '#38bdf8',
@@ -493,9 +493,16 @@ const readNowBarAction = () => {
   }
 };
 
+const getStoredNowBarActionLabel = (label: string) => {
+  const normalizedLabel = label.trim().toUpperCase();
+  if (normalizedLabel === 'WITHDRAW') return 'WITHDRAWALS';
+  if (normalizedLabel === 'ASSET') return 'ASSETS';
+  return normalizedLabel;
+};
+
 const saveNowBarAction = (label: string) => {
   try {
-    window.localStorage.setItem(NOWBAR_ACTION_STORAGE_KEY, label);
+    window.localStorage.setItem(NOWBAR_ACTION_STORAGE_KEY, getStoredNowBarActionLabel(label));
   } catch {
     // Ignore storage failures; the NowBar should remain usable without persistence.
   }
@@ -544,6 +551,11 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
       setCurrentPath(getActivePath());
       setView('title');
       setMode('compact');
+    };
+
+    const handleVoiceNavigation = (event: Event) => {
+      const detail = (event as CustomEvent<{ label?: string }>).detail;
+      if (detail?.label) saveNowBarAction(detail.label);
     };
 
     const syncEdgeLight = () => {
@@ -601,6 +613,7 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
     window.addEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
     window.addEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
     window.addEventListener(NOWBAR_COMMAND_EVENT, handleVoiceCommand);
+    window.addEventListener(VOICE_NAVIGATION_EVENT, handleVoiceNavigation);
 
     return () => {
       window.removeEventListener('popstate', syncPath);
@@ -612,6 +625,7 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
       window.removeEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
       window.removeEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
       window.removeEventListener(NOWBAR_COMMAND_EVENT, handleVoiceCommand);
+      window.removeEventListener(VOICE_NAVIGATION_EVENT, handleVoiceNavigation);
 
     };
   }, []);
