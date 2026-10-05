@@ -82,7 +82,7 @@ const Creation = () => {
   const [selectedTradingSymbol, setSelectedTradingSymbol] = useState('');
   const [payoutSystem, setPayoutSystem] = useState('Manual');
   const [tradeDirection, setTradeDirection] = useState('Long');
-  const [efficiency, setEfficiency] = useState(50);
+  const [efficiency, setEfficiency] = useState(0);
   const [minTradeAmount, setMinTradeAmount] = useState('');
   const [maxTradeAmount, setMaxTradeAmount] = useState('');
   const [saving, setSaving] = useState(false);
