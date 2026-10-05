@@ -41,21 +41,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '14px',
     marginTop: '10px',
   },
-  card: {
-    ...createHybridCardStyles(theme).card,
-  },
-  rowList: {
-    display: 'grid',
-    gap: '10px',
-    width: '100%',
-    minWidth: 0,
-    padding: '10px',
-    borderRadius: '16px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
-    boxSizing: 'border-box' as const,
-  },
   dangerRow: {
+    ...createHybridCardStyles(theme).card,
     width: '100%',
     maxWidth: '100%',
     background: theme.surfaceMuted,
@@ -215,8 +202,7 @@ const DangerPage = () => {
           
           <div style={styles.content}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
-            <div style={styles.rowList}>
-              <section style={styles.dangerRow}>
+            <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
               <div style={styles.field}>
@@ -281,8 +267,7 @@ const DangerPage = () => {
                 <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? <InlineLoadingDots /> : 'Delete Account'}</button>
               </div>
               {remove.status ? <NotificationBanner tone={remove.statusTone} title={remove.statusTone === 'success' ? 'Action completed' : 'Action required'} message={remove.status} /> : null}
-              </section>
-            </div>
+            </section>
           </div>
         </div>
         <NowBar />
