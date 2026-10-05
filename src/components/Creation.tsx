@@ -67,7 +67,7 @@ const Creation = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [name, setName] = useState('');
   const [botId, setBotId] = useState('');
-  const [useAutomaticId, setUseAutomaticId] = useState(true);
+  const [generatingBotId, setGeneratingBotId] = useState(false);
   const [symbol, setSymbol] = useState('crypto');
   const selectedSymbol = symbolOptions.find((option) => option.value === symbol) || symbolOptions[0];
   const [symbolSearch, setSymbolSearch] = useState('');
@@ -92,16 +92,15 @@ const Creation = () => {
     setError('');
     setMessage('');
     if (!name.trim()) { setError('Enter a name for your trading bot.'); return; }
-    if (!useAutomaticId && !/^\d{6}$/.test(botId)) { setError('A manual bot ID must be exactly 6 digits.'); return; }
+    if (!/^\d{6}$/.test(botId)) { setError('Bot ID must be exactly 6 digits.'); return; }
     if (!selectedTradingSymbol) { setError('Search for and select a TradingView symbol.'); return; }
     if (!duration || Number(duration) <= 0) { setError('Enter a run duration greater than zero.'); return; }
 
     setSaving(true);
     try {
-      await api.post('/api/trading-bots', {
+      await api.post('/api/market', {
         name: name.trim(),
-        botId: useAutomaticId ? undefined : botId,
-        autoGenerateId: useAutomaticId,
+        botId,
         symbolType: symbol,
         symbol: selectedTradingSymbol,
         runDuration: Number(duration),
@@ -126,7 +125,7 @@ const Creation = () => {
           <div style={outerCardStyle}>
           <form onSubmit={createBot} style={innerCardStyle}>
             <label style={labelStyle}>Bot name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="My momentum bot" style={inputStyle} maxLength={80} /></label>
-            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Bot ID</label><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input value={useAutomaticId ? '' : botId} onChange={(event) => setBotId(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={useAutomaticId} inputMode="numeric" placeholder={useAutomaticId ? 'Created automatically' : 'Six digits'} style={{ ...inputStyle, flex: 1 }} /><button type="button" onClick={() => setUseAutomaticId(!useAutomaticId)} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: useAutomaticId ? theme.primary : theme.surfaceMuted, color: useAutomaticId ? theme.textInverse : theme.text, cursor: 'pointer', whiteSpace: 'nowrap' }}>{useAutomaticId ? 'Auto' : 'Manual'}</button></div><small style={{ color: theme.textMuted }}>Choose Auto to have the backend create an unused unique six-digit number.</small></div>
+            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Bot ID</label><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input value={botId} onChange={(event) => setBotId(event.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="Six digits" style={{ ...inputStyle, flex: 1 }} /><button type="button" disabled={generatingBotId} onClick={async () => { setGeneratingBotId(true); setError(''); try { const response = await api.get('/api/market/generate-id'); setBotId(String(response.data?.botId || '').replace(/\D/g, '').slice(0, 6)); } catch (requestError: any) { setError(requestError?.response?.data?.message || 'Unable to generate a unique bot ID. Please try again.'); } finally { setGeneratingBotId(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.primary, color: theme.textInverse, cursor: generatingBotId ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}>{generatingBotId ? 'Generating…' : 'Auto'}</button></div><small style={{ color: theme.textMuted }}>Enter six digits or use Auto to generate an unused six-digit bot ID.</small></div>
             <label style={labelStyle}>Market category<CustomSelect options={symbolOptions.map((option) => option.value)} value={symbol} onChange={(value) => { setSymbol(value); setTradingViewResults([]); setSelectedTradingSymbol(''); }} theme={theme} formatOption={(value) => symbolOptions.find((option) => option.value === value)?.label || value} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>TradingView symbol<Search size={15} /><input value={symbolSearch} onChange={(event) => setSymbolSearch(event.target.value)} placeholder={`Search ${selectedSymbol.label.toLowerCase()} symbols`} style={inputStyle} /></label><button type="button" disabled={searchingSymbols || !symbolSearch.trim()} onClick={async () => { setSearchingSymbols(true); setError(''); const query = symbolSearch.trim().toLowerCase(); const fallbackResults = (fallbackTradingViewSymbols[symbol] || []).filter((result) => `${result.symbol} ${result.description} ${result.exchange}`.toLowerCase().includes(query)); try { const response = await api.get('/api/market/symbols', { params: { category: symbol, search: symbolSearch.trim() } }); const remoteResults = response.data?.symbols || response.data || []; setTradingViewResults(Array.isArray(remoteResults) && remoteResults.length > 0 ? remoteResults : fallbackResults); } catch { setTradingViewResults(fallbackResults); } finally { setSearchingSymbols(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}>{searchingSymbols ? 'Searching…' : 'Search symbols'}</button>{tradingViewResults.length > 0 && <div style={{ display: 'grid', gap: 6 }}>{tradingViewResults.map((result) => <button key={`${result.exchange}:${result.symbol}`} type="button" onClick={() => setSelectedTradingSymbol(`${result.exchange}:${result.symbol}`)} style={{ textAlign: 'left', border: `1px solid ${selectedTradingSymbol === `${result.exchange}:${result.symbol}` ? theme.primary : theme.borderGlass}`, borderRadius: 9, padding: '9px 10px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><strong>{result.symbol}</strong><small style={{ display: 'block', color: theme.textMuted }}>{result.description || result.exchange} · {result.type}</small></button>)}</div>}<small style={{ color: theme.textMuted }}>Selected: {selectedTradingSymbol || 'None'}</small></div>
             <label style={labelStyle}>Run duration (minutes)<input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="60" style={inputStyle} /></label>
