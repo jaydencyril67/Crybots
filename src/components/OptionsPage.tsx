@@ -8,6 +8,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Alert', description: 'Choose notification topics and delivery methods.', route: '/alert' },
 ];
 
-const OptionsPage = () => <><ParentPageLayout title="Options" description="Customize your app experience and notification preferences." cards={destinations} showHeader /><NowBar /></>;
+const OptionsPage = () => <><ParentPageLayout title="Options" description="Customize your app experience and notification preferences." cards={destinations} /><NowBar /></>;
 
 export default OptionsPage;

@@ -13,7 +13,6 @@ type ParentPageLayoutProps = {
   title: string;
   description: string;
   cards: ParentPageCard[];
-  showHeader?: boolean;
 };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -30,7 +29,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   viewButton: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '7px 12px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', justifySelf: 'end' },
 });
 
-const ParentPageLayout = ({ title, description, cards, showHeader = false }: ParentPageLayoutProps) => {
+const ParentPageLayout = ({ title, description, cards }: ParentPageLayoutProps) => {
   const { themeMode } = useAppTheme();
   const styles = getStyles(HYBRID_THEME_TOKENS[themeMode]);
 
@@ -39,12 +38,10 @@ const ParentPageLayout = ({ title, description, cards, showHeader = false }: Par
       <div style={styles.page}>
         <div style={styles.shell}>
           <div style={styles.content}>
-            {showHeader && title && description ? (
-              <section style={styles.section}>
-                <h2 style={styles.title}>{title}</h2>
-                <p style={styles.description}>{description}</p>
-              </section>
-            ) : null}
+            <section style={styles.section}>
+              <h2 style={styles.title}>{title}</h2>
+              <p style={styles.description}>{description}</p>
+            </section>
             <div style={styles.cardGrid}>
               {cards.map((card) => (
                 <article key={card.label} style={styles.card}>
