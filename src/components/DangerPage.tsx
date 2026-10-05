@@ -41,6 +41,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '14px',
     marginTop: '10px',
   },
+  outerCard: {
+    ...createHybridCardStyles(theme).card,
+    padding: '10px',
+    background: theme.surfaceGlass,
+  },
   dangerRow: {
     ...createHybridCardStyles(theme).card,
     width: '100%',
@@ -202,7 +207,8 @@ const DangerPage = () => {
           
           <div style={styles.content}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
-            <section style={styles.dangerRow}>
+            <div style={styles.outerCard}>
+              <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
               <div style={styles.field}>
@@ -221,9 +227,11 @@ const DangerPage = () => {
                 <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>{disable.loading === 'disable' ? <InlineLoadingDots /> : 'Disable Account'}</button>
               </div>
               {disable.status ? <NotificationBanner tone={disable.statusTone} title={disable.statusTone === 'success' ? 'Action completed' : 'Action required'} message={disable.status} /> : null}
-              </section>
+                </section>
+              </div>
 
-              <section style={styles.dangerRow}>
+              <div style={styles.outerCard}>
+                <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Self Exclude</h3>
               <p style={styles.actionText}>This places your account into a self-exclusion state to prevent further use according to your request.</p>
               <div style={styles.field}>
@@ -246,9 +254,11 @@ const DangerPage = () => {
                 <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null || !selfExclude.durationDays}>{selfExclude.loading === 'self-exclude' ? <InlineLoadingDots /> : 'Self Exclude Account'}</button>
               </div>
               {selfExclude.status ? <NotificationBanner tone={selfExclude.statusTone} title={selfExclude.statusTone === 'success' ? 'Action completed' : 'Action required'} message={selfExclude.status} /> : null}
-              </section>
+                  </section>
+              </div>
 
-              <section style={styles.dangerRow}>
+              <div style={styles.outerCard}>
+                <section style={styles.dangerRow}>
               <h3 style={styles.actionTitle}>Delete Account</h3>
               <p style={styles.actionText}>This starts a 30-day deletion countdown. Sign-in will be blocked while your account is pending deletion.</p>
               <div style={styles.field}>
@@ -267,8 +277,9 @@ const DangerPage = () => {
                 <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? <InlineLoadingDots /> : 'Delete Account'}</button>
               </div>
               {remove.status ? <NotificationBanner tone={remove.statusTone} title={remove.statusTone === 'success' ? 'Action completed' : 'Action required'} message={remove.status} /> : null}
-            </section>
-          </div>
+                </section>
+              </div>
+            </div>
         </div>
         <NowBar />
       </div>
