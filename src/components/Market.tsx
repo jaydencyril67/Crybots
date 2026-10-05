@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, BriefcaseBusiness, Home, Lightbulb } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -17,18 +17,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   cardText: { margin: '6px 0 16px', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
   list: { display: 'grid', gap: '10px' },
   row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
-  rowContent: { minWidth: 0 },
   label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
   description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
   action: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.textInverse, background: theme.primary, cursor: 'pointer', flexShrink: 0 },
-  icon: { display: 'grid', placeItems: 'center', width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0, background: theme.surfaceMuted, color: theme.primary },
-  rowContentWithIcon: { display: 'flex', alignItems: 'center', gap: '11px', minWidth: 0 },
 });
 
 const categories = [
-  { name: 'Commerce', description: 'Explore opportunities to buy, sell, and exchange goods and services.', icon: BriefcaseBusiness },
-  { name: 'Rentals', description: 'Discover flexible rental opportunities for products, spaces, and more.', icon: Home },
-  { name: 'Creation', description: 'Bring new ideas to life and build something valuable for the community.', icon: Lightbulb },
+  { name: 'Commerce', description: 'Explore opportunities to buy, sell, and exchange goods and services.' },
+  { name: 'Rentals', description: 'Discover flexible rental opportunities for products, spaces, and more.' },
+  { name: 'Creation', description: 'Bring new ideas to life and build something valuable for the community.' },
 ];
 
 const Market = (_props: Props) => {
@@ -47,16 +44,13 @@ const Market = (_props: Props) => {
             <h2 style={styles.cardHeading}>Explore the market</h2>
             <p style={styles.cardText}>Select one of the options below to get started.</p>
             <div style={styles.list}>
-              {categories.map(({ name, description, icon: Icon }) => {
+              {categories.map(({ name, description }) => {
                 const isSelected = selectedCategory === name;
                 return (
                   <div key={name} style={styles.row}>
-                    <div style={styles.rowContentWithIcon}>
-                      <div style={styles.icon}><Icon size={22} /></div>
-                      <div style={styles.rowContent}>
-                        <p style={styles.label}>{name}</p>
-                        <p style={styles.description}>{description}</p>
-                      </div>
+                    <div>
+                      <p style={styles.label}>{name}</p>
+                      <p style={styles.description}>{description}</p>
                     </div>
                     <button type="button" style={{ ...styles.action, ...(isSelected ? { background: theme.success, borderColor: theme.success } : {}) }} onClick={() => setSelectedCategory(name)} aria-pressed={isSelected}>
                       {isSelected ? 'Selected' : 'Explore'}
