@@ -21,6 +21,36 @@ const symbolOptions: SymbolOption[] = [
 const payoutOptions = ['Manual', 'Automatic'];
 const percentageOptions = ['0.5', '1', '2', '3', '5', '10'];
 
+const fallbackTradingViewSymbols: Record<string, TradingViewResult[]> = {
+  stocks: [
+    { symbol: 'AAPL', description: 'Apple Inc.', exchange: 'NASDAQ', type: 'stock' },
+    { symbol: 'MSFT', description: 'Microsoft Corporation', exchange: 'NASDAQ', type: 'stock' },
+    { symbol: 'TSLA', description: 'Tesla, Inc.', exchange: 'NASDAQ', type: 'stock' },
+    { symbol: 'NVDA', description: 'NVIDIA Corporation', exchange: 'NASDAQ', type: 'stock' },
+  ],
+  funds: [
+    { symbol: 'SPY', description: 'SPDR S&P 500 ETF Trust', exchange: 'AMEX', type: 'fund' },
+    { symbol: 'QQQ', description: 'Invesco QQQ Trust', exchange: 'NASDAQ', type: 'fund' },
+    { symbol: 'VTI', description: 'Vanguard Total Stock Market ETF', exchange: 'AMEX', type: 'fund' },
+  ],
+  futures: [
+    { symbol: 'ES1!', description: 'E-mini S&P 500 Futures', exchange: 'CME_MINI', type: 'futures' },
+    { symbol: 'NQ1!', description: 'E-mini Nasdaq-100 Futures', exchange: 'CME_MINI', type: 'futures' },
+    { symbol: 'CL1!', description: 'Crude Oil Futures', exchange: 'NYMEX', type: 'futures' },
+  ],
+  forex: [
+    { symbol: 'EURUSD', description: 'Euro / U.S. Dollar', exchange: 'FX', type: 'forex' },
+    { symbol: 'GBPUSD', description: 'British Pound / U.S. Dollar', exchange: 'FX', type: 'forex' },
+    { symbol: 'USDJPY', description: 'U.S. Dollar / Japanese Yen', exchange: 'FX', type: 'forex' },
+  ],
+  crypto: [
+    { symbol: 'BTCUSDT', description: 'Bitcoin / TetherUS', exchange: 'BINANCE', type: 'crypto' },
+    { symbol: 'ETHUSDT', description: 'Ethereum / TetherUS', exchange: 'BINANCE', type: 'crypto' },
+    { symbol: 'SOLUSDT', description: 'Solana / TetherUS', exchange: 'BINANCE', type: 'crypto' },
+    { symbol: 'XRPUSDT', description: 'XRP / TetherUS', exchange: 'BINANCE', type: 'crypto' },
+  ],
+};
+
 type CustomSelectProps = { options: string[]; value: string; onChange: (value: string) => void; theme: typeof HYBRID_THEME_TOKENS.dark; formatOption?: (option: string) => string };
 
 const CustomSelect = ({ options, value, onChange, theme, formatOption = (option) => option }: CustomSelectProps) => {
@@ -52,7 +82,9 @@ const Creation = () => {
 
   const [tradingViewResults, setTradingViewResults] = useState<TradingViewResult[]>([]);
   const [searchingSymbols, setSearchingSymbols] = useState(false);
-  const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, font: 'inherit' };
+  const outerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass };
+  const innerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted };
+  const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' };
   const labelStyle: React.CSSProperties = { display: 'grid', gap: 7, color: theme.text, fontWeight: 750, fontSize: '0.85rem' };
 
   const createBot = async (event: React.FormEvent) => {
@@ -91,18 +123,22 @@ const Creation = () => {
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={16} /> Market</button>
         <section style={{ display: 'grid', gap: 10, marginTop: 18 }}><h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em' }}>Create a trading bot</h1><p style={{ margin: 0, maxWidth: '62ch', color: theme.textMuted, fontSize: '0.92rem', lineHeight: 1.7 }}>Configure the strategy settings for your new bot.</p></section>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 18, alignItems: 'start', marginTop: 18 }}>
-          <form onSubmit={createBot} style={{ display: 'grid', gap: 16, padding: 14, borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' }}>
+          <div style={outerCardStyle}>
+          <form onSubmit={createBot} style={innerCardStyle}>
             <label style={labelStyle}>Bot name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="My momentum bot" style={inputStyle} maxLength={80} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Bot ID</label><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input value={useAutomaticId ? '' : botId} onChange={(event) => setBotId(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={useAutomaticId} inputMode="numeric" placeholder={useAutomaticId ? 'Created automatically' : 'Six digits'} style={{ ...inputStyle, flex: 1 }} /><button type="button" onClick={() => setUseAutomaticId(!useAutomaticId)} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: useAutomaticId ? theme.primary : theme.surfaceMuted, color: useAutomaticId ? theme.textInverse : theme.text, cursor: 'pointer', whiteSpace: 'nowrap' }}>{useAutomaticId ? 'Auto' : 'Manual'}</button></div><small style={{ color: theme.textMuted }}>Choose Auto to have the backend create an unused unique six-digit number.</small></div>
             <label style={labelStyle}>Market category<CustomSelect options={symbolOptions.map((option) => option.value)} value={symbol} onChange={(value) => { setSymbol(value); setTradingViewResults([]); setSelectedTradingSymbol(''); }} theme={theme} formatOption={(value) => symbolOptions.find((option) => option.value === value)?.label || value} /></label>
-            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>TradingView symbol<Search size={15} /><input value={symbolSearch} onChange={(event) => setSymbolSearch(event.target.value)} placeholder={`Search ${selectedSymbol.label.toLowerCase()} symbols`} style={inputStyle} /></label><button type="button" disabled={searchingSymbols || !symbolSearch.trim()} onClick={async () => { setSearchingSymbols(true); try { const response = await api.get('/api/market/symbols', { params: { category: symbol, search: symbolSearch.trim() } }); setTradingViewResults(response.data?.symbols || response.data || []); } catch (requestError) { setError('Unable to load TradingView symbols. Please try again.'); } finally { setSearchingSymbols(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}>{searchingSymbols ? 'Searching…' : 'Search symbols'}</button>{tradingViewResults.length > 0 && <div style={{ display: 'grid', gap: 6 }}>{tradingViewResults.map((result) => <button key={`${result.exchange}:${result.symbol}`} type="button" onClick={() => setSelectedTradingSymbol(`${result.exchange}:${result.symbol}`)} style={{ textAlign: 'left', border: `1px solid ${selectedTradingSymbol === `${result.exchange}:${result.symbol}` ? theme.primary : theme.borderGlass}`, borderRadius: 9, padding: '9px 10px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><strong>{result.symbol}</strong><small style={{ display: 'block', color: theme.textMuted }}>{result.description || result.exchange} · {result.type}</small></button>)}</div>}<small style={{ color: theme.textMuted }}>Powered by the backend’s TradingView symbol catalog. Selected: {selectedTradingSymbol || 'None'}</small></div>
+            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>TradingView symbol<Search size={15} /><input value={symbolSearch} onChange={(event) => setSymbolSearch(event.target.value)} placeholder={`Search ${selectedSymbol.label.toLowerCase()} symbols`} style={inputStyle} /></label><button type="button" disabled={searchingSymbols || !symbolSearch.trim()} onClick={async () => { setSearchingSymbols(true); setError(''); const query = symbolSearch.trim().toLowerCase(); const fallbackResults = (fallbackTradingViewSymbols[symbol] || []).filter((result) => `${result.symbol} ${result.description} ${result.exchange}`.toLowerCase().includes(query)); try { const response = await api.get('/api/market/symbols', { params: { category: symbol, search: symbolSearch.trim() } }); const remoteResults = response.data?.symbols || response.data || []; setTradingViewResults(Array.isArray(remoteResults) && remoteResults.length > 0 ? remoteResults : fallbackResults); } catch { setTradingViewResults(fallbackResults); } finally { setSearchingSymbols(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}>{searchingSymbols ? 'Searching…' : 'Search symbols'}</button>{tradingViewResults.length > 0 && <div style={{ display: 'grid', gap: 6 }}>{tradingViewResults.map((result) => <button key={`${result.exchange}:${result.symbol}`} type="button" onClick={() => setSelectedTradingSymbol(`${result.exchange}:${result.symbol}`)} style={{ textAlign: 'left', border: `1px solid ${selectedTradingSymbol === `${result.exchange}:${result.symbol}` ? theme.primary : theme.borderGlass}`, borderRadius: 9, padding: '9px 10px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><strong>{result.symbol}</strong><small style={{ display: 'block', color: theme.textMuted }}>{result.description || result.exchange} · {result.type}</small></button>)}</div>}<small style={{ color: theme.textMuted }}>Powered by the backend’s TradingView symbol catalog. Selected: {selectedTradingSymbol || 'None'}</small></div>
             <label style={labelStyle}>Run duration (minutes)<input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="60" style={inputStyle} /></label>
             <label style={labelStyle}>Payout system<CustomSelect options={payoutOptions} value={payoutSystem} onChange={setPayoutSystem} theme={theme} /></label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}><label style={labelStyle}>Take profit<CustomSelect options={percentageOptions} value={takeProfit} onChange={setTakeProfit} theme={theme} formatOption={(option) => `${option}%`} /></label><label style={labelStyle}>Stop loss<CustomSelect options={percentageOptions} value={stopLoss} onChange={setStopLoss} theme={theme} formatOption={(option) => `${option}%`} /></label></div>
             {error && <p role="alert" style={{ margin: 0, color: theme.danger }}>{error}</p>}{message && <p role="status" style={{ margin: 0, color: theme.success }}>{message}</p>}
             <button type="submit" disabled={saving} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving ? 'wait' : 'pointer' }}>{saving ? 'Creating…' : 'Create bot'}</button>
           </form>
-          <aside style={{ display: 'grid', gap: 14 }}><section style={{ padding: 14, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}><div style={{ display: 'flex', gap: 8, alignItems: 'center', fontWeight: 800 }}><Info size={17} color={theme.primary} /> TradingView symbol selector</div><p style={{ color: theme.textMuted, fontSize: '0.83rem', lineHeight: 1.5, marginBottom: 0 }}>Choose a market category, search the available TradingView symbols, then select the exact instrument your bot should trade. No chart is shown on this page.</p></section><p style={{ display: 'flex', gap: 7, margin: 0, color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.4 }}><Info size={15} /> Selected category: {selectedSymbol.label}. Confirm the exchange and symbol before creating the bot.</p></aside>
+          </div>
+          <div style={outerCardStyle}>
+          <aside style={{ display: 'grid', gap: 10 }}><section style={innerCardStyle}><div style={{ display: 'flex', gap: 8, alignItems: 'center', fontWeight: 800 }}><Info size={17} color={theme.primary} /> TradingView symbol selector</div><p style={{ color: theme.textMuted, fontSize: '0.83rem', lineHeight: 1.5, marginBottom: 0 }}>Choose a market category, search the available TradingView symbols, then select the exact instrument your bot should trade. No chart is shown on this page.</p></section><div style={innerCardStyle}><p style={{ display: 'flex', gap: 7, margin: 0, color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.4 }}><Info size={15} /> Selected category: {selectedSymbol.label}. Confirm the exchange and symbol before creating the bot.</p></div></aside>
+          </div>
         </div>
       </div><NowBar />
     </main>

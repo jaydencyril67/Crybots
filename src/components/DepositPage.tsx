@@ -82,6 +82,16 @@ const DepositPage = () => {
       fontSize: '0.82rem',
       maxWidth: '58ch',
     },
+    outerCard: {
+      width: '100%',
+      boxSizing: 'border-box' as const,
+      padding: '10px',
+      borderRadius: '16px',
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      display: 'grid',
+      gap: '10px',
+    },
     mutedCard: {
       width: '100%',
       boxSizing: 'border-box' as const,
@@ -95,7 +105,7 @@ const DepositPage = () => {
       color: theme.textMuted,
     },
     label: { display: 'block', marginBottom: '6px', fontSize: '0.82rem', fontWeight: 700 },
-    input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '10px 12px', background: theme.surface, color: theme.text, fontSize: '0.9rem', outline: 'none' },
+    input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '10px 12px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.9rem', outline: 'none' },
     selectTrigger: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.border}`, borderRadius: '14px', padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', textAlign: 'left' as const },
     selectMenu: { display: 'grid', gap: '6px', padding: '8px', border: `1px solid ${theme.borderStrong}`, borderRadius: '16px', background: theme.surfaceElevated, position: 'absolute' as const, top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 10 },
     selectOption: { width: '100%', border: `1px solid ${theme.border}`, borderRadius: '12px', padding: '10px 12px', background: theme.surface, color: theme.text, cursor: 'pointer', textAlign: 'left' as const },
@@ -362,13 +372,18 @@ const DepositPage = () => {
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'completed' ? <NotificationBanner tone="success" title="Deposit confirmed" message="Your USDT deposit has been confirmed and your balance will reflect it shortly." /> : null}
           {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'pending' ? <NotificationBanner tone="info" title="Deposit awaiting confirmation" message="Send the requested amount to the address above. We will update this page when the network confirms it." /> : null}
-          <div style={styles.card}>
+          <div style={styles.outerCard}>
+            <div style={styles.card}>
             <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
               <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Deposit address</button>
               <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
             </div>
+            </div>
           </div>
+          <div style={styles.outerCard}>
           {cryptoContent}
+          </div>
+          <div style={styles.outerCard}>
           <div style={styles.mutedCard}>
             <strong>Recent deposits</strong>
             {recentLoading ? (
@@ -411,6 +426,7 @@ const DepositPage = () => {
                 })}
               </div>
             )}
+          </div>
           </div>
         </div>
         <NowBar />

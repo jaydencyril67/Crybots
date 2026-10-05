@@ -47,6 +47,16 @@ const baseStyles = {
     width: '100%',
     boxSizing: 'border-box' as const,
   },
+  card: {
+    display: 'grid',
+    gap: '10px',
+    width: '100%',
+    boxSizing: 'border-box' as const,
+    padding: '10px',
+    borderRadius: '16px',
+    border: `1px solid ${HYBRID_THEME_TOKENS.dark.borderGlass}`,
+    background: HYBRID_THEME_TOKENS.dark.surfaceGlass,
+  },
   section: {
     display: 'grid',
     width: '100%',
@@ -105,7 +115,7 @@ const WithdrawPage = () => {
     section: { ...baseStyles.section, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
     sectionText: { ...baseStyles.sectionText, color: theme.textMuted },
     label: { ...baseStyles.label, color: theme.textMuted },
-    input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text },
+    input: { ...baseStyles.input, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
     selectTrigger: { ...baseStyles.selectTrigger, border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text },
     selectMenu: { ...baseStyles.selectMenu, border: `1px solid ${theme.border}`, background: theme.surfaceMuted },
     selectOption: { ...baseStyles.selectOption, border: `1px solid ${theme.border}`, background: theme.surfaceGlass, color: theme.text },
@@ -250,6 +260,7 @@ const WithdrawPage = () => {
       <div style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
         <div style={styles.content}>
+          <div style={styles.card}>
           <section style={styles.section}>
             {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Withdrawal updated' : 'Please review your details'} message={message.text} /> : null}
             <h2 style={styles.sectionTitle}><Coins size={18} /> Withdraw USDT</h2>
@@ -299,17 +310,22 @@ const WithdrawPage = () => {
             </div>
             <p style={styles.sectionText}>Crypto balance: {loading ? <LoadingDots /> : `${balances.usdtBalance.toFixed(2)} USDT`}</p>
           </section>
+          </div>
 
+          <div style={styles.card}>
           <section style={styles.section}>
             <h2 style={styles.sectionTitle}><ShieldCheck size={18} /> Security code</h2>
             <p style={styles.sectionText}>Use the Settings page to set or change your security code. Withdrawals only work after it has been set.</p>
             <p style={styles.sectionText}>If you have not set a security code yet, go to Settings and set one before submitting a withdrawal.</p>
           </section>
+          </div>
 
+          <div style={styles.card}>
           <section style={styles.section}>
             <h2 style={styles.sectionTitle}><TimerReset size={18} /> Withdrawal method guide</h2>
             <p style={styles.sectionText}>Instant withdrawals submit immediately. Scheduled withdrawals are queued for the date and time you choose, giving you more control over when the transfer is processed.</p>
           </section>
+          </div>
         </div>
         <NowBar />
       </div>
