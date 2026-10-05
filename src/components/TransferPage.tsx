@@ -53,7 +53,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   panel: {
     display: 'grid',
     gap: '10px',
-    marginTop: '22px',
+    marginTop: '10px',
     width: '100%',
     boxSizing: 'border-box' as const,
     padding: '10px',
