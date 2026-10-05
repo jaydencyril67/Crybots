@@ -32,6 +32,7 @@ const RentalsPage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [showListingForm, setShowListingForm] = useState(false);
+  const [listingSaving, setListingSaving] = useState(false);
   const [listingBotId, setListingBotId] = useState('');
   const [listingPrice, setListingPrice] = useState('');
 
@@ -89,6 +90,7 @@ const RentalsPage = () => {
       setError('Choose a bot and enter a rental price greater than zero.');
       return;
     }
+    setListingSaving(true);
     try {
       await api.post('/api/rentals', { botId: listingBotId.trim(), rentalPrice: Number(listingPrice) });
       setMessage('Your bot is now listed in Rentals.');
@@ -98,6 +100,8 @@ const RentalsPage = () => {
       await loadRentals();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to list your bot. Please try again.');
+    } finally {
+      setListingSaving(false);
     }
   };
 
@@ -121,7 +125,7 @@ const RentalsPage = () => {
           {error && <NotificationBanner tone="error" title="Rentals unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Rentals updated" message={message} />}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, margin: '4px 0 14px' }}><button type="button" onClick={() => setShowListingForm((current) => !current)} style={buttonStyle} aria-expanded={showListingForm}><Plus size={16} /> List</button><button type="button" onClick={() => void loadRentals()} style={{ ...buttonStyle, background: theme.surfaceMuted, color: theme.text }}><RefreshCw size={16} /> Refresh</button></div>
           {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Available in Rentals</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map((bot) => renderBot(bot, true))}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots are listed yet. Be the first to list one.</p>}</section>}
-          {showListingForm && <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>List your bot</h3><label>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label>Rental price per period<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="10" style={inputStyle} /></label><button type="submit" style={buttonStyle}>Publish listing</button></form>}
+          {showListingForm && <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>List your bot</h3><label>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label>Rental price per period<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="10" style={inputStyle} /></label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish listing'}</button></form>}
         </section>
       </div><NowBar />
     </main>
