@@ -288,7 +288,7 @@ const parentRoutes = [
 const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/details', '/statistics', '/security', '/danger'] },
   { routes: ['/stats', '/tools', '/menu'] },
-  { routes: ['/trade/chart', '/market', '/trade/creation', '/trade/portfolio', '/trade/history'] },
+  { routes: ['/trade/chart', '/market', '/creation', '/trade/portfolio', '/trade/history'] },
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/faq', '/tickets', '/chat'] },
   { routes: ['/theme', '/nowbar', '/alert'] },
