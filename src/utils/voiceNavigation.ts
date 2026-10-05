@@ -5,6 +5,7 @@ export const VOICE_MODE_CHANGED_EVENT = 'nowbar-voice-mode-changed';
 export const VOICE_STATUS_EVENT = 'nowbar-voice-status-changed';
 export const VOICE_OUTPUT_EVENT = 'nowbar-voice-output-changed';
 export const NOWBAR_COMMAND_EVENT = 'nowbar-voice-command';
+export const VOICE_NAVIGATION_EVENT = 'nowbar-voice-navigation';
 
 export type VoiceCommand = { label: string; route: string };
 
@@ -318,6 +319,7 @@ export const navigateFromVoice = (transcript: string) => {
   );
 
   if (!command) return false;
+  window.dispatchEvent(new CustomEvent(VOICE_NAVIGATION_EVENT, { detail: { label: command.label, route: command.route } }));
   navigate(command.route);
   return true;
 };
