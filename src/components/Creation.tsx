@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronDown, Info, Search } from 'lucide-react';
+import { ArrowLeft, Bot, ChevronDown, Info, Search } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -11,6 +11,7 @@ import { useAppTheme } from './AppTheme';
 
 type SymbolOption = { value: string; label: string; tradingViewSymbol: string };
 type TradingViewResult = { symbol: string; description: string; exchange: string; type: string };
+type CreatedBot = { _id?: string; botId: string; name: string; symbol?: string; efficiency?: number; tradeDirection?: string; minTradeAmount?: number; maxTradeAmount?: number; };
 
 const symbolOptions: SymbolOption[] = [
   { value: 'stocks', label: 'Stocks', tradingViewSymbol: 'NASDAQ:AAPL' },
@@ -66,6 +67,10 @@ const CustomSelect = ({ options, value, onChange, theme, formatOption = (option)
 const Creation = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const [activeView, setActiveView] = useState<'create' | 'creation'>('create');
+  const [createdBots, setCreatedBots] = useState<CreatedBot[]>([]);
+  const [loadingCreatedBots, setLoadingCreatedBots] = useState(false);
+  const [createdBotsError, setCreatedBotsError] = useState('');
   const [name, setName] = useState('');
   const [botId, setBotId] = useState('');
   const [generatingBotId, setGeneratingBotId] = useState(false);
@@ -90,6 +95,24 @@ const Creation = () => {
   const innerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted };
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' };
   const labelStyle: React.CSSProperties = { display: 'grid', gap: 7, color: theme.text, fontWeight: 750, fontSize: '0.85rem' };
+
+  useEffect(() => {
+    if (activeView !== 'creation') return;
+    let active = true;
+    setLoadingCreatedBots(true);
+    setCreatedBotsError('');
+    api.get('/api/market/mine').then((response) => {
+      if (!active) return;
+      const data = response.data;
+      const bots = data?.bots || data || [];
+      setCreatedBots(Array.isArray(bots) ? bots : []);
+    }).catch((requestError: any) => {
+      if (active) setCreatedBotsError(requestError?.response?.data?.message || 'Unable to load your created bots. Please try again.');
+    }).finally(() => {
+      if (active) setLoadingCreatedBots(false);
+    });
+    return () => { active = false; };
+  }, [activeView]);
 
   useEffect(() => {
     if (!/^\d{6}$/.test(botId)) {
@@ -131,7 +154,7 @@ const Creation = () => {
 
     setSaving(true);
     try {
-      await api.post('/api/market', {
+      const response = await api.post('/api/market', {
         name: name.trim(),
         botId,
         symbolType: symbol,
@@ -143,6 +166,7 @@ const Creation = () => {
         maxTradeAmount: maximumTrade,
       });
       setMessage('Your trading bot was created successfully.');
+      if (response.data?.bot) setCreatedBots((current) => [response.data.bot, ...current]);
       setName(''); setBotId('');
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to create the trading bot. Please try again.');
@@ -150,11 +174,14 @@ const Creation = () => {
   };
 
   return <HybridTheme mode={themeMode}>
-    <Helmet><title>Create trading bot | KingsHall</title></Helmet>
+    <Helmet><title>Creation | KingsHall</title></Helmet>
     <main style={{ minHeight: '100vh', overflowX: 'hidden', background: theme.background, color: theme.text, paddingBottom: 90 }}>
       <div style={{ width: '100%', maxWidth: 920, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' }}>
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={16} /> Market</button>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 18, alignItems: 'start', marginTop: 18 }}>
+        <div style={{ display: 'flex', gap: 8, marginTop: 18, padding: 4, borderRadius: 12, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
+          {(['create', 'creation'] as const).map((view) => <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, border: 0, borderRadius: 9, padding: '10px 12px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, cursor: 'pointer' }}>{view === 'create' ? 'Create' : 'Creation'}</button>)}
+        </div>
+        {activeView === 'create' ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 18, alignItems: 'start', marginTop: 18 }}>
           <div style={outerCardStyle}>
           <form onSubmit={createBot} style={innerCardStyle}>
             <label style={labelStyle}>Bot name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="My momentum bot" style={inputStyle} maxLength={80} /></label>
@@ -172,7 +199,10 @@ const Creation = () => {
           <div style={outerCardStyle}>
           <aside style={{ display: 'grid', gap: 10 }}><section style={innerCardStyle}><div style={{ display: 'flex', gap: 8, alignItems: 'center', fontWeight: 800 }}><Info size={17} color={theme.primary} /> Trading symbol selector</div><p style={{ color: theme.textMuted, fontSize: '0.83rem', lineHeight: 1.5, marginBottom: 0 }}>Choose a market category, search the available trading symbols, then select the exact instrument your bot should trade. No chart is shown on this page.</p></section><div style={innerCardStyle}><p style={{ display: 'flex', gap: 7, margin: 0, color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.4 }}><Info size={15} /> Selected category: {selectedSymbol.label}. Confirm the exchange and symbol before creating the bot.</p></div></aside>
           </div>
-        </div>
+        </div> : <div style={{ display: 'grid', gap: 10, marginTop: 18 }}>
+          {createdBotsError && <NotificationBanner tone="error" title="Unable to load created bots" message={createdBotsError} />}
+          {loadingCreatedBots ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : createdBots.length ? createdBots.map((bot) => <article key={bot._id || bot.botId} style={{ ...innerCardStyle, display: 'grid', gap: 8 }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Bot size={20} color={theme.primary} /><div><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>{bot.name}</h3><small style={{ color: theme.textMuted }}>{bot.symbol || 'No symbol selected'} · Bot ID {bot.botId}</small></div></div><p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>Efficiency {bot.efficiency ?? 0}% · {bot.tradeDirection || 'long'} · {bot.minTradeAmount ?? 0}–{bot.maxTradeAmount ?? 0}</p></article>) : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>You have not created any bots yet.</p>}
+        </div>}
       </div><NowBar />
     </main>
   </HybridTheme>;
