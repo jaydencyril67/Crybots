@@ -91,6 +91,7 @@ const CommercePage = () => {
     try {
       await api.post('/api/commerce', { botId: listingBotId.trim(), price: Number(listingPrice) });
       setMessage('Your bot is now listed in Commerce.');
+      setError('');
       setListingBotId('');
       setListingPrice('');
       setActiveView('browse');
