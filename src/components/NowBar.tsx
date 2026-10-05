@@ -288,7 +288,7 @@ const parentRoutes = [
 const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/details', '/statistics', '/security', '/danger'] },
   { routes: ['/stats', '/tools', '/menu'] },
-  { routes: ['/trade/chart', '/trade/market', '/trade/portfolio', '/trade/history'] },
+  { routes: ['/chart', '/market', '/creation', '/portfolio', '/trade/history'] },
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/faq', '/tickets', '/chat'] },
   { routes: ['/theme', '/nowbar', '/alert'] },
@@ -340,9 +340,9 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/tools') return 'TOOLS';
   if (path === '/menu') return 'MENU';
   if (path === '/trade') return 'TRADE';
-  if (path === '/trade/chart') return 'CHART';
-  if (path === '/trade/market') return 'MARKET';
-  if (path === '/trade/portfolio') return 'PORTFOLIO';
+  if (path === '/chart') return 'CHART';
+  if (path === '/market') return 'MARKET';
+  if (path === '/portfolio') return 'PORTFOLIO';
   if (path === '/trade/history') return 'TRADE HISTORY';
   if (path === '/logs') return 'LOGS';
   if (path === '/help') return 'HELP';

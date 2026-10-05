@@ -50,7 +50,7 @@ const Market = () => {
                       <p style={styles.label}>{name}</p>
                       <p style={styles.description}>{description}</p>
                     </div>
-                    <button type="button" style={{ ...styles.action, ...(isSelected ? { background: theme.success, borderColor: theme.success } : {}) }} onClick={() => setSelectedCategory(name)} aria-pressed={isSelected}>
+                    <button type="button" style={{ ...styles.action, ...(isSelected ? { background: theme.success, borderColor: theme.success } : {}) }} onClick={() => { setSelectedCategory(name); if (name === 'Creation') navigate('/creation'); }} aria-pressed={isSelected}>
                       {isSelected ? 'Selected' : 'Explore'}
                     </button>
                   </div>
