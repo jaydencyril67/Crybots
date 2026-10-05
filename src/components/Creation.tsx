@@ -82,6 +82,8 @@ const Creation = () => {
 
   const [tradingViewResults, setTradingViewResults] = useState<TradingViewResult[]>([]);
   const [searchingSymbols, setSearchingSymbols] = useState(false);
+  const outerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass };
+  const innerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted };
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, font: 'inherit' };
   const labelStyle: React.CSSProperties = { display: 'grid', gap: 7, color: theme.text, fontWeight: 750, fontSize: '0.85rem' };
 
@@ -121,7 +123,8 @@ const Creation = () => {
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={16} /> Market</button>
         <section style={{ display: 'grid', gap: 10, marginTop: 18 }}><h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em' }}>Create a trading bot</h1><p style={{ margin: 0, maxWidth: '62ch', color: theme.textMuted, fontSize: '0.92rem', lineHeight: 1.7 }}>Configure the strategy settings for your new bot.</p></section>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 18, alignItems: 'start', marginTop: 18 }}>
-          <form onSubmit={createBot} style={{ display: 'grid', gap: 16, padding: 14, borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' }}>
+          <div style={outerCardStyle}>
+          <form onSubmit={createBot} style={innerCardStyle}>
             <label style={labelStyle}>Bot name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="My momentum bot" style={inputStyle} maxLength={80} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Bot ID</label><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input value={useAutomaticId ? '' : botId} onChange={(event) => setBotId(event.target.value.replace(/\D/g, '').slice(0, 6))} disabled={useAutomaticId} inputMode="numeric" placeholder={useAutomaticId ? 'Created automatically' : 'Six digits'} style={{ ...inputStyle, flex: 1 }} /><button type="button" onClick={() => setUseAutomaticId(!useAutomaticId)} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: useAutomaticId ? theme.primary : theme.surfaceMuted, color: useAutomaticId ? theme.textInverse : theme.text, cursor: 'pointer', whiteSpace: 'nowrap' }}>{useAutomaticId ? 'Auto' : 'Manual'}</button></div><small style={{ color: theme.textMuted }}>Choose Auto to have the backend create an unused unique six-digit number.</small></div>
             <label style={labelStyle}>Market category<CustomSelect options={symbolOptions.map((option) => option.value)} value={symbol} onChange={(value) => { setSymbol(value); setTradingViewResults([]); setSelectedTradingSymbol(''); }} theme={theme} formatOption={(value) => symbolOptions.find((option) => option.value === value)?.label || value} /></label>
@@ -132,7 +135,10 @@ const Creation = () => {
             {error && <p role="alert" style={{ margin: 0, color: theme.danger }}>{error}</p>}{message && <p role="status" style={{ margin: 0, color: theme.success }}>{message}</p>}
             <button type="submit" disabled={saving} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving ? 'wait' : 'pointer' }}>{saving ? 'Creating…' : 'Create bot'}</button>
           </form>
-          <aside style={{ display: 'grid', gap: 14 }}><section style={{ padding: 14, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}><div style={{ display: 'flex', gap: 8, alignItems: 'center', fontWeight: 800 }}><Info size={17} color={theme.primary} /> TradingView symbol selector</div><p style={{ color: theme.textMuted, fontSize: '0.83rem', lineHeight: 1.5, marginBottom: 0 }}>Choose a market category, search the available TradingView symbols, then select the exact instrument your bot should trade. No chart is shown on this page.</p></section><p style={{ display: 'flex', gap: 7, margin: 0, color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.4 }}><Info size={15} /> Selected category: {selectedSymbol.label}. Confirm the exchange and symbol before creating the bot.</p></aside>
+          </div>
+          <div style={outerCardStyle}>
+          <aside style={{ display: 'grid', gap: 10 }}><section style={innerCardStyle}><div style={{ display: 'flex', gap: 8, alignItems: 'center', fontWeight: 800 }}><Info size={17} color={theme.primary} /> TradingView symbol selector</div><p style={{ color: theme.textMuted, fontSize: '0.83rem', lineHeight: 1.5, marginBottom: 0 }}>Choose a market category, search the available TradingView symbols, then select the exact instrument your bot should trade. No chart is shown on this page.</p></section><div style={innerCardStyle}><p style={{ display: 'flex', gap: 7, margin: 0, color: theme.textMuted, fontSize: '0.76rem', lineHeight: 1.4 }}><Info size={15} /> Selected category: {selectedSymbol.label}. Confirm the exchange and symbol before creating the bot.</p></div></aside>
+          </div>
         </div>
       </div><NowBar />
     </main>
