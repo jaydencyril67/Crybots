@@ -42,18 +42,25 @@ const RentalsPage = () => {
   const loadRentals = async () => {
     setLoading(true);
     setError('');
-    try {
-      const [availableResponse, mineResponse] = await Promise.all([
-        api.get('/api/rentals'),
-        api.get('/api/rentals/mine'),
-      ]);
-      setAvailableBots(availableResponse.data?.bots || availableResponse.data || []);
-      setMyBots(mineResponse.data?.bots || mineResponse.data || []);
-    } catch (requestError: any) {
-      setError(requestError?.response?.data?.message || 'Unable to load Rentals right now. Please try again.');
-    } finally {
-      setLoading(false);
+
+    const [availableResult, mineResult] = await Promise.allSettled([
+      api.get('/api/rentals'),
+      api.get('/api/rentals/mine'),
+    ]);
+
+    if (availableResult.status === 'fulfilled') {
+      const data = availableResult.value.data;
+      setAvailableBots(data?.bots || data || []);
+    } else {
+      setError(availableResult.reason?.response?.data?.message || 'Unable to load Rentals right now. Please try again.');
     }
+
+    if (mineResult.status === 'fulfilled') {
+      const data = mineResult.value.data;
+      setMyBots(data?.bots || data || []);
+    }
+
+    setLoading(false);
   };
 
   useEffect(() => { void loadRentals(); }, []);
@@ -106,14 +113,16 @@ const RentalsPage = () => {
 
   return <HybridTheme mode={themeMode}>
     <Helmet><title>Rentals | KingsHall</title></Helmet>
-    <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 90 }}>
-      <div style={{ width: '100%', maxWidth: 1050, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
-        <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Market</button>
-        <header style={{ margin: '24px 0' }}><h1 style={{ margin: 0, fontSize: 'clamp(1.7rem, 4vw, 2.4rem)' }}>Rentals</h1><p style={{ color: theme.textMuted, lineHeight: 1.6, maxWidth: 650 }}>Rent bots created by the community, or list your own bots so other users can rent them.</p></header>
-        {error && <NotificationBanner tone="error" title="Rentals unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Rentals updated" message={message} />}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 14 }}><button type="button" onClick={() => setShowListingForm((current) => !current)} style={buttonStyle}><Plus size={16} /> List a bot</button><button type="button" onClick={() => void loadRentals()} style={{ ...buttonStyle, background: theme.surfaceMuted, color: theme.text }}><RefreshCw size={16} /> Refresh</button></div>
-        {showListingForm && <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginBottom: 18 }}><h2 style={{ margin: 0, fontSize: '1.1rem' }}>List your bot</h2><label>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label>Rental price per period<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="10" style={inputStyle} /></label><button type="submit" style={buttonStyle}>Publish listing</button></form>}
-        {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : <div style={{ display: 'grid', gap: 24 }}><section><h2>Available in Rentals</h2>{availableBots.length ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 14 }}>{availableBots.map((bot) => renderBot(bot, true))}</div> : <p style={{ color: theme.textMuted }}>No bots are listed yet. Be the first to list one.</p>}</section><section><h2>Your bot listings</h2>{myBots.length ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 14 }}>{myBots.map((bot) => renderBot(bot, false))}</div> : <p style={{ color: theme.textMuted }}>Your created bots will appear here when you list them.</p>}</section></div>}
+    <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' }}>
+      <div style={{ width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
+        <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Market</button>
+        <section style={{ marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
+          <div style={{ padding: '3px 4px 10px' }}><h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 850 }}>Rentals</h2><p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 }}>Rent bots created by the community, or list your own bots so other users can rent them.</p></div>
+          {error && <NotificationBanner tone="error" title="Rentals unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Rentals updated" message={message} />}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, margin: '4px 0 14px' }}><button type="button" onClick={() => setShowListingForm((current) => !current)} style={buttonStyle}><Plus size={16} /> List a bot</button><button type="button" onClick={() => void loadRentals()} style={{ ...buttonStyle, background: theme.surfaceMuted, color: theme.text }}><RefreshCw size={16} /> Refresh</button></div>
+          {showListingForm && <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginBottom: 18 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>List your bot</h3><label>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label>Rental price per period<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="10" style={inputStyle} /></label><button type="submit" style={buttonStyle}>Publish listing</button></form>}
+          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : <div style={{ display: 'grid', gap: 18 }}><section><h3 style={{ margin: 0, fontSize: '1rem' }}>Available in Rentals</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map((bot) => renderBot(bot, true))}</div> : <p style={{ color: theme.textMuted }}>No bots are listed yet. Be the first to list one.</p>}</section><section><h3 style={{ margin: 0, fontSize: '1rem' }}>Your bot listings</h3>{myBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{myBots.map((bot) => renderBot(bot, false))}</div> : <p style={{ color: theme.textMuted }}>Your created bots will appear here when you list them.</p>}</section></div>}
+        </section>
       </div><NowBar />
     </main>
   </HybridTheme>;
