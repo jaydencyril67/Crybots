@@ -23,6 +23,8 @@ type RentalBot = {
   rentalExpiresAt?: string;
   price?: number;
   ownerName?: string;
+  ownerId?: string;
+  isOwner?: boolean;
 };
 
 const RentalsPage = () => {
@@ -84,6 +86,20 @@ const RentalsPage = () => {
     }
   };
 
+  const unlistBot = async (bot: RentalBot) => {
+    const botId = bot.botId || '';
+    if (!botId) return;
+    setError('');
+    setMessage('');
+    try {
+      const response = await api.post(`/api/rentals/${botId}/unlist`);
+      setMessage(response.data?.message || 'Your bot has been unlisted from Rentals.');
+      await loadRentals();
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to unlist this bot from Rentals. Please try again.');
+    }
+  };
+
   const listBot = async (event: React.FormEvent) => {
     event.preventDefault();
     setError('');
@@ -115,7 +131,7 @@ const RentalsPage = () => {
     return <article key={botId} style={{ ...cardStyle, display: 'grid', gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Bot size={20} color={theme.primary} /><div><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>{bot.name}</h3><small style={{ color: theme.textMuted, fontSize: '0.78rem' }}>{bot.symbol || 'Flexible strategy'}{bot.ownerName ? ` · Listed by ${bot.ownerName}` : ''}</small></div></div>
       <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.45 }}>{bot.description || 'A community-created bot available through Rentals.'}</p>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}><strong style={{ fontSize: '0.86rem' }}>{price !== undefined ? `${price} · ${duration || 'period'}` : 'Price set by owner'}</strong>{showRentButton && <button type="button" disabled={rentingId === botId} onClick={() => void rentBot(bot)} style={buttonStyle}>{rentingId === botId ? <InlineLoadingDots /> : 'Rent bot'}</button>}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}><strong style={{ fontSize: '0.86rem' }}>{price !== undefined ? `${price} · ${duration || 'period'}` : 'Price set by owner'}</strong>{bot.isOwner ? <button type="button" onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}` }}>Unlist</button> : showRentButton && <button type="button" disabled={rentingId === botId} onClick={() => void rentBot(bot)} style={buttonStyle}>{rentingId === botId ? <InlineLoadingDots /> : 'Rent bot'}</button>}</div>
     </article>;
   };
 
