@@ -360,7 +360,6 @@ const SecurityPage = () => {
   const [loading, setLoading] = useState(true);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [maxActiveSessions, setMaxActiveSessions] = useState(2);
-  const [maxSessionsMenuOpen, setMaxSessionsMenuOpen] = useState(false);
   const [savingMaxSessions, setSavingMaxSessions] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -815,13 +814,10 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{sessionsLoading ? <LoadingDots /> : `${currentLoginCount} active device${currentLoginCount === 1 ? '' : 's'} • max ${maxActiveSessions} per account`}</p>
                 <div className="security-control" style={styles.control}>
                   <label style={styles.note} htmlFor="max-active-sessions">Maximum active sessions</label>
-                  <div style={{ position: 'relative' as const }}>
-                    <button id="max-active-sessions" type="button" style={{ ...styles.selectTrigger, cursor: savingMaxSessions ? 'not-allowed' : 'pointer', opacity: savingMaxSessions ? 0.65 : 1 }} onClick={() => setMaxSessionsMenuOpen((current) => !current)} disabled={savingMaxSessions} aria-expanded={maxSessionsMenuOpen}>
-                      <span>{maxActiveSessions} device{maxActiveSessions === 1 ? '' : 's'}</span><span>▾</span>
-                    </button>
-                    {maxSessionsMenuOpen ? <div style={styles.selectMenu}>
-                      {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => <button key={value} type="button" style={{ ...styles.selectOption, background: value === maxActiveSessions ? theme.primarySoft : theme.highlightSoft }} onClick={() => { setMaxActiveSessions(value); setMaxSessionsMenuOpen(false); }}>{value} device{value === 1 ? '' : 's'}</button>)}
-                    </div> : null}
+                  <div style={{ display: 'grid', gap: 8 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: theme.text, fontWeight: 700 }}><span>{maxActiveSessions} device{maxActiveSessions === 1 ? '' : 's'}</span><span style={{ color: theme.textMuted, fontSize: '0.8rem' }}>1–10</span></div>
+                    <input id="max-active-sessions" type="range" min="1" max="10" step="1" value={maxActiveSessions} onChange={(event) => setMaxActiveSessions(Number(event.target.value))} disabled={savingMaxSessions} aria-label="Maximum active sessions" style={{ width: '100%', accentColor: theme.primary, cursor: savingMaxSessions ? 'not-allowed' : 'grab', opacity: savingMaxSessions ? 0.65 : 1 }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}>{Array.from({ length: 10 }, (_, index) => <span key={index + 1}>{index + 1}</span>)}</div>
                   </div>
                   <button type="button" style={styles.button} onClick={() => void handleMaxSessionsSave()} disabled={savingMaxSessions}>{savingMaxSessions ? <InlineLoadingDots /> : 'Save session limit'}</button>
                 </div>
