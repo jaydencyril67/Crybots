@@ -29,6 +29,7 @@ const CommercePage = () => {
   const [availableBots, setAvailableBots] = useState<CommerceBot[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState('');
+  const [unlistingId, setUnlistingId] = useState('');
   const [listingSaving, setListingSaving] = useState(false);
   const [listingBotId, setListingBotId] = useState('');
   const [listingPrice, setListingPrice] = useState('');
@@ -78,6 +79,7 @@ const CommercePage = () => {
   const unlistBot = async (bot: CommerceBot) => {
     const botId = bot.botId || '';
     if (!botId) return;
+    setUnlistingId(botId);
     setError('');
     setMessage('');
     try {
@@ -86,6 +88,8 @@ const CommercePage = () => {
       await loadCommerce();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to unlist this bot from Commerce. Please try again.');
+    } finally {
+      setUnlistingId('');
     }
   };
 
@@ -118,7 +122,7 @@ const CommercePage = () => {
     return <article key={botId} style={{ ...cardStyle, display: 'grid', gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Bot size={20} color={theme.primary} /><div><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>{bot.name}</h3><small style={{ color: theme.textMuted, fontSize: '0.78rem' }}>{bot.symbol || 'Flexible strategy'}{bot.sellerName ? ` · Listed by ${bot.sellerName}` : ''}</small></div></div>
       <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>Permanent ownership · Efficiency {bot.efficiency ?? 0}% · Bot ID {bot.botId || 'Unavailable'}</p>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}><strong style={{ fontSize: '0.86rem' }}>{bot.price !== undefined ? `${bot.price} USDT` : 'Price unavailable'}</strong>{bot.isOwner ? <button type="button" onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}` }}>Unlist</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={buttonStyle}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}><strong style={{ fontSize: '0.86rem' }}>{bot.price !== undefined ? `${bot.price} USDT` : 'Price unavailable'}</strong>{bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={buttonStyle}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}</div>
     </article>;
   };
 
