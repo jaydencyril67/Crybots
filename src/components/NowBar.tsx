@@ -483,25 +483,19 @@ const createDefaultActions = (): NowBarAction[] => [
   },
 ];
 
-const NOWBAR_POSITION_STORAGE_KEY = 'kingshall-nowbar-position';
+const NOWBAR_ACTION_STORAGE_KEY = 'kingshall-nowbar-action';
 
-type NowBarPosition = { left: number; top: number };
-
-const readNowBarPosition = (): NowBarPosition => {
+const readNowBarAction = () => {
   try {
-    const stored = window.localStorage.getItem(NOWBAR_POSITION_STORAGE_KEY);
-    if (!stored) return { left: 0, top: 0 };
-    const parsed = JSON.parse(stored) as Partial<NowBarPosition>;
-    return { left: Number(parsed.left) || 0, top: Number(parsed.top) || 0 };
+    return window.localStorage.getItem(NOWBAR_ACTION_STORAGE_KEY);
   } catch {
-    return { left: 0, top: 0 };
+    return null;
   }
 };
 
-const saveNowBarPosition = (bar: HTMLDivElement | null) => {
-  if (!bar) return;
+const saveNowBarAction = (label: string) => {
   try {
-    window.localStorage.setItem(NOWBAR_POSITION_STORAGE_KEY, JSON.stringify({ left: bar.scrollLeft, top: bar.scrollTop }));
+    window.localStorage.setItem(NOWBAR_ACTION_STORAGE_KEY, label);
   } catch {
     // Ignore storage failures; the NowBar should remain usable without persistence.
   }
@@ -547,7 +541,6 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
 
   useEffect(() => {
     const syncPath = () => {
-      saveNowBarPosition(barRef.current);
       setCurrentPath(getActivePath());
       setView('title');
       setMode('compact');
@@ -624,20 +617,25 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
   }, []);
 
   useEffect(() => {
-    const restorePosition = () => {
-      const position = readNowBarPosition();
-      if (!barRef.current) return;
-      barRef.current.scrollLeft = position.left;
-      barRef.current.scrollTop = position.top;
-    };
-    restorePosition();
-    const frame = window.requestAnimationFrame(restorePosition);
-    return () => window.cancelAnimationFrame(frame);
-  }, [isExpanded]);
+    if (isExpanded || view !== 'actions') return;
+    const targetLabel = readNowBarAction();
+    if (!targetLabel || !barRef.current) return;
 
-  useEffect(() => () => {
-    saveNowBarPosition(barRef.current);
-  }, []);
+    const target = Array.from(barRef.current.querySelectorAll<HTMLButtonElement>('button[aria-label]'))
+      .find((button) => button.getAttribute('aria-label') === targetLabel);
+    if (!target) return;
+
+    const centerTarget = () => {
+      if (!barRef.current) return;
+      const maxScrollLeft = barRef.current.scrollWidth - barRef.current.clientWidth;
+      const nextScrollLeft = target.offsetLeft - (barRef.current.clientWidth - target.offsetWidth) / 2;
+      barRef.current.scrollLeft = Math.max(0, Math.min(nextScrollLeft, maxScrollLeft));
+    };
+
+    centerTarget();
+    const frame = window.requestAnimationFrame(centerTarget);
+    return () => window.cancelAnimationFrame(frame);
+  }, [currentPath, isExpanded, resolvedActions, view]);
 
   useEffect(() => () => {
     if (holdTimer) {
@@ -755,7 +753,6 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
           ...(isExpanded ? styles.barExpanded : {}),
         }}
         data-nowbar-edge-light={edgeLight.enabled ? edgeLight.mode : undefined}
-        onScroll={() => saveNowBarPosition(barRef.current)}
         data-nowbar-control
         role="button"
         tabIndex={0}
@@ -806,7 +803,10 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                 type="button"
                 aria-label={action.label}
                 data-nowbar-control
-                onClick={action.onClick}
+                onClick={() => {
+                  if (!isExpanded) saveNowBarAction(action.label);
+                  action.onClick();
+                }}
                 style={{
                   ...styles.button,
                   ...(buttonColorEnabled ? { borderColor: buttonColor } : {}),
