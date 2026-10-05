@@ -66,17 +66,6 @@ const RentalsPage = () => {
 
   useEffect(() => {
     void loadRentals();
-
-    const refreshWhenVisible = () => {
-      if (document.visibilityState === 'visible') void loadRentals();
-    };
-
-    window.addEventListener('focus', refreshWhenVisible);
-    document.addEventListener('visibilitychange', refreshWhenVisible);
-    return () => {
-      window.removeEventListener('focus', refreshWhenVisible);
-      document.removeEventListener('visibilitychange', refreshWhenVisible);
-    };
   }, []);
 
   const rentBot = async (bot: RentalBot) => {
@@ -88,7 +77,7 @@ const RentalsPage = () => {
     try {
       await api.post(`/api/rentals/${botId}/rent`);
       setMessage(`${bot.name} has been added to your Rentals.`);
-      await loadRentals();
+      setAvailableBots((current) => current.filter((availableBot) => (availableBot.botId || availableBot._id || availableBot.id) !== botId));
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to rent this bot. Please try again.');
     } finally {
@@ -111,7 +100,6 @@ const RentalsPage = () => {
       setListingBotId('');
       setListingPrice('');
       setShowListingForm(false);
-      await loadRentals();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to list your bot. Please try again.');
     } finally {
@@ -138,7 +126,7 @@ const RentalsPage = () => {
           <div style={{ padding: '3px 4px 10px' }}><h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 850 }}>Rentals</h2><p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.4 }}>Rent community bots or list your own bot for others.</p></div>
           {error && <NotificationBanner tone="error" title="Rentals unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Rentals updated" message={message} />}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, margin: '4px 0 14px' }}><button type="button" onClick={() => setShowListingForm((current) => !current)} style={buttonStyle} aria-expanded={showListingForm}><Plus size={16} /> List</button></div>
-          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Available in Rentals</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map((bot) => renderBot(bot, true))}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots are listed yet. Be the first to list one.</p>}</section>}
+          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : <><section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Available in Rentals</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map((bot) => renderBot(bot, true))}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots from other users are listed yet.</p>}</section>{myBots.length > 0 && <section style={{ marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Your listings</h3><div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{myBots.map((bot) => renderBot(bot, false))}</div></section>}</>}
           {showListingForm && <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>List your bot</h3><label>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label>Rental price per period<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="10" style={inputStyle} /></label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish listing'}</button></form>}
         </section>
       </div><NowBar />
