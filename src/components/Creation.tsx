@@ -74,6 +74,7 @@ const Creation = () => {
   const [selectedTradingSymbol, setSelectedTradingSymbol] = useState(selectedSymbol.tradingViewSymbol);
   const [duration, setDuration] = useState('');
   const [payoutSystem, setPayoutSystem] = useState('Manual');
+  const [tradeDirection, setTradeDirection] = useState('Long');
   const [takeProfit, setTakeProfit] = useState('2');
   const [stopLoss, setStopLoss] = useState('1');
   const [minTradeAmount, setMinTradeAmount] = useState('');
@@ -112,6 +113,7 @@ const Creation = () => {
         symbol: selectedTradingSymbol,
         runDuration: Number(duration),
         payoutSystem: payoutSystem.toLowerCase(),
+        tradeDirection: tradeDirection.toLowerCase(),
         takeProfitPercent: Number(takeProfit),
         stopLossPercent: Number(stopLoss),
         minTradeAmount: minimumTrade,
@@ -140,6 +142,7 @@ const Creation = () => {
             <label style={labelStyle}>Run duration (minutes)<input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="60" style={inputStyle} /></label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}><label style={labelStyle}>Min trade amount<input type="number" min="0.01" step="0.01" value={minTradeAmount} onChange={(event) => setMinTradeAmount(event.target.value)} placeholder="10" style={inputStyle} /></label><label style={labelStyle}>Max trade amount<input type="number" min="0.01" step="0.01" value={maxTradeAmount} onChange={(event) => setMaxTradeAmount(event.target.value)} placeholder="100" style={inputStyle} /></label></div>
             <label style={labelStyle}>Payout system<CustomSelect options={payoutOptions} value={payoutSystem} onChange={setPayoutSystem} theme={theme} /></label>
+            <label style={labelStyle}>Trade direction<CustomSelect options={['Long', 'Short']} value={tradeDirection} onChange={setTradeDirection} theme={theme} /></label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}><label style={labelStyle}>Take profit<CustomSelect options={percentageOptions} value={takeProfit} onChange={setTakeProfit} theme={theme} formatOption={(option) => `${option}%`} /></label><label style={labelStyle}>Stop loss<CustomSelect options={percentageOptions} value={stopLoss} onChange={setStopLoss} theme={theme} formatOption={(option) => `${option}%`} /></label></div>
             {error && <p role="alert" style={{ margin: 0, color: theme.danger }}>{error}</p>}{message && <p role="status" style={{ margin: 0, color: theme.success }}>{message}</p>}
             <button type="submit" disabled={saving} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving ? 'wait' : 'pointer' }}>{saving ? 'Creating…' : 'Create bot'}</button>
