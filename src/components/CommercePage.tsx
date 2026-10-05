@@ -66,15 +66,6 @@ const CommercePage = () => {
 
   useEffect(() => {
     void loadCommerce();
-    const refreshWhenVisible = () => {
-      if (document.visibilityState === 'visible') void loadCommerce();
-    };
-    window.addEventListener('focus', refreshWhenVisible);
-    document.addEventListener('visibilitychange', refreshWhenVisible);
-    return () => {
-      window.removeEventListener('focus', refreshWhenVisible);
-      document.removeEventListener('visibilitychange', refreshWhenVisible);
-    };
   }, []);
 
   const buyBot = async (bot: CommerceBot) => {
