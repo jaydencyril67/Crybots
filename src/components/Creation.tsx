@@ -74,7 +74,7 @@ const Creation = () => {
   const [symbol, setSymbol] = useState('crypto');
   const selectedSymbol = symbolOptions.find((option) => option.value === symbol) || symbolOptions[0];
   const [symbolSearch, setSymbolSearch] = useState('');
-  const [selectedTradingSymbol, setSelectedTradingSymbol] = useState(selectedSymbol.tradingViewSymbol);
+  const [selectedTradingSymbol, setSelectedTradingSymbol] = useState('');
   const [payoutSystem, setPayoutSystem] = useState('Manual');
   const [tradeDirection, setTradeDirection] = useState('Long');
   const [efficiency, setEfficiency] = useState(50);
