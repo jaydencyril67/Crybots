@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Bot, Plus } from 'lucide-react';
+import { ArrowLeft, Bot } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -25,13 +25,13 @@ type RentalBot = {
 const RentalsPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const [activeView, setActiveView] = useState<'browse' | 'list'>('browse');
   const [availableBots, setAvailableBots] = useState<RentalBot[]>([]);
   const [myBots, setMyBots] = useState<RentalBot[]>([]);
   const [loading, setLoading] = useState(true);
   const [rentingId, setRentingId] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [showListingForm, setShowListingForm] = useState(false);
   const [listingSaving, setListingSaving] = useState(false);
   const [listingBotId, setListingBotId] = useState('');
   const [listingPrice, setListingPrice] = useState('');
@@ -124,10 +124,11 @@ const RentalsPage = () => {
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Market</button>
         <section style={{ marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
           <div style={{ padding: '3px 4px 10px' }}><h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 850 }}>Rentals</h2><p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.4 }}>Rent community bots or list your own bot for others.</p></div>
+          <div style={{ display: 'flex', gap: 8, margin: '4px 0 14px', padding: 4, borderRadius: 12, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
+            {(['browse', 'list'] as const).map((view) => <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, border: 0, borderRadius: 10, padding: '7px 10px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, cursor: 'pointer' }}>{view === 'browse' ? 'Browse' : 'List'}</button>)}
+          </div>
           {error && <NotificationBanner tone="error" title="Rentals unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Rentals updated" message={message} />}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, margin: '4px 0 14px' }}><button type="button" onClick={() => setShowListingForm((current) => !current)} style={buttonStyle} aria-expanded={showListingForm}><Plus size={16} /> List</button></div>
-          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : <><section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Available in Rentals</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map((bot) => renderBot(bot, true))}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots from other users are listed yet.</p>}</section>{myBots.length > 0 && <section style={{ marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Your listings</h3><div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{myBots.map((bot) => renderBot(bot, false))}</div></section>}</>}
-          {showListingForm && <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>List your bot</h3><label>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label>Rental price per period<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="10" style={inputStyle} /></label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish listing'}</button></form>}
+          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : activeView === 'browse' ? <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Available in Rentals</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map((bot) => renderBot(bot, true))}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots from other users are listed yet.</p>}</section> : <>{myBots.length > 0 && <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Your listings</h3><div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{myBots.map((bot) => renderBot(bot, false))}</div></section>}<form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>List your bot</h3><label>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label>Rental price per period<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="10" style={inputStyle} /></label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish listing'}</button></form></>}
         </section>
       </div><NowBar />
     </main>

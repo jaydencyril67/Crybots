@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Bot, Plus } from 'lucide-react';
+import { ArrowLeft, Bot } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -23,13 +23,13 @@ type CommerceBot = {
 const CommercePage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
+  const [activeView, setActiveView] = useState<'browse' | 'sell'>('browse');
   const [availableBots, setAvailableBots] = useState<CommerceBot[]>([]);
   const [myBots, setMyBots] = useState<CommerceBot[]>([]);
   const [myListings, setMyListings] = useState<CommerceBot[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState('');
   const [listingSaving, setListingSaving] = useState(false);
-  const [showListingForm, setShowListingForm] = useState(false);
   const [listingBotId, setListingBotId] = useState('');
   const [listingPrice, setListingPrice] = useState('');
   const [message, setMessage] = useState('');
@@ -133,11 +133,11 @@ const CommercePage = () => {
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Market</button>
         <section style={{ marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
           <div style={{ padding: '3px 4px 10px' }}><h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 850 }}>Commerce</h2><p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.4 }}>Buy bots with your USDT balance or sell bots you own. Ownership is permanent until sold.</p></div>
+          <div style={{ display: 'flex', gap: 8, margin: '4px 0 14px', padding: 4, borderRadius: 12, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
+            {(['browse', 'sell'] as const).map((view) => <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, border: 0, borderRadius: 10, padding: '7px 10px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, cursor: 'pointer' }}>{view === 'browse' ? 'Browse' : 'Sell'}</button>)}
+          </div>
           {error && <NotificationBanner tone="error" title="Commerce unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Commerce updated" message={message} />}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '4px 0 14px' }}><button type="button" onClick={() => setShowListingForm((current) => !current)} style={buttonStyle} aria-expanded={showListingForm}><Plus size={16} /> Sell</button></div>
-          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Bots available to buy</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map(renderBot)}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots are listed for sale yet.</p>}</section>}
-          {showListingForm && <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12, marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>Sell your bot</h3><p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>You keep ownership until another user buys the bot. Sale proceeds are credited to your USDT balance.</p><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Bot ID<select value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} style={inputStyle}><option value="">Choose one of your created bots</option>{myBots.filter((bot) => bot.botId && !myListings.some((listing) => listing.botId === bot.botId && listing.active)).map((bot) => <option key={bot.botId} value={bot.botId}>{bot.name} · {bot.botId}</option>)}</select></label><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Sale price in USDT<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="50" style={inputStyle} /></label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish sale listing'}</button></form>}
-          {myListings.length > 0 && <section style={{ marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Your Commerce listings</h3><div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{myListings.map((bot) => <div key={bot.botId} style={cardStyle}><strong style={{ fontSize: '0.86rem' }}>{bot.name}</strong><p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: '0.82rem' }}>{bot.price} USDT · {bot.active ? 'Listed for sale' : 'Sold'}</p></div>)}</div></section>}
+          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : activeView === 'browse' ? <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Bots available to buy</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map(renderBot)}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots are listed for sale yet.</p>}</section> : <><form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>Sell your bot</h3><p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>You keep ownership until another user buys the bot. Sale proceeds are credited to your USDT balance.</p><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Bot ID<select value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} style={inputStyle}><option value="">Choose one of your created bots</option>{myBots.filter((bot) => bot.botId && !myListings.some((listing) => listing.botId === bot.botId && listing.active)).map((bot) => <option key={bot.botId} value={bot.botId}>{bot.name} · {bot.botId}</option>)}</select></label><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Sale price in USDT<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="50" style={inputStyle} /></label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish sale listing'}</button></form>{myListings.length > 0 && <section style={{ marginTop: 18 }}><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Your Commerce listings</h3><div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{myListings.map((bot) => <div key={bot.botId} style={cardStyle}><strong style={{ fontSize: '0.86rem' }}>{bot.name}</strong><p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: '0.82rem' }}>{bot.price} USDT · {bot.active ? 'Listed for sale' : 'Sold'}</p></div>)}</div></section>}</>}
         </section>
       </div><NowBar />
     </main>
