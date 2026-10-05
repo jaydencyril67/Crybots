@@ -558,7 +558,7 @@ const HomePage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
 
-          <div style={styles.dashboardFrame}>
+          <>
             <div style={styles.heroGrid}>
             <section style={styles.heroCard}>
               <p style={styles.greeting}>{greeting}</p>
@@ -706,7 +706,7 @@ const HomePage = () => {
             </section>
 
             </div>
-          </div>
+          </>
         </div>
         <NowBar />
       </main>
