@@ -112,6 +112,7 @@ const WithdrawPage = () => {
     },
     back: { ...baseStyles.back, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text },
     content: { ...baseStyles.content, border: 'none', background: 'transparent' },
+    card: { ...baseStyles.card, margin: '10px auto 0', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
     section: { ...baseStyles.section, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
     sectionText: { ...baseStyles.sectionText, color: theme.textMuted },
     label: { ...baseStyles.label, color: theme.textMuted },
