@@ -76,6 +76,8 @@ const Creation = () => {
   const [payoutSystem, setPayoutSystem] = useState('Manual');
   const [takeProfit, setTakeProfit] = useState('2');
   const [stopLoss, setStopLoss] = useState('1');
+  const [minTradeAmount, setMinTradeAmount] = useState('');
+  const [maxTradeAmount, setMaxTradeAmount] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -95,6 +97,11 @@ const Creation = () => {
     if (!/^\d{6}$/.test(botId)) { setError('Bot ID must be exactly 6 digits.'); return; }
     if (!selectedTradingSymbol) { setError('Search for and select a TradingView symbol.'); return; }
     if (!duration || Number(duration) <= 0) { setError('Enter a run duration greater than zero.'); return; }
+    const minimumTrade = Number(minTradeAmount);
+    const maximumTrade = Number(maxTradeAmount);
+    if (!minTradeAmount || !Number.isFinite(minimumTrade) || minimumTrade <= 0) { setError('Enter a minimum trade amount greater than zero.'); return; }
+    if (!maxTradeAmount || !Number.isFinite(maximumTrade) || maximumTrade <= 0) { setError('Enter a maximum trade amount greater than zero.'); return; }
+    if (minimumTrade > maximumTrade) { setError('Maximum trade amount must be greater than or equal to minimum trade amount.'); return; }
 
     setSaving(true);
     try {
@@ -107,6 +114,8 @@ const Creation = () => {
         payoutSystem: payoutSystem.toLowerCase(),
         takeProfitPercent: Number(takeProfit),
         stopLossPercent: Number(stopLoss),
+        minTradeAmount: minimumTrade,
+        maxTradeAmount: maximumTrade,
       });
       setMessage('Your trading bot was created successfully.');
       setName(''); setBotId(''); setDuration('');
@@ -129,6 +138,7 @@ const Creation = () => {
             <label style={labelStyle}>Market category<CustomSelect options={symbolOptions.map((option) => option.value)} value={symbol} onChange={(value) => { setSymbol(value); setTradingViewResults([]); setSelectedTradingSymbol(''); }} theme={theme} formatOption={(value) => symbolOptions.find((option) => option.value === value)?.label || value} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>TradingView symbol<Search size={15} /><input value={symbolSearch} onChange={(event) => setSymbolSearch(event.target.value)} placeholder={`Search ${selectedSymbol.label.toLowerCase()} symbols`} style={inputStyle} /></label><button type="button" disabled={searchingSymbols || !symbolSearch.trim()} onClick={async () => { setSearchingSymbols(true); setError(''); const query = symbolSearch.trim().toLowerCase(); const fallbackResults = (fallbackTradingViewSymbols[symbol] || []).filter((result) => `${result.symbol} ${result.description} ${result.exchange}`.toLowerCase().includes(query)); try { const response = await api.get('/api/market/symbols', { params: { category: symbol, search: symbolSearch.trim() } }); const remoteResults = response.data?.symbols || response.data || []; setTradingViewResults(Array.isArray(remoteResults) && remoteResults.length > 0 ? remoteResults : fallbackResults); } catch { setTradingViewResults(fallbackResults); } finally { setSearchingSymbols(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}>{searchingSymbols ? 'Searching…' : 'Search symbols'}</button>{tradingViewResults.length > 0 && <div style={{ display: 'grid', gap: 6 }}>{tradingViewResults.map((result) => <button key={`${result.exchange}:${result.symbol}`} type="button" onClick={() => setSelectedTradingSymbol(`${result.exchange}:${result.symbol}`)} style={{ textAlign: 'left', border: `1px solid ${selectedTradingSymbol === `${result.exchange}:${result.symbol}` ? theme.primary : theme.borderGlass}`, borderRadius: 9, padding: '9px 10px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><strong>{result.symbol}</strong><small style={{ display: 'block', color: theme.textMuted }}>{result.description || result.exchange} · {result.type}</small></button>)}</div>}<small style={{ color: theme.textMuted }}>Selected: {selectedTradingSymbol || 'None'}</small></div>
             <label style={labelStyle}>Run duration (minutes)<input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="60" style={inputStyle} /></label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}><label style={labelStyle}>Min trade amount<input type="number" min="0.01" step="0.01" value={minTradeAmount} onChange={(event) => setMinTradeAmount(event.target.value)} placeholder="10" style={inputStyle} /></label><label style={labelStyle}>Max trade amount<input type="number" min="0.01" step="0.01" value={maxTradeAmount} onChange={(event) => setMaxTradeAmount(event.target.value)} placeholder="100" style={inputStyle} /></label></div>
             <label style={labelStyle}>Payout system<CustomSelect options={payoutOptions} value={payoutSystem} onChange={setPayoutSystem} theme={theme} /></label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}><label style={labelStyle}>Take profit<CustomSelect options={percentageOptions} value={takeProfit} onChange={setTakeProfit} theme={theme} formatOption={(option) => `${option}%`} /></label><label style={labelStyle}>Stop loss<CustomSelect options={percentageOptions} value={stopLoss} onChange={setStopLoss} theme={theme} formatOption={(option) => `${option}%`} /></label></div>
             {error && <p role="alert" style={{ margin: 0, color: theme.danger }}>{error}</p>}{message && <p role="status" style={{ margin: 0, color: theme.success }}>{message}</p>}
