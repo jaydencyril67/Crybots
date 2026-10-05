@@ -645,7 +645,6 @@ const HomePage = () => {
 
             <div style={styles.card}>
             <section style={styles.panel}>
-            <section style={styles.panel}>
               <p style={styles.panelTitle}>Market pulse</p>
               <p style={styles.panelSub}>A simple read on breadth and momentum across the coins in view.</p>
 
@@ -684,6 +683,7 @@ const HomePage = () => {
                 )}
               </div>
             </section>
+            </div>
 
             <div style={styles.card}>
             <section style={styles.panel}>
