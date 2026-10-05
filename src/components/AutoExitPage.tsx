@@ -145,6 +145,8 @@ const AutoExitPage = () => {
                     <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <InlineLoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
                   </div>
                 </div>
+              </section>
+              <section style={styles.dangerRow}>
                 <div style={styles.dangerRow}>
                   <strong>Scheduled exit</strong>
                   <p style={styles.status}>{scheduledExit ? `Set for ${scheduledExit.replace('T', ' ')}` : 'No scheduled exit set.'}</p>

@@ -230,9 +230,9 @@ const TransferPage = () => {
         <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
-          <div style={styles.panel}>
-            <div style={styles.body}>
-              <div style={styles.grid}>
+          <div style={styles.body}>
+            <div style={styles.grid}>
+              <div style={styles.panel}>
               <section style={styles.card}>
                 {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
                 <h2 style={styles.cardTitle}><ArrowRightLeft size={18} /> Send USDT to another user</h2>
@@ -289,15 +289,21 @@ const TransferPage = () => {
                 </div>
                 <p style={styles.cardText}>Available balance: {loading ? <LoadingDots /> : `${usdtBalance.toFixed(2)} USDT`}</p>
               </section>
+              </div>
+              <div style={styles.panel}>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><BadgeCheck size={18} /> Transfer rules</h2>
                 <p style={styles.cardText}>Transfers require a valid recipient, positive amount, and enough USDT in your wallet. The recipient cannot be yourself.</p>
               </section>
+              </div>
+              <div style={styles.panel}>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><UserRound size={18} /> Recipient validation</h2>
                 <p style={styles.cardText}>UID entries are restricted to 5 digits. Email validation checks the exact email that exists in the database.</p>
                 <p style={styles.cardText}>Validation runs live after a short pause so the interface stays responsive on mobile and desktop.</p>
               </section>
+              </div>
+              <div style={styles.panel}>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><Hash size={18} /> Security verification</h2>
                 <p style={styles.cardText}>Set a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>

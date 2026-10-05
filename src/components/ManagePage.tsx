@@ -187,7 +187,11 @@ const ManagePage = () => {
                 </div>
               </div>
             </div>
+          </section>
+          <section style={styles.card}>
             {wallets.length ? <div style={styles.innerCard}><strong>Bound wallets ({wallets.length}/10)</strong><div style={styles.walletTable}><table style={styles.walletTableInner}><thead><tr><th style={styles.walletTableHeader}>Wallet</th><th style={styles.walletTableHeader}>Network</th><th style={styles.walletTableHeader}>Address</th><th style={styles.walletTableHeader}>Actions</th></tr></thead><tbody>{wallets.map((wallet) => <tr key={wallet.id}><td style={styles.walletTableCell}>{wallet.description || 'Bound wallet'}</td><td style={styles.walletTableCell}>{wallet.network}</td><td style={styles.walletTableCell}>{wallet.address}</td><td style={styles.walletTableCell}><div style={{ display: 'flex', gap: '8px' }}><button type="button" style={styles.walletActionButton} onClick={() => { setEditingWalletId(wallet.id || null); setNetwork(wallet.network); setWalletAddress(wallet.address); setDescription(wallet.description || ''); setWalletValid(true); }}>Edit</button><button type="button" style={{ ...styles.walletActionButton, background: theme.surfaceMuted }} onClick={() => void (async () => { if (securityCode.replace(/\D/g, '').length !== 6) { setStatus({ kind: 'error', message: 'Enter your 6-digit security code before unbinding a wallet.' }); return; } try { const { data } = await api.delete(`/api/settings/wallets/${wallet.id}`, { data: { securityCode: securityCode.replace(/\D/g, '').slice(0, 6) } }); setWallets(data.wallets || []); if (editingWalletId === wallet.id) resetWalletForm(); setStatus({ kind: 'success', message: 'Wallet unbound successfully.' }); } catch (error: any) { setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to remove wallet.') }); } })()}>Unbind</button></div></td></tr>)}</tbody></table></div></div> : null}
+          </section>
+          <section style={styles.card}>
             <div style={styles.innerCard}>
               <strong>Withdrawal and transfer block</strong>
               <p style={styles.text}>Temporarily prevent withdrawals and transfers during a selected date and time range.</p>
