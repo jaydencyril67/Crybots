@@ -12,8 +12,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  title: { margin: '20px 0 0', fontSize: '1.15rem', fontWeight: 900 },
-  text: { margin: '10px 0 0', color: theme.textMuted, lineHeight: 1.6 },
   card: { marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   cardHeading: { margin: 0, fontSize: '1.05rem', fontWeight: 850 },
   cardText: { margin: '6px 0 16px', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
@@ -45,8 +43,6 @@ const Market = (_props: Props) => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
-          <h1 style={styles.title}>Market</h1>
-          <p style={styles.text}>Choose a market category to discover new opportunities across KingsHall Exchange.</p>
           <section style={styles.card}>
             <h2 style={styles.cardHeading}>Explore the market</h2>
             <p style={styles.cardText}>Select one of the options below to get started.</p>
