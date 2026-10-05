@@ -17,6 +17,8 @@ type CommerceBot = {
   efficiency?: number;
   price?: number;
   sellerName?: string;
+  sellerId?: string;
+  isOwner?: boolean;
   active?: boolean;
 };
 
@@ -25,7 +27,6 @@ const CommercePage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [activeView, setActiveView] = useState<'browse' | 'sell'>('browse');
   const [availableBots, setAvailableBots] = useState<CommerceBot[]>([]);
-  const [myListings, setMyListings] = useState<CommerceBot[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState('');
   const [listingSaving, setListingSaving] = useState(false);
@@ -41,19 +42,14 @@ const CommercePage = () => {
   const loadCommerce = async () => {
     setLoading(true);
     setError('');
-    const [availableResult, listingsResult] = await Promise.allSettled([
+    const availableResult = await Promise.allSettled([
       api.get('/api/commerce'),
-      api.get('/api/commerce/mine'),
-    ]);
+    ]).then(([result]) => result);
     if (availableResult.status === 'fulfilled') {
       const data = availableResult.value.data;
       setAvailableBots(data?.bots || data || []);
     } else {
       setError(availableResult.reason?.response?.data?.message || 'Unable to load Commerce right now. Please try again.');
-    }
-    if (listingsResult.status === 'fulfilled') {
-      const data = listingsResult.value.data;
-      setMyListings(data?.bots || data || []);
     }
     setLoading(false);
   };
@@ -76,6 +72,20 @@ const CommercePage = () => {
       setError(requestError?.response?.data?.message || 'Unable to purchase this bot. Please try again.');
     } finally {
       setBuyingId('');
+    }
+  };
+
+  const unlistBot = async (bot: CommerceBot) => {
+    const botId = bot.botId || '';
+    if (!botId) return;
+    setError('');
+    setMessage('');
+    try {
+      const response = await api.post(`/api/commerce/${botId}/unlist`);
+      setMessage(response.data?.message || 'Your bot has been unlisted from Commerce.');
+      await loadCommerce();
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to unlist this bot from Commerce. Please try again.');
     }
   };
 
@@ -108,7 +118,7 @@ const CommercePage = () => {
     return <article key={botId} style={{ ...cardStyle, display: 'grid', gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Bot size={20} color={theme.primary} /><div><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>{bot.name}</h3><small style={{ color: theme.textMuted, fontSize: '0.78rem' }}>{bot.symbol || 'Flexible strategy'}{bot.sellerName ? ` · Listed by ${bot.sellerName}` : ''}</small></div></div>
       <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>Permanent ownership · Efficiency {bot.efficiency ?? 0}% · Bot ID {bot.botId || 'Unavailable'}</p>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}><strong style={{ fontSize: '0.86rem' }}>{bot.price !== undefined ? `${bot.price} USDT` : 'Price unavailable'}</strong><button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={buttonStyle}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}><strong style={{ fontSize: '0.86rem' }}>{bot.price !== undefined ? `${bot.price} USDT` : 'Price unavailable'}</strong>{bot.isOwner ? <button type="button" onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}` }}>Unlist</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={buttonStyle}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}</div>
     </article>;
   };
 
