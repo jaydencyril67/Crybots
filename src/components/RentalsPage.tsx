@@ -99,7 +99,7 @@ const RentalsPage = () => {
       setMessage('Your bot is now listed in Rentals.');
       setListingBotId('');
       setListingPrice('');
-      setShowListingForm(false);
+      setActiveView('browse');
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to list your bot. Please try again.');
     } finally {
