@@ -483,6 +483,30 @@ const createDefaultActions = (): NowBarAction[] => [
   },
 ];
 
+const NOWBAR_POSITION_STORAGE_KEY = 'kingshall-nowbar-position';
+
+type NowBarPosition = { left: number; top: number };
+
+const readNowBarPosition = (): NowBarPosition => {
+  try {
+    const stored = window.localStorage.getItem(NOWBAR_POSITION_STORAGE_KEY);
+    if (!stored) return { left: 0, top: 0 };
+    const parsed = JSON.parse(stored) as Partial<NowBarPosition>;
+    return { left: Number(parsed.left) || 0, top: Number(parsed.top) || 0 };
+  } catch {
+    return { left: 0, top: 0 };
+  }
+};
+
+const saveNowBarPosition = (bar: HTMLDivElement | null) => {
+  if (!bar) return;
+  try {
+    window.localStorage.setItem(NOWBAR_POSITION_STORAGE_KEY, JSON.stringify({ left: bar.scrollLeft, top: bar.scrollTop }));
+  } catch {
+    // Ignore storage failures; the NowBar should remain usable without persistence.
+  }
+};
+
 const NowBar = ({ actions, admin = false }: NowBarProps) => {
   const [edgeLightVersion, setEdgeLightVersion] = useState(0);
   const [buttonColorVersion, setButtonColorVersion] = useState(0);
@@ -523,6 +547,7 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
 
   useEffect(() => {
     const syncPath = () => {
+      saveNowBarPosition(barRef.current);
       setCurrentPath(getActivePath());
       setView('title');
       setMode('compact');
@@ -596,6 +621,22 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
       window.removeEventListener(NOWBAR_COMMAND_EVENT, handleVoiceCommand);
 
     };
+  }, []);
+
+  useEffect(() => {
+    const restorePosition = () => {
+      const position = readNowBarPosition();
+      if (!barRef.current) return;
+      barRef.current.scrollLeft = position.left;
+      barRef.current.scrollTop = position.top;
+    };
+    restorePosition();
+    const frame = window.requestAnimationFrame(restorePosition);
+    return () => window.cancelAnimationFrame(frame);
+  }, [isExpanded]);
+
+  useEffect(() => () => {
+    saveNowBarPosition(barRef.current);
   }, []);
 
   useEffect(() => () => {
@@ -714,6 +755,7 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
           ...(isExpanded ? styles.barExpanded : {}),
         }}
         data-nowbar-edge-light={edgeLight.enabled ? edgeLight.mode : undefined}
+        onScroll={() => saveNowBarPosition(barRef.current)}
         data-nowbar-control
         role="button"
         tabIndex={0}
