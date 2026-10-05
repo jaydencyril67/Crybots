@@ -145,7 +145,6 @@ const AutoExitPage = () => {
                     {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleExit(true)}>{idleSaving ? <InlineLoadingDots /> : 'Save timeout'}</button>}
                     <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <InlineLoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
                   </div>
-                </div>
               </section>
             </div>
             <div style={styles.outerCard}>
