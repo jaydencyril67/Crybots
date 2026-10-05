@@ -10,7 +10,7 @@ import NotificationBanner from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
 import api, { API_BASE_URL } from '../api/axios';
 
-type Props = { mode: 'orders' | 'portfolio' | 'history' };
+type Props = { mode: 'market' | 'portfolio' | 'history' };
 
 type Order = { _id: string; symbol: string; side: 'buy' | 'sell'; quantity: number; status: 'open' | 'filled' | 'cancelled' | 'rejected'; executedPrice?: number; executedValue?: number; createdAt: string };
 type Fill = { _id: string; side: string; quantity: number; price: number; value?: number; realizedPnl: number; createdAt: string };
@@ -36,7 +36,7 @@ const calculateLivePnl = (position: OpenPosition, currentPrice: number | null) =
 const metricRowStyle = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, padding: '10px 0', borderBottom: `1px solid ${theme.borderGlass}` });
 type Portfolio = { price: number; balance: number; equity: number; unrealizedPnl: number; realizedPnl: number; positions: Position[] };
 
-const TradeRecordsPage = ({ mode }: Props) => {
+const Market = ({ mode }: Props) => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [orders, setOrders] = React.useState<Order[]>([]);
@@ -48,7 +48,7 @@ const TradeRecordsPage = ({ mode }: Props) => {
   const [portfolio, setPortfolio] = React.useState<Portfolio | null>(null);
   const [currentPrice, setCurrentPrice] = React.useState<number | null>(null);
   const [closingPositionId, setClosingPositionId] = React.useState<string | null>(null);
-  const title = mode === 'orders' ? 'Open trades' : mode === 'history' ? 'Trade history' : 'Portfolio';
+  const title = mode === 'market' ? 'Market' : mode === 'history' ? 'Trade history' : 'Portfolio';
   const loadRecords = React.useCallback(async (activeRef?: { current: boolean }) => {
     setMessage(null);
     try {
@@ -56,7 +56,7 @@ const TradeRecordsPage = ({ mode }: Props) => {
         const response = await api.get<Portfolio>('/api/trading/portfolio');
         if (!activeRef || activeRef.current) setPortfolio(response.data);
       } else {
-        const response = await api.get<{ orders: Order[]; fills?: Fill[]; positions?: OpenPosition[]; position?: OpenPosition | null; price?: number }>(mode === 'history' ? '/api/trading/history' : '/api/trading/orders', mode === 'orders' ? { params: { status: 'open' } } : undefined);
+        const response = await api.get<{ orders: Order[]; fills?: Fill[]; positions?: OpenPosition[]; position?: OpenPosition | null; price?: number }>(mode === 'history' ? '/api/trading/history' : '/api/trading/orders', mode === 'market' ? { params: { status: 'open' } } : undefined);
         if (!activeRef || activeRef.current) {
           setCurrentPrice(response.data.price ?? null);
           setOrders(response.data.orders || []);
@@ -96,7 +96,7 @@ const TradeRecordsPage = ({ mode }: Props) => {
     const active = { current: true };
     setLoading(true);
     void loadRecords(active);
-    if (mode !== 'orders') {
+    if (mode !== 'market') {
       return () => {
         active.current = false;
       };
@@ -158,4 +158,4 @@ const TradeRecordsPage = ({ mode }: Props) => {
     <section style={{ ...cardStyles.card, marginTop: 16 }}>{loading ? <LoadingDots /> : (mode === 'portfolio' && portfolio ? <div style={{ display: 'grid', gap: 10 }}><strong>Live price: ${portfolio.price.toFixed(6)}</strong><span>Available USDT: {portfolio.balance.toFixed(2)}</span><span>Total equity: {portfolio.equity.toFixed(2)} USDT</span><span>Unrealized P&L: {portfolio.unrealizedPnl.toFixed(2)} USDT</span><span>Realized P&L: {portfolio.realizedPnl.toFixed(2)} USDT</span></div> : mode === 'orders' ? <div style={{ display: 'grid', gap: 10 }}>{openPositions.map((openPosition, index) => <article key={openPosition._id || index} style={{ ...cardStyles.panel, display: 'grid', gap: 2 }}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingBottom: 10 }}><strong>{openPosition.quantity >= 0 ? 'BUY' : 'SELL'}</strong><span style={{ color: theme.textMuted }}>{formatKrn(Math.abs(openPosition.quantity))}</span></div><div style={metricRowStyle(theme)}><span style={{ color: theme.textMuted }}>Order Amount</span><strong>{formatUsdt(Math.abs(openPosition.quantity) * openPosition.averageEntryPrice)}</strong></div><div style={metricRowStyle(theme)}><span style={{ color: theme.textMuted }}>Entry Price</span><strong>{formatPrice(openPosition.averageEntryPrice)}</strong></div><div style={metricRowStyle(theme)}><span style={{ color: theme.textMuted }}>Current Price</span><strong>{currentPrice === null ? '—' : formatPrice(currentPrice)}</strong></div><div style={metricRowStyle(theme)}><span style={{ color: theme.textMuted }}>Take profit</span><strong>{openPosition.takeProfitPrice === undefined ? 'Not set' : formatPrice(openPosition.takeProfitPrice)}</strong></div><div style={metricRowStyle(theme)}><span style={{ color: theme.textMuted }}>Stop loss</span><strong>{openPosition.stopLossPrice === undefined ? 'Not set' : formatPrice(openPosition.stopLossPrice)}</strong></div><div style={{ ...metricRowStyle(theme), borderBottom: 0 }}><span style={{ color: theme.textMuted }}>Live P&amp;L</span><strong style={{ color: calculateLivePnl(openPosition, currentPrice) >= 0 ? theme.success : theme.danger }}>{formatPnl(calculateLivePnl(openPosition, currentPrice))}</strong></div><button type="button" disabled={closingPositionId !== null} onClick={() => { void closePosition(openPosition._id); }} style={{ width: '100%', marginTop: 10, padding: '8px 12px', border: 0, borderRadius: 8, background: theme.danger, color: theme.textInverse, cursor: closingPositionId === openPosition._id ? 'wait' : 'pointer' }}>{closingPositionId === openPosition._id ? <InlineLoadingDots /> : 'Close trade'}</button></article>)}{openPositions.length === 0 && orders.length === 0 ? <p style={{ color: theme.textMuted }}>No open trades yet.</p> : orders.map((order) => <article key={order._id} style={{ ...cardStyles.panel, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 8 }}><strong style={{ color: order.side === 'buy' ? theme.primary : theme.danger }}>{order.side === 'buy' ? 'BUY' : 'SELL'}</strong><span>{order.symbol}</span><span>{order.quantity.toFixed(6)} KRN · {order.status}</span><span>{order.executedPrice ? `Bought/sold @ ${order.executedPrice.toFixed(6)} · Value ${(order.executedValue || order.quantity * order.executedPrice).toFixed(6)} USDT` : 'Market trade'}</span><span>{new Date(order.createdAt).toLocaleString()}</span></article>)}</div> : mode === 'history' ? <div style={{ overflowX: 'auto', width: '100%', border: `1px solid ${theme.borderGlass}`, borderRadius: 10 }}><table style={{ width: '100%', minWidth: 680, borderCollapse: 'collapse' }}><thead><tr><th style={{ padding: '10px 12px', textAlign: 'left', color: theme.textMuted }}>Side</th><th style={{ padding: '10px 12px', textAlign: 'left', color: theme.textMuted }}>Symbol</th><th style={{ padding: '10px 12px', textAlign: 'right', color: theme.textMuted }}>Quantity</th><th style={{ padding: '10px 12px', textAlign: 'right', color: theme.textMuted }}>Price</th><th style={{ padding: '10px 12px', textAlign: 'right', color: theme.textMuted }}>Value</th><th style={{ padding: '10px 12px', textAlign: 'left', color: theme.textMuted }}>Status</th><th style={{ padding: '10px 12px', textAlign: 'left', color: theme.textMuted }}>Time</th></tr></thead><tbody>{orders.map((order) => <tr key={order._id}><td style={{ padding: '10px 12px', color: order.side === 'buy' ? theme.success : theme.danger }}>{order.side === 'buy' ? 'BUY' : 'SELL'}</td><td style={{ padding: '10px 12px' }}>{order.symbol}</td><td style={{ padding: '10px 12px', textAlign: 'right' }}>{order.quantity.toFixed(6)} KRN</td><td style={{ padding: '10px 12px', textAlign: 'right' }}>{order.executedPrice ? `${order.executedPrice.toFixed(2)} USDT` : '—'}</td><td style={{ padding: '10px 12px', textAlign: 'right' }}>{order.executedValue ? `${order.executedValue.toFixed(2)} USDT` : '—'}</td><td style={{ padding: '10px 12px' }}>{order.status}</td><td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{new Date(order.createdAt).toLocaleString()}</td></tr>)}</tbody></table></div> : orders.length === 0 ? <p style={{ color: theme.textMuted }}>No records yet.</p> : <div style={{ display: 'grid', gap: 8 }}>{orders.map((order) => <article key={order._id} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 8, padding: 10, borderBottom: `1px solid ${theme.borderGlass}` }}><strong style={{ color: order.side === 'buy' ? theme.primary : theme.danger }}>{order.side === 'buy' ? 'BUY' : 'SELL'}</strong><span>{order.symbol}</span><span>{order.quantity.toFixed(6)} KRN · {order.status}</span><span>{order.executedPrice ? `Traded @ ${order.executedPrice.toFixed(6)} · Value ${(order.executedValue || order.quantity * order.executedPrice).toFixed(6)} USDT` : 'Market trade'}</span><span>{new Date(order.createdAt).toLocaleString()}</span></article>)}</div>)}{mode === 'history' && fills.length > 0 ? <div style={{ display: 'grid', gap: 8, marginTop: 18 }}><strong>Fills</strong>{fills.map((fill) => <article key={fill._id} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 8, padding: 10, borderTop: `1px solid ${theme.borderGlass}` }}><span>{fill.side.toUpperCase()} · {fill.quantity.toFixed(6)} KRN</span><span>Entry/execution @ {fill.price.toFixed(6)} · Value {(fill.value || fill.quantity * fill.price).toFixed(6)} USDT</span><span>{new Date(fill.createdAt).toLocaleString()}</span><span>Realized P&L: {fill.realizedPnl.toFixed(2)} USDT</span></article>)}</div> : null}</section>
   </main><NowBar /></div></HybridTheme>;
 };
-export default TradeRecordsPage;
+export default Market;

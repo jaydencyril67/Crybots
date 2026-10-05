@@ -4,7 +4,7 @@ import NowBar from './NowBar';
 
 const destinations: ParentPageCard[] = [
   { label: 'Chart workspace', description: 'Monitor automated strategies and review the live crypto market.', route: '/trade/chart' },
-  { label: 'Active bot trades', description: 'Review positions opened by your trading bots.', route: '/trade/orders' },
+  { label: 'Market', description: 'Review positions opened by your trading bots.', route: '/trade/market' },
   { label: 'Bot performance', description: 'View balances, positions and automated trading performance.', route: '/trade/portfolio' },
   { label: 'Bot trade history', description: 'Review completed and cancelled bot trades.', route: '/trade/history' },
 ];
