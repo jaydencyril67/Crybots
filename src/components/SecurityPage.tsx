@@ -791,7 +791,8 @@ const SecurityPage = () => {
           <div style={styles.content}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.rowList}>
-              <div style={styles.row}>
+              <div style={styles.card}>
+                <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> UID</p>
                 <p style={styles.rowValue}>{loading ? <LoadingDots /> : uid || 'Not set yet'}</p>
                 <p style={styles.note}>{uidChangeMessage}</p>
@@ -802,9 +803,11 @@ const SecurityPage = () => {
                   {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid || uidChangeLocked}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
                 </div>
                 {renderStatus('uid')}
+                </div>
               </div>
 
-              <div style={styles.row}>
+              <div style={styles.card}>
+                <div style={styles.row}>
                 <p style={styles.rowLabel}><Smartphone size={16} /> Devices logged in</p>
                 <p style={styles.rowValue}>{sessionsLoading ? <LoadingDots /> : `${currentLoginCount} active device${currentLoginCount === 1 ? '' : 's'} • max ${maxActiveSessions} per account`}</p>
                 <div className="security-control" style={styles.control}>
@@ -898,9 +901,11 @@ const SecurityPage = () => {
                   </table>
                 </div>
                 {renderStatus('sessions')}
+                </div>
               </div>
 
-              <div style={styles.row}>
+              <div style={styles.card}>
+                <div style={styles.row}>
                 <p style={styles.rowLabel}><KeyRound size={16} /> Password</p>
                 <p style={styles.rowValue}>Change your account password</p>
                 <div className="security-control" style={styles.control}>
@@ -920,9 +925,11 @@ const SecurityPage = () => {
                   <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change'}</button>
                 </div>
                 {renderStatus('password')}
+                </div>
               </div>
 
-              <div style={styles.row}>
+              <div style={styles.card}>
+                <div style={styles.row}>
                 <p style={styles.rowLabel}><LockKeyhole size={16} /> Security code</p>
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
                 <p style={styles.note}>{securityCodeChangeMessage}</p>
@@ -933,9 +940,11 @@ const SecurityPage = () => {
                   <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode || securityCodeChangeLocked}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
                 </div>
                 {renderStatus('securityCode')}
+                </div>
               </div>
 
-              <div style={styles.row}>
+              <div style={styles.card}>
+                <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> 2FA</p>
                 <p style={styles.rowValue}>{twoFactorEnabled ? 'Two-factor authentication enabled' : twoFactorConfigured ? 'Authenticator configured but disabled' : 'Two-factor authentication not set up'}</p>
                 {!twoFactorConfigured ? (
@@ -973,24 +982,29 @@ const SecurityPage = () => {
                   </div>
                 )}
                 {renderStatus('twoFactor')}
+                </div>
               </div>
 
-              <div style={styles.row}>
+              <div style={styles.card}>
+                <div style={styles.row}>
                 <p style={styles.rowLabel}><Fingerprint size={16} /> Biometric</p>
                 <p style={styles.rowValue}>{biometricEnabled ? 'Biometric security enabled' : 'Biometric security disabled'}</p>
                 <div style={styles.buttonRow}>
                   <button type="button" style={styles.button} onClick={() => void handleToggleBiometric()} disabled={savingBiometric}>{savingBiometric ? <InlineLoadingDots /> : biometricEnabled ? 'Disable biometric' : 'Enable biometric'}</button>
                 </div>
                 {renderStatus('biometric')}
+                </div>
               </div>
 
-              <div style={styles.row}>
+              <div style={styles.card}>
+                <div style={styles.row}>
                 <p style={styles.rowLabel}><Laptop2 size={16} /> Hardware security</p>
                 <p style={styles.rowValue}>{hardwareKeyEnabled ? 'Hardware security enabled' : 'Hardware security disabled'}</p>
                 <div style={styles.buttonRow}>
                   <button type="button" style={styles.button} onClick={() => void handleToggleHardware()} disabled={savingHardware}>{savingHardware ? <InlineLoadingDots /> : hardwareKeyEnabled ? 'Disable hardware security' : 'Enable hardware security'}</button>
                 </div>
                 {renderStatus('hardware')}
+                </div>
               </div>
             </div>
           </div>
