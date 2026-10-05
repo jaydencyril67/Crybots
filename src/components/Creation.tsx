@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ChevronDown, Info, Search } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import NotificationBanner from './NotificationBanner';
+import InlineLoadingDots from './InlineLoadingDots';
 import { useAppTheme } from './AppTheme';
 
 type SymbolOption = { value: string; label: string; tradingViewSymbol: string };
@@ -68,11 +70,12 @@ const Creation = () => {
   const [name, setName] = useState('');
   const [botId, setBotId] = useState('');
   const [generatingBotId, setGeneratingBotId] = useState(false);
+  const [botIdStatus, setBotIdStatus] = useState<'idle' | 'checking' | 'available' | 'unavailable'>('idle');
+  const [botIdMessage, setBotIdMessage] = useState('');
   const [symbol, setSymbol] = useState('crypto');
   const selectedSymbol = symbolOptions.find((option) => option.value === symbol) || symbolOptions[0];
   const [symbolSearch, setSymbolSearch] = useState('');
   const [selectedTradingSymbol, setSelectedTradingSymbol] = useState(selectedSymbol.tradingViewSymbol);
-  const [duration, setDuration] = useState('');
   const [payoutSystem, setPayoutSystem] = useState('Manual');
   const [tradeDirection, setTradeDirection] = useState('Long');
   const [takeProfit, setTakeProfit] = useState('2');
@@ -90,14 +93,38 @@ const Creation = () => {
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' };
   const labelStyle: React.CSSProperties = { display: 'grid', gap: 7, color: theme.text, fontWeight: 750, fontSize: '0.85rem' };
 
+  useEffect(() => {
+    if (!/^\d{6}$/.test(botId)) {
+      setBotIdStatus('idle');
+      setBotIdMessage(botId ? 'Enter all 6 digits to check availability.' : '');
+      return;
+    }
+
+    let active = true;
+    setBotIdStatus('checking');
+    setBotIdMessage('Checking bot ID…');
+    api.get('/api/market/check-id', { params: { botId } }).then((response) => {
+      if (!active) return;
+      const available = response.data?.available === true;
+      setBotIdStatus(available ? 'available' : 'unavailable');
+      setBotIdMessage(response.data?.message || (available ? 'Bot ID is available.' : 'This bot ID is already in use.'));
+    }).catch(() => {
+      if (!active) return;
+      setBotIdStatus('unavailable');
+      setBotIdMessage('Unable to validate this bot ID. Please try again.');
+    });
+
+    return () => { active = false; };
+  }, [botId]);
+
   const createBot = async (event: React.FormEvent) => {
     event.preventDefault();
     setError('');
     setMessage('');
     if (!name.trim()) { setError('Enter a name for your trading bot.'); return; }
     if (!/^\d{6}$/.test(botId)) { setError('Bot ID must be exactly 6 digits.'); return; }
+    if (botIdStatus !== 'available') { setError(botIdStatus === 'checking' ? 'Wait for the bot ID availability check to finish.' : botIdMessage || 'Enter an available bot ID.'); return; }
     if (!selectedTradingSymbol) { setError('Search for and select a trading symbol.'); return; }
-    if (!duration || Number(duration) <= 0) { setError('Enter a run duration greater than zero.'); return; }
     const minimumTrade = Number(minTradeAmount);
     const maximumTrade = Number(maxTradeAmount);
     if (!minTradeAmount || !Number.isFinite(minimumTrade) || minimumTrade <= 0) { setError('Enter a minimum trade amount greater than zero.'); return; }
@@ -111,7 +138,6 @@ const Creation = () => {
         botId,
         symbolType: symbol,
         symbol: selectedTradingSymbol,
-        runDuration: Number(duration),
         payoutSystem: payoutSystem.toLowerCase(),
         tradeDirection: tradeDirection.toLowerCase(),
         takeProfitPercent: Number(takeProfit),
@@ -120,7 +146,7 @@ const Creation = () => {
         maxTradeAmount: maximumTrade,
       });
       setMessage('Your trading bot was created successfully.');
-      setName(''); setBotId(''); setDuration('');
+      setName(''); setBotId('');
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to create the trading bot. Please try again.');
     } finally { setSaving(false); }
@@ -131,21 +157,19 @@ const Creation = () => {
     <main style={{ minHeight: '100vh', overflowX: 'hidden', background: theme.background, color: theme.text, paddingBottom: 90 }}>
       <div style={{ width: '100%', maxWidth: 920, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' }}>
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={16} /> Market</button>
-        <section style={{ display: 'grid', gap: 10, marginTop: 18 }}><h1 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em' }}>Create a trading bot</h1><p style={{ margin: 0, maxWidth: '62ch', color: theme.textMuted, fontSize: '0.92rem', lineHeight: 1.7 }}>Configure the strategy settings for your new bot.</p></section>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 18, alignItems: 'start', marginTop: 18 }}>
           <div style={outerCardStyle}>
           <form onSubmit={createBot} style={innerCardStyle}>
             <label style={labelStyle}>Bot name<input value={name} onChange={(event) => setName(event.target.value)} placeholder="My momentum bot" style={inputStyle} maxLength={80} /></label>
-            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Bot ID</label><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input value={botId} onChange={(event) => setBotId(event.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="Six digits" style={{ ...inputStyle, flex: 1 }} /><button type="button" disabled={generatingBotId} onClick={async () => { setGeneratingBotId(true); setError(''); try { const response = await api.get('/api/market/generate-id'); setBotId(String(response.data?.botId || '').replace(/\D/g, '').slice(0, 6)); } catch (requestError: any) { setError(requestError?.response?.data?.message || 'Unable to generate a unique bot ID. Please try again.'); } finally { setGeneratingBotId(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.primary, color: theme.textInverse, cursor: generatingBotId ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}>{generatingBotId ? 'Generating…' : 'Auto'}</button></div><small style={{ color: theme.textMuted }}>Enter six digits or use Auto to generate an unused six-digit bot ID.</small></div>
+            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Bot ID</label><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input value={botId} onChange={(event) => { setBotId(event.target.value.replace(/\D/g, '').slice(0, 6)); setError(''); }} inputMode="numeric" pattern="[0-9]{6}" maxLength={6} placeholder="Six digits" style={{ ...inputStyle, flex: 1, borderColor: botIdStatus === 'available' ? theme.success : botIdStatus === 'unavailable' ? theme.danger : theme.borderGlass }} /><button type="button" disabled={generatingBotId} onClick={async () => { setGeneratingBotId(true); setError(''); try { const response = await api.get('/api/market/generate-id'); setBotId(String(response.data?.botId || '').replace(/\D/g, '').slice(0, 6)); } catch (requestError: any) { setError(requestError?.response?.data?.message || 'Unable to generate a unique bot ID. Please try again.'); } finally { setGeneratingBotId(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.primary, color: theme.textInverse, cursor: generatingBotId ? 'wait' : 'pointer', whiteSpace: 'nowrap' }}>{generatingBotId ? <InlineLoadingDots /> : 'Auto'}</button></div><small style={{ color: botIdStatus === 'available' ? theme.success : botIdStatus === 'unavailable' ? theme.danger : theme.textMuted }}>{botIdMessage || 'Enter six digits or use Auto to generate an unused six-digit bot ID.'}</small></div>
             <label style={labelStyle}>Market category<CustomSelect options={symbolOptions.map((option) => option.value)} value={symbol} onChange={(value) => { setSymbol(value); setTradingViewResults([]); setSelectedTradingSymbol(''); }} theme={theme} formatOption={(value) => symbolOptions.find((option) => option.value === value)?.label || value} /></label>
-            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Trading symbol<Search size={15} /><input value={symbolSearch} onChange={(event) => setSymbolSearch(event.target.value)} placeholder={`Search ${selectedSymbol.label.toLowerCase()} symbols`} style={inputStyle} /></label><button type="button" disabled={searchingSymbols || !symbolSearch.trim()} onClick={async () => { setSearchingSymbols(true); setError(''); const query = symbolSearch.trim().toLowerCase(); const fallbackResults = (fallbackTradingViewSymbols[symbol] || []).filter((result) => `${result.symbol} ${result.description} ${result.exchange}`.toLowerCase().includes(query)); try { const response = await api.get('/api/market/symbols', { params: { category: symbol, search: symbolSearch.trim() } }); const remoteResults = response.data?.symbols || response.data || []; setTradingViewResults(Array.isArray(remoteResults) && remoteResults.length > 0 ? remoteResults : fallbackResults); } catch { setTradingViewResults(fallbackResults); } finally { setSearchingSymbols(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}>{searchingSymbols ? 'Searching…' : 'Search symbols'}</button>{tradingViewResults.length > 0 && <div style={{ display: 'grid', gap: 6 }}>{tradingViewResults.map((result) => <button key={`${result.exchange}:${result.symbol}`} type="button" onClick={() => setSelectedTradingSymbol(`${result.exchange}:${result.symbol}`)} style={{ textAlign: 'left', border: `1px solid ${selectedTradingSymbol === `${result.exchange}:${result.symbol}` ? theme.primary : theme.borderGlass}`, borderRadius: 9, padding: '9px 10px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><strong>{result.symbol}</strong><small style={{ display: 'block', color: theme.textMuted }}>{result.description || result.exchange} · {result.type}</small></button>)}</div>}<small style={{ color: theme.textMuted }}>Selected: {selectedTradingSymbol || 'None'}</small></div>
-            <label style={labelStyle}>Run duration (minutes)<input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="60" style={inputStyle} /></label>
+            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Trading symbol<Search size={15} /><input value={symbolSearch} onChange={(event) => setSymbolSearch(event.target.value)} placeholder={`Search ${selectedSymbol.label.toLowerCase()} symbols`} style={inputStyle} /></label><button type="button" disabled={searchingSymbols || !symbolSearch.trim()} onClick={async () => { setSearchingSymbols(true); setError(''); const query = symbolSearch.trim().toLowerCase(); const fallbackResults = (fallbackTradingViewSymbols[symbol] || []).filter((result) => `${result.symbol} ${result.description} ${result.exchange}`.toLowerCase().includes(query)); try { const response = await api.get('/api/market/symbols', { params: { category: symbol, search: symbolSearch.trim() } }); const remoteResults = response.data?.symbols || response.data || []; setTradingViewResults(Array.isArray(remoteResults) && remoteResults.length > 0 ? remoteResults : fallbackResults); } catch { setTradingViewResults(fallbackResults); } finally { setSearchingSymbols(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}>{searchingSymbols ? <InlineLoadingDots /> : 'Search symbols'}</button>{tradingViewResults.length > 0 && <div style={{ display: 'grid', gap: 6 }}>{tradingViewResults.map((result) => <button key={`${result.exchange}:${result.symbol}`} type="button" onClick={() => setSelectedTradingSymbol(`${result.exchange}:${result.symbol}`)} style={{ textAlign: 'left', border: `1px solid ${selectedTradingSymbol === `${result.exchange}:${result.symbol}` ? theme.primary : theme.borderGlass}`, borderRadius: 9, padding: '9px 10px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><strong>{result.symbol}</strong><small style={{ display: 'block', color: theme.textMuted }}>{result.description || result.exchange} · {result.type}</small></button>)}</div>}<small style={{ color: theme.textMuted }}>Selected: {selectedTradingSymbol || 'None'}</small></div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}><label style={labelStyle}>Min trade amount<input type="number" min="0.01" step="0.01" value={minTradeAmount} onChange={(event) => setMinTradeAmount(event.target.value)} placeholder="10" style={inputStyle} /></label><label style={labelStyle}>Max trade amount<input type="number" min="0.01" step="0.01" value={maxTradeAmount} onChange={(event) => setMaxTradeAmount(event.target.value)} placeholder="100" style={inputStyle} /></label></div>
             <label style={labelStyle}>Payout system<CustomSelect options={payoutOptions} value={payoutSystem} onChange={setPayoutSystem} theme={theme} /></label>
             <label style={labelStyle}>Trade direction<CustomSelect options={['Long', 'Short']} value={tradeDirection} onChange={setTradeDirection} theme={theme} /></label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}><label style={labelStyle}>Take profit<CustomSelect options={percentageOptions} value={takeProfit} onChange={setTakeProfit} theme={theme} formatOption={(option) => `${option}%`} /></label><label style={labelStyle}>Stop loss<CustomSelect options={percentageOptions} value={stopLoss} onChange={setStopLoss} theme={theme} formatOption={(option) => `${option}%`} /></label></div>
-            {error && <p role="alert" style={{ margin: 0, color: theme.danger }}>{error}</p>}{message && <p role="status" style={{ margin: 0, color: theme.success }}>{message}</p>}
-            <button type="submit" disabled={saving} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving ? 'wait' : 'pointer' }}>{saving ? 'Creating…' : 'Create bot'}</button>
+            {error && <NotificationBanner tone="error" title="Unable to create trading bot" message={error} />}{message && <NotificationBanner tone="success" title="Trading bot created" message={message} />}
+            <button type="submit" disabled={saving} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving ? 'wait' : 'pointer' }}>{saving ? <InlineLoadingDots /> : 'Create bot'}</button>
           </form>
           </div>
           <div style={outerCardStyle}>
