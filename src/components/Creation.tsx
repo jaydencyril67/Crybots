@@ -71,6 +71,7 @@ const Creation = () => {
   const [createdBots, setCreatedBots] = useState<CreatedBot[]>([]);
   const [loadingCreatedBots, setLoadingCreatedBots] = useState(false);
   const [createdBotsError, setCreatedBotsError] = useState('');
+  const [deletingBotId, setDeletingBotId] = useState('');
   const [name, setName] = useState('');
   const [botId, setBotId] = useState('');
   const [generatingBotId, setGeneratingBotId] = useState(false);
@@ -97,7 +98,6 @@ const Creation = () => {
   const labelStyle: React.CSSProperties = { display: 'grid', gap: 7, color: theme.text, fontWeight: 750, fontSize: '0.85rem' };
 
   useEffect(() => {
-    if (activeView !== 'creation') return;
     let active = true;
     setLoadingCreatedBots(true);
     setCreatedBotsError('');
@@ -137,6 +137,20 @@ const Creation = () => {
 
     return () => { active = false; };
   }, [botId]);
+
+  const deleteBot = async (bot: CreatedBot) => {
+    if (!window.confirm(`Delete ${bot.name}? This cannot be undone.`)) return;
+    setCreatedBotsError('');
+    setDeletingBotId(bot.botId);
+    try {
+      await api.delete(`/api/market/${bot.botId}`);
+      setCreatedBots((current) => current.filter((item) => item.botId !== bot.botId));
+    } catch (requestError: any) {
+      setCreatedBotsError(requestError?.response?.data?.message || 'Unable to delete this bot. Please try again.');
+    } finally {
+      setDeletingBotId('');
+    }
+  };
 
   const createBot = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -193,7 +207,8 @@ const Creation = () => {
             <label style={labelStyle}>Trade direction<CustomSelect options={['Long', 'Short']} value={tradeDirection} onChange={setTradeDirection} theme={theme} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Efficiency <strong style={{ color: theme.primary }}>{efficiency}%</strong></label><input type="range" min="0" max="100" step="10" value={efficiency} onChange={(event) => setEfficiency(Number(event.target.value))} list="efficiency-steps" style={{ width: '100%', accentColor: theme.primary, cursor: 'grab' }} /><datalist id="efficiency-steps">{Array.from({ length: 11 }, (_, index) => <option key={index} value={index * 10} label={`${index * 10}%`} />)}</datalist><div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span></div></div>
             {error && <NotificationBanner tone="error" title="Unable to create trading bot" message={error} />}{message && <NotificationBanner tone="success" title="Trading bot created" message={message} />}
-            <button type="submit" disabled={saving} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving ? 'wait' : 'pointer' }}>{saving ? <InlineLoadingDots /> : 'Create bot'}</button>
+            {createdBots.length >= 10 && <small style={{ color: theme.danger }}>You have reached the maximum of 10 created bots. Delete a bot before creating another.</small>}
+            <button type="submit" disabled={saving || createdBots.length >= 10} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving || createdBots.length >= 10 ? 'not-allowed' : 'pointer', opacity: createdBots.length >= 10 ? 0.55 : 1 }}>{saving ? <InlineLoadingDots /> : 'Create bot'}</button>
           </form>
           </div>
           <div style={outerCardStyle}>
@@ -201,7 +216,7 @@ const Creation = () => {
           </div>
         </div> : <div style={{ display: 'grid', gap: 10, marginTop: 18 }}>
           {createdBotsError && <NotificationBanner tone="error" title="Unable to load created bots" message={createdBotsError} />}
-          {loadingCreatedBots ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : createdBots.length ? createdBots.map((bot) => <article key={bot._id || bot.botId} style={outerCardStyle}><section style={{ ...innerCardStyle, gap: 8 }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, color: theme.primary }}><Bot size={20} /></div><div style={{ minWidth: 0, flex: 1 }}><h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850 }}>{bot.name}</h3><small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.symbol || 'No symbol selected'} · Bot ID {bot.botId}</small></div></div></section><section style={{ ...innerCardStyle, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Efficiency</small><strong style={{ fontSize: '0.88rem' }}>{bot.efficiency ?? 0}%</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Direction</small><strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.tradeDirection || 'long'}</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trade range</small><strong style={{ fontSize: '0.88rem' }}>{bot.minTradeAmount ?? 0}–{bot.maxTradeAmount ?? 0}</strong></div></section></article>) : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>You have not created any bots yet.</p>}
+          {loadingCreatedBots ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : createdBots.length ? createdBots.map((bot) => <article key={bot._id || bot.botId} style={outerCardStyle}><section style={{ ...innerCardStyle, gap: 8 }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, color: theme.primary }}><Bot size={20} /></div><div style={{ minWidth: 0, flex: 1 }}><h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850 }}>{bot.name}</h3><small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.symbol || 'No symbol selected'} · Bot ID {bot.botId}</small></div></div></section><section style={{ ...innerCardStyle, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Efficiency</small><strong style={{ fontSize: '0.88rem' }}>{bot.efficiency ?? 0}%</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Direction</small><strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.tradeDirection || 'long'}</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trade range</small><strong style={{ fontSize: '0.88rem' }}>{bot.minTradeAmount ?? 0}–{bot.maxTradeAmount ?? 0}</strong></div><button type="button" onClick={() => deleteBot(bot)} disabled={deletingBotId === bot.botId} style={{ border: `1px solid ${theme.danger}`, borderRadius: 10, padding: '8px 10px', background: 'transparent', color: theme.danger, fontWeight: 800, cursor: deletingBotId === bot.botId ? 'wait' : 'pointer', opacity: deletingBotId && deletingBotId !== bot.botId ? 0.55 : 1 }}>{deletingBotId === bot.botId ? <InlineLoadingDots /> : 'Delete bot'}</button></section></article>) : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>You have not created any bots yet.</p>}
         </div>}
       </div><NowBar />
     </main>
