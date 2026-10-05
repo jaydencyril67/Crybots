@@ -13,8 +13,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '90px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '14px', marginTop: '10px' },
-  card: { ...createHybridCardStyles(theme).card },
-  rowList: { display: 'grid', gap: '10px', width: '100%', minWidth: 0, padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
+  outerCard: {
+    padding: '10px',
+    borderRadius: '16px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+    width: '100%',
+    minWidth: 0,
+    boxSizing: 'border-box' as const,
+  },
   dangerRow: { width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
   title: { margin: 0, fontSize: '0.96rem', fontWeight: 800, color: theme.text },
@@ -118,13 +125,16 @@ const AutoExitPage = () => {
         <main style={styles.shell}>
           <div style={styles.content}>
             <button type="button" style={styles.back} onClick={() => navigate('/exit')}><ArrowLeft size={17} /> Exit</button>
-            <div style={styles.rowList}>
+            <div style={styles.outerCard}>
               <section style={styles.dangerRow}>
                 <h3 style={styles.title}>Automatic Exit</h3>
                 <p style={styles.text}>Set an automatic exit for inactivity or schedule a specific time to end this session.</p>
-                <div style={styles.dangerRow}>
-                  <strong>Exit when the app is idle</strong>
-                  <p style={styles.status}>End your session after the selected period of inactivity. Scheduled exit remains independent.</p>
+              </section>
+            </div>
+            <div style={styles.outerCard}>
+              <section style={styles.dangerRow}>
+                <h3 style={styles.title}>Exit when the app is idle</h3>
+                <p style={styles.status}>End your session after the selected period of inactivity. Scheduled exit remains independent.</p>
                   <div style={styles.buttonRow}>
                     <span style={styles.status}>Timeout</span>
                     <div style={{ display: 'grid', gap: '8px', width: '100%', maxWidth: '320px' }}>
@@ -137,15 +147,15 @@ const AutoExitPage = () => {
                   </div>
                 </div>
               </section>
+            </div>
+            <div style={styles.outerCard}>
               <section style={styles.dangerRow}>
-                <div style={styles.dangerRow}>
-                  <strong>Scheduled exit</strong>
-                  <p style={styles.status}>{scheduledExit ? `Set for ${scheduledExit.replace('T', ' ')}` : 'No scheduled exit set.'}</p>
+                <h3 style={styles.title}>Scheduled exit</h3>
+                <p style={styles.status}>{scheduledExit ? `Set for ${scheduledExit.replace('T', ' ')}` : 'No scheduled exit set.'}</p>
                   <div style={styles.buttonRow}>
                     <button type="button" style={styles.button} disabled={scheduleSaving} onClick={() => setShowDatePicker(true)}>{scheduledExit ? 'Change time' : 'Choose time'}</button>
                     {scheduledExit && <button type="button" style={styles.button} disabled={scheduleSaving} onClick={cancelSchedule}>{scheduleSaving ? <InlineLoadingDots /> : 'Cancel scheduled exit'}</button>}
                   </div>
-                </div>
                 <p style={styles.status} aria-live="polite">{status}</p>
               </section>
             </div>
