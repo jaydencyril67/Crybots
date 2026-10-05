@@ -21,7 +21,6 @@ const symbolOptions: SymbolOption[] = [
 ];
 
 const payoutOptions = ['Manual', 'Automatic'];
-const percentageOptions = ['0.5', '1', '2', '3', '5', '10'];
 
 const fallbackTradingViewSymbols: Record<string, TradingViewResult[]> = {
   stocks: [
@@ -78,8 +77,7 @@ const Creation = () => {
   const [selectedTradingSymbol, setSelectedTradingSymbol] = useState(selectedSymbol.tradingViewSymbol);
   const [payoutSystem, setPayoutSystem] = useState('Manual');
   const [tradeDirection, setTradeDirection] = useState('Long');
-  const [takeProfit, setTakeProfit] = useState('2');
-  const [stopLoss, setStopLoss] = useState('1');
+  const [efficiency, setEfficiency] = useState(50);
   const [minTradeAmount, setMinTradeAmount] = useState('');
   const [maxTradeAmount, setMaxTradeAmount] = useState('');
   const [saving, setSaving] = useState(false);
@@ -140,8 +138,7 @@ const Creation = () => {
         symbol: selectedTradingSymbol,
         payoutSystem: payoutSystem.toLowerCase(),
         tradeDirection: tradeDirection.toLowerCase(),
-        takeProfitPercent: Number(takeProfit),
-        stopLossPercent: Number(stopLoss),
+        efficiency,
         minTradeAmount: minimumTrade,
         maxTradeAmount: maximumTrade,
       });
@@ -167,7 +164,7 @@ const Creation = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}><label style={labelStyle}>Min trade amount<input type="number" min="0.01" step="0.01" value={minTradeAmount} onChange={(event) => setMinTradeAmount(event.target.value)} placeholder="10" style={inputStyle} /></label><label style={labelStyle}>Max trade amount<input type="number" min="0.01" step="0.01" value={maxTradeAmount} onChange={(event) => setMaxTradeAmount(event.target.value)} placeholder="100" style={inputStyle} /></label></div>
             <label style={labelStyle}>Payout system<CustomSelect options={payoutOptions} value={payoutSystem} onChange={setPayoutSystem} theme={theme} /></label>
             <label style={labelStyle}>Trade direction<CustomSelect options={['Long', 'Short']} value={tradeDirection} onChange={setTradeDirection} theme={theme} /></label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}><label style={labelStyle}>Take profit<CustomSelect options={percentageOptions} value={takeProfit} onChange={setTakeProfit} theme={theme} formatOption={(option) => `${option}%`} /></label><label style={labelStyle}>Stop loss<CustomSelect options={percentageOptions} value={stopLoss} onChange={setStopLoss} theme={theme} formatOption={(option) => `${option}%`} /></label></div>
+            <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Efficiency <strong style={{ color: theme.primary }}>{efficiency}%</strong></label><input type="range" min="0" max="100" step="10" value={efficiency} onChange={(event) => setEfficiency(Number(event.target.value))} list="efficiency-steps" style={{ width: '100%', accentColor: theme.primary, cursor: 'grab' }} /><datalist id="efficiency-steps">{Array.from({ length: 11 }, (_, index) => <option key={index} value={index * 10} label={`${index * 10}%`} />)}</datalist><div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span></div></div>
             {error && <NotificationBanner tone="error" title="Unable to create trading bot" message={error} />}{message && <NotificationBanner tone="success" title="Trading bot created" message={message} />}
             <button type="submit" disabled={saving} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving ? 'wait' : 'pointer' }}>{saving ? <InlineLoadingDots /> : 'Create bot'}</button>
           </form>
