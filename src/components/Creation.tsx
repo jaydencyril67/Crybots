@@ -72,7 +72,7 @@ const Creation = () => {
     <Helmet><title>Create trading bot | KingsHall</title></Helmet>
     <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 90 }}>
       <div style={{ maxWidth: 980, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) 16px' }}>
-        <button type="button" onClick={() => navigate('/trade/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Market</button>
+        <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Market</button>
         <header style={{ margin: '24px 0 18px' }}><p style={{ margin: 0, color: theme.primary, fontWeight: 800, letterSpacing: '0.08em', fontSize: '0.73rem' }}>TRADING TOOLS</p><h1 style={{ margin: '6px 0', fontSize: 'clamp(1.55rem, 4vw, 2.2rem)' }}>Create a trading bot</h1><p style={{ margin: 0, color: theme.textMuted, lineHeight: 1.5 }}>Set your bot’s strategy and let the backend assign a unique six-digit ID automatically.</p></header>
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(280px, 0.85fr)', gap: 18, alignItems: 'start' }}>
           <form onSubmit={createBot} style={{ display: 'grid', gap: 16, padding: 18, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>

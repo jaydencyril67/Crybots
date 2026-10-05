@@ -158,7 +158,7 @@ const getRouteKey = () => {
   if (pathname === '/agent' || hash === '#/agent') return 'agent';
   if (pathname === '/trade' || hash === '#/trade') return 'trade';
   if (pathname === '/trade/chart' || hash === '#/trade/chart') return 'trade-chart';
-  if (pathname === '/trade/market' || hash === '#/trade/market') return 'trade-market';
+  if (pathname === '/market' || hash === '#/market') return 'trade-market';
   if (pathname === '/trade/creation' || hash === '#/trade/creation') return 'trade-creation';
   if (pathname === '/trade/portfolio' || hash === '#/trade/portfolio') return 'trade-portfolio';
   if (pathname === '/trade/history' || hash === '#/trade/history') return 'trade-history';
@@ -235,7 +235,7 @@ const routeToKey = (path: string) => {
   if (path === '/agent' || path === '#/agent') return 'agent';
   if (path === '/trade' || path === '#/trade') return 'trade';
   if (path === '/trade/chart' || path === '#/trade/chart') return 'trade-chart';
-  if (path === '/trade/market' || path === '#/trade/market') return 'trade-market';
+  if (path === '/market' || path === '#/market') return 'trade-market';
   if (path === '/trade/creation' || path === '#/trade/creation') return 'trade-creation';
   if (path === '/trade/portfolio' || path === '#/trade/portfolio') return 'trade-portfolio';
   if (path === '/trade/history' || path === '#/trade/history') return 'trade-history';
