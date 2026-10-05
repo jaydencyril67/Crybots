@@ -205,6 +205,7 @@ const routeToKey = (path: string) => {
   if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'account-confirmed';
   if (normalizedPath === '/signin' || normalizedPath === '#/signin') return 'signin';
   if (normalizedPath === '/admin-home' || normalizedPath === '#/admin-home') return 'admin-home';
+  if (normalizedPath === '/admin/settings' || normalizedPath === '#/admin/settings') return 'admin-settings';
   if (normalizedPath === '/admin/users' || normalizedPath === '#/admin/users') return 'admin-users';
   if (normalizedPath === '/admin/deposits' || normalizedPath === '#/admin/deposits') return 'admin-deposits';
   if (normalizedPath.startsWith('/admin/deposit-stats/') || normalizedPath.startsWith('#/admin/deposit-stats/')) return 'admin-deposit-stats';
