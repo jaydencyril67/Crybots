@@ -93,6 +93,7 @@ const CommercePage = () => {
       setMessage('Your bot is now listed in Commerce.');
       setListingBotId('');
       setListingPrice('');
+      setActiveView('browse');
       await loadCommerce();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to list your bot for sale. Please try again.');
