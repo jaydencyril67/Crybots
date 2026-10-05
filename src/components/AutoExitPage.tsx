@@ -127,12 +127,6 @@ const AutoExitPage = () => {
             <button type="button" style={styles.back} onClick={() => navigate('/exit')}><ArrowLeft size={17} /> Exit</button>
             <div style={styles.outerCard}>
               <section style={styles.dangerRow}>
-                <h3 style={styles.title}>Automatic Exit</h3>
-                <p style={styles.text}>Set an automatic exit for inactivity or schedule a specific time to end this session.</p>
-              </section>
-            </div>
-            <div style={styles.outerCard}>
-              <section style={styles.dangerRow}>
                 <h3 style={styles.title}>Exit when the app is idle</h3>
                 <p style={styles.status}>End your session after the selected period of inactivity. Scheduled exit remains independent.</p>
                   <div style={styles.buttonRow}>
