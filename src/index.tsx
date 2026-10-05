@@ -50,6 +50,7 @@ import Chart from './components/Chart';
 import Market from './components/Market';
 import Creation from './components/Creation';
 import RentalsPage from './components/RentalsPage';
+import CommercePage from './components/CommercePage';
 import Portfolio from './components/Portfolio';
 import TradeHistory from './components/TradeHistory';
 import LogsPage from './components/LogsPage';
@@ -162,6 +163,7 @@ const getRouteKey = () => {
   if (pathname === '/market' || hash === '#/market') return 'market';
   if (pathname === '/creation' || hash === '#/creation') return 'creation';
   if (pathname === '/rentals' || hash === '#/rentals') return 'rentals';
+  if (pathname === '/commerce' || hash === '#/commerce') return 'commerce';
   if (pathname === '/portfolio' || hash === '#/portfolio') return 'portfolio';
   if (pathname === '/trade/history' || hash === '#/trade/history') return 'trade-history';
   if (pathname === '/logs' || hash === '#/logs') return 'logs';
@@ -240,6 +242,7 @@ const routeToKey = (path: string) => {
   if (path === '/market' || path === '#/market') return 'market';
   if (path === '/creation' || path === '#/creation') return 'creation';
   if (path === '/rentals' || path === '#/rentals') return 'rentals';
+  if (path === '/commerce' || path === '#/commerce') return 'commerce';
   if (path === '/portfolio' || path === '#/portfolio') return 'portfolio';
   if (path === '/trade/history' || path === '#/trade/history') return 'trade-history';
   if (path === '/logs' || path === '#/logs') return 'logs';
@@ -549,6 +552,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'market') return <ProtectedRoute><Market /></ProtectedRoute>;
     if (displayedRouteKey === 'creation') return <ProtectedRoute><Creation /></ProtectedRoute>;
     if (displayedRouteKey === 'rentals') return <ProtectedRoute><RentalsPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'commerce') return <ProtectedRoute><CommercePage /></ProtectedRoute>;
     if (displayedRouteKey === 'portfolio') return <ProtectedRoute><Portfolio /></ProtectedRoute>;
     if (displayedRouteKey === 'trade-history') return <ProtectedRoute><TradeHistory /></ProtectedRoute>;
     if (displayedRouteKey === 'logs') return <ProtectedRoute><LogsPage /></ProtectedRoute>;
