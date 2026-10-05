@@ -22,11 +22,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   status: { margin: '5px 0 0', fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
   button: { borderRadius: '999px', padding: '12px 16px', border: `1px solid ${theme.primary}`, cursor: 'pointer', fontWeight: 700, color: theme.textInverse, background: theme.primary, width: '100%', maxWidth: '100%' },
-  selectorWrapper: { position: 'relative' as const, width: '100%', maxWidth: '220px' },
-  selector: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', font: 'inherit', fontWeight: 700, cursor: 'pointer', textAlign: 'left' as const },
-  selectorMenu: { position: 'absolute' as const, zIndex: 10, top: 'calc(100% + 6px)', left: 0, right: 0, maxHeight: '220px', overflowY: 'auto' as const, padding: '6px', borderRadius: '14px', border: `1px solid ${theme.borderGlass}`, background: theme.surface, boxShadow: `0 16px 36px ${theme.borderGlass}` },
-  selectorOption: { display: 'block', width: '100%', border: 0, borderRadius: '9px', background: 'transparent', color: theme.text, padding: '9px 10px', font: 'inherit', fontWeight: 700, textAlign: 'left' as const, cursor: 'pointer' },
-  selectedSelectorOption: { background: theme.primary, color: theme.textInverse },
 });
 
 const toLocalDateTimeValue = (value: string) => {
@@ -43,7 +38,6 @@ const AutoExitPage = () => {
   const [idleEnabled, setIdleEnabled] = useState(false);
   const [idleMinutes, setIdleMinutes] = useState(10);
   const [idleSaving, setIdleSaving] = useState(false);
-  const [idlePickerOpen, setIdlePickerOpen] = useState(false);
   const [scheduledExit, setScheduledExitValue] = useState(getScheduledLogout);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [scheduleSaving, setScheduleSaving] = useState(false);
@@ -133,13 +127,10 @@ const AutoExitPage = () => {
                   <p style={styles.status}>End your session after the selected period of inactivity. Scheduled exit remains independent.</p>
                   <div style={styles.buttonRow}>
                     <span style={styles.status}>Timeout</span>
-                    <div style={styles.selectorWrapper}>
-                      <button type="button" aria-haspopup="listbox" aria-expanded={idlePickerOpen} disabled={idleSaving} style={{ ...styles.selector, ...(idleSaving ? { opacity: 0.6, cursor: 'not-allowed' } : {}) }} onClick={() => setIdlePickerOpen((open) => !open)}>
-                        <span>{idleMinutes} minutes</span><span aria-hidden="true">⌄</span>
-                      </button>
-                      {idlePickerOpen ? <div role="listbox" aria-label="Idle exit timeout" style={styles.selectorMenu}>
-                        {[5, 10, 15, 30].map((minutes) => <button key={minutes} type="button" role="option" aria-selected={idleMinutes === minutes} style={{ ...styles.selectorOption, ...(idleMinutes === minutes ? styles.selectedSelectorOption : {}) }} onClick={() => { setIdleMinutes(minutes); setIdlePickerOpen(false); }}>{minutes} minutes</button>)}
-                      </div> : null}
+                    <div style={{ display: 'grid', gap: '8px', width: '100%', maxWidth: '320px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: theme.text, fontWeight: 700 }}><span>{idleMinutes} minutes</span><span style={{ color: theme.textMuted, fontSize: '0.8rem' }}>5–30</span></div>
+                      <input type="range" min="5" max="30" step="5" value={idleMinutes} onChange={(event) => setIdleMinutes(Number(event.target.value))} disabled={idleSaving} aria-label="Idle exit timeout in minutes" style={{ width: '100%', accentColor: theme.primary, cursor: idleSaving ? 'not-allowed' : 'grab', opacity: idleSaving ? 0.65 : 1 }} />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
                     </div>
                     {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleExit(true)}>{idleSaving ? <InlineLoadingDots /> : 'Save timeout'}</button>}
                     <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <InlineLoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
