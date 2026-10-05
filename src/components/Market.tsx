@@ -28,37 +28,53 @@ const categories = [
   { name: 'Creation', description: 'Bring new ideas to life and build something valuable for the community.' },
 ];
 
-const Market = (_props: Props) => {
+const Market = ({ mode }: Props) => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [selectedCategory, setSelectedCategory] = React.useState<string | null>(null);
+  const isMarket = mode === 'market';
+  const pageTitle = mode === 'portfolio' ? 'Portfolio' : mode === 'history' ? 'Trade history' : 'Market';
+  const pageDescription = mode === 'portfolio'
+    ? 'Review your balances, positions, and trading performance.'
+    : mode === 'history'
+      ? 'Review completed and cancelled trades from your bots.'
+      : 'Select one of the options below to get started.';
 
   return (
     <HybridTheme mode={themeMode}>
-      <Helmet><title>Market | KingsHall</title></Helmet>
+      <Helmet><title>{pageTitle} | KingsHall</title></Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
           <section style={styles.card}>
-            <h2 style={styles.cardHeading}>Explore the market</h2>
-            <p style={styles.cardText}>Select one of the options below to get started.</p>
-            <div style={styles.list}>
-              {categories.map(({ name, description }) => {
-                const isSelected = selectedCategory === name;
-                return (
-                  <div key={name} style={styles.row}>
-                    <div>
-                      <p style={styles.label}>{name}</p>
-                      <p style={styles.description}>{description}</p>
+            <h2 style={styles.cardHeading}>{isMarket ? 'Explore the market' : pageTitle}</h2>
+            <p style={styles.cardText}>{pageDescription}</p>
+            {isMarket ? (
+              <div style={styles.list}>
+                {categories.map(({ name, description }) => {
+                  const isSelected = selectedCategory === name;
+                  return (
+                    <div key={name} style={styles.row}>
+                      <div>
+                        <p style={styles.label}>{name}</p>
+                        <p style={styles.description}>{description}</p>
+                      </div>
+                      <button type="button" style={{ ...styles.action, ...(isSelected ? { background: theme.success, borderColor: theme.success } : {}) }} onClick={() => setSelectedCategory(name)} aria-pressed={isSelected}>
+                        {isSelected ? 'Selected' : 'Explore'}
+                      </button>
                     </div>
-                    <button type="button" style={{ ...styles.action, ...(isSelected ? { background: theme.success, borderColor: theme.success } : {}) }} onClick={() => setSelectedCategory(name)} aria-pressed={isSelected}>
-                      {isSelected ? 'Selected' : 'Explore'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={styles.row}>
+                <div>
+                  <p style={styles.label}>{mode === 'portfolio' ? 'No portfolio data available' : 'No trade history available'}</p>
+                  <p style={styles.description}>Trading records will appear here when activity is available.</p>
+                </div>
+              </div>
+            )}
           </section>
         </div>
         <NowBar />
