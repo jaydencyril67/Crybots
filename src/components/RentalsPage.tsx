@@ -66,17 +66,6 @@ const RentalsPage = () => {
 
   useEffect(() => {
     void loadRentals();
-
-    const refreshWhenVisible = () => {
-      if (document.visibilityState === 'visible') void loadRentals();
-    };
-
-    window.addEventListener('focus', refreshWhenVisible);
-    document.addEventListener('visibilitychange', refreshWhenVisible);
-    return () => {
-      window.removeEventListener('focus', refreshWhenVisible);
-      document.removeEventListener('visibilitychange', refreshWhenVisible);
-    };
   }, []);
 
   const rentBot = async (bot: RentalBot) => {
@@ -88,7 +77,7 @@ const RentalsPage = () => {
     try {
       await api.post(`/api/rentals/${botId}/rent`);
       setMessage(`${bot.name} has been added to your Rentals.`);
-      await loadRentals();
+      setAvailableBots((current) => current.filter((availableBot) => (availableBot.botId || availableBot._id || availableBot.id) !== botId));
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to rent this bot. Please try again.');
     } finally {
@@ -111,7 +100,6 @@ const RentalsPage = () => {
       setListingBotId('');
       setListingPrice('');
       setShowListingForm(false);
-      await loadRentals();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to list your bot. Please try again.');
     } finally {
