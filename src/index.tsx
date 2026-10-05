@@ -48,7 +48,7 @@ import MenuPage from './components/MenuPage';
 import TradePage from './components/TradePage';
 import Chart from './components/Chart';
 import Market from './components/Market';
-import TradingBotCreationPage from './components/TradingBotCreationPage';
+import Creation from './components/Creation';
 import Portfolio from './components/Portfolio';
 import TradeHistory from './components/TradeHistory';
 import LogsPage from './components/LogsPage';
@@ -544,7 +544,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'trade') return <ProtectedRoute><TradePage /></ProtectedRoute>;
     if (displayedRouteKey === 'trade-chart') return <ProtectedRoute><Chart /></ProtectedRoute>;
     if (displayedRouteKey === 'trade-market') return <ProtectedRoute><Market /></ProtectedRoute>;
-    if (displayedRouteKey === 'trade-creation') return <ProtectedRoute><TradingBotCreationPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'trade-creation') return <ProtectedRoute><Creation /></ProtectedRoute>;
     if (displayedRouteKey === 'trade-portfolio') return <ProtectedRoute><Portfolio /></ProtectedRoute>;
     if (displayedRouteKey === 'trade-history') return <ProtectedRoute><TradeHistory /></ProtectedRoute>;
     if (displayedRouteKey === 'logs') return <ProtectedRoute><LogsPage /></ProtectedRoute>;

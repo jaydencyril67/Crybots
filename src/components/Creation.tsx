@@ -21,7 +21,7 @@ const symbolOptions: SymbolOption[] = [
 const payoutOptions = ['Manual', 'Automatic'];
 const percentageOptions = ['0.5', '1', '2', '3', '5', '10'];
 
-const TradingBotCreationPage = () => {
+const Creation = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [name, setName] = useState('');
@@ -92,4 +92,4 @@ const TradingBotCreationPage = () => {
   </HybridTheme>;
 };
 
-export default TradingBotCreationPage;
+export default Creation;
