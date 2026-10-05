@@ -141,15 +141,18 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     fontSize: '0.78rem',
     fontWeight: 600,
   },
-  dashboardFrame: {
-    position: 'relative' as const,
-    zIndex: 1,
+  cardList: {
     display: 'grid',
-    gap: '10px',
+    gap: '14px',
+    width: '100%',
+    minWidth: 0,
+  },
+  card: {
     padding: '10px',
     borderRadius: '16px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
+    minWidth: 0,
     boxSizing: 'border-box' as const,
   },
   heroGrid: {
@@ -558,8 +561,8 @@ const HomePage = () => {
           <div style={styles.glow} />
           <div style={styles.topLine} />
 
-          <div style={styles.dashboardFrame}>
-            <div style={styles.heroGrid}>
+          <div style={styles.cardList}>
+            <div style={styles.card}>
             <section style={styles.heroCard}>
               <p style={styles.greeting}>{greeting}</p>
               <h2 style={styles.title}>
@@ -599,7 +602,9 @@ const HomePage = () => {
                 <span style={styles.pill}>No account details shown here</span>
               </div>
             </section>
+            </div>
 
+            <div style={styles.card}>
             <section style={styles.panel}>
               <div style={styles.liveHeader}>
                 <div>
@@ -638,7 +643,8 @@ const HomePage = () => {
             </section>
             </div>
 
-            <div style={styles.sectionGrid}>
+            <div style={styles.card}>
+            <section style={styles.panel}>
             <section style={styles.panel}>
               <p style={styles.panelTitle}>Market pulse</p>
               <p style={styles.panelSub}>A simple read on breadth and momentum across the coins in view.</p>
@@ -679,6 +685,7 @@ const HomePage = () => {
               </div>
             </section>
 
+            <div style={styles.card}>
             <section style={styles.panel}>
               <p style={styles.panelTitle}>Financial advice</p>
               <p style={styles.panelSub}>A rotating insight keeps the guidance fresh and relevant.</p>
@@ -704,7 +711,6 @@ const HomePage = () => {
                 </div>
               </div>
             </section>
-
             </div>
           </div>
         </div>
