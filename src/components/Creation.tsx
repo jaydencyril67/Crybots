@@ -21,7 +21,6 @@ const symbolOptions: SymbolOption[] = [
   { value: 'crypto', label: 'Crypto' },
 ];
 
-const payoutOptions = ['Manual', 'Automatic'];
 
 type CustomSelectProps = { options: string[]; value: string; onChange: (value: string) => void; theme: typeof HYBRID_THEME_TOKENS.dark; formatOption?: (option: string) => string };
 
