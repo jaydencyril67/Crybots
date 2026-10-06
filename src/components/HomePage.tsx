@@ -24,7 +24,7 @@ type MarketCoin = {
   symbol: string;
   name: string;
   price: number;
-  change24h: number;
+  marketChangePercent: number;
   id: string;
 };
 
@@ -36,12 +36,12 @@ type AdviceCard = {
 };
 
 const marketCoins: MarketCoin[] = [
-  { symbol: 'BTC', name: 'Bitcoin', price: 0, change24h: 0, id: 'bitcoin' },
-  { symbol: 'ETH', name: 'Ethereum', price: 0, change24h: 0, id: 'ethereum' },
-  { symbol: 'BNB', name: 'BNB', price: 0, change24h: 0, id: 'binancecoin' },
-  { symbol: 'SOL', name: 'Solana', price: 0, change24h: 0, id: 'solana' },
-  { symbol: 'XRP', name: 'XRP', price: 0, change24h: 0, id: 'ripple' },
-  { symbol: 'ADA', name: 'Cardano', price: 0, change24h: 0, id: 'cardano' },
+  { symbol: 'BTC', name: 'Bitcoin', price: 0, marketChangePercent: 0, id: 'bitcoin' },
+  { symbol: 'ETH', name: 'Ethereum', price: 0, marketChangePercent: 0, id: 'ethereum' },
+  { symbol: 'BNB', name: 'BNB', price: 0, marketChangePercent: 0, id: 'binancecoin' },
+  { symbol: 'SOL', name: 'Solana', price: 0, marketChangePercent: 0, id: 'solana' },
+  { symbol: 'XRP', name: 'XRP', price: 0, marketChangePercent: 0, id: 'ripple' },
+  { symbol: 'ADA', name: 'Cardano', price: 0, marketChangePercent: 0, id: 'cardano' },
 ];
 
 const dashboardMetrics = [
@@ -511,7 +511,7 @@ const HomePage = () => {
           return {
             ...coin,
             price: Number.isFinite(Number(live?.price)) ? Number(live.price) : coin.price,
-            change24h: Number.isFinite(Number(live?.change24h)) ? Number(live.change24h) : coin.change24h,
+            marketChangePercent: Number.isFinite(Number(live?.marketChangePercent)) ? Number(live.marketChangePercent) : coin.marketChangePercent,
           };
         });
 
@@ -537,9 +537,9 @@ const HomePage = () => {
   }, []);
   const advice = advicePool[hourlyAdviceIndex];
   const marketSummary = useMemo(() => {
-    const winners = liveCoins.filter((coin) => coin.change24h >= 0).length;
-    const avgMove = liveCoins.reduce((sum, coin) => sum + coin.change24h, 0) / liveCoins.length;
-    const topMover = [...liveCoins].sort((a, b) => Math.abs(b.change24h) - Math.abs(a.change24h))[0];
+    const winners = liveCoins.filter((coin) => coin.marketChangePercent >= 0).length;
+    const avgMove = liveCoins.reduce((sum, coin) => sum + coin.marketChangePercent, 0) / liveCoins.length;
+    const topMover = [...liveCoins].sort((a, b) => Math.abs(b.marketChangePercent) - Math.abs(a.marketChangePercent))[0];
 
     return {
       winners,
@@ -606,7 +606,7 @@ const HomePage = () => {
               <div style={styles.liveHeader}>
                 <div>
                   <p style={styles.panelTitle}>Live market watch</p>
-                  <p style={styles.panelSub}>A quick snapshot of major coins with 24h movement and a clean market pulse.</p>
+                  <p style={styles.panelSub}>A quick snapshot of major coins with TradingView market movement and a clean market pulse.</p>
                 </div>
                 <span style={styles.pulse}>
                   <Activity style={styles.icon} />
@@ -626,8 +626,8 @@ const HomePage = () => {
                     </div>
                     <div>
                       <p style={styles.coinPrice}>{formatCurrency(coin.price)}</p>
-                      <p style={{ ...styles.coinChange, color: coin.change24h >= 0 ? theme.success : theme.danger }}>
-                        {formatChange(coin.change24h)} 24h
+                      <p style={{ ...styles.coinChange, color: coin.marketChangePercent >= 0 ? theme.success : theme.danger }}>
+                        {formatChange(coin.marketChangePercent)} market change
                       </p>
                     </div>
                   </article>
@@ -655,7 +655,7 @@ const HomePage = () => {
                 <div style={styles.featureItem}>
                   <TrendingUp style={styles.icon} />
                   <p style={styles.featureText}>
-                    {marketSummary.winners} of {liveCoins.length} coins are positive over the last 24 hours.
+                    {marketSummary.winners} of {liveCoins.length} coins are positive in the current TradingView market change.
                   </p>
                 </div>
                 <div style={styles.featureItem}>
@@ -667,7 +667,7 @@ const HomePage = () => {
                 <div style={styles.featureItem}>
                   <Coins style={styles.icon} />
                   <p style={styles.featureText}>
-                    Biggest mover right now: {marketSummary.topMover.name} ({marketSummary.topMover.symbol}) at {formatChange(marketSummary.topMover.change24h)}.
+                    Biggest mover right now: {marketSummary.topMover.name} ({marketSummary.topMover.symbol}) at {formatChange(marketSummary.topMover.marketChangePercent)}.
                   </p>
                 </div>
                 <div style={styles.featureItem}>
