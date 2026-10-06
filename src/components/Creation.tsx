@@ -60,6 +60,8 @@ const Creation = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [creationPricing, setCreationPricing] = useState<{ creationCost: number; balance: number; canAfford: boolean } | null>(null);
+  const [pricingLoading, setPricingLoading] = useState(false);
 
   const [tradingViewResults, setTradingViewResults] = useState<TradingViewResult[]>([]);
   const [searchingSymbols, setSearchingSymbols] = useState(false);
@@ -84,6 +86,26 @@ const Creation = () => {
     });
     return () => { active = false; };
   }, [activeView]);
+
+  useEffect(() => {
+    if (!selectedTradingSymbol) {
+      setCreationPricing(null);
+      return;
+    }
+    let active = true;
+    setPricingLoading(true);
+    api.get('/api/market/pricing', { params: { symbolType: symbol, symbol: selectedTradingSymbol, payoutSystem: payoutSystem.toLowerCase(), efficiency } })
+      .then((response) => {
+        if (active) setCreationPricing(response.data || null);
+      })
+      .catch(() => {
+        if (active) setCreationPricing(null);
+      })
+      .finally(() => {
+        if (active) setPricingLoading(false);
+      });
+    return () => { active = false; };
+  }, [selectedTradingSymbol, symbol, payoutSystem, efficiency]);
 
   useEffect(() => {
     if (!/^\d{6}$/.test(botId)) {
@@ -177,9 +199,9 @@ const Creation = () => {
             <label style={labelStyle}>Payout system<CustomSelect options={payoutOptions} value={payoutSystem} onChange={setPayoutSystem} theme={theme} /></label>
             <label style={labelStyle}>Trade direction<CustomSelect options={['Long', 'Short']} value={tradeDirection} onChange={setTradeDirection} theme={theme} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Efficiency <strong style={{ color: theme.primary }}>{efficiency}%</strong></label><input type="range" min="0" max="100" step="10" value={efficiency} onChange={(event) => setEfficiency(Number(event.target.value))} list="efficiency-steps" style={{ width: '100%', accentColor: theme.primary, cursor: 'grab' }} /><datalist id="efficiency-steps">{Array.from({ length: 11 }, (_, index) => <option key={index} value={index * 10} label={`${index * 10}%`} />)}</datalist><div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span></div></div>
-            {error && <NotificationBanner tone="error" title="Unable to create trading bot" message={error} />}{message && <NotificationBanner tone="success" title="Trading bot created" message={message} />}
+            {creationPricing && <section style={{ ...innerCardStyle, gap: 6 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}><strong>Creation cost</strong><strong style={{ color: theme.primary }}>{pricingLoading ? 'Checking…' : `${creationPricing.creationCost.toFixed(2)} USDT`}</strong></div><small style={{ color: creationPricing.canAfford ? theme.success : theme.danger }}>{creationPricing.canAfford ? `Available balance: ${Number(creationPricing.balance || 0).toFixed(2)} USDT` : `Insufficient balance. You need ${creationPricing.creationCost.toFixed(2)} USDT.`}</small></section>}{error && <NotificationBanner tone="error" title="Unable to create trading bot" message={error} />}{message && <NotificationBanner tone="success" title="Trading bot created" message={message} />}
             {createdBots.length >= 10 && <small style={{ color: theme.danger }}>You have reached the maximum of 10 created bots. Delete a bot before creating another.</small>}
-            <button type="submit" disabled={saving || createdBots.length >= 10} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving || createdBots.length >= 10 ? 'not-allowed' : 'pointer', opacity: createdBots.length >= 10 ? 0.55 : 1 }}>{saving ? <InlineLoadingDots /> : 'Create bot'}</button>
+            <button type="submit" disabled={saving || createdBots.length >= 10 || (creationPricing !== null && !creationPricing.canAfford)} style={{ border: 0, borderRadius: 999, padding: '12px 16px', background: theme.primary, color: theme.textInverse, fontWeight: 850, cursor: saving || createdBots.length >= 10 ? 'not-allowed' : 'pointer', opacity: createdBots.length >= 10 ? 0.55 : 1 }}>{saving ? <InlineLoadingDots /> : 'Create bot'}</button>
           </form>
           </div>
           <div style={outerCardStyle}>
