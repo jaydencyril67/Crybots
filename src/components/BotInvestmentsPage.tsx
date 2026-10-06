@@ -108,6 +108,34 @@ const BotInvestmentsPage = () => {
     <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: 90 }}>
       <div style={{ width: '100%', maxWidth: 920, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Market</button>
+        {selectedBot ? <section style={{ minHeight: 'calc(100vh - 170px)', marginTop: 22, padding: 'clamp(16px, 4vw, 30px)', borderRadius: 18, border: `1px solid ${theme.primary}`, background: theme.surfaceGlass, boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+            <button type="button" onClick={() => { setSelectedBot(null); setAmount(''); setError(''); }} style={{ ...button, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, padding: '8px 11px' }}><ArrowLeft size={16} /> Back to My Bots</button>
+          </div>
+          {error && <NotificationBanner tone="error" title="Bot action unavailable" message={error} />}
+          <div style={{ maxWidth: 680, margin: '0 auto', paddingTop: 'clamp(18px, 7vh, 70px)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              <Bot size={34} color={theme.primary} />
+              <h2 style={{ margin: '10px 0 4px', fontSize: '1.35rem', fontWeight: 900 }}>Activate {selectedBot.name}</h2>
+              <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.84rem', lineHeight: 1.5 }}>Set the USDT capital this bot should use before activating it.</p>
+            </div>
+            <div style={{ ...card, display: 'grid', gap: 14 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+                <div><small style={{ display: 'block', color: theme.textMuted }}>Source</small><strong style={{ textTransform: 'capitalize' }}>{selectedBot.source}</strong></div>
+                <div><small style={{ display: 'block', color: theme.textMuted }}>Symbol</small><strong>{selectedBot.symbol || '—'}</strong></div>
+                <div><small style={{ display: 'block', color: theme.textMuted }}>Efficiency</small><strong>{selectedBot.efficiency ?? 0}%</strong></div>
+                <div><small style={{ display: 'block', color: theme.textMuted }}>Direction</small><strong style={{ textTransform: 'capitalize' }}>{selectedBot.tradeDirection || 'long'}</strong></div>
+              </div>
+              <label style={{ display: 'grid', gap: 7, fontSize: '0.84rem', fontWeight: 800 }}>Investment amount (USDT)
+                <input autoFocus type="number" min={selectedBot.minTradeAmount || 0.01} max={selectedBot.maxTradeAmount || undefined} step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit', fontSize: '1rem' }} />
+              </label>
+              <small style={{ color: theme.textMuted }}>Allowed range: {money(selectedBot.minTradeAmount || 0)} – {money(selectedBot.maxTradeAmount || 0)}</small>
+              <button type="button" disabled={busyBotId === selectedBot.botId} onClick={() => void activate()} style={{ ...button, width: '100%', padding: '12px 16px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                {busyBotId === selectedBot.botId ? <InlineLoadingDots /> : <><TrendingUp size={16} /> Confirm Investment</>}
+              </button>
+            </div>
+          </div>
+        </section> : <>
         <section style={{ marginTop: 22, padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
           <div style={{ padding: '3px 4px 12px' }}>
             <h2 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 850, display: 'flex', alignItems: 'center', gap: 8 }}><Bot size={20} color={theme.primary} /> My Bots</h2>
@@ -142,30 +170,7 @@ const BotInvestmentsPage = () => {
             </article>;
           })}</div> : <div style={{ ...card, color: theme.textMuted }}>You do not have any created, purchased, or rented bots yet.</div>}
         </section>
-
-        {selectedBot ? <section style={{ marginTop: 14, padding: 14, borderRadius: 16, border: `1px solid ${theme.primary}`, background: theme.surfaceGlass }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <button type="button" onClick={() => { setSelectedBot(null); setAmount(''); }} style={{ ...button, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, padding: '7px 10px' }}><ArrowLeft size={15} /> Back</button>
-            <div style={{ minWidth: 0 }}>
-              <h3 style={{ margin: 0, fontSize: '1rem' }}>Activate {selectedBot.name}</h3>
-              <small style={{ color: theme.textMuted }}>Inline activation</small>
-            </div>
-          </div>
-          <div style={{ ...card, display: 'grid', gap: 12 }}>
-            <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.5 }}>Choose how much USDT to allocate to this bot. Your investment becomes the bot's current capital while it is active.</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
-              <div><small style={{ display: 'block', color: theme.textMuted }}>Bot</small><strong>{selectedBot.name}</strong></div>
-              <div><small style={{ display: 'block', color: theme.textMuted }}>Source</small><strong style={{ textTransform: 'capitalize' }}>{selectedBot.source}</strong></div>
-              <div><small style={{ display: 'block', color: theme.textMuted }}>Efficiency</small><strong>{selectedBot.efficiency ?? 0}%</strong></div>
-              <div><small style={{ display: 'block', color: theme.textMuted }}>Direction</small><strong style={{ textTransform: 'capitalize' }}>{selectedBot.tradeDirection || 'long'}</strong></div>
-            </div>
-            <label style={{ display: 'grid', gap: 6, fontSize: '0.82rem', fontWeight: 750 }}>Investment amount (USDT)<input autoFocus type="number" min={selectedBot.minTradeAmount || 0.01} max={selectedBot.maxTradeAmount || undefined} step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' }} /></label>
-            <small style={{ color: theme.textMuted }}>Allowed range: {money(selectedBot.minTradeAmount || 0)} – {money(selectedBot.maxTradeAmount || 0)}</small>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button type="button" disabled={busyBotId === selectedBot.botId} onClick={() => void activate()} style={{ ...button, flex: 1 }}>{busyBotId === selectedBot.botId ? <InlineLoadingDots /> : <><TrendingUp size={15} style={{ verticalAlign: 'middle', marginRight: 5 }} /> Confirm Investment</>}</button>
-            </div>
-          </div>
-        </section> : null}
+        </>}
       </div>
       <NowBar />
     </main>
