@@ -45,6 +45,7 @@ const BotInvestmentsPage = () => {
   const [selectedBot, setSelectedBot] = useState<Bot | null>(null);
   const [amount, setAmount] = useState('');
   const [busyBotId, setBusyBotId] = useState('');
+  const [confirmingBotId, setConfirmingBotId] = useState('');
 
   const styles: Record<string, React.CSSProperties> = {
     page: {
@@ -205,13 +206,13 @@ const BotInvestmentsPage = () => {
   };
 
   const deactivate = async (bot: Bot) => {
-    if (!window.confirm(`Deactivate ${bot.name}? Its current capital will be returned to your USDT balance.`)) return;
     setBusyBotId(bot.botId);
     setError('');
     setMessage('');
     try {
       const response = await api.post(`/api/bot-investments/${bot.botId}/deactivate`);
       setMessage(response.data?.message || 'Bot deactivated successfully.');
+      setConfirmingBotId('');
       await load();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to deactivate this bot.');
@@ -382,12 +383,37 @@ const BotInvestmentsPage = () => {
                               >
                                 {busyBotId === bot.botId ? <InlineLoadingDots /> : <><PlayCircle size={15} /> Activate Bot</>}
                               </button>
+                            ) : confirmingBotId === bot.botId ? (
+                              <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: '1px solid ' + theme.danger, background: theme.surfaceGlass }}>
+                                <div style={{ display: 'grid', gap: 5 }}>
+                                  <p style={{ ...styles.value, fontSize: '0.88rem' }}>Deactivate {bot.name}?</p>
+                                  <p style={styles.note}>Its current capital will be returned to your USDT balance.</p>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                                  <button
+                                    type="button"
+                                    disabled={busyBotId === bot.botId}
+                                    onClick={() => setConfirmingBotId('')}
+                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={busyBotId === bot.botId}
+                                    onClick={() => void deactivate(bot)}
+                                    style={{ ...styles.button, background: theme.danger, borderRadius: 10 }}
+                                  >
+                                    {busyBotId === bot.botId ? <InlineLoadingDots /> : 'Deactivate'}
+                                  </button>
+                                </div>
+                              </div>
                             ) : (
                               <button
                                 type="button"
                                 style={{ ...styles.button, ...styles.mutedButton }}
-                                disabled={busyBotId === bot.botId}
-                                onClick={() => void deactivate(bot)}
+                                disabled={busyBotId === bot.botId || Boolean(confirmingBotId)}
+                                onClick={() => setConfirmingBotId(bot.botId)}
                               >
                                 {busyBotId === bot.botId ? <InlineLoadingDots /> : <><PauseCircle size={15} /> Deactivate</>}
                               </button>
