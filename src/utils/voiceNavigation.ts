@@ -69,6 +69,7 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'NOTIFICATIONS', route: '/notifications' },
   { label: 'TICKETS', route: '/tickets' },
   { label: 'ALERT', route: '/alert' },
+  { label: 'NOTIFICATION COLOR', route: '/notification-color' },
   { label: 'APP USAGE', route: '/app-usage' },
   { label: 'ADMIN CHAT', route: '/admin/chat' },
 ];
@@ -80,7 +81,7 @@ const AUTHENTICATED_ROUTES = new Set([
   '/logs', '/help', '/faq', '/options', '/creation', '/bots',
   '/store', '/about', '/dev', '/api-keys', '/webhooks', '/configure', '/asset',
   '/danger', '/security', '/withdrawals', '/transfer', '/deposit', '/transactions',
-  '/notifications', '/alert', '/app-usage', '/information', '/privacy-policy',
+  '/notifications', '/alert', '/notification-color', '/app-usage', '/information', '/privacy-policy',
   '/community-standards', '/admin/chat',
 ]);
 
@@ -129,6 +130,7 @@ export const VOICE_COMMANDS: VoiceCommand[] = [
   { label: 'TRANSACTIONS', route: '/transactions' },
   { label: 'NOTIFICATIONS', route: '/notifications' },
   { label: 'ALERT', route: '/alert' },
+  { label: 'NOTIFICATION COLOR', route: '/notification-color' },
   { label: 'APP USAGE', route: '/app-usage' },
   { label: 'THEME', route: '/theme' },
   { label: 'NOWBAR', route: '/nowbar' },
