@@ -21,6 +21,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const categories = [
+  { name: 'My Bots', description: 'Activate created, purchased, or rented bots and manage their investments.' },
   { name: 'Commerce', description: 'Buy and sell trading bots with permanent ownership until sold.' },
   { name: 'Rentals', description: 'Rent community-created bots or list your own bots for others to rent.' },
   { name: 'Creation', description: 'Bring new ideas to life and build something valuable for the community.' },
@@ -50,7 +51,7 @@ const Market = () => {
                       <p style={styles.label}>{name}</p>
                       <p style={styles.description}>{description}</p>
                     </div>
-                    <button type="button" style={{ ...styles.action, ...(isSelected ? { background: theme.success, borderColor: theme.success } : {}) }} onClick={() => { setSelectedCategory(name); if (name === 'Creation') navigate('/creation'); if (name === 'Rentals') navigate('/rentals'); if (name === 'Commerce') navigate('/commerce'); }} aria-pressed={isSelected}>
+                    <button type="button" style={{ ...styles.action, ...(isSelected ? { background: theme.success, borderColor: theme.success } : {}) }} onClick={() => { setSelectedCategory(name); if (name === 'My Bots') navigate('/bots'); if (name === 'Creation') navigate('/creation'); if (name === 'Rentals') navigate('/rentals'); if (name === 'Commerce') navigate('/commerce'); }} aria-pressed={isSelected}>
                       {isSelected ? 'Selected' : 'Explore'}
                     </button>
                   </div>
