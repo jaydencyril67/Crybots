@@ -219,8 +219,97 @@ const Creation = () => {
           </div>
         </div> : <div style={{ display: 'grid', gap: 10, marginTop: 18 }}>
           {createdBotsError && <NotificationBanner tone="error" title="Unable to load created bots" message={createdBotsError} />}
-          {loadingCreatedBots ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : createdBots.length ? createdBots.map((bot) => <article key={bot._id || bot.botId} style={outerCardStyle}><section style={{ ...innerCardStyle, gap: 8 }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, color: theme.primary }}><Bot size={20} /></div><div style={{ minWidth: 0, flex: 1 }}><h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850 }}>{bot.name}</h3><small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.symbol || 'No symbol selected'} · Bot ID {bot.botId}</small></div></div></section><button type="button" onClick={() => setExpandedBotId((current) => current === bot.botId ? '' : bot.botId)} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, border: `1px solid ${theme.borderGlass}`, borderRadius: 12, padding: '10px 12px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', textAlign: 'left' }}><span style={{ display: 'grid', gap: 3, minWidth: 0 }}><small style={{ color: theme.textMuted, fontSize: '0.7rem' }}>Bot name</small><strong style={{ fontSize: '0.9rem', overflowWrap: 'anywhere' }}>{bot.name}</strong><small style={{ color: theme.textMuted }}>ID {bot.botId}</small></span><span style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceMuted, color: theme.primary, fontWeight: 800, fontSize: '0.78rem' }}>{expandedBotId === bot.botId ? 'Hide' : 'View'}</span></button>{expandedBotId === bot.botId && <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, paddingTop: 10 }}><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Market category</small><strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.symbolType || 'crypto'}</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trading symbol</small><strong style={{ fontSize: '0.88rem', overflowWrap: 'anywhere' }}>{bot.symbol || 'Not set'}</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Min activation</small><strong style={{ fontSize: '0.88rem' }}>{Number(bot.minTradeAmount ?? 0).toFixed(2)} USDT</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Max activation</small><strong style={{ fontSize: '0.88rem' }}>{Number(bot.maxTradeAmount ?? 0).toFixed(2)} USDT</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Retainer</small><strong style={{ fontSize: '0.88rem' }}>{Number(bot.retainerAmount ?? 0).toFixed(2)} USDT</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trade direction</small><strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.tradeDirection || 'long'}</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Active efficiency</small><strong style={{ fontSize: '0.88rem' }}>{bot.efficiency ?? 0}%</strong></div><div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Creation cost</small><strong style={{ fontSize: '0.88rem' }}>{bot.creationCost !== undefined ? Number(bot.creationCost).toFixed(2) + ' USDT' : '—'}</strong></div><div style={{ gridColumn: '1 / -1' }}><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Created</small><strong style={{ fontSize: '0.82rem' }}>{bot.createdAt ? new Date(bot.createdAt).toLocaleString() : '—'}</strong></div></div>{confirmingBotId === bot.botId ? <div role="alertdialog" aria-label={`Confirm deletion of ${bot.name}`} style={{ gridColumn: '1 / -1', display: 'grid', gap: 8, padding: 10, borderRadius: 10, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><p style={{ margin: 0, color: theme.text, fontSize: '0.8rem', lineHeight: 1.4 }}>Delete <strong>{bot.name}</strong> permanently? This cannot be undone.</p><div style={{ display: 'flex', gap: 8 }}><button type="button" onClick={() => setConfirmingBotId('')} disabled={deletingBotId === bot.botId} style={{ flex: 1, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 10px', background: theme.surfaceMuted, color: theme.text, fontWeight: 800, cursor: 'pointer' }}>Cancel</button><button type="button" onClick={() => void deleteBot(bot)} disabled={deletingBotId === bot.botId} style={{ flex: 1, border: `1px solid ${theme.danger}`, borderRadius: 9, padding: '8px 10px', background: 'transparent', color: theme.danger, fontWeight: 800, cursor: deletingBotId === bot.botId ? 'wait' : 'pointer' }}>{deletingBotId === bot.botId ? <InlineLoadingDots /> : 'Delete'}</button></div></div> : <button type="button" onClick={() => setConfirmingBotId(bot.botId)} disabled={Boolean(deletingBotId) || Boolean(confirmingBotId)} style={{ border: `1px solid ${theme.danger}`, borderRadius: 10, padding: '8px 10px', background: 'transparent', color: theme.danger, fontWeight: 800, cursor: 'pointer', opacity: confirmingBotId && confirmingBotId !== bot.botId ? 0.55 : 1 }}>Delete bot</button>}</section></article>) : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>You have not created any bots yet.</p>}
-        </div>}
+          {loadingCreatedBots ? (
+            <div style={{ padding: 30, textAlign: 'center' }}>
+              <InlineLoadingDots />
+            </div>
+          ) : createdBots.length ? (
+            createdBots.map((bot) => (
+              <article key={bot._id || bot.botId} style={outerCardStyle}>
+                <section style={{ ...innerCardStyle, gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, color: theme.primary }}>
+                      <Bot size={20} />
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850, overflowWrap: 'anywhere' }}>{bot.name}</h3>
+                      <small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>ID {bot.botId}</small>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setExpandedBotId((current) => current === bot.botId ? '' : bot.botId)}
+                      style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceMuted, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}
+                    >
+                      {expandedBotId === bot.botId ? 'Hide' : 'View'}
+                    </button>
+                  </div>
+
+                  {expandedBotId === bot.botId && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8, paddingTop: 10, borderTop: `1px solid ${theme.borderGlass}` }}>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Market category</small>
+                        <strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.symbolType || 'crypto'}</strong>
+                      </div>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trading symbol</small>
+                        <strong style={{ fontSize: '0.88rem', overflowWrap: 'anywhere' }}>{bot.symbol || 'Not set'}</strong>
+                      </div>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Min activation</small>
+                        <strong style={{ fontSize: '0.88rem' }}>{Number(bot.minTradeAmount ?? 0).toFixed(2)} USDT</strong>
+                      </div>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Max activation</small>
+                        <strong style={{ fontSize: '0.88rem' }}>{Number(bot.maxTradeAmount ?? 0).toFixed(2)} USDT</strong>
+                      </div>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Retainer</small>
+                        <strong style={{ fontSize: '0.88rem' }}>{Number(bot.retainerAmount ?? 0).toFixed(2)} USDT</strong>
+                      </div>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trade direction</small>
+                        <strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.tradeDirection || 'long'}</strong>
+                      </div>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Active efficiency</small>
+                        <strong style={{ fontSize: '0.88rem' }}>{bot.efficiency ?? 0}%</strong>
+                      </div>
+                      <div>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Creation cost</small>
+                        <strong style={{ fontSize: '0.88rem' }}>{bot.creationCost !== undefined ? Number(bot.creationCost).toFixed(2) + ' USDT' : '—'}</strong>
+                      </div>
+                      <div style={{ gridColumn: '1 / -1' }}>
+                        <small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Created</small>
+                        <strong style={{ fontSize: '0.82rem' }}>{bot.createdAt ? new Date(bot.createdAt).toLocaleString() : '—'}</strong>
+                      </div>
+
+                      {confirmingBotId === bot.botId ? (
+                        <div role="alertdialog" aria-label={`Confirm deletion of ${bot.name}`} style={{ gridColumn: '1 / -1', display: 'grid', gap: 8, padding: 10, borderRadius: 10, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
+                          <p style={{ margin: 0, color: theme.text, fontSize: '0.8rem', lineHeight: 1.4 }}>
+                            Delete <strong>{bot.name}</strong> permanently? This cannot be undone.
+                          </p>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button type="button" onClick={() => setConfirmingBotId('')} disabled={deletingBotId === bot.botId} style={{ flex: 1, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 10px', background: theme.surfaceMuted, color: theme.text, fontWeight: 800, cursor: 'pointer' }}>
+                              Cancel
+                            </button>
+                            <button type="button" onClick={() => void deleteBot(bot)} disabled={deletingBotId === bot.botId} style={{ flex: 1, border: `1px solid ${theme.danger}`, borderRadius: 9, padding: '8px 10px', background: 'transparent', color: theme.danger, fontWeight: 800, cursor: deletingBotId === bot.botId ? 'wait' : 'pointer' }}>
+                              {deletingBotId === bot.botId ? <InlineLoadingDots /> : 'Delete'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => setConfirmingBotId(bot.botId)} disabled={Boolean(deletingBotId) || Boolean(confirmingBotId)} style={{ gridColumn: '1 / -1', border: `1px solid ${theme.danger}`, borderRadius: 10, padding: '8px 10px', background: 'transparent', color: theme.danger, fontWeight: 800, cursor: 'pointer', opacity: confirmingBotId && confirmingBotId !== bot.botId ? 0.55 : 1 }}>
+                          Delete bot
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </section>
+              </article>
+            ))
+          ) : (
+            <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>You have not created any bots yet.</p>
+          )}        </div>}
       </div><NowBar />
     </main>
   </HybridTheme>;
