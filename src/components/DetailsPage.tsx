@@ -9,6 +9,7 @@ import { navigate } from '../utils/navigate';
 import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import ImagePickerButton from './ImagePickerButton';
+import ProfileImageCropModal from './ProfileImageCropModal';
 
 const baseStyles = {
   page: {
@@ -283,6 +284,7 @@ const DetailsPage = () => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [avatarCropSource, setAvatarCropSource] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({
     usdtBalance: null,
   }));
@@ -376,7 +378,14 @@ const DetailsPage = () => {
     }
 
     setAvatarError(null);
+    const sourceUrl = URL.createObjectURL(file);
+    setAvatarCropSource(sourceUrl);
+  };
+
+  const handleAvatarCropDone = async (file: File) => {
+    setAvatarCropSource(null);
     setAvatarUploading(true);
+    setAvatarError(null);
     try {
       const configResponse = await api.get('/api/cloudinary/upload');
       const cloudinaryConfig = configResponse.data as { cloudName?: string; uploadPreset?: string };
@@ -398,12 +407,28 @@ const DetailsPage = () => {
     }
   };
 
+  const handleAvatarCropCancel = () => {
+    if (avatarCropSource) URL.revokeObjectURL(avatarCropSource);
+    setAvatarCropSource(null);
+  };
+
   return (
     <HybridTheme mode={themeMode}>
       <>
         <Helmet>
           <title>KingsHall Exchange | Details</title>
         </Helmet>
+        {avatarCropSource ? (
+          <ProfileImageCropModal
+            imageUrl={avatarCropSource}
+            onCancel={handleAvatarCropCancel}
+            onDone={async (file) => {
+              URL.revokeObjectURL(avatarCropSource);
+              await handleAvatarCropDone(file);
+            }}
+          />
+        ) : null}
+
         <main style={styles.page}>
           <div style={styles.shell}>
             
