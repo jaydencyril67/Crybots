@@ -50,6 +50,7 @@ const BotInvestmentsPage = () => {
   const [amount, setAmount] = useState('');
   const [busyBotId, setBusyBotId] = useState('');
   const [confirmingBotId, setConfirmingBotId] = useState('');
+  const [expandedBotId, setExpandedBotId] = useState('');
   const [withdrawBot, setWithdrawBot] = useState<Bot | null>(null);
   const [withdrawAmount, setWithdrawAmount] = useState('');
 
@@ -355,28 +356,33 @@ const BotInvestmentsPage = () => {
                             <Bot size={20} color={theme.primary} />
                             <div style={{ minWidth: 0, flex: 1 }}>
                               <p style={{ ...styles.value, fontSize: '0.95rem' }}>{bot.name}</p>
-                              <p style={{ ...styles.note, marginTop: 3 }}>
-                                {bot.symbol || 'No symbol'} · ID {bot.botId} · {bot.source === 'rented' ? 'Rented' : 'Owned'}
-                              </p>
+                              <p style={{ ...styles.note, marginTop: 3 }}>ID {bot.botId}</p>
                             </div>
-                            <span style={{
-                              borderRadius: 999,
-                              padding: '5px 9px',
-                              fontSize: '0.7rem',
-                              fontWeight: 850,
-                              background: lifecycleStatus === 'active' ? theme.success : theme.surfaceGlass,
-                              color: lifecycleStatus === 'active' ? theme.textInverse : theme.textMuted,
-                              flexShrink: 0,
-                            }}>
-                              {lifecycleStatus === 'active'
-                                ? 'ACTIVE'
-                                : lifecycleStatus === 'activating'
-                                  ? 'ACTIVATING'
-                                  : lifecycleStatus === 'deactivating'
-                                    ? 'DEACTIVATING'
-                                    : 'READY'}
-                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setExpandedBotId((current) => current === bot.botId ? '' : bot.botId)}
+                              style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}
+                            >
+                              {expandedBotId === bot.botId ? 'Hide' : 'View'}
+                            </button>
                           </div>
+
+                          {expandedBotId === bot.botId && (
+                          <div style={{ display: 'grid', gap: 10 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                              <p style={{ ...styles.note, margin: 0 }}>{bot.symbol || 'No symbol'} · {bot.source === 'rented' ? 'Rented' : 'Owned'}</p>
+                              <span style={{
+                                borderRadius: 999,
+                                padding: '5px 9px',
+                                fontSize: '0.7rem',
+                                fontWeight: 850,
+                                background: lifecycleStatus === 'active' ? theme.success : theme.surfaceGlass,
+                                color: lifecycleStatus === 'active' ? theme.textInverse : theme.textMuted,
+                                flexShrink: 0,
+                              }}>
+                                {lifecycleStatus === 'active' ? 'ACTIVE' : lifecycleStatus === 'activating' ? 'ACTIVATING' : lifecycleStatus === 'deactivating' ? 'DEACTIVATING' : 'READY'}
+                              </span>
+                            </div>
 
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14 }}>
                             <div><p style={styles.label}>Efficiency</p><p style={{ ...styles.value, marginTop: 6 }}>{bot.efficiency ?? 0}%</p></div>
@@ -528,6 +534,8 @@ const BotInvestmentsPage = () => {
                               </div>
                             )}
                           </div>
+                          </div>
+                          )}
                         </article>
                       );
                     })}
