@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Bot, PauseCircle, PlayCircle, TrendingUp } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, Bot, PauseCircle, PlayCircle, TrendingUp } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -14,6 +14,7 @@ type Investment = {
   currentCapital: number;
   totalProfit: number;
   totalLoss: number;
+  totalWithdrawn: number;
   active: boolean;
   lifecycleStatus?: 'inactive' | 'activating' | 'active' | 'deactivating';
   lifecycleAvailableAt?: string;
@@ -48,6 +49,8 @@ const BotInvestmentsPage = () => {
   const [amount, setAmount] = useState('');
   const [busyBotId, setBusyBotId] = useState('');
   const [confirmingBotId, setConfirmingBotId] = useState('');
+  const [withdrawBot, setWithdrawBot] = useState<Bot | null>(null);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
 
   const styles: Record<string, React.CSSProperties> = {
     page: {
@@ -218,6 +221,29 @@ const BotInvestmentsPage = () => {
       await load();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to deactivate this bot.');
+    } finally {
+      setBusyBotId('');
+    }
+  };
+
+  const withdraw = async () => {
+    if (!withdrawBot) return;
+    const value = Number(withdrawAmount);
+    if (!Number.isFinite(value) || value <= 0) {
+      setError('Enter a valid withdrawal amount.');
+      return;
+    }
+    setBusyBotId(withdrawBot.botId);
+    setError('');
+    setMessage('');
+    try {
+      const response = await api.post(`/api/bot-investments/${withdrawBot.botId}/withdraw`, { amount: value });
+      setMessage(response.data?.message || 'Funds withdrawn successfully.');
+      setWithdrawBot(null);
+      setWithdrawAmount('');
+      await load();
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to withdraw funds from this bot.');
     } finally {
       setBusyBotId('');
     }
@@ -405,6 +431,55 @@ const BotInvestmentsPage = () => {
                               >
                                 {busyBotId === bot.botId ? <InlineLoadingDots /> : <><PlayCircle size={15} /> Activate Bot</>}
                               </button>
+                            ) : withdrawBot?.botId === bot.botId ? (
+                              <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: '1px solid ' + theme.borderGlass, background: theme.surfaceGlass }}>
+                                <div style={{ display: 'grid', gap: 5 }}>
+                                  <p style={{ ...styles.value, fontSize: '0.88rem' }}>Withdraw from {bot.name}</p>
+                                  <p style={styles.note}>
+                                    The bot stays active. Minimum active capital: {money(bot.minTradeAmount || 0)}.
+                                  </p>
+                                </div>
+                                <input
+                                  type="number"
+                                  min="0.01"
+                                  max={Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.minTradeAmount || 0))}
+                                  step="0.01"
+                                  value={withdrawAmount}
+                                  onChange={(event) => setWithdrawAmount(event.target.value)}
+                                  style={styles.input}
+                                  placeholder="Amount in USDT"
+                                  autoFocus
+                                />
+                                <p style={styles.note}>
+                                  Maximum withdrawable: {money(Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.minTradeAmount || 0))}
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+                                  <button
+                                    type="button"
+                                    disabled={busyBotId === bot.botId}
+                                    onClick={() => { setWithdrawBot(null); setWithdrawAmount(''); }}
+                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={busyBotId === bot.botId}
+                                    onClick={() => setWithdrawAmount(String(Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.minTradeAmount || 0)).toFixed(2)))}
+                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}
+                                  >
+                                    Max
+                                  </button>
+                                  <button
+                                    type="button"
+                                    disabled={busyBotId === bot.botId}
+                                    onClick={() => void withdraw()}
+                                    style={{ ...styles.button, borderRadius: 10 }}
+                                  >
+                                    {busyBotId === bot.botId ? <InlineLoadingDots /> : 'Withdraw'}
+                                  </button>
+                                </div>
+                              </div>
                             ) : confirmingBotId === bot.botId ? (
                               <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: '1px solid ' + theme.danger, background: theme.surfaceGlass }}>
                                 <div style={{ display: 'grid', gap: 5 }}>
@@ -431,14 +506,25 @@ const BotInvestmentsPage = () => {
                                 </div>
                               </div>
                             ) : (
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                                <button
+                                  type="button"
+                                  style={{ ...styles.button, ...styles.mutedButton }}
+                                  disabled={busyBotId === bot.botId || Boolean(confirmingBotId)}
+                                  onClick={() => { setWithdrawBot(bot); setWithdrawAmount(''); setError(''); setMessage(''); }}
+                                >
+                                  {busyBotId === bot.botId ? <InlineLoadingDots /> : <><ArrowDownToLine size={15} /> Withdraw</>}
+                                </button>
                               <button
                                 type="button"
                                 style={{ ...styles.button, ...styles.mutedButton }}
                                 disabled={busyBotId === bot.botId || Boolean(confirmingBotId)}
                                 onClick={() => setConfirmingBotId(bot.botId)}
                               >
+
                                 {busyBotId === bot.botId ? <InlineLoadingDots /> : <><PauseCircle size={15} /> Deactivate</>}
-                              </button>
+                                </button>
+                              </div>
                             )}
                           </div>
                         </article>
