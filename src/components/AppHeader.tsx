@@ -7,6 +7,9 @@ import KHLogo from './KHLogo';
 import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
 import { getVoiceModeEnabled, VOICE_MODE_CHANGED_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
+const NOTIFICATION_COLOR_STORAGE_KEY = 'kingshall_notification_color';
+const DEFAULT_NOTIFICATION_COLOR = '#ef4444';
+
 const styles = {
   header: {
     display: 'grid',
@@ -115,6 +118,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const [voiceModeEnabled, setVoiceModeEnabled] = useState(getVoiceModeEnabled);
   const [isListening, setIsListening] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [notificationColor, setNotificationColor] = useState(DEFAULT_NOTIFICATION_COLOR);
   const previousCount = useRef(0);
   const hasLoadedCount = useRef(false);
   const alertTimeout = useRef<number | undefined>(undefined);
@@ -136,6 +140,20 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       window.removeEventListener(VOICE_STATUS_EVENT, handleVoiceStatus);
       window.removeEventListener(VOICE_MODE_CHANGED_EVENT, handleVoiceMode);
     };
+  }, []);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(NOTIFICATION_COLOR_STORAGE_KEY);
+      if (/^#[0-9a-f]{6}$/i.test(stored || '')) setNotificationColor(stored as string);
+    } catch {}
+    const handleColorChanged = () => {
+      const stored = window.localStorage.getItem(NOTIFICATION_COLOR_STORAGE_KEY);
+      if (/^#[0-9a-f]{6}$/i.test(stored || '')) setNotificationColor(stored as string);
+      else setNotificationColor(DEFAULT_NOTIFICATION_COLOR);
+    };
+    window.addEventListener('kingshall-notification-color-changed', handleColorChanged);
+    return () => window.removeEventListener('kingshall-notification-color-changed', handleColorChanged);
   }, []);
 
   useEffect(() => {
@@ -252,12 +270,12 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const headerStyle = isEdgeLit
     ? {
       ...styles.header,
-      borderColor: 'rgba(239, 68, 68, 0.72)',
+      borderColor: `${notificationColor}b8`,
       boxShadow: isAlertActive
         ? '0 0 0 1px rgba(239, 68, 68, 0.72), 0 0 16px rgba(239, 68, 68, 0.48), 0 14px 30px rgba(0,0,0,0.24)'
         : '0 0 0 1px rgba(239, 68, 68, 0.42), 0 0 10px rgba(239, 68, 68, 0.24), 0 14px 30px rgba(0,0,0,0.24)',
       animation: voiceModeEnabled || isAlertActive ? 'ke-header-alert 1.2s ease-in-out infinite' : 'none',
-      filter: voiceModeEnabled || isAlertActive ? 'drop-shadow(0 0 7px rgba(239, 68, 68, 0.34))' : 'none',
+      filter: voiceModeEnabled || isAlertActive ? `drop-shadow(0 0 7px ${notificationColor}57)` : 'none',
     }
     : styles.header;
   const headerTitle = voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
@@ -265,7 +283,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const artworkStyle = {
     ...styles.unreadArtwork,
     color: theme.textInverse,
-    background: theme.danger,
+    background: notificationColor,
     border: `2px solid ${theme.surfaceElevated}`,
     boxShadow: `0 2px 8px ${theme.danger}66`,
   };
