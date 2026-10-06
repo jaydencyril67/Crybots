@@ -176,6 +176,16 @@ const baseStyles = {
     margin: 0,
     lineHeight: 1.5,
   },
+  avatarUploadingOverlay: {
+    position: 'absolute' as const,
+    inset: 0,
+    display: 'grid',
+    placeItems: 'center',
+    borderRadius: '15px',
+    background: 'rgba(0,0,0,0.38)',
+    zIndex: 2,
+    pointerEvents: 'none' as const,
+  },
   avatarCameraButton: {
     position: 'absolute' as const,
     right: '12px',
