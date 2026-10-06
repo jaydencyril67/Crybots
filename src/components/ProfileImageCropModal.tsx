@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Check, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 type ProfileImageCropModalProps = {
   imageUrl: string;
@@ -15,6 +15,8 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropModalProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const dragRef = useRef({ active: false, x: 0, y: 0 });
+  const pointersRef = useRef(new Map<number, { x: number; y: number }>());
+  const pinchRef = useRef<{ distance: number; midpoint: { x: number; y: number }; zoom: number } | null>(null);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [ready, setReady] = useState(false);
@@ -62,19 +64,67 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!ready || saving) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    dragRef.current = { active: true, x: event.clientX, y: event.clientY };
+    pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (pointersRef.current.size === 1) {
+      dragRef.current = { active: true, x: event.clientX, y: event.clientY };
+      pinchRef.current = null;
+      return;
+    }
+
+    if (pointersRef.current.size === 2) {
+      dragRef.current.active = false;
+      const [first, second] = Array.from(pointersRef.current.values());
+      pinchRef.current = {
+        distance: Math.max(1, Math.hypot(second.x - first.x, second.y - first.y)),
+        midpoint: { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 },
+        zoom,
+      };
+    }
   };
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current.active || saving) return;
+    if (!ready || saving || !pointersRef.current.has(event.pointerId)) return;
+    pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (pointersRef.current.size >= 2 && pinchRef.current) {
+      const [first, second] = Array.from(pointersRef.current.values());
+      const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
+      const midpoint = { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 };
+      const nextZoom = clamp(pinchRef.current.zoom * (distance / pinchRef.current.distance), 1, 3);
+      const geometry = getGeometry();
+
+      if (geometry) {
+        const nextScale = geometry.scale * (nextZoom / zoom);
+        const imagePointX = (pinchRef.current.midpoint.x - offset.x) / geometry.scale;
+        const imagePointY = (pinchRef.current.midpoint.y - offset.y) / geometry.scale;
+        setZoom(nextZoom);
+        setOffset(constrainOffset({
+          x: midpoint.x - imagePointX * nextScale,
+          y: midpoint.y - imagePointY * nextScale,
+        }));
+      } else {
+        setZoom(nextZoom);
+      }
+      return;
+    }
+
+    if (!dragRef.current.active) return;
     const dx = event.clientX - dragRef.current.x;
     const dy = event.clientY - dragRef.current.y;
     dragRef.current = { active: true, x: event.clientX, y: event.clientY };
     setOffset((current) => constrainOffset({ x: current.x + dx, y: current.y + dy }));
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    pointersRef.current.delete(event.pointerId);
     dragRef.current.active = false;
+    pinchRef.current = null;
+
+    if (pointersRef.current.size === 1) {
+      const remaining = Array.from(pointersRef.current.values())[0];
+      dragRef.current = { active: true, x: remaining.x, y: remaining.y };
+    }
   };
 
   const handleZoomChange = (nextZoom: number) => {
@@ -202,115 +252,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
         <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.8)', pointerEvents: 'none' }} />
       </div>
 
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '360px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '12px',
-          touchAction: 'none',
-        }}
-      >
-        <button
-          type="button"
-          aria-label="Zoom out"
-          onClick={() => handleZoomChange(clamp(zoom - 0.15, 1, 3))}
-          disabled={!ready || saving || zoom <= 1}
-          style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '999px',
-            border: '1px solid rgba(255,255,255,0.24)',
-            background: 'rgba(255,255,255,0.08)',
-            color: '#fff',
-            display: 'grid',
-            placeItems: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <ZoomOut size={18} />
-        </button>
-
-        <div
-          role="slider"
-          aria-label="Zoom"
-          aria-valuemin={1}
-          aria-valuemax={3}
-          aria-valuenow={Number(zoom.toFixed(2))}
-          tabIndex={0}
-          onPointerDown={(event) => {
-            if (!ready || saving) return;
-            event.currentTarget.setPointerCapture(event.pointerId);
-            const rect = event.currentTarget.getBoundingClientRect();
-            const updateFromPointer = (clientX: number) => {
-              const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
-              handleZoomChange(1 + ratio * 2);
-            };
-            updateFromPointer(event.clientX);
-            const move = (moveEvent: PointerEvent) => updateFromPointer(moveEvent.clientX);
-            const stop = () => {
-              window.removeEventListener('pointermove', move);
-              window.removeEventListener('pointerup', stop);
-            };
-            window.addEventListener('pointermove', move);
-            window.addEventListener('pointerup', stop, { once: true });
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'ArrowLeft') handleZoomChange(clamp(zoom - 0.1, 1, 3));
-            if (event.key === 'ArrowRight') handleZoomChange(clamp(zoom + 0.1, 1, 3));
-          }}
-          style={{
-            position: 'relative',
-            width: '190px',
-            height: '42px',
-            display: 'flex',
-            alignItems: 'center',
-            cursor: ready && !saving ? 'ew-resize' : 'default',
-            opacity: ready ? 1 : 0.5,
-          }}
-        >
-          <div style={{ position: 'absolute', left: 0, right: 0, height: '4px', borderRadius: '999px', background: 'rgba(255,255,255,0.22)' }} />
-          <div
-            style={{
-              position: 'absolute',
-              left: `calc(${((zoom - 1) / 2) * 100}% - 13px)`,
-              width: '26px',
-              height: '26px',
-              borderRadius: '50%',
-              background: '#fff',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.35)',
-              display: 'grid',
-              placeItems: 'center',
-            }}
-          >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#777' }} />
-          </div>
-        </div>
-
-        <button
-          type="button"
-          aria-label="Zoom in"
-          onClick={() => handleZoomChange(clamp(zoom + 0.15, 1, 3))}
-          disabled={!ready || saving || zoom >= 3}
-          style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '999px',
-            border: '1px solid rgba(255,255,255,0.24)',
-            background: 'rgba(255,255,255,0.08)',
-            color: '#fff',
-            display: 'grid',
-            placeItems: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <ZoomIn size={18} />
-        </button>
-      </div>
-
-      <span style={{ fontSize: '0.78rem', opacity: 0.7 }}>Drag the photo to position it</span>
+      <span style={{ fontSize: '0.78rem', opacity: 0.7 }}>Pinch to zoom • Drag to position</span>
     </div>
   );
 };
