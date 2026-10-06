@@ -272,10 +272,11 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       ...styles.header,
       borderColor: `${notificationColor}b8`,
       boxShadow: isAlertActive
-        ? '0 0 0 1px rgba(239, 68, 68, 0.72), 0 0 16px rgba(239, 68, 68, 0.48), 0 14px 30px rgba(0,0,0,0.24)'
-        : '0 0 0 1px rgba(239, 68, 68, 0.42), 0 0 10px rgba(239, 68, 68, 0.24), 0 14px 30px rgba(0,0,0,0.24)',
+        ? `0 0 0 1px color-mix(in srgb, ${notificationColor} 72%, transparent), 0 0 16px color-mix(in srgb, ${notificationColor} 48%, transparent), 0 14px 30px rgba(0,0,0,0.24)`
+        : `0 0 0 1px color-mix(in srgb, ${notificationColor} 42%, transparent), 0 0 10px color-mix(in srgb, ${notificationColor} 24%, transparent), 0 14px 30px rgba(0,0,0,0.24)`,
       animation: voiceModeEnabled || isAlertActive ? 'ke-header-alert 1.2s ease-in-out infinite' : 'none',
       filter: voiceModeEnabled || isAlertActive ? `drop-shadow(0 0 7px ${notificationColor}57)` : 'none',
+      ['--notification-color' as string]: notificationColor,
     }
     : styles.header;
   const headerTitle = voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
@@ -285,7 +286,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     color: theme.textInverse,
     background: notificationColor,
     border: `2px solid ${theme.surfaceElevated}`,
-    boxShadow: `0 2px 8px ${theme.danger}66`,
+    boxShadow: `0 2px 8px ${notificationColor}66`,
   };
   const renderArtwork = () => (
     <span style={styles.artworkContainer}>
@@ -297,8 +298,8 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   return (
     <>
       <style>{`@keyframes ke-header-alert {
-        0%, 100% { opacity: 1; box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.72), 0 0 16px rgba(239, 68, 68, 0.48), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px rgba(239, 68, 68, 0.34)); }
-        50% { opacity: 0.9; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.78), 0 0 22px rgba(239, 68, 68, 0.62), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.48)); }
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 1px color-mix(in srgb, var(--notification-color) 72%, transparent), 0 0 16px color-mix(in srgb, var(--notification-color) 48%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px color-mix(in srgb, var(--notification-color) 34%, transparent)); }
+        50% { opacity: 0.9; box-shadow: 0 0 0 2px color-mix(in srgb, var(--notification-color) 78%, transparent), 0 0 22px color-mix(in srgb, var(--notification-color) 62%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--notification-color) 48%, transparent)); }
       }`}</style>
       <header
         style={headerStyle}
