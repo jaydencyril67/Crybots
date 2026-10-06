@@ -300,13 +300,15 @@ const BotInvestmentsPage = () => {
             {selectedBot ? (
               renderActivation()
             ) : (
-              <>
+              <div style={styles.card}>
                 {error && <NotificationBanner tone="error" title="Bot action unavailable" message={error} />}
                 {message && <NotificationBanner tone="success" title="Bot updated" message={message} />}
 
                 {loading ? (
-                  <div style={{ ...styles.row, textAlign: 'center' }}>
-                    <InlineLoadingDots />
+                  <div style={styles.row}>
+                    <div style={{ textAlign: 'center' }}>
+                      <InlineLoadingDots />
+                    </div>
                   </div>
                 ) : bots.length ? (
                   <div style={{ display: 'grid', gap: 14 }}>
@@ -396,11 +398,11 @@ const BotInvestmentsPage = () => {
                     })}
                   </div>
                 ) : (
-                  <div style={{ ...styles.row, marginTop: 10 }}>
+                  <div style={styles.row}>
                     <p style={styles.note}>You do not have any created, purchased, or rented bots yet.</p>
                   </div>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>
