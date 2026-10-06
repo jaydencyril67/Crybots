@@ -465,7 +465,7 @@ const BotInvestmentsPage = () => {
                                     type="button"
                                     disabled={busyBotId === bot.botId}
                                     onClick={() => { setWithdrawBot(null); setWithdrawAmount(''); }}
-                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}
+                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10, padding: '7px 10px', fontSize: '0.84rem' }}
                                   >
                                     Cancel
                                   </button>
@@ -473,7 +473,7 @@ const BotInvestmentsPage = () => {
                                     type="button"
                                     disabled={busyBotId === bot.botId}
                                     onClick={() => setWithdrawAmount(String(Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.minTradeAmount || 0)).toFixed(2)))}
-                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}
+                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10, padding: '7px 10px', fontSize: '0.84rem' }}
                                   >
                                     Max
                                   </button>
@@ -481,7 +481,7 @@ const BotInvestmentsPage = () => {
                                     type="button"
                                     disabled={busyBotId === bot.botId}
                                     onClick={() => void withdraw()}
-                                    style={{ ...styles.button, borderRadius: 10 }}
+                                    style={{ ...styles.button, borderRadius: 10, padding: '7px 10px', fontSize: '0.84rem' }}
                                   >
                                     {busyBotId === bot.botId ? <InlineLoadingDots /> : 'Withdraw'}
                                   </button>
