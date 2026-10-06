@@ -41,6 +41,11 @@ const baseStyles = {
     border: '1px solid transparent',
     boxSizing: 'border-box' as const,
   },
+  profilePhotoCard: {
+    width: 'fit-content',
+    maxWidth: '100%',
+    margin: '0 auto',
+  },
   row: {
     width: '100%',
     maxWidth: '100%',
@@ -80,7 +85,7 @@ const baseStyles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
+    width: 'min(78vw, 360px)',
     aspectRatio: '1 / 1',
     margin: '0',
     padding: '0',
@@ -119,7 +124,7 @@ const baseStyles = {
     shell: { maxWidth: '100%', padding: '14px 12px 24px' },
     content: { gap: '14px', marginTop: '14px' },
     card: {},
-    profileIdentity: { width: '100%', padding: '0', gap: '0' },
+    profileIdentity: { width: 'min(82vw, 360px)', padding: '0', gap: '0' },
     profileAvatarFrame: { width: '100%', height: '100%' },
     profileAvatar: { width: '100%', height: '100%', borderRadius: '15px' },
     profileAvatarFallback: { width: '100%', height: '100%', borderRadius: '15px' },
@@ -436,7 +441,7 @@ const DetailsPage = () => {
 
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.content}>
-              <div style={styles.rowList}>
+              <div style={{ ...styles.rowList, ...styles.profilePhotoCard }}>
                 <div style={{ ...styles.row, ...styles.profileIdentity }}>
                   <div style={styles.profileAvatarFrame}>
                     {avatarPicture ? (
