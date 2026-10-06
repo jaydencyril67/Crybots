@@ -202,20 +202,112 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
         <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.8)', pointerEvents: 'none' }} />
       </div>
 
-      <div style={{ width: '100%', maxWidth: '360px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <ZoomOut size={18} />
-        <input
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '360px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          touchAction: 'none',
+        }}
+      >
+        <button
+          type="button"
+          aria-label="Zoom out"
+          onClick={() => handleZoomChange(clamp(zoom - 0.15, 1, 3))}
+          disabled={!ready || saving || zoom <= 1}
+          style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '999px',
+            border: '1px solid rgba(255,255,255,0.24)',
+            background: 'rgba(255,255,255,0.08)',
+            color: '#fff',
+            display: 'grid',
+            placeItems: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <ZoomOut size={18} />
+        </button>
+
+        <div
+          role="slider"
           aria-label="Zoom"
-          type="range"
-          min="1"
-          max="3"
-          step="0.01"
-          value={zoom}
-          onChange={(event) => handleZoomChange(Number(event.target.value))}
-          style={{ flex: 1 }}
-          disabled={!ready || saving}
-        />
-        <ZoomIn size={18} />
+          aria-valuemin={1}
+          aria-valuemax={3}
+          aria-valuenow={Number(zoom.toFixed(2))}
+          tabIndex={0}
+          onPointerDown={(event) => {
+            if (!ready || saving) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            const rect = event.currentTarget.getBoundingClientRect();
+            const updateFromPointer = (clientX: number) => {
+              const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
+              handleZoomChange(1 + ratio * 2);
+            };
+            updateFromPointer(event.clientX);
+            const move = (moveEvent: PointerEvent) => updateFromPointer(moveEvent.clientX);
+            const stop = () => {
+              window.removeEventListener('pointermove', move);
+              window.removeEventListener('pointerup', stop);
+            };
+            window.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', stop, { once: true });
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'ArrowLeft') handleZoomChange(clamp(zoom - 0.1, 1, 3));
+            if (event.key === 'ArrowRight') handleZoomChange(clamp(zoom + 0.1, 1, 3));
+          }}
+          style={{
+            position: 'relative',
+            width: '190px',
+            height: '42px',
+            display: 'flex',
+            alignItems: 'center',
+            cursor: ready && !saving ? 'ew-resize' : 'default',
+            opacity: ready ? 1 : 0.5,
+          }}
+        >
+          <div style={{ position: 'absolute', left: 0, right: 0, height: '4px', borderRadius: '999px', background: 'rgba(255,255,255,0.22)' }} />
+          <div
+            style={{
+              position: 'absolute',
+              left: `calc(${((zoom - 1) / 2) * 100}% - 13px)`,
+              width: '26px',
+              height: '26px',
+              borderRadius: '50%',
+              background: '#fff',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.35)',
+              display: 'grid',
+              placeItems: 'center',
+            }}
+          >
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#777' }} />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Zoom in"
+          onClick={() => handleZoomChange(clamp(zoom + 0.15, 1, 3))}
+          disabled={!ready || saving || zoom >= 3}
+          style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '999px',
+            border: '1px solid rgba(255,255,255,0.24)',
+            background: 'rgba(255,255,255,0.08)',
+            color: '#fff',
+            display: 'grid',
+            placeItems: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <ZoomIn size={18} />
+        </button>
       </div>
 
       <span style={{ fontSize: '0.78rem', opacity: 0.7 }}>Drag the photo to position it</span>
