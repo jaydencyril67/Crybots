@@ -148,7 +148,8 @@ const BotInvestmentsPage = () => {
       padding: '11px 16px',
       fontWeight: 700,
       cursor: 'pointer',
-      minWidth: '108px',
+      width: '100%',
+      minWidth: 0,
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -270,7 +271,7 @@ const BotInvestmentsPage = () => {
             <p style={styles.note}>
               Allowed range: {money(selectedBot?.minTradeAmount || 0)} – {money(selectedBot?.maxTradeAmount || 0)}
             </p>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'grid', width: '100%' }}>
               <button
                 type="button"
                 disabled={busyBotId === selectedBot?.botId}
@@ -364,7 +365,7 @@ const BotInvestmentsPage = () => {
                             <p style={styles.note}>Rental ends {new Date(bot.rentalExpiresAt).toLocaleString()}</p>
                           ) : null}
 
-                          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 2 }}>
+                          <div style={{ display: 'grid', width: '100%', marginTop: 2 }}>
                             {!active ? (
                               <button
                                 type="button"
