@@ -299,24 +299,16 @@ const BotInvestmentsPage = () => {
             {selectedBot ? (
               renderActivation()
             ) : (
-              <div style={styles.card}>
-                <div style={styles.row}>
-                  <p style={styles.label}><Bot size={16} /> My Bots</p>
-                  <p style={styles.value}>Manage your trading bots</p>
-                  <p style={styles.note}>
-                    Activate a bot with USDT, monitor its capital and earnings, or deactivate it to return its current capital to your balance.
-                  </p>
-                </div>
-
+              <>
                 {error && <NotificationBanner tone="error" title="Bot action unavailable" message={error} />}
                 {message && <NotificationBanner tone="success" title="Bot updated" message={message} />}
 
                 {loading ? (
-                  <div style={{ ...styles.row, marginTop: 10, textAlign: 'center' }}>
+                  <div style={{ ...styles.row, textAlign: 'center' }}>
                     <InlineLoadingDots />
                   </div>
                 ) : bots.length ? (
-                  <div style={{ display: 'grid', gap: 14, marginTop: 10 }}>
+                  <div style={{ display: 'grid', gap: 14 }}>
                     {bots.map((bot) => {
                       const investment = bot.investment;
                       const active = investment?.active === true;
@@ -407,7 +399,7 @@ const BotInvestmentsPage = () => {
                     <p style={styles.note}>You do not have any created, purchased, or rented bots yet.</p>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>
