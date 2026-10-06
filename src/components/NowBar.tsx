@@ -344,6 +344,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/chart') return 'CHART';
   if (path === '/market') return 'MARKET';
   if (path === '/portfolio') return 'PORTFOLIO';
+  if (path === '/bots') return 'MY BOTS';
   if (path === '/trade/history') return 'TRADE HISTORY';
   if (path === '/logs') return 'LOGS';
   if (path === '/help') return 'HELP';
