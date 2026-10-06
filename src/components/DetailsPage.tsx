@@ -22,8 +22,8 @@ const baseStyles = {
   infoList: { display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginTop: '8px' },
   infoRow: { width: '100%', padding: '13px 14px', borderRadius: '15px', boxSizing: 'border-box' as const, display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, gridColumn: '1 / -1' },
   card: {},
-  profileIdentity: { display: 'flex', alignItems: 'center', justifyContent: 'center', width: 'min(58vw, 180px)', aspectRatio: '1 / 1', margin: '0', padding: '0', overflow: 'hidden', borderRadius: '15px', boxSizing: 'border-box' as const },
-  profileAvatarFrame: { position: 'relative' as const, width: '100%', height: '100%' },
+  profileIdentity: { display: 'flex', alignItems: 'center', justifyContent: 'center', width: 'min(58vw, 180px)', aspectRatio: '1 / 1', margin: '0', padding: '0', overflow: 'visible', borderRadius: '15px', boxSizing: 'border-box' as const },
+  profileAvatarFrame: { position: 'relative' as const, width: '100%', height: '100%', overflow: 'visible' as const },
   profileAvatar: { width: '100%', height: '100%', borderRadius: '15px', objectFit: 'cover' as const, border: '0', boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)', background: '#111827', flexShrink: 0 },
   profileAvatarFallback: { width: '100%', height: '100%', borderRadius: '15px', display: 'grid', placeItems: 'center', border: '0', boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)', background: '#111827', flexShrink: 0 },
   '@media (max-width: 640px)': {
@@ -40,7 +40,7 @@ const baseStyles = {
   helper: { display: 'flex' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const, gap: '14px', marginTop: '8px', padding: '16px 18px', borderRadius: '16px', border: 'none', background: 'transparent', flexWrap: 'wrap' as const },
   helperText: { margin: 0, lineHeight: 1.5 },
   avatarUploadingOverlay: { position: 'absolute' as const, inset: 0, display: 'grid', placeItems: 'center', borderRadius: '15px', background: 'rgba(0,0,0,0.38)', zIndex: 2, pointerEvents: 'none' as const },
-  avatarCameraButton: { position: 'absolute' as const, right: '12px', bottom: '12px', width: '36px', height: '36px', display: 'grid', placeItems: 'center', borderRadius: '999px', border: '3px solid #111827', cursor: 'pointer', boxShadow: '0 6px 16px rgba(0,0,0,0.28)' },
+  avatarCameraButton: { position: 'absolute' as const, right: '-6px', bottom: '-6px', width: '36px', height: '36px', display: 'grid', placeItems: 'center', borderRadius: '999px', border: '3px solid #111827', cursor: 'pointer', boxShadow: '0 6px 16px rgba(0,0,0,0.28)' },
 };
 
 type ProfileDetails = {
