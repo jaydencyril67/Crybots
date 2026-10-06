@@ -197,7 +197,7 @@ const Creation = () => {
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={16} /> Market</button>
         <div style={{ ...outerCardStyle, display: 'flex', gap: 8, marginTop: 18, padding: 5 }}>
           {(['create', 'creation'] as const).map((view) => (
-            <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: 0, borderRadius: 11, padding: '9px 12px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, fontSize: '0.84rem', lineHeight: 'normal', cursor: 'pointer' }}>
+            <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.84rem', lineHeight: 'normal', cursor: 'pointer', ...(activeView === view ? { borderColor: theme.primary, color: theme.primary } : {}) }}>
               {view === 'create' ? 'Create' : 'Creation'}
             </button>
           ))}
