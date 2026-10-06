@@ -1,5 +1,4 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
 import { ArrowLeft } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
@@ -68,16 +67,13 @@ const Chart = () => {
     return () => window.clearInterval(timer);
   }, [loadMovers]);
   const card: React.CSSProperties = { padding: 16, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass };
-  return <HybridTheme><Helmet><title>Chart | KingsHall</title></Helmet><style>{'@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }'}</style><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1680, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
+  return <HybridTheme><Helmet><title>Chart | KingsHall</title></Helmet><div style={{ minHeight: '100vh', paddingBottom: 90, background: theme.background, color: theme.text }}><main style={{ width: '100%', maxWidth: 1680, margin: '0 auto', padding: '18px 14px 28px', boxSizing: 'border-box' }}>
     <button type="button" onClick={() => navigate('/trade')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 14, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 11px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer' }}><ArrowLeft size={16} /> Trade</button>
     <section style={{ ...card, padding: 0, height: 'clamp(620px, 78vw, 1000px)', overflow: 'hidden' }}><TradingViewChart themeMode={themeMode} /></section>
     <section style={{ ...card, marginTop: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 900 }}>24H Movers</h2>
-          <p style={{ margin: '4px 0 0', fontSize: 12, color: theme.textMuted }}>TradingView assets with a 24h change between +1.5% and +3%</p>
-        </div>
-        <button type="button" onClick={() => void loadMovers()} disabled={moversLoading} aria-label="Refresh 24h movers" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 9, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, cursor: moversLoading ? 'default' : 'pointer', opacity: moversLoading ? 0.6 : 1 }}><RefreshCw size={15} style={{ animation: moversLoading ? 'spin 1s linear infinite' : 'none' }} /></button>
+      <div style={{ marginBottom: 12 }}>
+        <h2 style={{ margin: 0, fontSize: 16, fontWeight: 900 }}>24H Movers</h2>
+        <p style={{ margin: '4px 0 0', fontSize: 12, color: theme.textMuted }}>TradingView assets with a 24h change between +1.5% and +3%</p>
       </div>
       {moversLoading ? <div style={{ padding: '18px 4px', textAlign: 'center', fontSize: 13, color: theme.textMuted }}>Scanning TradingView…</div> : moversError ? <div style={{ padding: '14px 12px', borderRadius: 10, background: theme.surfaceGlass, color: theme.textMuted, fontSize: 13 }}>{moversError}</div> : movers.length === 0 ? <div style={{ padding: '18px 4px', textAlign: 'center', fontSize: 13, color: theme.textMuted }}>No assets currently match the +1.5% to +3% range.</div> : <div style={{ display: 'grid', gap: 8 }}>{movers.map((item) => <div key={item.symbol} style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', alignItems: 'center', gap: 12, padding: '11px 12px', borderRadius: 11, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}><div style={{ minWidth: 0 }}><div style={{ fontSize: 13, fontWeight: 850, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.symbol}</div><div style={{ marginTop: 3, fontSize: 11, color: theme.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div></div><div style={{ textAlign: 'right' }}><div style={{ fontSize: 13, fontWeight: 900 }}>+{item.change.toFixed(2)}%</div>{item.price !== null ? <div style={{ marginTop: 3, fontSize: 11, color: theme.textMuted }}>{item.price.toLocaleString(undefined, { maximumFractionDigits: 8 })}</div> : null}</div></div>)}</div>}
     </section>
