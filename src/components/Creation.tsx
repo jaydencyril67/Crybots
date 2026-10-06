@@ -52,7 +52,6 @@ const Creation = () => {
   const selectedSymbol = symbolOptions.find((option) => option.value === symbol) || symbolOptions[0];
   const [symbolSearch, setSymbolSearch] = useState('');
   const [selectedTradingSymbol, setSelectedTradingSymbol] = useState('');
-  const [payoutSystem, setPayoutSystem] = useState('Manual');
   const [tradeDirection, setTradeDirection] = useState('Long');
   const [efficiency, setEfficiency] = useState(100);
   const [minTradeAmount, setMinTradeAmount] = useState('');
@@ -94,7 +93,7 @@ const Creation = () => {
     }
     let active = true;
     setPricingLoading(true);
-    api.get('/api/market/pricing', { params: { symbolType: symbol, symbol: selectedTradingSymbol, payoutSystem: payoutSystem.toLowerCase(), tradeDirection, efficiency, minTradeAmount, maxTradeAmount } })
+    api.get('/api/market/pricing', { params: { symbolType: symbol, symbol: selectedTradingSymbol, tradeDirection, efficiency, minTradeAmount, maxTradeAmount } })
       .then((response) => {
         if (active) setCreationPricing(response.data || null);
       })
@@ -105,7 +104,7 @@ const Creation = () => {
         if (active) setPricingLoading(false);
       });
     return () => { active = false; };
-  }, [selectedTradingSymbol, symbol, payoutSystem, tradeDirection, efficiency, minTradeAmount, maxTradeAmount]);
+  }, [selectedTradingSymbol, symbol, tradeDirection, efficiency, minTradeAmount, maxTradeAmount]);
 
   useEffect(() => {
     if (!/^\d{6}$/.test(botId)) {
@@ -166,7 +165,6 @@ const Creation = () => {
         botId,
         symbolType: symbol,
         symbol: selectedTradingSymbol,
-        payoutSystem: payoutSystem.toLowerCase(),
         tradeDirection: tradeDirection.toLowerCase(),
         efficiency,
         minTradeAmount: minimumTrade,
@@ -196,7 +194,6 @@ const Creation = () => {
             <label style={labelStyle}>Market category<CustomSelect options={symbolOptions.map((option) => option.value)} value={symbol} onChange={(value) => { setSymbol(value); setTradingViewResults([]); setSelectedTradingSymbol(''); }} theme={theme} formatOption={(value) => symbolOptions.find((option) => option.value === value)?.label || value} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Trading symbol<Search size={15} /><input value={symbolSearch} onChange={(event) => setSymbolSearch(event.target.value.toUpperCase())} placeholder={`Search ${selectedSymbol.label.toLowerCase()} symbols`} style={inputStyle} /></label><button type="button" disabled={searchingSymbols || !symbolSearch.trim()} onClick={async () => { setSearchingSymbols(true); setError(''); try { const response = await api.get('/api/market/symbols', { params: { category: symbol, search: symbolSearch.trim() } }); const remoteResults = response.data?.symbols || response.data || []; setTradingViewResults(Array.isArray(remoteResults) ? remoteResults : []); if (!Array.isArray(remoteResults) || remoteResults.length === 0) setError('No TradingView symbols matched your search.'); } catch (requestError: any) { setTradingViewResults([]); setError(requestError?.response?.data?.message || 'Unable to search TradingView symbols right now.'); } finally { setSearchingSymbols(false); } }} style={{ border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '10px 12px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}>{searchingSymbols ? <InlineLoadingDots /> : 'Search symbols'}</button>{tradingViewResults.length > 0 && <div style={{ display: 'grid', gap: 6 }}>{tradingViewResults.map((result) => <button key={`${result.exchange}:${result.symbol}`} type="button" onClick={() => setSelectedTradingSymbol(`${result.exchange}:${result.symbol}`)} style={{ textAlign: 'left', border: `1px solid ${selectedTradingSymbol === `${result.exchange}:${result.symbol}` ? theme.primary : theme.borderGlass}`, borderRadius: 9, padding: '9px 10px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><strong>{result.symbol}</strong><small style={{ display: 'block', color: theme.textMuted }}>{result.description || result.exchange} · {result.type}</small></button>)}</div>}<small style={{ color: theme.textMuted }}>Selected: {selectedTradingSymbol || 'None'}</small></div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}><label style={labelStyle}>Min trade amount<input type="number" min="0.01" step="0.01" value={minTradeAmount} onChange={(event) => setMinTradeAmount(event.target.value)} placeholder="10" style={inputStyle} /></label><label style={labelStyle}>Max trade amount<input type="number" min="0.01" step="0.01" value={maxTradeAmount} onChange={(event) => setMaxTradeAmount(event.target.value)} placeholder="100" style={inputStyle} /></label></div>
-            <label style={labelStyle}>Payout system<CustomSelect options={payoutOptions} value={payoutSystem} onChange={setPayoutSystem} theme={theme} /></label>
             <label style={labelStyle}>Trade direction<CustomSelect options={['Long', 'Short']} value={tradeDirection} onChange={setTradeDirection} theme={theme} /></label>
             <div style={{ display: 'grid', gap: 8 }}><label style={labelStyle}>Starting efficiency <strong style={{ color: theme.primary }}>{efficiency}%</strong></label><input type="range" min="0" max="100" step="10" value={efficiency} onChange={(event) => setEfficiency(Number(event.target.value))} list="efficiency-steps" style={{ width: '100%', accentColor: theme.primary, cursor: 'grab' }} /><datalist id="efficiency-steps">{Array.from({ length: 11 }, (_, index) => <option key={index} value={index * 10} label={`${index * 10}%`} />)}</datalist><div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>0%</span><span>10%</span><span>20%</span><span>30%</span><span>40%</span><span>50%</span><span>60%</span><span>70%</span><span>80%</span><span>90%</span><span>100%</span></div></div>
             {creationPricing && <section style={{ ...innerCardStyle, gap: 6 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}><strong>Creation cost</strong><strong style={{ color: theme.primary }}>{pricingLoading ? 'Checking…' : `${creationPricing.creationCost.toFixed(2)} USDT`}</strong></div><small style={{ color: creationPricing.canAfford ? theme.success : theme.danger }}>{creationPricing.canAfford ? `Available balance: ${Number(creationPricing.balance || 0).toFixed(2)} USDT` : `Insufficient balance. You need ${creationPricing.creationCost.toFixed(2)} USDT.`}</small></section>}{error && <NotificationBanner tone="error" title="Unable to create trading bot" message={error} />}{message && <NotificationBanner tone="success" title="Trading bot created" message={message} />}
