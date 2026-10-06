@@ -143,18 +143,29 @@ const BotInvestmentsPage = () => {
           })}</div> : <div style={{ ...card, color: theme.textMuted }}>You do not have any created, purchased, or rented bots yet.</div>}
         </section>
 
-        {selectedBot ? <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,.65)' }}>
-          <div style={{ width: '100%', maxWidth: 430, padding: 16, borderRadius: 18, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, boxShadow: '0 20px 60px rgba(0,0,0,.45)' }}>
-            <h3 style={{ margin: 0, fontSize: '1rem' }}>Activate {selectedBot.name}</h3>
-            <p style={{ color: theme.textMuted, fontSize: '0.8rem', lineHeight: 1.45 }}>Choose how much USDT to allocate to this bot. Your investment is held as the bot's current capital while it is active.</p>
+        {selectedBot ? <section style={{ marginTop: 14, padding: 14, borderRadius: 16, border: `1px solid ${theme.primary}`, background: theme.surfaceGlass }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <button type="button" onClick={() => { setSelectedBot(null); setAmount(''); }} style={{ ...button, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, padding: '7px 10px' }}><ArrowLeft size={15} /> Back</button>
+            <div style={{ minWidth: 0 }}>
+              <h3 style={{ margin: 0, fontSize: '1rem' }}>Activate {selectedBot.name}</h3>
+              <small style={{ color: theme.textMuted }}>Inline activation</small>
+            </div>
+          </div>
+          <div style={{ ...card, display: 'grid', gap: 12 }}>
+            <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.5 }}>Choose how much USDT to allocate to this bot. Your investment becomes the bot's current capital while it is active.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 10 }}>
+              <div><small style={{ display: 'block', color: theme.textMuted }}>Bot</small><strong>{selectedBot.name}</strong></div>
+              <div><small style={{ display: 'block', color: theme.textMuted }}>Source</small><strong style={{ textTransform: 'capitalize' }}>{selectedBot.source}</strong></div>
+              <div><small style={{ display: 'block', color: theme.textMuted }}>Efficiency</small><strong>{selectedBot.efficiency ?? 0}%</strong></div>
+              <div><small style={{ display: 'block', color: theme.textMuted }}>Direction</small><strong style={{ textTransform: 'capitalize' }}>{selectedBot.tradeDirection || 'long'}</strong></div>
+            </div>
             <label style={{ display: 'grid', gap: 6, fontSize: '0.82rem', fontWeight: 750 }}>Investment amount (USDT)<input autoFocus type="number" min={selectedBot.minTradeAmount || 0.01} max={selectedBot.maxTradeAmount || undefined} step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' }} /></label>
-            <small style={{ display: 'block', marginTop: 7, color: theme.textMuted }}>Allowed range: {money(selectedBot.minTradeAmount || 0)} – {money(selectedBot.maxTradeAmount || 0)}</small>
-            <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-              <button type="button" onClick={() => { setSelectedBot(null); setAmount(''); }} style={{ ...button, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}` }}>Cancel</button>
+            <small style={{ color: theme.textMuted }}>Allowed range: {money(selectedBot.minTradeAmount || 0)} – {money(selectedBot.maxTradeAmount || 0)}</small>
+            <div style={{ display: 'flex', gap: 8 }}>
               <button type="button" disabled={busyBotId === selectedBot.botId} onClick={() => void activate()} style={{ ...button, flex: 1 }}>{busyBotId === selectedBot.botId ? <InlineLoadingDots /> : <><TrendingUp size={15} style={{ verticalAlign: 'middle', marginRight: 5 }} /> Confirm Investment</>}</button>
             </div>
           </div>
-        </div> : null}
+        </section> : null}
       </div>
       <NowBar />
     </main>
