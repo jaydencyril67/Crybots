@@ -142,9 +142,19 @@ const AlertPage = () => {
           <section style={styles.card}>
             <h2 style={styles.cardHeading}>Notification color</h2>
             <p style={styles.cardText}>Customize the color used for your app header notification alert and unread badge.</p>
-            <button type="button" style={{ ...styles.enableButton, width: '100%', textAlign: 'left' }} onClick={() => navigate('/notification-color')}>
-              Choose notification color
-            </button>
+            <div style={styles.list}>
+              <div style={styles.row}>
+                <div style={styles.rowContent}>
+                  <div>
+                    <p style={styles.label}>Notification color</p>
+                    <p style={styles.description}>Choose the color used by the app header notification alert and unread badge.</p>
+                  </div>
+                </div>
+                <button type="button" style={styles.enableButton} onClick={() => navigate('/notification-color')}>
+                  Choose color
+                </button>
+              </div>
+            </div>
           </section>
 
           <section style={styles.card}>
