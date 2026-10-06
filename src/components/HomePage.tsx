@@ -627,7 +627,7 @@ const HomePage = () => {
                     <div>
                       <p style={styles.coinPrice}>{formatCurrency(coin.price)}</p>
                       <p style={{ ...styles.coinChange, color: coin.marketChangePercent >= 0 ? theme.success : theme.danger }}>
-                        {formatChange(coin.marketChangePercent)} market change
+                        {formatChange(coin.marketChangePercent)} Change
                       </p>
                     </div>
                   </article>
