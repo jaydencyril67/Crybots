@@ -453,8 +453,9 @@ const DetailsPage = () => {
                       aria-label={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
                       title={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}
                     >
-                      {avatarUploading ? <LoadingDots /> : <Camera size={17} strokeWidth={2.2} />}
+                      <Camera size={17} strokeWidth={2.2} />
                     </ImagePickerButton>
+                    {avatarUploading ? <div style={styles.avatarUploadingOverlay} aria-label="Uploading profile photo"><LoadingDots /></div> : null}
                   </div>
                 </div>
               </div>
