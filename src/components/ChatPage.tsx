@@ -31,7 +31,7 @@ const ChatPage = () => {
   const [imagePreview, setImagePreview] = useState('');
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState('');
-  const endRef = useRef<HTMLDivElement>(null);
+  const chatListRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -50,7 +50,13 @@ const ChatPage = () => {
     return () => { socket.disconnect(); socketRef.current = null; };
   }, []);
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  useEffect(() => {
+    const list = chatListRef.current;
+    if (!list) return;
+    requestAnimationFrame(() => {
+      list.scrollTop = list.scrollHeight;
+    });
+  }, [messages]);
 
   const sendMessage = (event: React.FormEvent) => {
     event.preventDefault();
@@ -95,9 +101,9 @@ const ChatPage = () => {
       <button type="button" onClick={() => navigate('/help')} style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '.84rem', marginBottom: 12 }}><ArrowLeft size={17} /> Help</button>
       <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 14px', borderBottom: `1px solid ${theme.borderGlass}`, color: connected ? theme.success : theme.textMuted, fontSize: '.82rem' }}>{connected ? '● Live connection' : '○ Connecting…'}</div>
-        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 16 }}>
+        <div ref={chatListRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', padding: 16, boxSizing: 'border-box' }}>
           {error && <p style={{ margin: '0 0 10px', color: theme.danger, fontSize: '.84rem' }}>{error}</p>}
-          {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}><LoadingDots /></div> : messages.length === 0 ? <p style={{ color: theme.textMuted, textAlign: 'center', padding: 40 }}>Start a conversation with support.</p> : messages.map((message) => <div key={message.id} style={{ display: 'flex', justifyContent: message.senderRole === 'user' ? 'flex-end' : 'flex-start', marginBottom: 12 }}><div style={{ maxWidth: '78%', padding: '10px 13px', borderRadius: 14, background: message.senderRole === 'user' ? theme.primary : theme.surfaceMuted, color: message.senderRole === 'user' ? theme.textInverse : theme.text, overflowWrap: 'anywhere' }}><div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>{(message.type === 'image' || message.imageUrl) && message.imageUrl ? <img src={message.imageUrl} alt="Chat attachment" style={{ display: 'block', maxWidth: '100%', maxHeight: 320, borderRadius: 10, objectFit: 'contain' }} /> : message.message}</div><small style={{ display: 'block', marginTop: 5, opacity: .65 }}>{new Date(message.createdAt).toLocaleString()}</small></div></div>)}<div ref={endRef} /></div>
+          {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}><LoadingDots /></div> : messages.length === 0 ? <p style={{ color: theme.textMuted, textAlign: 'center', padding: 40 }}>Start a conversation with support.</p> : messages.map((message) => <div key={message.id} style={{ display: 'flex', justifyContent: message.senderRole === 'user' ? 'flex-end' : 'flex-start', marginBottom: 12 }}><div style={{ maxWidth: '78%', padding: '10px 13px', borderRadius: 14, background: message.senderRole === 'user' ? theme.primary : theme.surfaceMuted, color: message.senderRole === 'user' ? theme.textInverse : theme.text, overflowWrap: 'anywhere' }}><div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>{(message.type === 'image' || message.imageUrl) && message.imageUrl ? <img src={message.imageUrl} alt="Chat attachment" style={{ display: 'block', maxWidth: '100%', maxHeight: 320, borderRadius: 10, objectFit: 'contain' }} /> : message.message}</div><small style={{ display: 'block', marginTop: 5, opacity: .65 }}>{new Date(message.createdAt).toLocaleString()}</small></div></div>)}</div>
         {imagePreview && <div style={{ padding: '8px 12px 0', borderTop: `1px solid ${theme.borderGlass}` }}><img src={imagePreview} alt="Selected attachment preview" style={{ maxWidth: 120, maxHeight: 80, borderRadius: 8 }} /></div>}<form onSubmit={sendMessage} style={{ display: 'flex', flexShrink: 0, gap: 8, padding: '12px 12px calc(12px + env(safe-area-inset-bottom))', borderTop: `1px solid ${theme.borderGlass}` }}><ImagePickerButton accept="image/*" onImageSelected={sendImage} disabled={!connected || sending || uploading} style={{ alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '0 12px', color: theme.text, background: 'transparent', cursor: connected && !uploading ? 'pointer' : 'not-allowed', opacity: connected && !uploading ? 1 : .5 }} title="Send image" aria-label="Send image">{uploading ? <InlineLoadingDots /> : <ImagePlus size={18} />}</ImagePickerButton><textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Write a message…" rows={2} disabled={!connected || sending || uploading} style={{ flex: 1, resize: 'none', border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: 10, background: theme.surfaceMuted, color: theme.text, font: 'inherit' }} /><button type="submit" disabled={!connected || sending || uploading || !draft.trim()} style={{ alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '0 15px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 800 }}>{sending ? <InlineLoadingDots /> : <><Send size={16} /> Send</>}</button></form>
       </div>
     </main>
