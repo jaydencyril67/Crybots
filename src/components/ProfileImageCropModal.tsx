@@ -16,9 +16,11 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
   const imageRef = useRef<HTMLImageElement | null>(null);
   const dragRef = useRef({ active: false, x: 0, y: 0 });
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
-  const pinchRef = useRef<{ distance: number; midpoint: { x: number; y: number }; zoom: number } | null>(null);
+  const pinchRef = useRef<{ distance: number; midpoint: { x: number; y: number }; zoom: number; offset: { x: number; y: number } } | null>(null);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const zoomRef = useRef(1);
+  const offsetRef = useRef({ x: 0, y: 0 });
   const [ready, setReady] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -28,6 +30,16 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
     const baseScale = Math.max(CROP_SIZE / image.naturalWidth, CROP_SIZE / image.naturalHeight);
     const scale = baseScale * zoom;
     return { scale, width: image.naturalWidth * scale, height: image.naturalHeight * scale };
+  };
+
+  const setCurrentZoom = (nextZoom: number) => {
+    zoomRef.current = nextZoom;
+    setZoom(nextZoom);
+  };
+
+  const setCurrentOffset = (nextOffset: { x: number; y: number }) => {
+    offsetRef.current = nextOffset;
+    setOffset(nextOffset);
   };
 
   const constrainOffset = (next: { x: number; y: number }) => {
@@ -40,6 +52,8 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
   };
 
   useEffect(() => {
+    zoomRef.current = 1;
+    offsetRef.current = { x: 0, y: 0 };
     setZoom(1);
     setOffset({ x: 0, y: 0 });
     setReady(false);
@@ -48,7 +62,9 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
   const handleImageLoad = () => {
     const geometry = getGeometry();
     if (!geometry) return;
-    setOffset({ x: (CROP_SIZE - geometry.width) / 2, y: (CROP_SIZE - geometry.height) / 2 });
+    const initialOffset = { x: (CROP_SIZE - geometry.width) / 2, y: (CROP_SIZE - geometry.height) / 2 };
+    offsetRef.current = initialOffset;
+    setOffset(initialOffset);
     setReady(true);
   };
 
@@ -69,7 +85,8 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
       pinchRef.current = {
         distance: Math.max(1, Math.hypot(second.x - first.x, second.y - first.y)),
         midpoint: { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 },
-        zoom,
+        zoom: zoomRef.current,
+        offset: offsetRef.current,
       };
     }
   };
@@ -83,16 +100,21 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
       const distance = Math.max(1, Math.hypot(second.x - first.x, second.y - first.y));
       const midpoint = { x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 };
       const nextZoom = clamp(pinchRef.current.zoom * (distance / pinchRef.current.distance), 1, 3);
-      const geometry = getGeometry();
-
-      if (geometry) {
-        const nextScale = geometry.scale * (nextZoom / zoom);
-        const imagePointX = (pinchRef.current.midpoint.x - offset.x) / geometry.scale;
-        const imagePointY = (pinchRef.current.midpoint.y - offset.y) / geometry.scale;
-        setZoom(nextZoom);
-        setOffset(constrainOffset({ x: midpoint.x - imagePointX * nextScale, y: midpoint.y - imagePointY * nextScale }));
+      const image = imageRef.current;
+      if (image?.naturalWidth && image.naturalHeight) {
+        const baseScale = Math.max(CROP_SIZE / image.naturalWidth, CROP_SIZE / image.naturalHeight);
+        const startScale = baseScale * pinchRef.current.zoom;
+        const nextScale = baseScale * nextZoom;
+        const imagePointX = (pinchRef.current.midpoint.x - pinchRef.current.offset.x) / startScale;
+        const imagePointY = (pinchRef.current.midpoint.y - pinchRef.current.offset.y) / startScale;
+        const nextOffset = constrainOffset({
+          x: midpoint.x - imagePointX * nextScale,
+          y: midpoint.y - imagePointY * nextScale,
+        });
+        setCurrentZoom(nextZoom);
+        setCurrentOffset(nextOffset);
       } else {
-        setZoom(nextZoom);
+        setCurrentZoom(nextZoom);
       }
       return;
     }
@@ -101,7 +123,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
     const dx = event.clientX - dragRef.current.x;
     const dy = event.clientY - dragRef.current.y;
     dragRef.current = { active: true, x: event.clientX, y: event.clientY };
-    setOffset((current) => constrainOffset({ x: current.x + dx, y: current.y + dy }));
+    setCurrentOffset(constrainOffset({ x: offsetRef.current.x + dx, y: offsetRef.current.y + dy }));
   };
 
   const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -128,7 +150,8 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
       if (!context) throw new Error('Unable to prepare the cropped image.');
       const ratio = OUTPUT_SIZE / CROP_SIZE;
       context.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
-      context.drawImage(image, offset.x * ratio, offset.y * ratio, geometry.width * ratio, geometry.height * ratio);
+      const currentOffset = offsetRef.current;
+      context.drawImage(image, currentOffset.x * ratio, currentOffset.y * ratio, geometry.width * ratio, geometry.height * ratio);
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
       if (!blob) throw new Error('Unable to create the cropped image.');
       await onDone(new File([blob], 'profile-picture.jpg', { type: 'image/jpeg' }));
