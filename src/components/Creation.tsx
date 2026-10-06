@@ -195,8 +195,12 @@ const Creation = () => {
     <main style={{ minHeight: '100vh', overflowX: 'hidden', background: theme.background, color: theme.text, paddingBottom: 90 }}>
       <div style={{ width: '100%', maxWidth: 920, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' }}>
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={16} /> Market</button>
-        <div style={{ display: 'flex', gap: 8, marginTop: 18, padding: 4, borderRadius: 12, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
-          {(['create', 'creation'] as const).map((view) => <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: 0, borderRadius: 10, padding: '7px 10px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, fontSize: '0.84rem', lineHeight: 'normal', cursor: 'pointer' }}>{view === 'create' ? 'Create' : 'Creation'}</button>)}
+        <div style={{ ...outerCardStyle, display: 'flex', gap: 8, marginTop: 18, padding: 5 }}>
+          {(['create', 'creation'] as const).map((view) => (
+            <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: 0, borderRadius: 11, padding: '9px 12px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, fontSize: '0.84rem', lineHeight: 'normal', cursor: 'pointer' }}>
+              {view === 'create' ? 'Create' : 'Creation'}
+            </button>
+          ))}
         </div>
         {activeView === 'create' ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: 18, alignItems: 'start', marginTop: 18 }}>
           <div style={outerCardStyle}>
