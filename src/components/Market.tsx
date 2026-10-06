@@ -21,10 +21,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const categories = [
-  { name: 'My Bots', description: 'Activate created, purchased, or rented bots and manage their investments.' },
   { name: 'Commerce', description: 'Buy and sell trading bots with permanent ownership until sold.' },
   { name: 'Rentals', description: 'Rent community-created bots or list your own bots for others to rent.' },
   { name: 'Creation', description: 'Bring new ideas to life and build something valuable for the community.' },
+  { name: 'My Bots', description: 'Activate created, purchased, or rented bots and manage their investments.' },
 ];
 
 const Market = () => {
