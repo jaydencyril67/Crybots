@@ -105,7 +105,7 @@ const Creation = () => {
         if (active) setPricingLoading(false);
       });
     return () => { active = false; };
-  }, [selectedTradingSymbol, symbol, payoutSystem, efficiency]);
+  }, [selectedTradingSymbol, symbol, payoutSystem, tradeDirection, efficiency, minTradeAmount, maxTradeAmount]);
 
   useEffect(() => {
     if (!/^\d{6}$/.test(botId)) {
