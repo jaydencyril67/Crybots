@@ -46,7 +46,7 @@ const BotInvestmentsPage = () => {
   const [amount, setAmount] = useState('');
   const [busyBotId, setBusyBotId] = useState('');
 
-  const styles = {
+  const styles: Record<string, React.CSSProperties> = {
     page: {
       minHeight: '100vh',
       overflowX: 'hidden' as const,
