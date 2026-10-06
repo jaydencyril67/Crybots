@@ -588,7 +588,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'alert') return <ProtectedRoute><AlertPage /></ProtectedRoute>;
     if (displayedRouteKey === 'app-usage') return <ProtectedRoute><AppUsagePage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['home', 'details', 'manage', 'theme', 'nowbar', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'about', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'alert', 'app-usage'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['home', 'details', 'manage', 'theme', 'nowbar', 'voice-commands', 'nowbar-color', 'nowbar-button-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'about', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'alert', 'app-usage'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
