@@ -24,8 +24,8 @@ const baseStyles = {
   card: {},
   profileIdentity: { display: 'flex', alignItems: 'center', justifyContent: 'center', width: 'min(58vw, 180px)', aspectRatio: '1 / 1', margin: '0', padding: '0', overflow: 'hidden', borderRadius: '15px', boxSizing: 'border-box' as const },
   profileAvatarFrame: { position: 'relative' as const, width: '100%', height: '100%' },
-  profileAvatar: { width: '100%', height: '100%', borderRadius: '15px', objectFit: 'cover' as const, border: '4px solid rgba(255,255,255,0.9)', boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)', background: '#111827', flexShrink: 0 },
-  profileAvatarFallback: { width: '100%', height: '100%', borderRadius: '15px', display: 'grid', placeItems: 'center', border: '4px solid rgba(255,255,255,0.9)', boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)', background: '#111827', flexShrink: 0 },
+  profileAvatar: { width: '100%', height: '100%', borderRadius: '15px', objectFit: 'cover' as const, border: '0', boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)', background: '#111827', flexShrink: 0 },
+  profileAvatarFallback: { width: '100%', height: '100%', borderRadius: '15px', display: 'grid', placeItems: 'center', border: '0', boxShadow: '0 0 0 3px rgba(56,189,248,0.35), 0 14px 34px rgba(0,0,0,0.35)', background: '#111827', flexShrink: 0 },
   '@media (max-width: 640px)': {
     page: { paddingBottom: '90px' }, shell: { maxWidth: '100%', padding: '14px 12px 24px' }, content: { gap: '14px', marginTop: '14px' }, card: {},
     profileIdentity: { width: 'min(64vw, 180px)', padding: '0', gap: '0' }, profileAvatarFrame: { width: '100%', height: '100%' },
