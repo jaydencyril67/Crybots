@@ -18,6 +18,7 @@ import {
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
+import api from '../api';
 
 type MarketCoin = {
   symbol: string;
@@ -42,8 +43,6 @@ const marketCoins: MarketCoin[] = [
   { symbol: 'XRP', name: 'XRP', price: 0, change24h: 0, id: 'ripple' },
   { symbol: 'ADA', name: 'Cardano', price: 0, change24h: 0, id: 'cardano' },
 ];
-
-const marketCoinIds = marketCoins.map((coin) => coin.id).join(',');
 
 const dashboardMetrics = [
   { label: 'Market sentiment', value: 'Bullish momentum', icon: <ChartNoAxesColumnIncreasing size={18} /> },
@@ -505,16 +504,14 @@ const HomePage = () => {
 
     const loadLiveCoins = async () => {
       try {
-        const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${marketCoinIds}&vs_currencies=usd&include_24hr_change=true`);
-        if (!response.ok) throw new Error('Failed to load live prices');
-
-        const data = await response.json() as Record<string, { usd?: number; usd_24h_change?: number }>;
+        const response = await api.get('/api/market/home');
+        const remoteCoins = Array.isArray(response.data?.coins) ? response.data.coins : [];
         const updatedCoins = marketCoins.map((coin) => {
-          const live = data[coin.id];
+          const live = remoteCoins.find((item: any) => item?.symbol === coin.symbol);
           return {
             ...coin,
-            price: live?.usd ?? coin.price,
-            change24h: live?.usd_24h_change ?? coin.change24h,
+            price: Number.isFinite(Number(live?.price)) ? Number(live.price) : coin.price,
+            change24h: Number.isFinite(Number(live?.change24h)) ? Number(live.change24h) : coin.change24h,
           };
         });
 
