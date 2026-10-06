@@ -143,15 +143,34 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   }, []);
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(NOTIFICATION_COLOR_STORAGE_KEY);
-      if (/^#[0-9a-f]{6}$/i.test(stored || '')) setNotificationColor(stored as string);
-    } catch {}
-    const handleColorChanged = () => {
-      const stored = window.localStorage.getItem(NOTIFICATION_COLOR_STORAGE_KEY);
-      if (/^#[0-9a-f]{6}$/i.test(stored || '')) setNotificationColor(stored as string);
-      else setNotificationColor(DEFAULT_NOTIFICATION_COLOR);
+    const readNotificationColor = () => {
+      try {
+        const stored = window.localStorage.getItem(NOTIFICATION_COLOR_STORAGE_KEY);
+        if (!stored) return DEFAULT_NOTIFICATION_COLOR;
+
+        // NotificationColorPage stores the setting as JSON: { color: '#38bdf8' }.
+        // Keep raw-hex support too so older saved values continue to work.
+        try {
+          const parsed = JSON.parse(stored) as { color?: unknown };
+          if (typeof parsed?.color === 'string' && /^#[0-9a-f]{6}$/i.test(parsed.color)) {
+            return parsed.color;
+          }
+        } catch {
+          // Fall through to the legacy raw-hex format.
+        }
+
+        return /^#[0-9a-f]{6}$/i.test(stored) ? stored : DEFAULT_NOTIFICATION_COLOR;
+      } catch {
+        return DEFAULT_NOTIFICATION_COLOR;
+      }
     };
+
+    setNotificationColor(readNotificationColor());
+
+    const handleColorChanged = () => {
+      setNotificationColor(readNotificationColor());
+    };
+
     window.addEventListener('kingshall-notification-color-changed', handleColorChanged);
     return () => window.removeEventListener('kingshall-notification-color-changed', handleColorChanged);
   }, []);
