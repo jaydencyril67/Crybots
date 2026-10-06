@@ -56,6 +56,13 @@ const Creation = () => {
   const [minTradeAmount, setMinTradeAmount] = useState('');
   const [maxTradeAmount, setMaxTradeAmount] = useState('');
   const [retainerAmount, setRetainerAmount] = useState('');
+  useEffect(() => {
+    const maximum = Number(maxTradeAmount);
+    const current = Number(retainerAmount);
+    if (Number.isFinite(maximum) && maximum > 0 && Number.isFinite(current) && current > Math.min(maximum, 100)) {
+      setRetainerAmount(String(Math.min(maximum, 100)));
+    }
+  }, [maxTradeAmount, retainerAmount]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
