@@ -249,7 +249,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
             pointerEvents: 'none',
           }}
         />
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.8)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '24px', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.8)', pointerEvents: 'none' }} />
       </div>
 
       <span style={{ fontSize: '0.78rem', opacity: 0.7 }}>Pinch to zoom • Drag to position</span>
