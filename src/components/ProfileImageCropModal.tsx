@@ -172,7 +172,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
           maxWidth: '82vw',
           maxHeight: '82vw',
           overflow: 'hidden',
-          borderRadius: '50%',
+          borderRadius: '24px',
           background: '#111',
           touchAction: 'none',
           cursor: saving ? 'default' : 'grab',
