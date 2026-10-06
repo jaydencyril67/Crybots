@@ -42,9 +42,14 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
     setOffset(nextOffset);
   };
 
-  const constrainOffset = (next: { x: number; y: number }) => {
-    const geometry = getGeometry();
-    if (!geometry) return next;
+  const constrainOffset = (next: { x: number; y: number }, activeZoom = zoomRef.current) => {
+    const image = imageRef.current;
+    if (!image?.naturalWidth || !image.naturalHeight) return next;
+    const baseScale = Math.max(CROP_SIZE / image.naturalWidth, CROP_SIZE / image.naturalHeight);
+    const geometry = {
+      width: image.naturalWidth * baseScale * activeZoom,
+      height: image.naturalHeight * baseScale * activeZoom,
+    };
     return {
       x: clamp(next.x, CROP_SIZE - geometry.width, 0),
       y: clamp(next.y, CROP_SIZE - geometry.height, 0),
@@ -70,7 +75,6 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!ready || saving) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
     pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
     if (pointersRef.current.size === 1) {
@@ -110,7 +114,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
         const nextOffset = constrainOffset({
           x: midpoint.x - imagePointX * nextScale,
           y: midpoint.y - imagePointY * nextScale,
-        });
+        }, nextZoom);
         setCurrentZoom(nextZoom);
         setCurrentOffset(nextOffset);
       } else {
@@ -128,6 +132,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
 
   const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
     pointersRef.current.delete(event.pointerId);
+    try { event.currentTarget.releasePointerCapture(event.pointerId); } catch { /* pointer was not captured */ }
     dragRef.current.active = false;
     pinchRef.current = null;
     if (pointersRef.current.size === 1) {
