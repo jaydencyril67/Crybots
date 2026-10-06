@@ -7,7 +7,7 @@ type ProfileImageCropModalProps = {
   onDone: (file: File) => void | Promise<void>;
 };
 
-const CROP_SIZE = 300;
+const CROP_SIZE = 340;
 const OUTPUT_SIZE = 800;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -27,21 +27,15 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
     if (!image?.naturalWidth || !image.naturalHeight) return null;
     const baseScale = Math.max(CROP_SIZE / image.naturalWidth, CROP_SIZE / image.naturalHeight);
     const scale = baseScale * zoom;
-    return {
-      scale,
-      width: image.naturalWidth * scale,
-      height: image.naturalHeight * scale,
-    };
+    return { scale, width: image.naturalWidth * scale, height: image.naturalHeight * scale };
   };
 
   const constrainOffset = (next: { x: number; y: number }) => {
     const geometry = getGeometry();
     if (!geometry) return next;
-    const minX = CROP_SIZE - geometry.width;
-    const minY = CROP_SIZE - geometry.height;
     return {
-      x: clamp(next.x, minX, 0),
-      y: clamp(next.y, minY, 0),
+      x: clamp(next.x, CROP_SIZE - geometry.width, 0),
+      y: clamp(next.y, CROP_SIZE - geometry.height, 0),
     };
   };
 
@@ -54,10 +48,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
   const handleImageLoad = () => {
     const geometry = getGeometry();
     if (!geometry) return;
-    setOffset({
-      x: (CROP_SIZE - geometry.width) / 2,
-      y: (CROP_SIZE - geometry.height) / 2,
-    });
+    setOffset({ x: (CROP_SIZE - geometry.width) / 2, y: (CROP_SIZE - geometry.height) / 2 });
     setReady(true);
   };
 
@@ -99,10 +90,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
         const imagePointX = (pinchRef.current.midpoint.x - offset.x) / geometry.scale;
         const imagePointY = (pinchRef.current.midpoint.y - offset.y) / geometry.scale;
         setZoom(nextZoom);
-        setOffset(constrainOffset({
-          x: midpoint.x - imagePointX * nextScale,
-          y: midpoint.y - imagePointY * nextScale,
-        }));
+        setOffset(constrainOffset({ x: midpoint.x - imagePointX * nextScale, y: midpoint.y - imagePointY * nextScale }));
       } else {
         setZoom(nextZoom);
       }
@@ -120,31 +108,10 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
     pointersRef.current.delete(event.pointerId);
     dragRef.current.active = false;
     pinchRef.current = null;
-
     if (pointersRef.current.size === 1) {
       const remaining = Array.from(pointersRef.current.values())[0];
       dragRef.current = { active: true, x: remaining.x, y: remaining.y };
     }
-  };
-
-  const handleZoomChange = (nextZoom: number) => {
-    const previous = getGeometry();
-    setZoom(nextZoom);
-    requestAnimationFrame(() => {
-      const image = imageRef.current;
-      if (!image?.naturalWidth || !image.naturalHeight) return;
-      const baseScale = Math.max(CROP_SIZE / image.naturalWidth, CROP_SIZE / image.naturalHeight);
-      const nextScale = baseScale * nextZoom;
-      const nextWidth = image.naturalWidth * nextScale;
-      const nextHeight = image.naturalHeight * nextScale;
-      setOffset((current) => {
-        if (!previous) return constrainOffset({ x: (CROP_SIZE - nextWidth) / 2, y: (CROP_SIZE - nextHeight) / 2 });
-        const ratio = nextZoom / zoom;
-        const centeredX = CROP_SIZE / 2 + (current.x - CROP_SIZE / 2) * ratio;
-        const centeredY = CROP_SIZE / 2 + (current.y - CROP_SIZE / 2) * ratio;
-        return constrainOffset({ x: centeredX, y: centeredY });
-      });
-    });
   };
 
   const createCroppedFile = async () => {
@@ -159,17 +126,9 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
       canvas.height = OUTPUT_SIZE;
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Unable to prepare the cropped image.');
-
       const ratio = OUTPUT_SIZE / CROP_SIZE;
       context.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
-      context.drawImage(
-        image,
-        offset.x * ratio,
-        offset.y * ratio,
-        geometry.width * ratio,
-        geometry.height * ratio,
-      );
-
+      context.drawImage(image, offset.x * ratio, offset.y * ratio, geometry.width * ratio, geometry.height * ratio);
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
       if (!blob) throw new Error('Unable to create the cropped image.');
       await onDone(new File([blob], 'profile-picture.jpg', { type: 'image/jpeg' }));
@@ -181,33 +140,15 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Edit profile picture"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 9999,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '22px',
-        padding: '24px',
-        boxSizing: 'border-box',
-        background: 'rgba(0,0,0,0.88)',
-        color: '#fff',
-      }}
-    >
+    <div role="dialog" aria-modal="true" aria-label="Edit profile picture" style={{
+      position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: '22px', padding: '24px', boxSizing: 'border-box',
+      background: 'rgba(0,0,0,0.88)', color: '#fff'
+    }}>
       <div style={{ width: '100%', maxWidth: '420px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <button type="button" onClick={onCancel} disabled={saving} aria-label="Cancel" style={{ background: 'transparent', border: 0, color: '#fff', padding: 8, cursor: 'pointer' }}>
-          <X size={25} />
-        </button>
+        <button type="button" onClick={onCancel} disabled={saving} aria-label="Cancel" style={{ background: 'transparent', border: 0, color: '#fff', padding: 8, cursor: 'pointer' }}><X size={25} /></button>
         <strong style={{ fontSize: '1rem' }}>Edit profile picture</strong>
-        <button type="button" onClick={() => void createCroppedFile()} disabled={!ready || saving} aria-label="Done" style={{ background: 'transparent', border: 0, color: '#fff', padding: 8, cursor: ready && !saving ? 'pointer' : 'default' }}>
-          <Check size={27} />
-        </button>
+        <button type="button" onClick={() => void createCroppedFile()} disabled={!ready || saving} aria-label="Done" style={{ background: 'transparent', border: 0, color: '#fff', padding: 8, cursor: ready && !saving ? 'pointer' : 'default' }}><Check size={27} /></button>
       </div>
 
       <div
@@ -216,17 +157,10 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         style={{
-          position: 'relative',
-          width: CROP_SIZE,
-          height: CROP_SIZE,
-          maxWidth: '82vw',
-          maxHeight: '82vw',
-          overflow: 'hidden',
-          borderRadius: '24px',
-          background: '#111',
-          touchAction: 'none',
+          position: 'relative', width: CROP_SIZE, height: CROP_SIZE, maxWidth: '82vw', maxHeight: '82vw',
+          overflow: 'hidden', borderRadius: '24px', background: '#111', touchAction: 'none',
           cursor: saving ? 'default' : 'grab',
-          boxShadow: '0 0 0 2px rgba(255,255,255,0.9), 0 0 0 100vmax rgba(0,0,0,0.18)',
+          boxShadow: '0 0 0 2px rgba(255,255,255,0.9), 0 0 0 100vmax rgba(0,0,0,0.18)'
         }}
       >
         <img
@@ -236,17 +170,10 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone }: ProfileImageCropM
           onLoad={handleImageLoad}
           draggable={false}
           style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            width: ready ? getGeometry()?.width : '100%',
-            height: ready ? getGeometry()?.height : '100%',
-            maxWidth: 'none',
-            objectFit: 'fill',
+            position: 'absolute', left: 0, top: 0, width: ready ? getGeometry()?.width : '100%',
+            height: ready ? getGeometry()?.height : '100%', maxWidth: 'none', objectFit: 'fill',
             transform: ready ? `translate(${offset.x}px, ${offset.y}px)` : 'none',
-            transformOrigin: 'top left',
-            userSelect: 'none',
-            pointerEvents: 'none',
+            transformOrigin: 'top left', userSelect: 'none', pointerEvents: 'none'
           }}
         />
         <div style={{ position: 'absolute', inset: 0, borderRadius: '24px', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.8)', pointerEvents: 'none' }} />
