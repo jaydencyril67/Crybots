@@ -436,13 +436,13 @@ const BotInvestmentsPage = () => {
                                 <div style={{ display: 'grid', gap: 5 }}>
                                   <p style={{ ...styles.value, fontSize: '0.88rem' }}>Withdraw from {bot.name}</p>
                                   <p style={styles.note}>
-                                    The bot stays active. Minimum active capital: {money(bot.minTradeAmount || 0)}.
+                                    The bot stays active. Required retainer: {money(bot.retainerAmount || 0)}.
                                   </p>
                                 </div>
                                 <input
                                   type="number"
                                   min="0.01"
-                                  max={Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.minTradeAmount || 0))}
+                                  max={Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.retainerAmount || 0))}
                                   step="0.01"
                                   value={withdrawAmount}
                                   onChange={(event) => setWithdrawAmount(event.target.value)}
