@@ -15,6 +15,8 @@ type Investment = {
   totalProfit: number;
   totalLoss: number;
   active: boolean;
+  lifecycleStatus?: 'inactive' | 'activating' | 'active' | 'deactivating';
+  lifecycleAvailableAt?: string;
   activatedAt?: string;
   deactivatedAt?: string;
 };
@@ -316,6 +318,8 @@ const BotInvestmentsPage = () => {
                     {bots.map((bot) => {
                       const investment = bot.investment;
                       const active = investment?.active === true;
+                      const lifecycleStatus = investment?.lifecycleStatus || (active ? 'active' : 'inactive');
+                      const lifecyclePending = lifecycleStatus === 'activating' || lifecycleStatus === 'deactivating';
                       const profit = Number(investment?.totalProfit || 0) - Number(investment?.totalLoss || 0);
 
                       return (
@@ -333,11 +337,17 @@ const BotInvestmentsPage = () => {
                               padding: '5px 9px',
                               fontSize: '0.7rem',
                               fontWeight: 850,
-                              background: active ? theme.success : theme.surfaceGlass,
-                              color: active ? theme.textInverse : theme.textMuted,
+                              background: lifecycleStatus === 'active' ? theme.success : theme.surfaceGlass,
+                              color: lifecycleStatus === 'active' ? theme.textInverse : theme.textMuted,
                               flexShrink: 0,
                             }}>
-                              {active ? 'ACTIVE' : 'READY'}
+                              {lifecycleStatus === 'active'
+                                ? 'ACTIVE'
+                                : lifecycleStatus === 'activating'
+                                  ? 'ACTIVATING'
+                                  : lifecycleStatus === 'deactivating'
+                                    ? 'DEACTIVATING'
+                                    : 'READY'}
                             </span>
                           </div>
 
@@ -364,12 +374,24 @@ const BotInvestmentsPage = () => {
                             ) : null}
                           </div>
 
+                          {lifecyclePending && investment?.lifecycleAvailableAt ? (
+                            <p style={styles.note}>
+                              {lifecycleStatus === 'activating' ? 'Activation' : 'Return'} is processing until {new Date(investment.lifecycleAvailableAt).toLocaleString()}.
+                            </p>
+                          ) : null}
+
                           {bot.source === 'rented' && bot.rentalExpiresAt ? (
                             <p style={styles.note}>Rental ends {new Date(bot.rentalExpiresAt).toLocaleString()}</p>
                           ) : null}
 
                           <div style={{ display: 'grid', width: '100%', marginTop: 2 }}>
-                            {!active ? (
+                            {lifecycleStatus === 'activating' || lifecycleStatus === 'deactivating' ? (
+                              <div style={{ ...styles.note, padding: '10px 12px', borderRadius: 10, border: '1px solid ' + theme.borderGlass, background: theme.surfaceGlass }}>
+                                {lifecycleStatus === 'activating'
+                                  ? 'Activation is being processed. The reserved funds are not active in the bot until processing completes.'
+                                  : 'Deactivation is being processed. The bot has stopped earning and the return will be credited when processing completes.'}
+                              </div>
+                            ) : !active ? (
                               <button
                                 type="button"
                                 style={styles.button}
