@@ -289,7 +289,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/details', '/statistics', '/security', '/danger'] },
   { routes: ['/stats', '/tools', '/menu'] },
   { routes: ['/chart', '/market', '/portfolio', '/trade/history'] },
-  { routes: ['/creation', '/rentals', '/commerce'] },
+  { routes: ['/commerce', '/rentals', '/creation', '/bots'] },
   { routes: ['/transactions', '/app-usage'] },
   { routes: ['/faq', '/tickets', '/chat'] },
   { routes: ['/theme', '/nowbar', '/alert'] },
