@@ -81,7 +81,11 @@ const AdminChatUserPage = () => {
   }, [targetUserId]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const list = chatListRef.current;
+    if (!list) return;
+    requestAnimationFrame(() => {
+      list.scrollTop = list.scrollHeight;
+    });
   }, [messages]);
 
   const sendMessage = (event: React.FormEvent) => {
