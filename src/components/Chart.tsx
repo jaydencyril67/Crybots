@@ -24,34 +24,9 @@ const Chart = () => {
     setMoversLoading(true);
     setMoversError('');
     try {
-      const response = await fetch('https://scanner.tradingview.com/crypto/scan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filter: [
-            { left: 'change', operation: 'in_range', right: [1.5, 3] },
-          ],
-          columns: ['name', 'description', 'close', 'change'],
-          sort: { sortBy: 'change', sortOrder: 'asc' },
-          options: { lang: 'en' },
-          range: [0, 30],
-        }),
-      });
-      if (!response.ok) throw new Error('TradingView scanner request failed');
-      const payload = await response.json();
-      const rows = Array.isArray(payload?.data) ? payload.data : [];
-      const nextMovers = rows
-        .map((row: any) => {
-          const values = Array.isArray(row?.d) ? row.d : [];
-          return {
-            symbol: String(row?.s || values[0] || ''),
-            name: String(values[1] || row?.s || ''),
-            price: Number.isFinite(Number(values[2])) ? Number(values[2]) : null,
-            change: Number(values[3]),
-          };
-        })
-        .filter((item: TradingViewMover) => Number.isFinite(item.change) && item.change >= 1.5 && item.change <= 3)
-        .sort((a: TradingViewMover, b: TradingViewMover) => a.change - b.change);
+      const { default: api } = await import('../api/axios');
+      const response = await api.get('/api/creation/movers');
+      const nextMovers = Array.isArray(response.data?.movers) ? response.data.movers : [];
       setMovers(nextMovers);
     } catch {
       setMoversError('Unable to load TradingView 24h movers right now.');
