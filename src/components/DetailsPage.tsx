@@ -126,13 +126,15 @@ const DetailsPage = () => {
           <div style={styles.shell}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.content}>
-              <div style={{ ...styles.row, ...styles.profileIdentity }}>
+              <div style={{ ...styles.rowList, ...styles.profilePhotoCard }}>
+                <div style={{ ...styles.row, ...styles.profileIdentity }}>
 
                   <div style={styles.profileAvatarFrame}>
                     {avatarPicture ? <img src={avatarPicture} alt={`${fullName || 'User'} profile`} style={styles.profileAvatar} /> : <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder"><CircleUserRound size={58} strokeWidth={1.6} /></div>}
                     <ImagePickerButton accept="image/*" onImageSelected={handleAvatarFileChange} disabled={avatarUploading} style={styles.avatarCameraButton} aria-label={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'} title={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}><Camera size={17} strokeWidth={2.2} /></ImagePickerButton>
                     {avatarUploading ? <div style={styles.avatarUploadingOverlay} aria-label="Uploading profile photo"><LoadingDots /></div> : null}
-                  </div>
+                    </div>
+              </div>
               </div>
               {avatarError ? <p style={{ ...styles.helperText, color: theme.danger }}>{avatarError}</p> : null}
               <div style={styles.rowList}>
