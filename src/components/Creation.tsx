@@ -93,7 +93,7 @@ const Creation = () => {
     }
     let active = true;
     setPricingLoading(true);
-    api.get('/api/market/pricing', { params: { symbolType: symbol, symbol: selectedTradingSymbol, tradeDirection, efficiency, minTradeAmount, maxTradeAmount } })
+    api.get('/api/market/pricing', { params: { symbolType: symbol, symbol: selectedTradingSymbol, tradeDirection, efficiency, minTradeAmount, maxTradeAmount, retainerAmount } })
       .then((response) => {
         if (active) setCreationPricing(response.data || null);
       })
@@ -104,7 +104,7 @@ const Creation = () => {
         if (active) setPricingLoading(false);
       });
     return () => { active = false; };
-  }, [selectedTradingSymbol, symbol, tradeDirection, efficiency, minTradeAmount, maxTradeAmount]);
+  }, [selectedTradingSymbol, symbol, tradeDirection, efficiency, minTradeAmount, maxTradeAmount, retainerAmount]);
 
   useEffect(() => {
     if (!/^\d{6}$/.test(botId)) {
