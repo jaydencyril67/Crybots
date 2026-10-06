@@ -31,6 +31,7 @@ type Bot = {
   tradeDirection?: string;
   minTradeAmount?: number;
   maxTradeAmount?: number;
+  retainerAmount?: number;
   source: 'owned' | 'rented';
   rentalExpiresAt?: string | null;
   investment?: Investment | null;
