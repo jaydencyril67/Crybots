@@ -94,7 +94,7 @@ const Creation = () => {
     }
     let active = true;
     setPricingLoading(true);
-    api.get('/api/market/pricing', { params: { symbolType: symbol, symbol: selectedTradingSymbol, payoutSystem: payoutSystem.toLowerCase(), efficiency } })
+    api.get('/api/market/pricing', { params: { symbolType: symbol, symbol: selectedTradingSymbol, payoutSystem: payoutSystem.toLowerCase(), efficiency, minTradeAmount, maxTradeAmount } })
       .then((response) => {
         if (active) setCreationPricing(response.data || null);
       })
