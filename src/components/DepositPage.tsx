@@ -373,11 +373,9 @@ const DepositPage = () => {
           {payment && ['failed', 'refunded', 'expired', 'cancelled', 'canceled'].includes(statusLabel(payment.paymentStatus || payment.status)) ? <NotificationBanner tone="error" title="Deposit not completed" message="This deposit could not be completed. Please start a new deposit or contact support." /> : null}
           {payment && statusLabel(payment.paymentStatus || payment.status) === 'pending' ? <NotificationBanner tone="info" title="Deposit awaiting confirmation" message="Send the requested amount to the address above. We will update this page when the network confirms it." /> : null}
           <div style={styles.outerCard}>
-            <div style={styles.card}>
             <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
               <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Deposit address</button>
               <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
-            </div>
             </div>
           </div>
           <div style={styles.outerCard}>
