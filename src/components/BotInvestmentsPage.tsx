@@ -460,7 +460,7 @@ const BotInvestmentsPage = () => {
                                 <p style={styles.note}>
                                   Maximum withdrawable: {money(Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.retainerAmount || 0)))}
                                 </p>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
                                   <button
                                     type="button"
                                     disabled={busyBotId === bot.botId}
@@ -468,14 +468,6 @@ const BotInvestmentsPage = () => {
                                     style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10, padding: '7px 10px', fontSize: '0.84rem' }}
                                   >
                                     Cancel
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={busyBotId === bot.botId}
-                                    onClick={() => setWithdrawAmount(String(Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.retainerAmount || 0)).toFixed(2)))}
-                                    style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10, padding: '7px 10px', fontSize: '0.84rem' }}
-                                  >
-                                    Max
                                   </button>
                                   <button
                                     type="button"
