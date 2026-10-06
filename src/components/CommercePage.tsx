@@ -33,12 +33,28 @@ const CommercePage = () => {
   const [listingSaving, setListingSaving] = useState(false);
   const [listingBotId, setListingBotId] = useState('');
   const [listingPrice, setListingPrice] = useState('');
+  const [listingPricing, setListingPricing] = useState<{ salePriceMin: number; salePriceMax: number; qualityScore: number; qualityTier: string } | null>(null);
+  const [listingPricingLoading, setListingPricingLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const cardStyle: React.CSSProperties = { padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted };
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' };
   const buttonStyle: React.CSSProperties = { border: 0, borderRadius: 999, padding: '9px 13px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer', font: 'inherit' };
+
+  useEffect(() => {
+    if (!/^\d{6}$/.test(listingBotId.trim())) {
+      setListingPricing(null);
+      return;
+    }
+    let active = true;
+    setListingPricingLoading(true);
+    api.get('/api/commerce/pricing', { params: { botId: listingBotId.trim() } })
+      .then((response) => { if (active) setListingPricing(response.data || null); })
+      .catch(() => { if (active) setListingPricing(null); })
+      .finally(() => { if (active) setListingPricingLoading(false); });
+    return () => { active = false; };
+  }, [listingBotId]);
 
   const loadCommerce = async () => {
     setLoading(true);
@@ -101,6 +117,10 @@ const CommercePage = () => {
       setError('Enter a bot ID and a sale price greater than zero.');
       return;
     }
+    if (listingPricing && (Number(listingPrice) < listingPricing.salePriceMin || Number(listingPrice) > listingPricing.salePriceMax)) {
+      setError(`Sale price must be between ${listingPricing.salePriceMin.toFixed(2)} and ${listingPricing.salePriceMax.toFixed(2)} USDT for this bot.`);
+      return;
+    }
     setListingSaving(true);
     try {
       await api.post('/api/commerce', { botId: listingBotId.trim(), price: Number(listingPrice) });
@@ -137,7 +157,7 @@ const CommercePage = () => {
             {(['browse', 'sell'] as const).map((view) => <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, border: 0, borderRadius: 10, padding: '7px 10px', background: activeView === view ? theme.primary : 'transparent', color: activeView === view ? theme.textInverse : theme.text, fontWeight: 800, cursor: 'pointer' }}>{view === 'browse' ? 'Browse' : 'Sell'}</button>)}
           </div>
           {error && <NotificationBanner tone="error" title="Commerce unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Commerce updated" message={message} />}
-          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : activeView === 'browse' ? <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Bots available to buy</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map(renderBot)}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots are listed for sale yet.</p>}</section> : <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>Sell your bot</h3><p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>You keep ownership until another user buys the bot. Sale proceeds are credited to your USDT balance.</p><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Sale price in USDT<input type="number" min="0.01" step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="50" style={inputStyle} /></label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish sale listing'}</button></form>}
+          {loading ? <div style={{ padding: 30, textAlign: 'center' }}><InlineLoadingDots /></div> : activeView === 'browse' ? <section><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>Bots available to buy</h3>{availableBots.length ? <div style={{ display: 'grid', gap: 10, marginTop: 10 }}>{availableBots.map(renderBot)}</div> : <p style={{ color: theme.textMuted, fontSize: '0.82rem' }}>No bots are listed for sale yet.</p>}</section> : <form onSubmit={listBot} style={{ ...cardStyle, display: 'grid', gap: 12 }}><h3 style={{ margin: 0, fontSize: '1rem' }}>Sell your bot</h3><p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>You keep ownership until another user buys the bot. Sale proceeds are credited to your USDT balance.</p><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Bot ID<input value={listingBotId} onChange={(event) => setListingBotId(event.target.value)} placeholder="Enter your created bot ID" style={inputStyle} /></label><label style={{ display: 'grid', gap: 7, fontSize: '0.85rem', fontWeight: 700 }}>Sale price in USDT<input type="number" min={listingPricing?.salePriceMin ?? 0.01} max={listingPricing?.salePriceMax} step="0.01" value={listingPrice} onChange={(event) => setListingPrice(event.target.value)} placeholder="50" style={inputStyle} />{listingPricing && <small style={{ color: theme.textMuted, fontWeight: 500 }}>{listingPricingLoading ? 'Checking bot quality…' : `Allowed range: ${listingPricing.salePriceMin.toFixed(2)}–${listingPricing.salePriceMax.toFixed(2)} USDT · ${listingPricing.qualityTier} quality (${listingPricing.qualityScore}/100)`}</small>}</label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish sale listing'}</button></form>}
         </section>
       </div><NowBar />
     </main>
