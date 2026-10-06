@@ -451,7 +451,7 @@ const BotInvestmentsPage = () => {
                                   autoFocus
                                 />
                                 <p style={styles.note}>
-                                  Maximum withdrawable: {money(Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.minTradeAmount || 0))}
+                                  Maximum withdrawable: {money(Math.max(0, Number(investment?.currentCapital || 0) - Number(bot.retainerAmount || 0)))}
                                 </p>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
                                   <button
