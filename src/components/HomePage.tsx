@@ -18,7 +18,7 @@ import {
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
-import api from '../api';
+import api from '../api/axios';
 
 type MarketCoin = {
   symbol: string;
