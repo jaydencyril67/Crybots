@@ -19,7 +19,7 @@ const preferenceTopics = [
 const deliveryChannels = [
   { key: 'email', label: 'Email', description: 'Receive important updates in your inbox.', icon: Mail },
   { key: 'push', label: 'Push', description: 'Get alerts on your device when available.', icon: Smartphone },
-  { key: 'inApp', label: 'In-app', description: 'Show alerts in the KingsHall notification center.', icon: Bell },
+  { key: 'inApp', label: 'In-app', description: 'Show alerts in the CryBots notification center.', icon: Bell },
 ] as const;
 
 type TopicKey = typeof preferenceTopics[number]['key'];
