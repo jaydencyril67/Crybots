@@ -9,6 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:wght@400;700&display=swap" rel="stylesheet" />
     <style>
       /* One typography source for both the browser build and the Android WebView APK. */
+      @font-face {
+        font-family: "STIX Two Text";
+        src: url("https://raw.githubusercontent.com/stipub/stixfonts/master/fonts/variable_ttf_woff2/STIXTwoText%5Bwght%5D.woff2") format("woff2");
+        font-weight: 125 950;
+        font-style: normal;
+        font-display: swap;
+      }
+
       :root {
         --kingshall-global-font: "STIX Two Text", Georgia, serif;
       }
@@ -25,7 +33,6 @@
       select,
       option {
         font-family: var(--kingshall-global-font) !important;
-        font-weight: 700;
       }
 
       /* Keep the same font family even when Android WebView creates native-looking form controls. */
@@ -33,7 +40,6 @@
       textarea,
       select,
       button {
-        -webkit-font-family: var(--kingshall-global-font);
         font-family: var(--kingshall-global-font) !important;
       }
 
