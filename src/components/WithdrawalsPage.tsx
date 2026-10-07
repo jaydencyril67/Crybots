@@ -257,7 +257,7 @@ const WithdrawPage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <div data-shadow-free-page="withdrawals" style={styles.page}>
-      <Helmet><title>Withdraw | KingsHall Exchange</title></Helmet>
+      <Helmet><title>Withdraw | CryBots</title></Helmet>
       <div style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
         <div style={styles.content}>
