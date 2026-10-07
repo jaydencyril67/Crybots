@@ -646,10 +646,10 @@ const SignupPage = () => {
   return (
     <>
       <Helmet>
-        <title>KingsHall | Signup</title>
+        <title>CryBots | Signup</title>
         <meta
           name="description"
-          content="Create your KingsHall trading bot account with a modern step-by-step signup flow."
+          content="Create your CryBots trading bot account with a modern step-by-step signup flow."
         />
       </Helmet>
 
@@ -765,7 +765,7 @@ const SignupPage = () => {
                   </button>
                 </div>
                 <p style={styles.footerNote}>
-                  Your account will be created on the Kingshalls backend when you finish signup.
+                  Your account will be created on the CryBotss backend when you finish signup.
                 </p>
               </article>
             </div>
