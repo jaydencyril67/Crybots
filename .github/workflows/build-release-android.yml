@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       build_apk:
-        description: 'Confirm that you intentionally want to build the production APK'
+        description: Intentionally build the production APK
         required: true
         default: false
         type: boolean
@@ -15,167 +15,83 @@ permissions:
 
 jobs:
   build-release:
-    if: github.event_name == 'workflow_dispatch' && inputs.build_apk == true
+    if: inputs.build_apk == true
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Download or generate release keystore
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          mkdir -p signing
-          run_id="$(gh run list --workflow generate-release-keystore.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
-          if [ -n "$run_id" ] && gh run download "$run_id" --name kingshall-release-signing-files --dir signing \
-            && [ -f signing/kingshall-release.keystore ]; then
-            echo "Downloaded the latest release signing artifact."
-          else
-            echo "Release signing artifact unavailable; generating a temporary release keystore."
-            keystore_password="$(openssl rand -hex 24)"
-            key_password="$keystore_password"
-            keytool -genkeypair \
-              -keystore signing/kingshall-release.keystore \
-              -alias kingshall \
-              -keyalg RSA \
-              -keysize 2048 \
-              -validity 10000 \
-              -storepass "$keystore_password" \
-              -storetype PKCS12 \
-              -keypass "$key_password" \
-              -dname "CN=CryBots, OU=Mobile, O=KingsHall, L=Unknown, ST=Unknown, C=US"
-            printf 'ANDROID_KEY_ALIAS=kingshall\nANDROID_KEYSTORE_PASSWORD=%s\nANDROID_KEY_PASSWORD=%s\n' "$keystore_password" "$key_password" > signing/kingshall-signing-credentials.txt
-          fi
-
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
-
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
-
+          packages: platform-tools platforms;android-35 build-tools;35.0.0
       - name: Accept Android SDK licenses
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-
       - name: Install dependencies
         run: npm ci
-
       - name: Install Capacitor build tools
-        run: npm install --no-save --package-lock=false @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9 @capacitor/assets@3.0.5 @capacitor/splash-screen@7.0.3 @capacitor-community/text-to-speech@6.0.0 sharp
-
-      - name: Create app branding assets
-        run: |
-          mkdir -p assets
-          node - <<'NODE'
-          const fs = require('fs');
-          const sharp = require('sharp');
-          const source = fs.readFileSync('public/icons/ke-icon.svg', 'utf8');
-          const logo = source.replace(
-            /<svg[^>]*>/,
-            '<svg width="400" height="400" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">',
-          );
-          const crown = logo;
-
-          // Keep the native splash visually aligned with the canonical CryBots logo:
-          // black canvas, centered KingsHall mark, title and loading bar.
-          const splash = \`<svg width="2732" height="2732" viewBox="0 0 2732 2732" xmlns="http://www.w3.org/2000/svg">
-            <rect width="2732" height="2732" fill="#000000"/>
-            <g transform="translate(1366 980) scale(1.34 1.34) translate(-256 -256)">
-              ${crown.replace('<svg', '<g').replace('</svg>', '</g>')}
-            </g>
-            <text x="1366" y="1550" text-anchor="middle" fill="#ffffff" font-family="STIX Two Text" font-size="112" letter-spacing="12">CRYBOTS</text>
-      <text x="1366" y="1640" text-anchor="middle" fill="#ffffff" font-family="STIX Two Text" font-size="48" letter-spacing="5">Powered by KingsHall</text>
-      <rect x="686" y="1715" width="1360" height="22" rx="11" fill="#ffffff"/>
-          </svg>\`;
-          fs.writeFileSync('assets/splash.svg', splash);
-          fs.writeFileSync('assets/icon.svg', logo);
-
-          sharp('public/icons/ke-icon.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-only.png')
-            .then(() => sharp('assets/icon.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-foreground.png'))
-            .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#111827' } }).png().toFile('assets/icon-background.png'))
-            .then(() => sharp('assets/splash.svg').png().toFile('assets/splash.png'))
-            .catch(error => { console.error(error); process.exit(1); });
-          NODE
-
+        run: npm install --no-save --package-lock=false @capacitor/core@7.6.9 @capacitor/android@7.6.9 @capacitor/cli@7.6.9 @capacitor/assets@3.0.5 @capacitor/splash-screen@7.0.3 @capacitor-community/text-to-speech@6.0.0 @capacitor/camera@7.0.2 sharp
       - name: Build web app
         run: npm run build
-        env:
-          REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL || 'https://kingshalls.onrender.com' }}
-
-      - name: Create Android project and generate branding
+      - name: Create Android project
+        run: npx cap add android && npx cap sync android
+      - name: Add Android permissions
         run: |
-          npx cap add android
-          node <<'NODE'
-          const fs = require('fs');
-          const file = 'android/app/src/main/AndroidManifest.xml';
-          let manifest = fs.readFileSync(file, 'utf8');
-          const permissions = ['android.permission.INTERNET', 'android.permission.RECORD_AUDIO', 'android.permission.MODIFY_AUDIO_SETTINGS'];
-          const missing = permissions.filter(permission => !manifest.includes(permission));
-          if (missing.length) {
-            const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\\n');
-            manifest = manifest.replace(/(<manifest[^>]*>\n)/, `$1${lines}\n`);
-          }
-          fs.writeFileSync(file, manifest);
-          NODE
-          npx capacitor-assets generate --android
-          npx cap sync android
-
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/src/main/AndroidManifest.xml')
+          s=p.read_text()
+          items=['    <uses-permission android:name="android.permission.INTERNET" />','    <uses-permission android:name="android.permission.RECORD_AUDIO" />','    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />']
+          pos=s.find('>')+1
+          missing=[x for x in items if x not in s]
+          if missing: p.write_text(s[:pos]+'\n'+'\n'.join(missing)+s[pos:])
+          PY
+      - name: Prepare release signing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p signing
+          id="$(gh run list --workflow generate-release-keystore.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          if [ -n "$id" ]; then gh run download "$id" --name kingshall-release-signing-files --dir signing || true; fi
+          if [ ! -s signing/kingshall-release.keystore ] || [ ! -s signing/kingshall-signing-credentials.txt ]; then
+            password="$(openssl rand -hex 24)"
+            keytool -genkeypair -keystore signing/kingshall-release.keystore -alias kingshall -keyalg RSA -keysize 2048 -validity 10000 -storepass "$password" -storetype PKCS12 -keypass "$password" -dname "CN=CryBots, OU=Mobile, O=CryBots, L=Unknown, ST=Unknown, C=US"
+            printf 'ANDROID_KEY_ALIAS=kingshall\nANDROID_KEYSTORE_PASSWORD=%s\nANDROID_KEY_PASSWORD=%s\n' "$password" "$password" > signing/kingshall-signing-credentials.txt
+          fi
       - name: Configure release signing
         run: |
           set -euo pipefail
-          # Always use credentials distributed with the keystore. Using repository secrets
-          # here can pair a stale password with a newly downloaded signing artifact.
-          test -f signing/kingshall-signing-credentials.txt
           source signing/kingshall-signing-credentials.txt
-          test -n "${ANDROID_KEYSTORE_PASSWORD:-}"
-          test -n "${ANDROID_KEY_ALIAS:-}"
-          test -n "${ANDROID_KEY_PASSWORD:-}"
           cp signing/kingshall-release.keystore android/app/kingshall-release.keystore
-          cat >> android/gradle.properties <<EOF
-          KINGS_HALL_KEYSTORE_FILE=kingshall-release.keystore
-          KINGS_HALL_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD
-          KINGS_HALL_KEY_ALIAS=$ANDROID_KEY_ALIAS
-          KINGS_HALL_KEY_PASSWORD=$ANDROID_KEY_PASSWORD
-          EOF
+          printf 'KINGS_HALL_KEYSTORE_FILE=kingshall-release.keystore\nKINGS_HALL_KEYSTORE_PASSWORD=%s\nKINGS_HALL_KEY_ALIAS=%s\nKINGS_HALL_KEY_PASSWORD=%s\n' "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_ALIAS" "$ANDROID_KEY_PASSWORD" >> android/gradle.properties
           python3 - <<'PY'
           from pathlib import Path
-          path = Path('android/app/build.gradle')
-          text = path.read_text()
-          signing = '''
-              signingConfigs {
-                  release {
-                      storeFile file(project.findProperty("KINGS_HALL_KEYSTORE_FILE"))
-                      storePassword project.findProperty("KINGS_HALL_KEYSTORE_PASSWORD")
-                      keyAlias project.findProperty("KINGS_HALL_KEY_ALIAS")
-                      keyPassword project.findProperty("KINGS_HALL_KEY_PASSWORD")
-                  }
-              }
-          '''
-          text = text.replace('    buildTypes {', signing + '\n    buildTypes {', 1)
-          build_types_start = text.index('    buildTypes {')
-          release_start = text.index('        release {', build_types_start)
-          signing_line = '        release {\n            signingConfig signingConfigs.release'
-          text = text[:release_start] + text[release_start:].replace('        release {', signing_line, 1)
-          path.write_text(text)
+          p=Path('android/app/build.gradle')
+          s=p.read_text()
+          if 'signingConfigs {' not in s:
+              block='''\n    signingConfigs {\n        release {\n            storeFile file(project.findProperty("KINGS_HALL_KEYSTORE_FILE"))\n            storePassword project.findProperty("KINGS_HALL_KEYSTORE_PASSWORD")\n            keyAlias project.findProperty("KINGS_HALL_KEY_ALIAS")\n            keyPassword project.findProperty("KINGS_HALL_KEY_PASSWORD")\n        }\n    }\n'''
+              s=s.replace('    buildTypes {',block+'    buildTypes {',1)
+          start=s.find('    buildTypes {')
+          rel=s.find('        release {',start)
+          if rel < 0: raise SystemExit('release build type not found')
+          if 'signingConfig signingConfigs.release' not in s[rel:rel+250]: s=s[:rel]+s[rel:].replace('        release {','        release {\n            signingConfig signingConfigs.release',1)
+          p.write_text(s)
           PY
-
       - name: Build signed production APK
         working-directory: android
         run: ./gradlew assembleRelease
-
       - name: Upload production APK
         uses: actions/upload-artifact@v4
         with:
-          name: kingshall-release-apk
+          name: crybots-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
