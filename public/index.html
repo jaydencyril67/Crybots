@@ -8,7 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:wght@400;700&display=swap" rel="stylesheet" />
     <style>
-      /* Keep typography consistent across every page and native form control. */
+      /* One typography source for both the browser build and the Android WebView APK. */
+      :root {
+        --kingshall-global-font: "STIX Two Text", Georgia, serif;
+      }
+
       html,
       body,
       #root,
@@ -18,9 +22,19 @@
       button,
       input,
       textarea,
-      select {
-        font-family: "STIX Two Text", Georgia, serif !important;
+      select,
+      option {
+        font-family: var(--kingshall-global-font) !important;
         font-weight: 700;
+      }
+
+      /* Keep the same font family even when Android WebView creates native-looking form controls. */
+      input,
+      textarea,
+      select,
+      button {
+        -webkit-font-family: var(--kingshall-global-font);
+        font-family: var(--kingshall-global-font) !important;
       }
 
       /* Prevent mobile browsers from showing a tap highlight on interactions. */
