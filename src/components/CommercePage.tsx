@@ -34,6 +34,7 @@ const CommercePage = () => {
   const [availableBots, setAvailableBots] = useState<CommerceBot[]>([]);
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState('');
+  const [confirmingBuyBotId, setConfirmingBuyBotId] = useState('');
   const [unlistingId, setUnlistingId] = useState('');
   const [listingSaving, setListingSaving] = useState(false);
   const [listingBotId, setListingBotId] = useState('');
@@ -180,7 +181,7 @@ const CommercePage = () => {
             <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Sale price</small><strong style={{ fontSize: '0.88rem', color: theme.primary }}>{bot.price !== undefined ? String(bot.price) + ' USDT' : 'Unavailable'}</strong></div>
           </div>
           <div style={{ width: '100%' }}>
-            {bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box', background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box' }}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}
+            {bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box', background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : confirmingBuyBotId === botId ? <div role="alertdialog" aria-label={`Confirm purchase of ${bot.name}`} style={{ display: 'grid', gap: 8, width: '100%', padding: 10, boxSizing: 'border-box', borderRadius: 10, border: `1px solid ${theme.primary}`, background: theme.surfaceGlass }}><p style={{ margin: 0, color: theme.text, fontSize: '0.8rem', lineHeight: 1.4 }}>Buy <strong>{bot.name}</strong> for <strong>{Number(bot.price ?? 0).toFixed(2)} USDT</strong>?</p><div style={{ display: 'flex', gap: 8 }}><button type="button" onClick={() => setConfirmingBuyBotId('')} disabled={buyingId === botId} style={{ flex: 1, border: `1px solid ${theme.borderGlass}`, borderRadius: 9, padding: '8px 10px', background: theme.surfaceMuted, color: theme.text, fontWeight: 800, cursor: 'pointer' }}>Cancel</button><button type="button" onClick={() => void buyBot(bot)} disabled={buyingId === botId} style={{ flex: 1, border: `1px solid ${theme.primary}`, borderRadius: 9, padding: '8px 10px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: buyingId === botId ? 'wait' : 'pointer' }}>{buyingId === botId ? <InlineLoadingDots /> : 'Confirm purchase'}</button></div></div> : <button type="button" disabled={Boolean(buyingId) || Boolean(confirmingBuyBotId)} onClick={() => setConfirmingBuyBotId(botId)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box', opacity: confirmingBuyBotId && confirmingBuyBotId !== botId ? 0.55 : 1 }}>Buy bot</button>}
           </div>
         </div>}
       </section>
