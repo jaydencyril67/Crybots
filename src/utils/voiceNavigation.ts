@@ -147,6 +147,18 @@ const getButtonLabel = (button: HTMLButtonElement) =>
       || '',
   );
 
+const getButtonContext = (button: HTMLButtonElement) => {
+  const row = button.closest('[role="row"], li, tr, section, article, div');
+  if (!row) return '';
+
+  const texts = Array.from(row.querySelectorAll<HTMLElement>('p, h1, h2, h3, h4, h5, label, span'))
+    .map((element) => normalizeButtonLabel(element.innerText || element.textContent || ''))
+    .filter(Boolean)
+    .filter((text) => text !== getButtonLabel(button));
+
+  return texts.slice(0, 2).join(' — ');
+};
+
 const isVisibleButton = (button: HTMLButtonElement) => {
   if (button.disabled || button.dataset.voiceExclude === 'true') return false;
   const style = window.getComputedStyle(button);
@@ -164,7 +176,9 @@ export const getVisibleVoiceButtons = (): VoiceUiButton[] => {
   return Array.from(document.querySelectorAll<HTMLButtonElement>('button'))
     .filter(isVisibleButton)
     .map((button) => {
-      const label = getButtonLabel(button) || 'unlabelled button';
+      const rawLabel = getButtonLabel(button) || 'unlabelled button';
+      const context = getButtonContext(button);
+      const label = context ? `${rawLabel} — ${context}` : rawLabel;
       const base = normalizeButtonLabel(label).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'button';
       const count = (counts.get(base) || 0) + 1;
       counts.set(base, count);
@@ -318,6 +332,7 @@ export const askVoiceAssistant = async (message: string) => {
     }
 
     if (body.action?.type === 'click') {
+      logVoiceDebug('info', `Assistant action: click ${body.action.target || ''}`);
       executeVoiceUiAction(body.action);
     }
 
