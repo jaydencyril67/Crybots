@@ -145,7 +145,7 @@ const VerifyEmailPage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <Helmet>
-        <title>KingsHall Exchange | Verify email</title>
+        <title>CryBots | Verify email</title>
       </Helmet>
       <main style={styles.page}>
         <div style={styles.backdrop} />
