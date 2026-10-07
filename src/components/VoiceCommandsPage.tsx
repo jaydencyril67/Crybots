@@ -35,7 +35,7 @@ const VoiceCommandsPage = () => {
         <div style={styles.shell}>
           <button type="button" onClick={() => navigate('/home')} style={styles.back}><ArrowLeft size={17} /> Back</button>
           <h1 style={styles.heading}>Voice Commands</h1>
-          <p style={styles.intro}>Say “Hi”, “Hello”, or “Hey” for a spoken welcome. Say any NowBar label to navigate. Say “Up” or “Down” to scroll the page. Say “Off” or “Of” to turn voice mode off. Say “Command” to open this full page menu.</p>
+          <p style={styles.intro}>Say “Hi”, “Hello”, or “Hey” for a spoken welcome. You can also speak naturally, ask questions, request help, or ask CryBots to open a page for you. Say “Up” or “Down” to scroll the page. Say “Off” or “Of” to turn voice mode off. Say “Command” to open this full page menu.</p>
 
           <section style={styles.card}>
             <div style={styles.list}>
