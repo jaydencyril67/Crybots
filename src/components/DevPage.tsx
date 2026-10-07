@@ -8,6 +8,6 @@ const destinations: ParentPageCard[] = [
   { label: 'Configure', description: 'Adjust dev tools and integration preferences.', route: '/configure' },
 ];
 
-const DevPage = () => <><ParentPageLayout title="Dev" description="Manage dev tools and integrations for your KingsHall Exchange account." cards={destinations} /><NowBar /></>;
+const DevPage = () => <><ParentPageLayout title="Dev" description="Manage dev tools and integrations for your CryBots account." cards={destinations} /><NowBar /></>;
 
 export default DevPage;
