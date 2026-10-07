@@ -23,7 +23,7 @@ PORT=3001
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_long_random_jwt_secret
 RESEND_API_KEY=your_resend_api_key
-EMAIL_FROM=KingsHall <noreply@yourdomain.com>
+EMAIL_FROM=CryBots <noreply@yourdomain.com>
 APP_URL=https://your-frontend-domain.com
 ```
 
