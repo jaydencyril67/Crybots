@@ -359,7 +359,7 @@ const WebhooksPage = () => {
                           <div style={{ padding: 12, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
                             <p style={styles.label}>Delivery history</p>
                             {!deliveries[webhook.id] ? <div style={{ textAlign: 'center', padding: 8 }}><LoadingDots /></div> : !deliveries[webhook.id].length ? <p style={{ ...styles.note, marginTop: 6 }}>No deliveries yet.</p> : (
-                              <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
+                              <div style={{ display: 'grid', gap: 8, marginTop: 8, maxHeight: 300, overflowY: 'auto', paddingRight: 4, overscrollBehavior: 'contain' }}>
                                 {deliveries[webhook.id].map((delivery) => (
                                   <div key={delivery._id} style={{ display: 'grid', gap: 5, padding: 10, borderRadius: 10, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
                                     <p style={styles.value}>{delivery.eventType}</p>
