@@ -11,7 +11,7 @@ const TradeHistory = () => {
 
   return (
     <HybridTheme mode={themeMode}>
-      <Helmet><title>Trade history | KingsHall</title></Helmet>
+      <Helmet><title>Trade history | CryBots</title></Helmet>
       <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' }}>
         <div style={{ width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
           <button type="button" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
