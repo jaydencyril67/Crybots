@@ -35,7 +35,7 @@ const Market = () => {
 
   return (
     <HybridTheme mode={themeMode}>
-      <Helmet><title>Market | KingsHall</title></Helmet>
+      <Helmet><title>Market | CryBots</title></Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
