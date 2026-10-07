@@ -81,7 +81,7 @@ const AccountConfirmedPage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <Helmet>
-        <title>KingsHall Exchange | Account confirmed</title>
+        <title>CryBots | Account confirmed</title>
       </Helmet>
       <main style={styles.page}>
         <section style={styles.card}>
