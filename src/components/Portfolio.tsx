@@ -153,7 +153,7 @@ const Portfolio = () => {
 
   return (
     <HybridTheme mode={themeMode}>
-      <Helmet><title>Portfolio | KingsHall</title></Helmet>
+      <Helmet><title>Portfolio | CryBots</title></Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/trade')}>
