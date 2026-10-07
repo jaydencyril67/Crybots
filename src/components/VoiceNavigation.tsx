@@ -190,7 +190,7 @@ const VoiceNavigation = () => {
 
         socket = new WebSocket(`wss://api.deepgram.com/v1/listen?${params.toString()}`, ['bearer', token]);
 
-        socket.onopen = () => {
+        socket.onopen = async () => {
           if (!socket || !stream || !enabled || stopped || voiceOutputActive || isVoiceOutputActive()) {
             cleanup();
             return;
