@@ -157,14 +157,11 @@ const getButtonContext = (button: HTMLButtonElement) => {
     if (!candidates.includes(text)) candidates.push(text);
   };
 
-  // Prefer semantic metadata when a page already provides it.
   addCandidate(button.getAttribute('data-label'));
   addCandidate(button.getAttribute('data-name'));
   addCandidate(button.getAttribute('data-section'));
   addCandidate(button.getAttribute('data-title'));
 
-  // Walk up through meaningful containers so repeated labels inherit the
-  // card, setting, row, or section they actually belong to.
   let container: HTMLElement | null = button.parentElement;
   let depth = 0;
   while (container && depth < 5) {
@@ -175,7 +172,7 @@ const getButtonContext = (button: HTMLButtonElement) => {
 
     const labelledBy = container.getAttribute('aria-labelledby');
     if (labelledBy) {
-      labelledBy.split(/\\s+/).forEach((id) => addCandidate(document.getElementById(id)?.innerText));
+      labelledBy.split(/\s+/).forEach((id) => addCandidate(document.getElementById(id)?.innerText));
     }
 
     const label = container.querySelector<HTMLElement>(':scope > label');
@@ -189,7 +186,7 @@ const getButtonContext = (button: HTMLButtonElement) => {
     const siblings = Array.from(container.children)
       .filter((child) => child !== button && !(child as HTMLElement).querySelector('button'))
       .map((child) => (child as HTMLElement).innerText || child.textContent || '')
-      .flatMap((text) => text.split(/\\n+/))
+      .flatMap((text) => text.split(/\n+/))
       .map((text) => normalizeButtonLabel(text))
       .filter((text) => text && text !== buttonLabel && text.length <= 100);
     siblings.slice(0, 2).forEach(addCandidate);
@@ -198,7 +195,6 @@ const getButtonContext = (button: HTMLButtonElement) => {
     depth += 1;
   }
 
-  // Page-level heading is a final fallback for otherwise unlabelled controls.
   const pageHeading = document.querySelector<HTMLElement>(
     'main h1, main h2, [role="main"] h1, [role="main"] h2, body > h1, body > h2',
   );
@@ -330,8 +326,20 @@ export const speakVoiceResponse = (message: string) => {
     });
 };
 
-type VoiceAssistantAction = { type?: string; route?: string; target?: string; direction?: string; amount?: number } | null;
-type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction; debug?: { requestId?: string; elapsedMs?: number; providerStatus?: number } };
+type VoiceAssistantAction = {
+  type?: string;
+  route?: string;
+  target?: string;
+  direction?: string;
+  amount?: number;
+  position?: 'top' | 'bottom';
+} | null;
+
+type VoiceAssistantResponse = {
+  reply?: string;
+  action?: VoiceAssistantAction;
+  debug?: { requestId?: string; elapsedMs?: number; providerStatus?: number };
+};
 
 export const askVoiceAssistant = async (message: string) => {
   logVoiceDebug('info', `Assistant request: ${message.trim().slice(0, 500)}`);
