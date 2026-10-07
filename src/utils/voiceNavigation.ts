@@ -146,37 +146,7 @@ export const getVoiceModeEnabled = () => {
   return window.localStorage.getItem(VOICE_MODE_STORAGE_KEY) === 'true';
 };
 
-type CapacitorPlugin = {
-  requestPermissions?: () => Promise<{ speechRecognition?: string }>;
-  available?: () => Promise<{ available: boolean }>;
-  start?: (options: { language: string; maxResults: number; prompt: string; popup: boolean }) => Promise<{ matches?: string[] }>;
-  stop?: () => Promise<void>;
-  speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number }) => Promise<void>;
-};
-
-type CapacitorBridge = {
-  Plugins?: Record<string, CapacitorPlugin>;
-  registerPlugin?: (name: string) => CapacitorPlugin;
-};
-
-const getCapacitorPlugin = (name: 'SpeechRecognition' | 'TextToSpeech'): CapacitorPlugin | null => {
-  if (typeof window === 'undefined') return null;
-  const capacitor = (window as Window & { Capacitor?: CapacitorBridge }).Capacitor;
-  return capacitor?.Plugins?.[name] || capacitor?.registerPlugin?.(name) || null;
-};
-
-export const getNativeSpeechRecognition = () => getCapacitorPlugin('SpeechRecognition');
-
 export const requestVoiceMicrophoneAccess = async () => {
-  const nativeSpeechRecognition = getNativeSpeechRecognition();
-  if (nativeSpeechRecognition?.requestPermissions) {
-    try {
-      const permission = await nativeSpeechRecognition.requestPermissions();
-      return permission.speechRecognition === 'granted';
-    } catch {
-      return false;
-    }
-  }
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return false;
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
