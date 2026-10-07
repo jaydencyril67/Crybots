@@ -325,7 +325,7 @@ export const speakVoiceResponse = (message: string) => {
 };
 
 type VoiceAssistantAction = { type?: string; route?: string } | null;
-type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction };
+type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction; debug?: { requestId?: string; elapsedMs?: number; providerStatus?: number } };
 
 export const askVoiceAssistant = async (message: string) => {\n  logVoiceDebug('info', `Assistant request: ${message.trim().slice(0, 500)}`);
   const trimmed = message.trim();
@@ -353,7 +353,7 @@ export const askVoiceAssistant = async (message: string) => {\n  logVoiceDebug('
     return false;
   }
 
-  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';\n  logVoiceDebug('info', `Assistant response: ${reply || '[empty reply]'}`);
+  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';\n  logVoiceDebug('info', `Assistant response: ${reply || '[empty reply]'}`);\n  if (body.debug?.requestId) logVoiceDebug('debug', `Backend request ${body.debug.requestId}${typeof body.debug.elapsedMs === 'number' ? ` (${body.debug.elapsedMs}ms)` : ''}`);
   if (reply) {
     voiceConversationHistory.push({ role: 'user', content: trimmed });
     voiceConversationHistory.push({ role: 'assistant', content: reply });
