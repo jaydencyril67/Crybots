@@ -178,18 +178,25 @@
       }
 
       .initial-splash-powered {
-        position: absolute;
+        position: fixed;
         left: 0;
         right: 0;
-        bottom: calc(env(safe-area-inset-bottom) + 24px);
+        bottom: calc(env(safe-area-inset-bottom) + 28px);
+        z-index: 10001;
+        display: block;
         margin: 0;
-        color: inherit;
-        font-size: 10px;
+        padding: 0 16px;
+        box-sizing: border-box;
+        color: #ffffff;
+        font-family: "STIX Two Text", sans-serif !important;
+        font-size: 12px;
+        font-weight: 700;
         line-height: 1.4;
-        letter-spacing: 0.12em;
-        opacity: 0.62;
+        letter-spacing: 0.08em;
+        opacity: 0.72;
         text-align: center;
         text-transform: none;
+        pointer-events: none;
       }
 
       .initial-splash-shimmer {
