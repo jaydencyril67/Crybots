@@ -152,30 +152,53 @@ jobs:
 
           python3 - <<'PY'
           from pathlib import Path
+          import re
 
           path = Path("android/app/build.gradle")
           text = path.read_text()
 
+          # Define the release signing configuration once, before buildTypes.
           if "signingConfigs {" not in text:
               signing_block = """    signingConfigs {
-                  release {
-                      storeFile file(project.findProperty("CRYBOTS_KEYSTORE_FILE"))
-                      storePassword project.findProperty("CRYBOTS_KEYSTORE_PASSWORD")
-                      keyAlias project.findProperty("CRYBOTS_KEY_ALIAS")
-                      keyPassword project.findProperty("CRYBOTS_KEY_PASSWORD")
-                  }
+              release {
+                  storeFile file(project.findProperty("CRYBOTS_KEYSTORE_FILE"))
+                  storePassword project.findProperty("CRYBOTS_KEYSTORE_PASSWORD")
+                  keyAlias project.findProperty("CRYBOTS_KEY_ALIAS")
+                  keyPassword project.findProperty("CRYBOTS_KEY_PASSWORD")
               }
+          }
 
           """
-              text = text.replace("    buildTypes {", signing_block + "    buildTypes {", 1)
+              marker = "    buildTypes {"
+              if marker not in text:
+                  raise SystemExit("Could not find Android buildTypes block")
+              text = text.replace(marker, signing_block + marker, 1)
 
-          if "signingConfig signingConfigs.release" not in text:
-              text = text.replace(
-                  "        release {",
-                  "        release {\n            signingConfig signingConfigs.release",
-                  1,
+          # Attach the signing configuration to the release build type.
+          # Do not put signingConfig inside signingConfigs.release itself.
+          build_types = re.search(r"(?ms)^    buildTypes \{.*$", text)
+          if not build_types:
+              raise SystemExit("Could not find Android buildTypes block")
+
+          build_text = build_types.group(0)
+          release_match = re.search(r"(?m)^        release \{\n", build_text)
+          if not release_match:
+              raise SystemExit("Could not find release build type")
+
+          release_start = release_match.end()
+          release_body_end = build_text.find("\n        }", release_start)
+          if release_body_end == -1:
+              raise SystemExit("Could not find end of release build type")
+
+          release_body = build_text[release_start:release_body_end]
+          if "signingConfig signingConfigs.release" not in release_body:
+              build_text = (
+                  build_text[:release_start]
+                  + "            signingConfig signingConfigs.release\n"
+                  + build_text[release_start:]
               )
 
+          text = text[:build_types.start()] + build_text
           path.write_text(text)
           PY
 
