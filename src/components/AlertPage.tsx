@@ -31,8 +31,8 @@ const defaultPreferences: Preferences = {
   security: true,
   transactions: true,
   market: false,
-  email: true,
-  push: true,
+  email: false,
+  push: false,
   inApp: true,
 };
 
