@@ -9,8 +9,20 @@ import NowBar from './NowBar';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
-type ApiKey = { id: string; name: string; prefix: string; scopes: string[]; expiresAt?: string; revokedAt?: string; createdAt: string };
-const scopes = ['read', 'trade', 'transfers'];
+type PermissionCategory = 'data' | 'trade' | 'funds';
+type PermissionAction = 'read' | 'write';
+type Permissions = Record<PermissionCategory, Record<PermissionAction, boolean>>;
+type ApiKey = { id: string; name: string; prefix: string; permissions: Permissions; expiresAt?: string; revokedAt?: string; createdAt: string };
+const permissionCategories: { key: PermissionCategory; label: string; description: string }[] = [
+  { key: 'data', label: 'Data', description: 'User details, account information, transactions and related data.' },
+  { key: 'trade', label: 'Trade', description: 'Bot and trading-related activities.' },
+  { key: 'funds', label: 'Funds', description: 'Financial activities such as withdrawals and transfers.' },
+];
+const emptyPermissions = (): Permissions => ({
+  data: { read: false, write: false },
+  trade: { read: false, write: false },
+  funds: { read: false, write: false },
+});
 
 const ApiKeysPage = () => {
   const { themeMode } = useAppTheme();
