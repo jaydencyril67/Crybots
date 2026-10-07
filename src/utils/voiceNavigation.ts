@@ -374,6 +374,11 @@ export const askVoiceAssistant = async (message: string) => {
   }
 
   return Boolean(reply);
+  } catch (error) {
+    logVoiceDebug('error', `Assistant request failed: ${error instanceof Error ? error.message : String(error)}`);
+    speakVoiceResponse('I could not reach the voice assistant right now.');
+    return false;
+  }
 };
 
 
