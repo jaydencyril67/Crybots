@@ -235,7 +235,7 @@ const WebhooksPage = () => {
                   <WebhookIcon size={20} color={theme.primary} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={styles.value}>Webhooks</p>
-                    <p style={styles.note}>Receive KingsHall events in your external application.</p>
+                    <p style={styles.note}>Receive CryBots events in your external application.</p>
                   </div>
                   <span style={{ borderRadius: 999, padding: '5px 9px', fontSize: '0.7rem', fontWeight: 850, background: theme.surfaceGlass, color: theme.textMuted }}>
                     {webhooks.filter((webhook) => webhook.enabled).length} enabled
