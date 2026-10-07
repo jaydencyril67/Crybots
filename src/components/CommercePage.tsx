@@ -35,6 +35,7 @@ const CommercePage = () => {
   const [listingPrice, setListingPrice] = useState('');
   const [listingPricing, setListingPricing] = useState<{ botValue: number; salePriceMin: number; salePriceMax: number; qualityScore: number; qualityTier: string } | null>(null);
   const [listingPricingLoading, setListingPricingLoading] = useState(false);
+  const [expandedBotId, setExpandedBotId] = useState('');
 
   useEffect(() => {
     if (!listingPricing) return;
@@ -47,6 +48,7 @@ const CommercePage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
+  const outerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass };
   const cardStyle: React.CSSProperties = { padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted };
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' };
   const buttonStyle: React.CSSProperties = { border: 0, borderRadius: 999, padding: '9px 13px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer', font: 'inherit' };
@@ -148,10 +150,34 @@ const CommercePage = () => {
 
   const renderBot = (bot: CommerceBot) => {
     const botId = bot.botId || bot._id || bot.name;
-    return <article key={botId} style={{ ...cardStyle, display: 'grid', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Bot size={20} color={theme.primary} /><div><h3 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800 }}>{bot.name}</h3><small style={{ color: theme.textMuted, fontSize: '0.78rem' }}>{bot.symbol || 'Flexible strategy'}{bot.sellerName ? ` · Listed by ${bot.sellerName}` : ''}</small></div></div>
-      <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem' }}>Permanent ownership · Efficiency {bot.efficiency ?? 0}% · Bot ID {bot.botId || 'Unavailable'}</p>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}><strong style={{ fontSize: '0.86rem' }}>{bot.price !== undefined ? `${bot.price} USDT` : 'Price unavailable'}</strong>{bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={buttonStyle}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}</div>
+    const expanded = expandedBotId === botId;
+    return <article key={botId} style={outerCardStyle}>
+      <section style={{ ...cardStyle, display: 'grid', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <div style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, color: theme.primary }}>
+            <Bot size={20} />
+          </div>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850, overflowWrap: 'anywhere' }}>{bot.name}</h3>
+            <small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.symbol || 'Flexible strategy'}{bot.sellerName ? ` · Listed by ${bot.sellerName}` : ''}</small>
+          </div>
+          <button type="button" onClick={() => setExpandedBotId((current) => current === botId ? '' : botId)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceMuted, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
+            {expanded ? 'Hide' : 'View'}
+          </button>
+        </div>
+
+        {expanded && <div style={{ display: 'grid', gap: 10, paddingTop: 10, borderTop: `1px solid ${theme.borderGlass}` }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trading symbol</small><strong style={{ fontSize: '0.88rem', overflowWrap: 'anywhere' }}>{bot.symbol || 'Not set'}</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Efficiency</small><strong style={{ fontSize: '0.88rem' }}>{bot.efficiency ?? 0}%</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Bot ID</small><strong style={{ fontSize: '0.88rem' }}>{bot.botId || 'Unavailable'}</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Sale price</small><strong style={{ fontSize: '0.88rem', color: theme.primary }}>{bot.price !== undefined ? `${bot.price} USDT` : 'Unavailable'}</strong></div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            {bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={buttonStyle}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}
+          </div>
+        </div>}
+      </section>
     </article>;
   };
 
