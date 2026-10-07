@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { API_BASE_URL, authHeaders } from '../api/axios';
+import { releaseMediaOutput } from '../utils/mediaAudio';
 import { askVoiceAssistant, getVoiceModeEnabled, isVoiceOutputActive, logVoiceDebug, speakVoiceResponse, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type DeepgramResult = {
@@ -90,6 +91,7 @@ const VoiceNavigation = () => {
 
       stream?.getTracks().forEach((track) => track.stop());
       stream = null;
+      void releaseMediaOutput();
     };
 
     const cleanupSocket = () => {
