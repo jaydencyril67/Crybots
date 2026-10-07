@@ -2,10 +2,16 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      build_apk:
+        description: 'Confirm that you intentionally want to build the debug APK'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   build-apk:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.build_apk == true
     runs-on: ubuntu-latest
 
     steps:
