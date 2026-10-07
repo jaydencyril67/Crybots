@@ -73,12 +73,25 @@ const RentalsPage = () => {
     }
     let active = true;
     api.get('/api/market/check-owned-id', { params: { botId: listingBotId.trim() } })
-      .then(() => {
-        if (!active || !listingDuration || !Number.isInteger(Number(listingDuration)) || Number(listingDuration) < 1) return;
-        setListingPricingLoading(true);
-        return api.get('/api/rentals/pricing', { params: { botId: listingBotId.trim(), duration: Number(listingDuration), unit: listingDurationUnit } });
-      })
-      .then((response) => { if (active && response) setListingPricing(response.data || null); })
+      .catch((requestError: any) => {
+        if (!active) return;
+        setListingPricing(null);
+        if (requestError?.response?.status === 404) setError('Bot ID not found.');
+        else if (requestError?.response?.status === 409) setError(requestError?.response?.data?.message || 'Deactivate this bot before listing it for rent.');
+      });
+    return () => { active = false; };
+  }, [listingBotId]);
+
+  useEffect(() => {
+    if (!/^\d{6}$/.test(listingBotId.trim()) || !listingDuration || !Number.isInteger(Number(listingDuration)) || Number(listingDuration) < 1) {
+      setListingPricing(null);
+      setListingPricingLoading(false);
+      return;
+    }
+    let active = true;
+    setListingPricingLoading(true);
+    api.get('/api/rentals/pricing', { params: { botId: listingBotId.trim(), duration: Number(listingDuration), unit: listingDurationUnit } })
+      .then((response) => { if (active) setListingPricing(response.data || null); })
       .catch((requestError: any) => {
         if (!active) return;
         setListingPricing(null);
