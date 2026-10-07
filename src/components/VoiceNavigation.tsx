@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { API_BASE_URL, authHeaders } from '../api/axios';
-import { getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { askVoiceAssistant, getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type DeepgramResult = {
   type?: string;
@@ -259,7 +259,7 @@ const VoiceNavigation = () => {
 
             if (message.is_final && message.speech_final && transcript !== lastFinalTranscript) {
               lastFinalTranscript = transcript;
-              const navigated = navigateFromVoice(transcript);
+              const navigated = navigateFromVoice(transcript);\n              if (!navigated) {\n                void askVoiceAssistant(transcript).catch(() => undefined);\n              }
             }
           } catch (error) {
           }
