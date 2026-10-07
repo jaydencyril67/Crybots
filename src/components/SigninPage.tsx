@@ -720,8 +720,8 @@ const SigninPage = () => {
     return (
     <>
       <Helmet>
-        <title>KingsHall | Sign in</title>
-        <meta name="description" content="Sign in to your KingsHall trading bot account using email and your preferred secure method." />
+        <title>CryBots | Sign in</title>
+        <meta name="description" content="Sign in to your CryBots trading bot account using email and your preferred secure method." />
       </Helmet>
 
       <main style={hybridStyles.page}>
@@ -861,7 +861,7 @@ const SigninPage = () => {
                   )}
                 </div>
                 <div style={styles.switchRow}>
-                  <span style={hybridStyles.switchText}>New to KingsHall?</span>
+                  <span style={hybridStyles.switchText}>New to CryBots?</span>
                   <button type="button" onClick={() => { navigate('/signup'); }} style={hybridStyles.switchLink}>
                     Signup here
                   </button>
