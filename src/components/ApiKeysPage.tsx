@@ -106,7 +106,7 @@ const ApiKeysPage = () => {
     value: { margin: 0, color: theme.text, fontSize: '0.94rem', fontWeight: 800, lineHeight: 1.5, wordBreak: 'break-word' as const, overflowWrap: 'anywhere' as const },
     note: { margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.4 },
     input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem', font: 'inherit' },
-    button: { border: 'none', borderRadius: 999, padding: '0 12px', height: 30, fontWeight: 700, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, fontSize: '0.88rem', font: 'inherit' },
+    button: { border: 'none', borderRadius: 999, padding: '9px 13px', fontWeight: 800, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, font: 'inherit' },
     mutedButton: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text },
   };
 
@@ -169,14 +169,14 @@ const ApiKeysPage = () => {
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                  <button type="button" onClick={() => setShowCreate(false)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
-                  <button disabled={saving || !permissionCategories.some((category) => permissions[category.key].read || permissions[category.key].write)} style={{ ...styles.button, borderRadius: 10 }}>{saving ? <InlineLoadingDots /> : 'Create key'}</button>
+                  <button type="button" onClick={() => setShowCreate(false)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
+                  <button disabled={saving || !permissionCategories.some((category) => permissions[category.key].read || permissions[category.key].write)} style={{ ...styles.button }}>{saving ? <InlineLoadingDots /> : 'Create key'}</button>
                 </div>
               </form>
             )}
           </div>
 
-          {secret && <div style={styles.card}><div style={styles.row}><p style={styles.label}><KeyRound size={15} /> Secret</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button, borderRadius: 10 }}>{copyingSecret ? <InlineLoadingDots /> : <><Copy size={15} /> Copy</>}</button><button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Dismiss</button></div></div></div>}
+          {secret && <div style={styles.card}><div style={styles.row}><p style={styles.label}><KeyRound size={15} /> Secret</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button }}>{copyingSecret ? <InlineLoadingDots /> : <><Copy size={15} /> Copy</>}</button><button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton }}>Dismiss</button></div></div></div>}
 
           <div style={styles.card}>
             <div style={styles.row}><p style={styles.value}>Your API keys</p><p style={styles.note}>Tap View to inspect permissions and manage each credential.</p></div>
@@ -184,7 +184,7 @@ const ApiKeysPage = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                 <KeyRound size={20} color={key.revokedAt ? theme.textMuted : theme.primary} />
                 <div style={{ minWidth: 0, flex: 1 }}><p style={{ ...styles.value, fontSize: '0.95rem' }}>{key.name}</p><p style={{ ...styles.note, marginTop: 3 }}>{key.prefix}… · {key.revokedAt ? 'Revoked' : 'Active'}</p></div>
-                <button type="button" onClick={() => setExpandedKeyId((current) => current === key.id ? '' : key.id)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '0 12px', height: 30, background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>{expandedKeyId === key.id ? 'Hide' : 'View'}</button>
+                <button type="button" onClick={() => setExpandedKeyId((current) => current === key.id ? '' : key.id)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>{expandedKeyId === key.id ? 'Hide' : 'View'}</button>
               </div>
               {expandedKeyId === key.id && <div style={{ display: 'grid', gap: 10 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14 }}>
@@ -197,18 +197,18 @@ const ApiKeysPage = () => {
                   <p style={styles.label}>Access</p><p style={{ ...styles.note, marginTop: 5 }}>{key.permissions?.withdrawals ? 'API withdrawals enabled' : 'API withdrawals disabled'}</p>
                 </div>
 
-                {!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><p style={styles.note}>Revoke this API key? Applications using it will stop working.</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} disabled={revokingId === key.id} style={{ ...styles.button, background: theme.danger, borderRadius: 10 }}><Ban size={15} />{revokingId === key.id ? <InlineLoadingDots /> : 'Confirm revoke'}</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} disabled={revokingId !== null} style={{ ...styles.button, ...styles.mutedButton }}><Ban size={15} /> Revoke API key</button>)}
+                {!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><p style={styles.note}>Revoke this API key? Applications using it will stop working.</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} disabled={revokingId === key.id} style={{ ...styles.button, background: theme.danger }}><Ban size={15} />{revokingId === key.id ? <InlineLoadingDots /> : 'Confirm revoke'}</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} disabled={revokingId !== null} style={{ ...styles.button, ...styles.mutedButton }}><Ban size={15} /> Revoke API key</button>)}
                 {deleteId === key.id ? (
                   <div style={{ display: 'grid', gap: 10, marginTop: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
                     <p style={styles.note}>Permanently delete this API key? This cannot be undone.</p>
                     <label style={{ display: 'grid', gap: 7, fontWeight: 700 }}>Security code<input type="password" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit security code" style={styles.input} /></label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                      <button type="button" onClick={() => { setDeleteId(null); setSecurityCode(''); }} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
-                      <button type="button" onClick={() => void deleteKey(key.id)} disabled={deletingId === key.id || securityCode.length !== 6} style={{ ...styles.button, background: theme.danger, borderRadius: 10 }}>{deletingId === key.id ? <InlineLoadingDots /> : 'Delete API key'}</button>
+                      <button type="button" onClick={() => { setDeleteId(null); setSecurityCode(''); }} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
+                      <button type="button" onClick={() => void deleteKey(key.id)} disabled={deletingId === key.id || securityCode.length !== 6} style={{ ...styles.button, background: theme.danger }}>{deletingId === key.id ? <InlineLoadingDots /> : 'Delete API key'}</button>
                     </div>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => { setDeleteId(key.id); setSecurityCode(''); setRevokeId(null); }} disabled={deletingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Delete API key</button>
+                  <button type="button" onClick={() => { setDeleteId(key.id); setSecurityCode(''); setRevokeId(null); }} disabled={deletingId !== null} style={{ ...styles.button, ...styles.mutedButton }}>Delete API key</button>
                 )}
               </div>}
             </article>)}</div>}
