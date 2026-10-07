@@ -3,6 +3,7 @@ import { navigate } from './navigate';
 export const VOICE_MODE_STORAGE_KEY = 'nowbar_voice_navigation_enabled';
 export const VOICE_MODE_CHANGED_EVENT = 'nowbar-voice-mode-changed';
 export const VOICE_STATUS_EVENT = 'nowbar-voice-status-changed';
+export const VOICE_DEBUG_EVENT = 'nowbar-voice-debug';
 export const VOICE_OUTPUT_EVENT = 'nowbar-voice-output-changed';
 export const NOWBAR_COMMAND_EVENT = 'nowbar-voice-command';
 export const VOICE_NAVIGATION_EVENT = 'nowbar-voice-navigation';
