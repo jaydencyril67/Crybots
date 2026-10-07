@@ -99,7 +99,7 @@ jobs:
       - name: Generate CryBots native assets
         run: |
           mkdir -p assets
-          cp public/icons/ke-icon.svg assets/icon.svg
+          cp public/icons/android-icon.svg assets/icon.svg
           cp public/icons/ke-icon.svg assets/splash.svg
           npx capacitor-assets generate --android
 
