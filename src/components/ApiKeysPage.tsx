@@ -40,6 +40,9 @@ const ApiKeysPage = () => {
   const [error, setError] = useState('');
   const [revokeId, setRevokeId] = useState<string | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [securityCode, setSecurityCode] = useState('');
   const [expandedKeyId, setExpandedKeyId] = useState<string>('');
   const [showCreate, setShowCreate] = useState(false);
 
@@ -69,6 +72,22 @@ const ApiKeysPage = () => {
     try { await api.post(`/api/developer/api-keys/${id}/revoke`); await loadKeys(); }
     catch (requestError: any) { setError(requestError?.response?.data?.message || 'Unable to revoke API key.'); }
     finally { setRevokingId(null); }
+  };
+
+  const deleteKey = async (id: string) => {
+    setDeletingId(id);
+    setError('');
+    try {
+      await api.delete(`/api/developer/api-keys/${id}`, { data: { securityCode } });
+      setKeys((current) => current.filter((key) => key.id !== id));
+      setExpandedKeyId('');
+      setDeleteId(null);
+      setSecurityCode('');
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to delete API key.');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   if (showExpirationPage) {
@@ -176,7 +195,20 @@ const ApiKeysPage = () => {
                 <div style={{ padding: 12, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
                   <p style={styles.label}>Access</p><p style={{ ...styles.note, marginTop: 5 }}>{key.permissions?.withdrawals ? 'API withdrawals enabled' : 'API withdrawals disabled'}</p>
                 </div>
+
                 {!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><p style={styles.note}>Revoke this API key? Applications using it will stop working.</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} disabled={revokingId === key.id} style={{ ...styles.button, background: theme.danger, borderRadius: 10 }}><Ban size={15} />{revokingId === key.id ? <InlineLoadingDots /> : 'Confirm revoke'}</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} disabled={revokingId !== null} style={{ ...styles.button, ...styles.mutedButton }}><Ban size={15} /> Revoke API key</button>)}
+                {deleteId === key.id ? (
+                  <div style={{ display: 'grid', gap: 10, marginTop: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
+                    <p style={styles.note}>Permanently delete this API key? This cannot be undone.</p>
+                    <label style={{ display: 'grid', gap: 7, fontWeight: 700 }}>Security code<input type="password" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit security code" style={styles.input} /></label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                      <button type="button" onClick={() => { setDeleteId(null); setSecurityCode(''); }} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
+                      <button type="button" onClick={() => void deleteKey(key.id)} disabled={deletingId === key.id || securityCode.length !== 6} style={{ ...styles.button, background: theme.danger, borderRadius: 10 }}>{deletingId === key.id ? <InlineLoadingDots /> : 'Delete API key'}</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => { setDeleteId(key.id); setSecurityCode(''); setRevokeId(null); }} disabled={deletingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Delete API key</button>
+                )}
               </div>}
             </article>)}</div>}
           </div>
