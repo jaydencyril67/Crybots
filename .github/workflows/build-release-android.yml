@@ -85,7 +85,7 @@ jobs:
 
           marker = "</manifest>"
           additions = "".join(
-              f'    <uses-permission android:name="{permission}" />\\n'
+              f'    <uses-permission android:name="{permission}" />\n'
               for permission in permissions
               if f'android:name="{permission}"' not in text
           )
