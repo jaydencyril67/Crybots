@@ -65,10 +65,18 @@ const CommercePage = () => {
       return;
     }
     let active = true;
-    setListingPricingLoading(true);
-    api.get('/api/commerce/pricing', { params: { botId: listingBotId.trim() } })
-      .then((response) => { if (active) setListingPricing(response.data || null); })
-      .catch(() => { if (active) setListingPricing(null); })
+    api.get('/api/market/check-owned-id', { params: { botId: listingBotId.trim() } })
+      .then(() => {
+        if (!active) return;
+        setListingPricingLoading(true);
+        return api.get('/api/commerce/pricing', { params: { botId: listingBotId.trim() } });
+      })
+      .then((response) => { if (active && response) setListingPricing(response.data || null); })
+      .catch((requestError: any) => {
+        if (!active) return;
+        setListingPricing(null);
+        if (requestError?.response?.status === 404) window.alert('Bot ID not found.');
+      })
       .finally(() => { if (active) setListingPricingLoading(false); });
     return () => { active = false; };
   }, [listingBotId]);
