@@ -24,6 +24,7 @@ type TransactionRecord = {
   status: Exclude<TransactionStatus, 'all'>;
   date: string;
   time: string;
+  timestamp?: string;
   counterpart?: string;
   reference: string;
 };
@@ -239,6 +240,13 @@ const TransactionHistoryPage = () => {
               .filter((transaction) => Boolean(transaction?.id && transaction.type && transaction.direction && transaction.status && transaction.title && transaction.amount && transaction.currency && transaction.date && transaction.time && transaction.reference && typeof transaction.amountValue === 'number'))
               .map((transaction) => ({
                 ...(transaction as TransactionRecord),
+                ...(transaction.timestamp ? (() => {
+                  const localDate = new Date(transaction.timestamp);
+                  return Number.isNaN(localDate.getTime()) ? {} : {
+                    date: localDate.toLocaleDateString(),
+                    time: localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                  };
+                })() : {}),
                 counterpart: transaction.counterpart || undefined,
               }))
           : [];
