@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.crybots.app',
+  appId: 'com.kingshall.exchange',
   appName: 'CryBots',
   webDir: 'build',
   server: {
