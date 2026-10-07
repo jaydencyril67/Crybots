@@ -320,7 +320,7 @@ const BotInvestmentsPage = () => {
 
   return (
     <HybridTheme mode={themeMode}>
-      <Helmet><title>My Bots | KingsHall</title></Helmet>
+      <Helmet><title>My Bots | CryBots</title></Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" onClick={() => navigate('/market')} style={styles.back}>
