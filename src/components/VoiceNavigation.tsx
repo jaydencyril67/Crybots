@@ -59,6 +59,7 @@ const VoiceNavigation = () => {
     let reconnectTimer: number | null = null;
     let lastFinalTranscript = '';
     let keepAliveTimer: number | null = null;
+    let processingVoiceRequest = false;
 
     const setStatus = (listening: boolean, transcript = '') => {
       window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening, transcript } }));
@@ -116,7 +117,7 @@ const VoiceNavigation = () => {
 
     const scheduleStart = (delay = 350) => {
       clearReconnect();
-      if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive()) return;
+      if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive() || processingVoiceRequest) return;
       reconnectTimer = window.setTimeout(() => {
         reconnectTimer = null;
         void start();
@@ -155,7 +156,7 @@ const VoiceNavigation = () => {
     };
 
     const start = async () => {
-      if (starting || !enabled || stopped || voiceOutputActive || isVoiceOutputActive() || socket || recorder) return;
+      if (starting || !enabled || stopped || voiceOutputActive || isVoiceOutputActive() || processingVoiceRequest || socket || recorder) return;
       starting = true;
       logVoiceDebug('info', 'Voice start requested');
 
@@ -269,14 +270,40 @@ const VoiceNavigation = () => {
 
             if (message.is_final && message.speech_final && transcript !== lastFinalTranscript) {
               lastFinalTranscript = transcript;
+              processingVoiceRequest = true;
               logVoiceDebug('info', `Processing final transcript: ${transcript}`);
+
+              // IMPORTANT: fully leave microphone capture before processing or TTS.
+              // A live getUserMedia() track makes the browser's audio session
+              // "play-and-record", which can route output like a call instead of
+              // normal media playback. Stop every capture resource first.
+              setStatus(false);
+              clearReconnect();
+              cleanupAudio();
+              cleanupSocket();
+              logVoiceDebug('info', 'Microphone and AudioContext fully stopped before assistant processing');
               logVoiceDebug('info', 'Sending transcript to /api/voice/assistant');
-              void askVoiceAssistant(transcript).catch((error) => {
-                const message = error instanceof Error ? error.message : 'I could not process that request right now.';
-                logVoiceDebug('error', `Assistant request failed: ${message}`);
-                setStatus(false, message);
-                speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');
-              });
+
+              void askVoiceAssistant(transcript)
+                .then((handled) => {
+                  processingVoiceRequest = false;
+
+                  // If the assistant did not start TTS, safely return to listening.
+                  // If TTS did start, VOICE_OUTPUT_EVENT owns the restart and keeps
+                  // the microphone off until playback has completely finished.
+                  if (!handled && !voiceOutputActive && !isVoiceOutputActive() && enabled && !stopped) {
+                    scheduleStart(350);
+                  }
+                })
+                .catch((error) => {
+                  const errorMessage = error instanceof Error
+                    ? error.message
+                    : 'I could not process that request right now.';
+                  processingVoiceRequest = false;
+                  logVoiceDebug('error', `Assistant request failed: ${errorMessage}`);
+                  setStatus(false, errorMessage);
+                  speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');
+                });
             }
           } catch (error) {
           }
@@ -293,7 +320,7 @@ const VoiceNavigation = () => {
           const closeReason = event.reason || (event.code !== 1000 ? `Voice connection closed (${event.code})` : '');
           setStatus(false, closeReason);
           logVoiceDebug('error', `Deepgram socket closed: ${closeReason || 'normal close'}`);
-          if (enabled && !stopped && !voiceOutputActive && !isVoiceOutputActive()) {
+          if (enabled && !stopped && !voiceOutputActive && !isVoiceOutputActive() && !processingVoiceRequest) {
             scheduleStart(700);
           }
         };
@@ -311,7 +338,7 @@ const VoiceNavigation = () => {
       voiceOutputActive = (event as CustomEvent<{ active?: boolean }>).detail?.active === true;
       if (voiceOutputActive) {
         cleanup();
-      } else if (enabled && !stopped) {
+      } else if (enabled && !stopped && !processingVoiceRequest) {
         scheduleStart(350);
       }
     };
