@@ -30,7 +30,7 @@ const ToolsPage = () => {
 
   const share = async () => {
     if (!data?.agent.link) return;
-    if (navigator.share) await navigator.share({ title: 'Join KingsHall Exchange', text: 'Join me on KingsHall Exchange.', url: data.agent.link });
+    if (navigator.share) await navigator.share({ title: 'Join CryBots', text: 'Join me on CryBots.', url: data.agent.link });
     else await copy(data.agent.link, 'link');
   };
 
