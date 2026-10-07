@@ -207,7 +207,7 @@ const TransactionHistoryPage = () => {
         .transaction-history-filters span { font-size: 0.68rem; letter-spacing: 0.04em; }
       }`}</style>
       <div data-shadow-free-page="transaction-history" style={styles.page}>
-        <Helmet><title>Transaction History | KingsHall Exchange</title></Helmet>
+        <Helmet><title>Transaction History | CryBots</title></Helmet>
         <div style={styles.shell}>
           <div style={styles.content}>
             <button type="button" style={styles.back} onClick={() => navigate('/logs')}><ArrowLeft size={17} /> Logs</button>
