@@ -630,7 +630,7 @@ const RouteTransition = () => {
       <div
         style={{
           minHeight: '100vh',
-          paddingTop: '70px',
+          paddingTop: '60px',
         }}
       >
         <AppHeader isPublicPage={!isProtectedPage} />
