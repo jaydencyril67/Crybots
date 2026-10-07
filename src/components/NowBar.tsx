@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Bell, CandlestickChart, ChevronDown, CircleHelp, CircleUserRound, Coins, DoorOpen, HandCoins, History, Home, Info, LifeBuoy, MessageCircle, Settings, ShieldCheck, SlidersHorizontal, Store, Terminal, UserRound, Users, WalletCards } from 'lucide-react';
 import { navigate } from '../utils/navigate';
-import { NOWBAR_COMMAND_EVENT, PAGE_ROUTES, VOICE_NAVIGATION_EVENT } from '../utils/voiceNavigation';
+import { PAGE_ROUTES } from '../utils/voiceNavigation';
 
 const EDGE_LIGHT_COLORS = {
   blue: '#38bdf8',
@@ -471,11 +471,6 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
       setMode('compact');
     };
 
-    const handleVoiceNavigation = (event: Event) => {
-      const detail = (event as CustomEvent<{ label?: string }>).detail;
-      if (detail?.label) saveNowBarAction(detail.label);
-    };
-
     const syncEdgeLight = () => {
       setEdgeLightVersion((current) => current + 1);
     };
@@ -488,40 +483,6 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
       setFeatureSettingsVersion((current) => current + 1);
     };
 
-    const handleVoiceCommand = (event: Event) => {
-      const command = (event as CustomEvent<{ command?: string }>).detail?.command;
-      if (!command) return;
-
-      handleInteraction();
-      if (command === 'expand') {
-        setMode('compact');
-        setView('actions');
-      } else if (command === 'collapse') {
-        setMode((currentMode) => {
-          if (currentMode === 'expanded') return 'compact';
-          setView('title');
-          return currentMode;
-        });
-      } else if (command === 'left' || command === 'right') {
-        if (modeRef.current === 'compact') {
-          barRef.current?.scrollBy({
-            left: command === 'right' ? Math.round(barRef.current.clientWidth * 0.8) : -Math.round(barRef.current.clientWidth * 0.8),
-            behavior: 'smooth',
-          });
-          return;
-        }
-
-        const path = getActivePath();
-        const currentIndex = parentRoutes.indexOf(path);
-        const childGroup = childNavigationGroups.find((group) => group.routes.includes(path));
-        const routes = childGroup ? childGroup.routes : currentIndex >= 0 ? parentRoutes : [];
-        const routeIndex = routes.indexOf(path);
-        const nextIndex = routeIndex + (command === 'right' ? 1 : -1);
-        const nextRoute = routes[nextIndex];
-        if (nextRoute) navigate(nextRoute);
-      }
-    };
-
     window.addEventListener('popstate', syncPath);
     window.addEventListener('hashchange', syncPath);
     window.addEventListener('ke:navigation-start', syncPath as EventListener);
@@ -530,8 +491,6 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
     window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
     window.addEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
     window.addEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
-    window.addEventListener(NOWBAR_COMMAND_EVENT, handleVoiceCommand);
-    window.addEventListener(VOICE_NAVIGATION_EVENT, handleVoiceNavigation);
 
     return () => {
       window.removeEventListener('popstate', syncPath);
@@ -542,8 +501,6 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
       window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
       window.removeEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
       window.removeEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
-      window.removeEventListener(NOWBAR_COMMAND_EVENT, handleVoiceCommand);
-      window.removeEventListener(VOICE_NAVIGATION_EVENT, handleVoiceNavigation);
 
     };
   }, []);
