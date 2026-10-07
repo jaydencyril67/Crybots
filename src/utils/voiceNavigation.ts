@@ -282,7 +282,7 @@ export const speakVoiceResponse = (message: string) => {
     });
 };
 
-type VoiceAssistantAction = { type?: string; route?: string; target?: string } | null;
+type VoiceAssistantAction = { type?: string; route?: string; target?: string; direction?: string; amount?: number } | null;
 type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction; debug?: { requestId?: string; elapsedMs?: number; providerStatus?: number } };
 
 export const askVoiceAssistant = async (message: string) => {
@@ -334,6 +334,27 @@ export const askVoiceAssistant = async (message: string) => {
     if (body.action?.type === 'click') {
       logVoiceDebug('info', `Assistant action: click ${body.action.target || ''}`);
       executeVoiceUiAction(body.action);
+    }
+
+    if (body.action?.type === 'scroll_page' || body.action?.type === 'scroll_nowbar') {
+      const direction = body.action.direction === 'up' || body.action.direction === 'left' ? -1 : 1;
+      const amount = Math.max(100, Math.min(Number(body.action.amount) || 500, 1200));
+      if (body.action.type === 'scroll_page') {
+        window.scrollBy({ top: direction * amount, behavior: 'smooth' });
+        logVoiceDebug('info', `Gemini scrolled page ${direction < 0 ? 'up' : 'down'} ${amount}px`);
+      } else {
+        window.dispatchEvent(new CustomEvent('crybots-voice-nowbar-scroll', {
+          detail: { direction: body.action.direction === 'left' ? -1 : 1, amount },
+        }));
+        logVoiceDebug('info', `Gemini scrolled NowBar ${body.action.direction === 'left' ? 'left' : 'right'} ${amount}px`);
+      }
+    }
+
+    if (body.action?.type === 'expand_nowbar' || body.action?.type === 'collapse_nowbar') {
+      window.dispatchEvent(new CustomEvent('crybots-voice-nowbar-mode', {
+        detail: { mode: body.action.type === 'expand_nowbar' ? 'expanded' : 'compact' },
+      }));
+      logVoiceDebug('info', `Gemini set NowBar mode: ${body.action.type === 'expand_nowbar' ? 'expanded' : 'compact'}`);
     }
 
     return Boolean(reply);
