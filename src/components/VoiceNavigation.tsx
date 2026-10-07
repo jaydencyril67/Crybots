@@ -85,10 +85,12 @@ const VoiceNavigation = () => {
     const fetchToken = async () => {
       const response = await fetch(`${API_BASE_URL}/api/voice/token`, {
         method: 'POST',
-        headers: {
-          ...authHeaders(),
-          'Content-Type': 'application/json',
-        },
+        headers: (() => {
+          const headers = new Headers({ 'Content-Type': 'application/json' });
+          const auth = authHeaders();
+          if (auth.Authorization) headers.set('Authorization', auth.Authorization);
+          return headers;
+        })(),
       });
 
       if (!response.ok) {
