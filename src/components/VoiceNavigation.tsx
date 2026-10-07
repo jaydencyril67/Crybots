@@ -42,7 +42,40 @@ const downsampleTo16kPcm = (input: Float32Array, inputSampleRate: number) => {
   return pcm;
 };
 
-const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  const [logs, setLogs] = useState(getVoiceDebugLogs());\n\n  useEffect(() => {\n    const refresh = () => setLogs(getVoiceDebugLogs());\n    window.addEventListener(VOICE_DEBUG_EVENT, refresh);\n    return () => window.removeEventListener(VOICE_DEBUG_EVENT, refresh);\n  }, []);\n\n  return (\n    <div style={{ position: 'fixed', right: 12, bottom: 12, zIndex: 2147483647, fontFamily: 'monospace', fontSize: 11 }}>\n      <button type="button" onClick={() => setOpen((value) => !value)} style={{ border: '1px solid rgba(255,255,255,.2)', borderRadius: 10, padding: '8px 10px', background: '#111827', color: '#fff' }}>\n        {open ? 'Hide voice debug' : 'Voice debug'}\n      </button>\n      {open && (\n        <div style={{ marginTop: 8, width: 'min(92vw, 420px)', maxHeight: '55vh', overflow: 'auto', background: '#030712', color: '#d1d5db', border: '1px solid rgba(255,255,255,.15)', borderRadius: 12, padding: 10, boxShadow: '0 12px 40px rgba(0,0,0,.45)' }}>\n          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>\n            <strong style={{ color: '#fff' }}>Voice debug log</strong>\n            <button type="button" onClick={() => { localStorage.removeItem('crybots_voice_debug_logs'); setLogs([]); logVoiceDebug('debug', 'Debug log cleared'); }} style={{ border: 0, borderRadius: 7, padding: '4px 7px', background: '#1f2937', color: '#fff' }}>Clear</button>\n          </div>\n          {logs.length === 0 ? <div>No voice events yet.</div> : logs.map((entry, index) => (\n            <div key={`${entry.time}-${index}`} style={{ borderTop: index ? '1px solid rgba(255,255,255,.08)' : undefined, padding: '7px 0', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>\n              <div style={{ color: '#9ca3af' }}>{entry.time} · {entry.level}</div>\n              <div>{entry.message}</div>\n            </div>\n          ))}\n        </div>\n      )}\n    </div>\n  );\n};\n\nconst VoiceNavigation = () => {
+const VoiceDebugPanel = () => {
+  const [open, setOpen] = useState(false);
+  const [logs, setLogs] = useState(getVoiceDebugLogs());
+
+  useEffect(() => {
+    const refresh = () => setLogs(getVoiceDebugLogs());
+    window.addEventListener(VOICE_DEBUG_EVENT, refresh);
+    return () => window.removeEventListener(VOICE_DEBUG_EVENT, refresh);
+  }, []);
+
+  return (
+    <div style={{ position: 'fixed', right: 12, bottom: 12, zIndex: 2147483647, fontFamily: 'monospace', fontSize: 11 }}>
+      <button type="button" onClick={() => setOpen((value) => !value)} style={{ border: '1px solid rgba(255,255,255,.2)', borderRadius: 10, padding: '8px 10px', background: '#111827', color: '#fff' }}>
+        {open ? 'Hide voice debug' : 'Voice debug'}
+      </button>
+      {open && (
+        <div style={{ marginTop: 8, width: 'min(92vw, 420px)', maxHeight: '55vh', overflow: 'auto', background: '#030712', color: '#d1d5db', border: '1px solid rgba(255,255,255,.15)', borderRadius: 12, padding: 10, boxShadow: '0 12px 40px rgba(0,0,0,.45)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+            <strong style={{ color: '#fff' }}>Voice debug log</strong>
+            <button type="button" onClick={() => { localStorage.removeItem('crybots_voice_debug_logs'); setLogs([]); logVoiceDebug('debug', 'Debug log cleared'); }} style={{ border: 0, borderRadius: 7, padding: '4px 7px', background: '#1f2937', color: '#fff' }}>Clear</button>
+          </div>
+          {logs.length === 0 ? <div>No voice events yet.</div> : logs.map((entry, index) => (
+            <div key={`${entry.time}-${index}`} style={{ borderTop: index ? '1px solid rgba(255,255,255,.08)' : undefined, padding: '7px 0', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              <div style={{ color: '#9ca3af' }}>{entry.time} · {entry.level}</div>
+              <div>{entry.message}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const VoiceNavigation = () => {
   useEffect(() => {
     let stream: MediaStream | null = null;
     let recorder: MediaRecorder | null = null;
@@ -154,7 +187,8 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
 
     const start = async () => {
       if (starting || !enabled || stopped || voiceOutputActive || isVoiceOutputActive() || socket || recorder) return;
-      starting = true;\n      logVoiceDebug('info', 'Voice start requested');
+      starting = true;
+      logVoiceDebug('info', 'Voice start requested');
 
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
@@ -174,7 +208,8 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
           throw error;
         }
         if (!stream) throw new Error('Microphone access was not available.');
-        const token = await fetchToken();\n        logVoiceDebug('info', 'Deepgram token acquired');
+        const token = await fetchToken();
+        logVoiceDebug('info', 'Deepgram token acquired');
         if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive()) return;
 
         const params = new URLSearchParams({
@@ -196,9 +231,11 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
         });
 
         const deepgramUrl = `wss://api.deepgram.com/v1/listen?${params.toString()}`;
-        logVoiceDebug('info', `Opening Deepgram socket: ${VOICE_MODEL}`);\n        socket = new WebSocket(deepgramUrl, ['bearer', token]);
+        logVoiceDebug('info', `Opening Deepgram socket: ${VOICE_MODEL}`);
+        socket = new WebSocket(deepgramUrl, ['bearer', token]);
 
-        socket.onopen = async () => {\n          logVoiceDebug('info', 'Deepgram WebSocket opened');
+        socket.onopen = async () => {
+          logVoiceDebug('info', 'Deepgram WebSocket opened');
           if (!socket || !stream || !enabled || stopped || voiceOutputActive || isVoiceOutputActive()) {
             cleanup();
             return;
@@ -228,7 +265,8 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
             audioProcessor.connect(audioGain);
             audioGain.connect(audioContext.destination);
 
-            setStatus(true);\n            logVoiceDebug('info', 'Microphone streaming started; listening');
+            setStatus(true);
+            logVoiceDebug('info', 'Microphone streaming started; listening');
             keepAliveTimer = window.setInterval(() => {
             if (socket?.readyState === WebSocket.OPEN) {
               try { socket.send(JSON.stringify({ type: 'KeepAlive' })); } catch {}
@@ -243,11 +281,13 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
         socket.onmessage = (event) => {
           try {
             const message = JSON.parse(event.data) as DeepgramResult;
-            if (message.type === 'Error') {\n              logVoiceDebug('error', `Deepgram error: ${message.description || 'unknown error'}`);
+            if (message.type === 'Error') {
+              logVoiceDebug('error', `Deepgram error: ${message.description || 'unknown error'}`);
               setStatus(false, message.description || 'Voice service error');
               return;
             }
-            if (message.type === 'SpeechStarted') {\n              logVoiceDebug('info', 'SpeechStarted');
+            if (message.type === 'SpeechStarted') {
+              logVoiceDebug('info', 'SpeechStarted');
               setStatus(true);
               return;
             }
@@ -255,14 +295,19 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
             const transcript = message.channel?.alternatives?.[0]?.transcript?.trim() || '';
             if (!transcript) return;
 
-            setStatus(true, transcript);\n            logVoiceDebug('info', `Transcript${message.is_final ? ' final' : ' interim'}: ${transcript}`);
+            setStatus(true, transcript);
+            logVoiceDebug('info', `Transcript${message.is_final ? ' final' : ' interim'}: ${transcript}`);
 
             if (message.is_final && message.speech_final && transcript !== lastFinalTranscript) {
               lastFinalTranscript = transcript;
-              logVoiceDebug('info', `Processing final transcript: ${transcript}`);\n              const navigated = navigateFromVoice(transcript);
-              logVoiceDebug('info', `Direct navigation handled: ${navigated}`);\n              if (!navigated) {
-                logVoiceDebug('info', 'Sending transcript to /api/voice/assistant');\n                void askVoiceAssistant(transcript).catch((error) => {
-                  const message = error instanceof Error ? error.message : 'I could not process that request right now.';\n                  logVoiceDebug('error', `Assistant request failed: ${message}`);
+              logVoiceDebug('info', `Processing final transcript: ${transcript}`);
+              const navigated = navigateFromVoice(transcript);
+              logVoiceDebug('info', `Direct navigation handled: ${navigated}`);
+              if (!navigated) {
+                logVoiceDebug('info', 'Sending transcript to /api/voice/assistant');
+                void askVoiceAssistant(transcript).catch((error) => {
+                  const message = error instanceof Error ? error.message : 'I could not process that request right now.';
+                  logVoiceDebug('error', `Assistant request failed: ${message}`);
                   setStatus(false, message);
                   speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');
                 });
@@ -272,7 +317,8 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
           }
         };
 
-        socket.onerror = () => {\n          logVoiceDebug('error', 'Deepgram WebSocket error');
+        socket.onerror = () => {
+          logVoiceDebug('error', 'Deepgram WebSocket error');
           setStatus(false, 'Voice connection error');
         };
 
@@ -280,7 +326,8 @@ const VoiceDebugPanel = () => {\n  const [open, setOpen] = useState(false);\n  c
           cleanupAudio();
           socket = null;
           const closeReason = event.reason || (event.code !== 1000 ? `Voice connection closed (${event.code})` : '');
-          setStatus(false, closeReason);\n          logVoiceDebug('error', `Deepgram socket closed: ${closeReason || 'normal close'}`);
+          setStatus(false, closeReason);
+          logVoiceDebug('error', `Deepgram socket closed: ${closeReason || 'normal close'}`);
           if (enabled && !stopped && !voiceOutputActive && !isVoiceOutputActive()) {
             scheduleStart(700);
           }
