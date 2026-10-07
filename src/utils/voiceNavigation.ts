@@ -147,7 +147,7 @@ export const getVoiceModeEnabled = () => {
 };
 
 type CapacitorPlugin = {
-  speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number }) => Promise<void>;
+  speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number; voice?: number }) => Promise<void>;
 };
 
 type CapacitorBridge = {
@@ -239,7 +239,7 @@ export const speakVoiceGreeting = () => {
 
   if (nativeTextToSpeech?.speak) {
     if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-    void nativeTextToSpeech.speak({ text: message, lang: 'en-US', rate: 1.02, pitch: 0.95, volume: 1 })
+    void nativeTextToSpeech.speak({ text: message, lang: 'en-US', rate: 0.98, pitch: 0.72, volume: 1 })
       .catch(() => undefined)
       .finally(() => {
         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
@@ -251,8 +251,8 @@ export const speakVoiceGreeting = () => {
   const utterance = new SpeechSynthesisUtterance(message);
   const preferredMasculineVoice = getPreferredMasculineVoice(window.speechSynthesis.getVoices());
   if (preferredMasculineVoice) utterance.voice = preferredMasculineVoice;
-  utterance.pitch = 0.95;
-  utterance.rate = 1.02;
+  utterance.pitch = 0.72;
+  utterance.rate = 0.98;
   const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
   window.speechSynthesis.cancel();
   window.sessionStorage.setItem('kingshall_voice_prompt', prompt);
