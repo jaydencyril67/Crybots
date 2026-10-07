@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { API_BASE_URL, authHeaders } from '../api/axios';
-import { askVoiceAssistant, getVoiceDebugLogs, getVoiceModeEnabled, isVoiceOutputActive, logVoiceDebug, speakVoiceResponse, VOICE_DEBUG_EVENT, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { askVoiceAssistant, getVoiceModeEnabled, isVoiceOutputActive, logVoiceDebug, speakVoiceResponse, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type DeepgramResult = {
   type?: string;
@@ -40,64 +40,6 @@ const downsampleTo16kPcm = (input: Float32Array, inputSampleRate: number) => {
   }
 
   return pcm;
-};
-
-const VoiceDebugPanel = () => {
-  const [open, setOpen] = useState(false);
-  const [logs, setLogs] = useState(getVoiceDebugLogs());
-
-  useEffect(() => {
-    const refresh = () => setLogs(getVoiceDebugLogs());
-    window.addEventListener(VOICE_DEBUG_EVENT, refresh);
-    return () => window.removeEventListener(VOICE_DEBUG_EVENT, refresh);
-  }, []);
-
-  return (
-    <div style={{ position: 'fixed', right: 12, bottom: 12, zIndex: 2147483647, fontFamily: 'monospace', fontSize: 11 }}>
-      <button type="button" onClick={() => setOpen((value) => !value)} style={{ border: '1px solid rgba(255,255,255,.2)', borderRadius: 10, padding: '8px 10px', background: '#111827', color: '#fff' }}>
-        {open ? 'Hide voice debug' : 'Voice debug'}
-      </button>
-      {open && (
-        <div style={{ marginTop: 8, width: 'min(92vw, 420px)', maxHeight: '55vh', overflow: 'auto', background: '#030712', color: '#d1d5db', border: '1px solid rgba(255,255,255,.15)', borderRadius: 12, padding: 10, boxShadow: '0 12px 40px rgba(0,0,0,.45)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 8, alignItems: 'center' }}>
-            <strong style={{ color: '#fff' }}>Voice debug log</strong>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                type="button"
-                onClick={async () => {
-                  const debugText = logs.map((entry) => `[${entry.time}] ${entry.level.toUpperCase()}: ${entry.message}`).join('\\n');
-                  try {
-                    await navigator.clipboard.writeText(debugText || 'No voice events yet.');
-                    logVoiceDebug('debug', 'Debug log copied to clipboard');
-                  } catch {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = debugText || 'No voice events yet.';
-                    textarea.style.position = 'fixed';
-                    textarea.style.opacity = '0';
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    try { document.execCommand('copy'); } catch {}
-                    textarea.remove();
-                    logVoiceDebug('debug', 'Debug log copied using fallback clipboard');
-                  }
-                }}
-                style={{ border: 0, borderRadius: 7, padding: '4px 7px', background: '#1f2937', color: '#fff' }}
-              >
-                Copy
-              </button>
-              <button type="button" onClick={() => { localStorage.removeItem('crybots_voice_debug_logs'); setLogs([]); logVoiceDebug('debug', 'Debug log cleared'); }} style={{ border: 0, borderRadius: 7, padding: '4px 7px', background: '#1f2937', color: '#fff' }}>Clear</button>
-            </div>
-          </div>
-          {logs.length === 0 ? <div>No voice events yet.</div> : logs.map((entry, index) => (
-            <div key={`${entry.time}-${index}`} style={{ borderTop: index ? '1px solid rgba(255,255,255,.08)' : undefined, padding: '7px 0', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-              <div style={{ color: '#9ca3af' }}>{entry.time} · {entry.level}</div>
-              <div>{entry.message}</div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 };
 
 const VoiceNavigation = () => {
@@ -393,7 +335,7 @@ const VoiceNavigation = () => {
     };
   }, []);
 
-  return <VoiceDebugPanel />;
+  return null;
 };
 
 export default VoiceNavigation;
