@@ -45,6 +45,7 @@ const ApiKeysPage = () => {
   const [securityCode, setSecurityCode] = useState('');
   const [expandedKeyId, setExpandedKeyId] = useState<string>('');
   const [showCreate, setShowCreate] = useState(false);
+  const [copyingSecret, setCopyingSecret] = useState(false);
 
   const loadKeys = async () => {
     try {
@@ -175,7 +176,7 @@ const ApiKeysPage = () => {
             )}
           </div>
 
-          {secret && <div style={styles.card}><div style={styles.row}><p style={styles.label}><KeyRound size={15} /> Secret</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => void navigator.clipboard?.writeText(secret)} style={{ ...styles.button, borderRadius: 10 }}><Copy size={15} /> Copy</button><button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Dismiss</button></div></div></div>}
+          {secret && <div style={styles.card}><div style={styles.row}><p style={styles.label}><KeyRound size={15} /> Secret</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button, borderRadius: 10 }}>{copyingSecret ? <InlineLoadingDots /> : <><Copy size={15} /> Copy</>}</button><button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Dismiss</button></div></div></div>}
 
           <div style={styles.card}>
             <div style={styles.row}><p style={styles.value}>Your API keys</p><p style={styles.note}>Tap View to inspect permissions and manage each credential.</p></div>
