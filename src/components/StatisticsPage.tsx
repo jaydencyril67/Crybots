@@ -59,7 +59,7 @@ const StatisticsPage = () => {
     return () => { active = false; };
   }, []);
 
-  return <HybridTheme><Helmet><title>Statistics | KingsHall</title></Helmet><div style={styles.page}><div style={styles.shell}>
+  return <HybridTheme><Helmet><title>Statistics | CryBots</title></Helmet><div style={styles.page}><div style={styles.shell}>
     <div style={styles.header}><button type="button" style={styles.back} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button></div>
     {error ? <div style={styles.card}>{error}</div> : null}
     <section style={styles.section}><h2 style={styles.sectionTitle}>Account activity</h2><div style={styles.listCard}><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Account created</p></div><CalendarDays size={19} color={theme.primary} /><p style={styles.value}>{data ? formatDate(data.account.createdAt) : <LoadingDots />}</p></div><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Logins this month</p><p style={styles.small}>{data ? `${data.account.activeSessions} active sessions` : <LoadingDots />}</p></div><LogIn size={19} color={theme.primary} /><p style={styles.value}>{data ? data.account.monthlyLoginCount.toLocaleString() : <LoadingDots />}</p></div><div style={styles.listItem}><div style={styles.listItemContent}><p style={styles.cardLabel}>Email confirmation</p></div><CheckCircle2 size={19} color={theme.primary} /><p style={styles.value}>{data ? formatDate(data.account.confirmedAt) : <LoadingDots />}</p></div></div></section>
