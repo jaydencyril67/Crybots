@@ -59,9 +59,34 @@ const VoiceDebugPanel = () => {
       </button>
       {open && (
         <div style={{ marginTop: 8, width: 'min(92vw, 420px)', maxHeight: '55vh', overflow: 'auto', background: '#030712', color: '#d1d5db', border: '1px solid rgba(255,255,255,.15)', borderRadius: 12, padding: 10, boxShadow: '0 12px 40px rgba(0,0,0,.45)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 8, alignItems: 'center' }}>
             <strong style={{ color: '#fff' }}>Voice debug log</strong>
-            <button type="button" onClick={() => { localStorage.removeItem('crybots_voice_debug_logs'); setLogs([]); logVoiceDebug('debug', 'Debug log cleared'); }} style={{ border: 0, borderRadius: 7, padding: '4px 7px', background: '#1f2937', color: '#fff' }}>Clear</button>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  const debugText = logs.map((entry) => `[${entry.time}] ${entry.level.toUpperCase()}: ${entry.message}`).join('\\n');
+                  try {
+                    await navigator.clipboard.writeText(debugText || 'No voice events yet.');
+                    logVoiceDebug('debug', 'Debug log copied to clipboard');
+                  } catch {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = debugText || 'No voice events yet.';
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try { document.execCommand('copy'); } catch {}
+                    textarea.remove();
+                    logVoiceDebug('debug', 'Debug log copied using fallback clipboard');
+                  }
+                }}
+                style={{ border: 0, borderRadius: 7, padding: '4px 7px', background: '#1f2937', color: '#fff' }}
+              >
+                Copy
+              </button>
+              <button type="button" onClick={() => { localStorage.removeItem('crybots_voice_debug_logs'); setLogs([]); logVoiceDebug('debug', 'Debug log cleared'); }} style={{ border: 0, borderRadius: 7, padding: '4px 7px', background: '#1f2937', color: '#fff' }}>Clear</button>
+            </div>
           </div>
           {logs.length === 0 ? <div>No voice events yet.</div> : logs.map((entry, index) => (
             <div key={`${entry.time}-${index}`} style={{ borderTop: index ? '1px solid rgba(255,255,255,.08)' : undefined, padding: '7px 0', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
