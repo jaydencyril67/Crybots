@@ -40,14 +40,14 @@ const WebhooksPage = () => {
     page: { minHeight: '100vh', overflowX: 'hidden', background: theme.background, color: theme.text, paddingBottom: '90px' },
     shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' },
     content: { display: 'grid', gap: 14, marginTop: 14 },
-    back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
+    back: { height: 30, display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
     card: { padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
     row: { display: 'grid', gap: 10, width: '100%', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, boxSizing: 'border-box', minWidth: 0 },
     label: { margin: 0, color: theme.textMuted, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'inline-flex', alignItems: 'center', gap: 7 },
     value: { margin: 0, color: theme.text, fontSize: '0.94rem', fontWeight: 800, lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'anywhere' },
     note: { margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.4 },
     input: { width: '100%', boxSizing: 'border-box', borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem', font: 'inherit' },
-    button: { border: 'none', borderRadius: 999, padding: '11px 16px', fontWeight: 700, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, fontSize: '0.88rem', font: 'inherit' },
+    button: { height: 30, border: 'none', borderRadius: 999, padding: '0 12px', fontWeight: 700, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, fontSize: '0.88rem', font: 'inherit' },
     mutedButton: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text },
   };
 
@@ -284,7 +284,7 @@ const WebhooksPage = () => {
                           const next = expandedId === webhook.id ? '' : webhook.id;
                           setExpandedId(next);
                           if (next && !deliveries[webhook.id]) void loadDeliveries(webhook.id);
-                        }} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
+                        }} style={{ height: 30, flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '0 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
                           {expandedId === webhook.id ? 'Hide' : 'View'}
                         </button>
                       </div>
