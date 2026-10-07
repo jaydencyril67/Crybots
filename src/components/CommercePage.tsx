@@ -159,12 +159,9 @@ const CommercePage = () => {
     return <article key={botId} style={outerCardStyle}>
       <section style={{ ...cardStyle, display: 'grid', gap: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, color: theme.primary }}>
-            <Bot size={20} />
-          </div>
           <div style={{ minWidth: 0, flex: 1 }}>
             <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850, overflowWrap: 'anywhere' }}>{bot.name}</h3>
-            <small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.symbol || 'Flexible strategy'}{bot.sellerName ? ` · Listed by ${bot.sellerName}` : ''}</small>
+            <small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.sellerName ? `Listed by ${bot.sellerName}` : 'Listed by —'}</small>
           </div>
           <button type="button" onClick={() => setExpandedBotId((current) => current === botId ? '' : botId)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceMuted, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
             {expanded ? 'Hide' : 'View'}
