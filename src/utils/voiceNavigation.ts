@@ -327,11 +327,14 @@ export const speakVoiceResponse = (message: string) => {
 type VoiceAssistantAction = { type?: string; route?: string } | null;
 type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction; debug?: { requestId?: string; elapsedMs?: number; providerStatus?: number } };
 
-export const askVoiceAssistant = async (message: string) => {\n  logVoiceDebug('info', `Assistant request: ${message.trim().slice(0, 500)}`);
+export const askVoiceAssistant = async (message: string) => {
+  logVoiceDebug('info', `Assistant request: ${message.trim().slice(0, 500)}`);
   const trimmed = message.trim();
   if (!trimmed) return false;
 
-  let response: Response;\n  try {\n    response = await fetch(`${API_BASE_URL}/api/voice/assistant`, {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}/api/voice/assistant`, {
     method: 'POST',
     headers: (() => {
       const headers = new Headers({ 'Content-Type': 'application/json' });
@@ -347,13 +350,16 @@ export const askVoiceAssistant = async (message: string) => {\n  logVoiceDebug('
   });
 
   const body = await response.json().catch(() => ({})) as VoiceAssistantResponse & { message?: string };
-  if (!response.ok) {\n    logVoiceDebug('error', `Assistant HTTP error ${response.status}: ${body.message || body.reply || 'no response body'}`);
+  if (!response.ok) {
+    logVoiceDebug('error', `Assistant HTTP error ${response.status}: ${body.message || body.reply || 'no response body'}`);
     if (body.reply) speakVoiceResponse(body.reply);
     else if (response.status === 503) speakVoiceResponse('The conversational assistant is not configured yet.');
     return false;
   }
 
-  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';\n  logVoiceDebug('info', `Assistant response: ${reply || '[empty reply]'}`);\n  if (body.debug?.requestId) logVoiceDebug('debug', `Backend request ${body.debug.requestId}${typeof body.debug.elapsedMs === 'number' ? ` (${body.debug.elapsedMs}ms)` : ''}`);
+  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';
+  logVoiceDebug('info', `Assistant response: ${reply || '[empty reply]'}`);
+  if (body.debug?.requestId) logVoiceDebug('debug', `Backend request ${body.debug.requestId}${typeof body.debug.elapsedMs === 'number' ? ` (${body.debug.elapsedMs}ms)` : ''}`);
   if (reply) {
     voiceConversationHistory.push({ role: 'user', content: trimmed });
     voiceConversationHistory.push({ role: 'assistant', content: reply });
@@ -362,7 +368,8 @@ export const askVoiceAssistant = async (message: string) => {\n  logVoiceDebug('
     speakVoiceResponse(reply);
   }
 
-  if (body.action?.type === 'navigate' && body.action.route) {\n    logVoiceDebug('info', `Assistant action: navigate ${body.action.route}`);
+  if (body.action?.type === 'navigate' && body.action.route) {
+    logVoiceDebug('info', `Assistant action: navigate ${body.action.route}`);
     navigate(body.action.route);
   }
 
