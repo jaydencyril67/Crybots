@@ -98,14 +98,14 @@ const ApiKeysPage = () => {
     page: { minHeight: '100vh', overflowX: 'hidden' as const, background: theme.background, color: theme.text, paddingBottom: '90px' },
     shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
     content: { display: 'grid', gap: '14px', marginTop: '14px' },
-    back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
+    back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '0 12px', height: 30, background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
     card: { padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
     row: { display: 'grid', gap: 10, width: '100%', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, boxSizing: 'border-box' as const, minWidth: 0 },
     label: { margin: 0, color: theme.textMuted, fontSize: '0.74rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', display: 'inline-flex', alignItems: 'center', gap: 7 },
     value: { margin: 0, color: theme.text, fontSize: '0.94rem', fontWeight: 800, lineHeight: 1.5, wordBreak: 'break-word' as const, overflowWrap: 'anywhere' as const },
     note: { margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.4 },
     input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem', font: 'inherit' },
-    button: { border: 'none', borderRadius: 999, padding: '11px 16px', fontWeight: 700, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, fontSize: '0.88rem', font: 'inherit' },
+    button: { border: 'none', borderRadius: 999, padding: '0 12px', height: 30, fontWeight: 700, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, fontSize: '0.88rem', font: 'inherit' },
     mutedButton: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text },
   };
 
@@ -183,7 +183,7 @@ const ApiKeysPage = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                 <KeyRound size={20} color={key.revokedAt ? theme.textMuted : theme.primary} />
                 <div style={{ minWidth: 0, flex: 1 }}><p style={{ ...styles.value, fontSize: '0.95rem' }}>{key.name}</p><p style={{ ...styles.note, marginTop: 3 }}>{key.prefix}… · {key.revokedAt ? 'Revoked' : 'Active'}</p></div>
-                <button type="button" onClick={() => setExpandedKeyId((current) => current === key.id ? '' : key.id)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>{expandedKeyId === key.id ? 'Hide' : 'View'}</button>
+                <button type="button" onClick={() => setExpandedKeyId((current) => current === key.id ? '' : key.id)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '0 12px', height: 30, background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>{expandedKeyId === key.id ? 'Hide' : 'View'}</button>
               </div>
               {expandedKeyId === key.id && <div style={{ display: 'grid', gap: 10 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14 }}>
