@@ -191,7 +191,7 @@ const VoiceNavigation = () => {
           vad_events: 'true',
         });
 
-        ['KingsHall', 'Kings Hall', 'portfolio', 'notifications', 'transactions', 'withdrawals', 'rentals', 'commerce', 'webhooks', 'API keys'].forEach((term) => {
+        ['CryBots', 'CryBots', 'portfolio', 'notifications', 'transactions', 'withdrawals', 'rentals', 'commerce', 'webhooks', 'API keys'].forEach((term) => {
           params.append('keyterm', term);
         });
 
