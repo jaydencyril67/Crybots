@@ -178,12 +178,17 @@
       }
 
       .initial-splash-powered {
-        margin: -10px 0 0;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: calc(env(safe-area-inset-bottom) + 24px);
+        margin: 0;
         color: inherit;
         font-size: 10px;
         line-height: 1.4;
         letter-spacing: 0.12em;
         opacity: 0.62;
+        text-align: center;
         text-transform: none;
       }
 
@@ -293,8 +298,9 @@
       <div class="initial-splash-card">
         <img class="initial-splash-logo" src="%PUBLIC_URL%/icons/ke-icon.svg?v=4" alt="CryBots" />
         <p class="initial-splash-title">CryBots</p>
-        <p class="initial-splash-powered">Powered by KingsHall</p>
         <div class="initial-splash-shimmer" aria-hidden="true"></div>
+      </div>
+      <p class="initial-splash-powered">Powered by KingsHall</p>
       </div>
     </div>
     <div id="root" style="min-height: 100vh;"></div>
