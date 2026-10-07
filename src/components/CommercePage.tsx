@@ -182,8 +182,8 @@ const CommercePage = () => {
             <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Efficiency</small><strong style={{ fontSize: '0.88rem' }}>{bot.efficiency ?? 0}%</strong></div>
             <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Sale price</small><strong style={{ fontSize: '0.88rem', color: theme.primary }}>{bot.price !== undefined ? String(bot.price) + ' USDT' : 'Unavailable'}</strong></div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            {bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={buttonStyle}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}
+          <div style={{ width: '100%' }}>
+            {bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box', background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : <button type="button" disabled={buyingId === botId} onClick={() => void buyBot(bot)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box' }}>{buyingId === botId ? <InlineLoadingDots /> : 'Buy bot'}</button>}
           </div>
         </div>}
       </section>
