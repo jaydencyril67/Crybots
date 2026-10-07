@@ -309,7 +309,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   };
   const renderArtwork = () => (
     <span style={styles.artworkContainer}>
-      <KHLogo size={30} label="KingsHall" />
+      <KHLogo size={30} label="CryBots" />
       {unreadCount > 0 ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span> : null}
     </span>
   );
@@ -338,7 +338,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       </div>
 
       <div style={styles.rightArtwork}>
-        <KHLogo size={30} label="KingsHall" />
+        <KHLogo size={30} label="CryBots" />
       </div>
 
       </header>
