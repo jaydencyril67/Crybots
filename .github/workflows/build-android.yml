@@ -5,6 +5,7 @@ on:
 
 jobs:
   build-apk:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -86,7 +87,7 @@ jobs:
           const permissions = ['android.permission.INTERNET', 'android.permission.RECORD_AUDIO', 'android.permission.MODIFY_AUDIO_SETTINGS'];
           const missing = permissions.filter(permission => !manifest.includes(permission));
           if (missing.length) {
-            const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\n');
+            const lines = missing.map(permission => `    <uses-permission android:name="${permission}" />`).join('\\n');
             manifest = manifest.replace(/(<manifest[^>]*>\n)/, `$1${lines}\n`);
           }
           fs.writeFileSync(file, manifest);
