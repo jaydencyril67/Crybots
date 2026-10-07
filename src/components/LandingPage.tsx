@@ -482,8 +482,8 @@ const LandingPage = () => {
           
 
           <div style={styles.heroGrid}>
-            <div>
-              <div style={styles.pill}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ ...styles.pill, justifyContent: 'center' }}>
                 <Sparkles style={styles.icon} />
                 Automated crypto trading for modern users
               </div>
@@ -491,7 +491,7 @@ const LandingPage = () => {
                 Automate smarter.
                 <span style={styles.gradientText}>Trade with a plan.</span>
               </h2>
-              <p style={styles.lead}>
+              <p style={{ ...styles.lead, marginLeft: 'auto', marginRight: 'auto' }}>
                 CryBots brings together bot rentals, strategy building, bot purchases, crypto market automation, and account tools in a clean,
                 modern experience built for serious users.
               </p>
