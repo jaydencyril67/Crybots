@@ -30,6 +30,8 @@ const WebhooksPage = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [rotateId, setRotateId] = useState<string | null>(null);
   const [rotatingId, setRotatingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editUrl, setEditUrl] = useState('');
@@ -154,6 +156,27 @@ const WebhooksPage = () => {
       setMessage(response.data.webhook.enabled ? 'Webhook enabled.' : 'Webhook disabled.');
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to change webhook status.');
+    }
+  };
+
+  const remove = async (id: string) => {
+    setDeletingId(id);
+    setError('');
+    try {
+      await api.delete(`/api/developer/webhooks/${id}`);
+      setWebhooks((current) => current.filter((item) => item.id !== id));
+      setDeliveries((current) => {
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+      if (expandedId === id) setExpandedId('');
+      if (deleteId === id) setDeleteId(null);
+      setMessage('Webhook deleted.');
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to delete webhook.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -396,6 +419,22 @@ const WebhooksPage = () => {
                             <button type="button" onClick={() => void toggleEnabled(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
                               {webhook.enabled ? 'Disable webhook' : 'Enable webhook'}
                             </button>
+
+                            {deleteId === webhook.id ? (
+                              <div style={{ display: 'grid', gap: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
+                                <p style={{ ...styles.note, color: theme.text }}>Delete this webhook permanently? Its delivery history will also be removed.</p>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                                  <button type="button" onClick={() => setDeleteId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
+                                  <button type="button" onClick={() => void remove(webhook.id)} disabled={deletingId === webhook.id} style={{ ...styles.button, borderRadius: 10, background: theme.danger }}>
+                                    {deletingId === webhook.id ? <InlineLoadingDots /> : 'Delete webhook'}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <button type="button" onClick={() => setDeleteId(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
+                                Delete webhook
+                              </button>
+                            )}
                           </div>
                           {editingId === webhook.id && (
                             <div style={{ display: 'grid', gap: 9, padding: 12, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
