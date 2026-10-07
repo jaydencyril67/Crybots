@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, KeyRound, Plus, ShieldCheck, Copy, Ban } from 'lucide-react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
 import InlineLoadingDots from './InlineLoadingDots';
 import ReusableDatePage from './ReusableDatePage';
 import NowBar from './NowBar';
+import NotificationBanner from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -39,6 +40,8 @@ const ApiKeysPage = () => {
   const [error, setError] = useState('');
   const [revokeId, setRevokeId] = useState<string | null>(null);
   const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [expandedKeyId, setExpandedKeyId] = useState<string>('');
+  const [showCreate, setShowCreate] = useState(false);
 
   const loadKeys = async () => {
     try {
@@ -72,18 +75,117 @@ const ApiKeysPage = () => {
     return <ReusableDatePage title="API key expiration" description="Choose when this API key should expire." value={expiration} mode="date" confirmLabel="Set expiration date" cancelLabel="Back" showNowBar={false} min={new Date().toISOString().slice(0, 10)} onConfirm={(value) => { setExpiration(value); setShowExpirationPage(false); }} onCancel={() => setShowExpirationPage(false)} />;
   }
 
-  const input: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text };
-  const button: React.CSSProperties = { border: 0, borderRadius: 999, padding: '10px 15px', fontWeight: 800, cursor: 'pointer', background: theme.primary, color: theme.textInverse, width: '100%', maxWidth: '100%', boxSizing: 'border-box' };
-  const rowList: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', minWidth: 0, padding: 10, border: `1px solid ${theme.borderGlass}`, borderRadius: 16, background: theme.surfaceGlass, boxSizing: 'border-box' };
-  const row: React.CSSProperties = { padding: '13px 14px', border: `1px solid ${theme.borderGlass}`, borderRadius: 15, background: theme.surfaceMuted, boxSizing: 'border-box' };
+  const styles: Record<string, React.CSSProperties> = {
+    page: { minHeight: '100vh', overflowX: 'hidden' as const, background: theme.background, color: theme.text, paddingBottom: '90px' },
+    shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
+    content: { display: 'grid', gap: '14px', marginTop: '14px' },
+    back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
+    card: { padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+    row: { display: 'grid', gap: 10, width: '100%', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, boxSizing: 'border-box' as const, minWidth: 0 },
+    label: { margin: 0, color: theme.textMuted, fontSize: '0.74rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', display: 'inline-flex', alignItems: 'center', gap: 7 },
+    value: { margin: 0, color: theme.text, fontSize: '0.94rem', fontWeight: 800, lineHeight: 1.5, wordBreak: 'break-word' as const, overflowWrap: 'anywhere' as const },
+    note: { margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.4 },
+    input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem', font: 'inherit' },
+    button: { border: 'none', borderRadius: 999, padding: '11px 16px', fontWeight: 700, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, fontSize: '0.88rem', font: 'inherit' },
+    mutedButton: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text },
+  };
 
-  return <HybridTheme mode={themeMode}><main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' }}><div style={{ maxWidth: 920, margin: '0 auto', padding: '24px 16px' }}>
-    <button type="button" onClick={() => navigate('/dev')} style={{ display: 'inline-flex', alignItems: 'center', alignSelf: 'start', width: 'fit-content', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: 12 }}><ArrowLeft size={15} /> Dev</button>
+  const permissionSummary = (permissions?: Permissions) => permissionCategories
+    .filter((category) => permissions?.[category.key] && (permissions[category.key].read || permissions[category.key].write))
+    .map((category) => `${category.label}: ${permissions![category.key].read ? 'Read' : ''}${permissions![category.key].read && permissions![category.key].write ? ' + ' : ''}${permissions![category.key].write ? 'Write' : ''}`)
+    .join(' · ') || 'No permissions';
 
-    {error && <p role="alert" style={{ color: theme.danger }}>{error}</p>}
-    {secret && <section style={{ ...rowList, marginBottom: 14, borderColor: theme.primary }}><div style={row}><strong>Copy your new API key now</strong><p style={{ color: theme.textMuted }}>For security, this secret cannot be shown again.</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, background: theme.surfaceMuted }}>{secret}</code><button type="button" onClick={() => void navigator.clipboard?.writeText(secret)} style={{ ...button, marginTop: 12 }}>Copy secret</button><button type="button" onClick={() => setSecret('')} style={{ ...button, marginLeft: 8, background: theme.surfaceMuted, color: theme.text }}>Dismiss</button></div></section>}
-    <form onSubmit={createKey} style={rowList}><div style={row}><h3 style={{ margin: 0 }}>Create API key</h3></div><div style={row}><label style={{ display: 'grid', gap: 7 }}>Name<input required minLength={2} value={name} onChange={(event) => setName(event.target.value)} style={input} /></label></div><div style={row}><label style={{ display: 'grid', gap: 7 }}>Expires on (optional)<button type="button" onClick={() => setShowExpirationPage(true)} style={{ ...input, textAlign: 'left', cursor: 'pointer' }}>{expiration || 'Choose expiration date'}</button></label></div><div style={row}><fieldset style={{ border: 0, padding: 0, margin: 0 }}><legend>Permissions</legend><p style={{ marginTop: 4, color: theme.textMuted, fontSize: '0.84rem' }}>Read lets an app view information. Write lets it perform actions in that category.</p><div style={{ display: 'grid', gap: 10 }}>{permissionCategories.map((category) => <div key={category.key} style={{ padding: 12, border: `1px solid ${theme.borderGlass}`, borderRadius: 12 }}><strong>{category.label}</strong><div style={{ color: theme.textMuted, fontSize: '0.8rem', margin: '4px 0 9px' }}>{category.description}</div><div style={{ display: 'flex', gap: 18 }}>{(['read', 'write'] as PermissionAction[]).map((action) => <label key={action} style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><input type="checkbox" checked={permissions[category.key][action]} onChange={() => setPermissions((current) => ({ ...current, [category.key]: { ...current[category.key], [action]: !current[category.key][action] } }))} />{action === 'read' ? 'Read' : 'Write'}</label>)}</div></div>)}<div style={{ marginTop: 10, padding: 12, border: `1px solid ${theme.borderGlass}`, borderRadius: 12 }}><strong>Withdrawal access</strong><div style={{ color: theme.textMuted, fontSize: '0.8rem', margin: '4px 0 9px' }}>Allows this API key to initiate wallet withdrawals. This is separate from Funds Write.</div><label style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><input type="checkbox" checked={permissions.withdrawals && permissions.funds.write} disabled={!permissions.funds.write} onChange={() => setPermissions((current) => ({ ...current, withdrawals: !current.withdrawals }))} />Allow API withdrawals</label></div></div></fieldset></div><div style={row}><button disabled={saving || !permissionCategories.some((category) => permissions[category.key].read || permissions[category.key].write)} style={button}>{saving ? <InlineLoadingDots /> : 'Create key'}</button></div></form>
-    <section style={{ ...rowList, marginTop: 18 }}><div style={row}><h3 style={{ margin: 0 }}>Your keys</h3></div>{loading ? <div style={{ ...row, textAlign: 'center' }}><LoadingDots /></div> : !keys.length ? <div style={{ ...row, color: theme.textMuted }}>No API keys yet.</div> : keys.map((key) => <article key={key.id} style={row}><strong>{key.name}</strong><p style={{ margin: '6px 0', color: theme.textMuted }}>{key.prefix}… · {permissionCategories.filter((category) => key.permissions?.[category.key] && (key.permissions[category.key].read || key.permissions[category.key].write)).map((category) => `${category.label}: ${key.permissions[category.key].read ? 'Read' : ''}${key.permissions[category.key].read && key.permissions[category.key].write ? ' + ' : ''}${key.permissions[category.key].write ? 'Write' : ''}`).join(' · ')}{key.permissions?.withdrawals ? ' · Withdrawals' : '' || 'No permissions'} · {key.revokedAt ? 'Revoked' : 'Active'}</p>{!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 8, marginTop: 8, padding: 10, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}><span style={{ color: theme.textMuted, fontSize: '0.82rem' }}>Revoke this API key? Applications using it will stop working.</span><div style={{ display: 'flex', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} disabled={revokingId === key.id} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>{revokingId === key.id ? <InlineLoadingDots /> : 'Confirm revoke'}</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} disabled={revokingId !== null} style={{ ...button, background: theme.surfaceMuted, color: theme.text }}>Revoke</button>)}</article>)}</section>
-  </div><NowBar /></main></HybridTheme>;
+  return <HybridTheme mode={themeMode}>
+    <Helmet><title>API Keys | KingsHall</title></Helmet>
+    <main style={styles.page}>
+      <div style={styles.shell}>
+        <button type="button" onClick={() => navigate('/dev')} style={styles.back}><ArrowLeft size={17} /> Dev</button>
+        <div style={styles.content}>
+          {error && <NotificationBanner tone="error" title="API key action unavailable" message={error} />}
+          {secret && <NotificationBanner tone="success" title="New API key created" message="Copy the secret now. It will not be shown again." />}
+
+          <div style={styles.card}>
+            <div style={styles.row}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <KeyRound size={20} color={theme.primary} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={styles.value}>API Keys</p>
+                  <p style={styles.note}>Manage secure credentials for external applications.</p>
+                </div>
+                <span style={{ borderRadius: 999, padding: '5px 9px', fontSize: '0.7rem', fontWeight: 850, background: theme.surfaceGlass, color: theme.textMuted }}>{keys.filter((key) => !key.revokedAt).length} active</span>
+              </div>
+            </div>
+            <div style={{ ...styles.row, marginTop: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12 }}>
+                <div><p style={styles.label}>Active</p><p style={{ ...styles.value, marginTop: 5 }}>{keys.filter((key) => !key.revokedAt).length}</p></div>
+                <div><p style={styles.label}>Revoked</p><p style={{ ...styles.value, marginTop: 5 }}>{keys.filter((key) => Boolean(key.revokedAt)).length}</p></div>
+                <div><p style={styles.label}>Total</p><p style={{ ...styles.value, marginTop: 5 }}>{keys.length}</p></div>
+              </div>
+            </div>
+          </div>
+
+          <div style={styles.card}>
+            {!showCreate ? (
+              <button type="button" onClick={() => setShowCreate(true)} style={styles.button}><Plus size={16} /> Create API key</button>
+            ) : (
+              <form onSubmit={createKey} style={{ display: 'grid', gap: 10 }}>
+                <div style={styles.row}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}><ShieldCheck size={18} color={theme.primary} /><div><p style={styles.value}>New API key</p><p style={styles.note}>Give only the permissions this application needs.</p></div></div>
+                </div>
+                <div style={styles.row}><label style={{ display: 'grid', gap: 7, fontWeight: 700 }}>Name<input required minLength={2} value={name} onChange={(event) => setName(event.target.value)} placeholder="My trading app" style={styles.input} /></label></div>
+                <div style={styles.row}><label style={{ display: 'grid', gap: 7, fontWeight: 700 }}>Expiration<button type="button" onClick={() => setShowExpirationPage(true)} style={{ ...styles.input, textAlign: 'left', cursor: 'pointer' }}>{expiration || 'No expiration'}</button></label></div>
+                <div style={styles.row}>
+                  <p style={styles.label}>Permissions</p>
+                  <p style={styles.note}>Read retrieves information. Write allows actions.</p>
+                  <div style={{ display: 'grid', gap: 10 }}>
+                    {permissionCategories.map((category) => <div key={category.key} style={{ padding: 12, border: `1px solid ${theme.borderGlass}`, borderRadius: 12, background: theme.surfaceGlass }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><strong>{category.label}</strong><span style={{ fontSize: '0.72rem', color: theme.textMuted }}>{category.key === 'data' ? 'Account & records' : category.key === 'trade' ? 'Bots & trading' : 'Transfers & financial actions'}</span></div>
+                      <p style={{ ...styles.note, marginTop: 4 }}>{category.description}</p>
+                      <div style={{ display: 'flex', gap: 18, marginTop: 8 }}>{(['read', 'write'] as PermissionAction[]).map((action) => <label key={action} style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><input type="checkbox" checked={permissions[category.key][action]} onChange={() => setPermissions((current) => ({ ...current, [category.key]: { ...current[category.key], [action]: !current[category.key][action] } }))} /> {action === 'read' ? 'Read' : 'Write'}</label>)}</div>
+                    </div>)}
+                    <div style={{ padding: 12, border: `1px solid ${theme.borderGlass}`, borderRadius: 12, background: theme.surfaceGlass }}>
+                      <strong>API withdrawals</strong><p style={styles.note}>Separate permission for initiating wallet withdrawals. Requires Funds Write.</p>
+                      <label style={{ display: 'inline-flex', gap: 6, alignItems: 'center', marginTop: 8 }}><input type="checkbox" checked={permissions.withdrawals && permissions.funds.write} disabled={!permissions.funds.write} onChange={() => setPermissions((current) => ({ ...current, withdrawals: !current.withdrawals }))} /> Allow API withdrawals</label>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                  <button type="button" onClick={() => setShowCreate(false)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
+                  <button disabled={saving || !permissionCategories.some((category) => permissions[category.key].read || permissions[category.key].write)} style={{ ...styles.button, borderRadius: 10 }}>{saving ? <InlineLoadingDots /> : 'Create key'}</button>
+                </div>
+              </form>
+            )}
+          </div>
+
+          {secret && <div style={styles.card}><div style={styles.row}><p style={styles.label}><KeyRound size={15} /> Secret</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => void navigator.clipboard?.writeText(secret)} style={{ ...styles.button, borderRadius: 10 }}><Copy size={15} /> Copy</button><button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Dismiss</button></div></div></div>}
+
+          <div style={styles.card}>
+            <div style={styles.row}><p style={styles.value}>Your API keys</p><p style={styles.note}>Tap View to inspect permissions and manage each credential.</p></div>
+            {loading ? <div style={{ ...styles.row, marginTop: 10, textAlign: 'center' }}><InlineLoadingDots /></div> : !keys.length ? <div style={{ ...styles.row, marginTop: 10 }}><p style={styles.note}>No API keys yet. Create one when you are ready to connect an external application.</p></div> : <div style={{ display: 'grid', gap: 14, marginTop: 10 }}>{keys.map((key) => <article key={key.id} style={styles.row}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                <KeyRound size={20} color={key.revokedAt ? theme.textMuted : theme.primary} />
+                <div style={{ minWidth: 0, flex: 1 }}><p style={{ ...styles.value, fontSize: '0.95rem' }}>{key.name}</p><p style={{ ...styles.note, marginTop: 3 }}>{key.prefix}… · {key.revokedAt ? 'Revoked' : 'Active'}</p></div>
+                <button type="button" onClick={() => setExpandedKeyId((current) => current === key.id ? '' : key.id)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>{expandedKeyId === key.id ? 'Hide' : 'View'}</button>
+              </div>
+              {expandedKeyId === key.id && <div style={{ display: 'grid', gap: 10 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14 }}>
+                  <div><p style={styles.label}>Status</p><p style={{ ...styles.value, marginTop: 5 }}>{key.revokedAt ? 'Revoked' : 'Active'}</p></div>
+                  <div><p style={styles.label}>Permissions</p><p style={{ ...styles.value, marginTop: 5, fontSize: '0.82rem' }}>{permissionSummary(key.permissions)}</p></div>
+                  <div><p style={styles.label}>Created</p><p style={{ ...styles.value, marginTop: 5 }}>{new Date(key.createdAt).toLocaleString()}</p></div>
+                  <div><p style={styles.label}>Expires</p><p style={{ ...styles.value, marginTop: 5 }}>{key.expiresAt ? new Date(key.expiresAt).toLocaleDateString() : 'Never'}</p></div>
+                </div>
+                <div style={{ padding: 12, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
+                  <p style={styles.label}>Access</p><p style={{ ...styles.note, marginTop: 5 }}>{key.permissions?.withdrawals ? 'API withdrawals enabled' : 'API withdrawals disabled'}</p>
+                </div>
+                {!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><p style={styles.note}>Revoke this API key? Applications using it will stop working.</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} disabled={revokingId === key.id} style={{ ...styles.button, background: theme.danger, borderRadius: 10 }}><Ban size={15} />{revokingId === key.id ? <InlineLoadingDots /> : 'Confirm revoke'}</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} disabled={revokingId !== null} style={{ ...styles.button, ...styles.mutedButton }}><Ban size={15} /> Revoke API key</button>)}
+              </div>}
+            </article>)}</div>}
+          </div>
+        </div>
+        <NowBar />
+      </div>
+    </main>
+  </HybridTheme>;
+
 };
 export default ApiKeysPage;
