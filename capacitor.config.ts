@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.kingshall.exchange',
-  appName: 'KingsHall Exchange',
+  appId: 'com.crybots.app',
+  appName: 'CryBots',
   webDir: 'build',
   server: {
     // Keep the Android WebView on a secure origin so API requests use HTTPS.
