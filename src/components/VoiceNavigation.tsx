@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { API_BASE_URL, authHeaders } from '../api/axios';
-import { askVoiceAssistant, speakVoiceResponse, VOICE_DEBUG_EVENT, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { askVoiceAssistant, getVoiceDebugLogs, getVoiceModeEnabled, isVoiceOutputActive, logVoiceDebug, speakVoiceResponse, VOICE_DEBUG_EVENT, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type DeepgramResult = {
   type?: string;
