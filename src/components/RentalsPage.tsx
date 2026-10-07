@@ -242,7 +242,7 @@ const RentalsPage = () => {
       </> : <>
         <input type="range" min="0" max="0" step="0.01" value="0" disabled style={{ width: '100%', accentColor: theme.primary, opacity: 0.7 }} aria-label="Rental price" />
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, color: theme.textMuted, fontSize: '0.75rem' }}><span>0.00 USDT</span><strong style={{ color: theme.text }}>0.00 USDT</strong><span>0.00 USDT</span></div>
-      </>}{listingPricing && <small style={{ color: theme.textMuted, fontWeight: 500 }}>{listingPricingLoading ? 'Calculating Bot Value…' : `Bot Value: ${listingPricing.botValue.toFixed(2)} USDT · Allowed rental range: ${listingPricing.rentalPriceMin.toFixed(2)}–${listingPricing.rentalPriceMax.toFixed(2)} USDT for this period · ${listingPricing.qualityTier} (${listingPricing.qualityScore}/100)`}</small>}</label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish listing'}</button></form>}
+      </>}{listingPricing && <small style={{ color: theme.textMuted, fontWeight: 500 }}>{listingPricingLoading ? 'Calculating Bot Value…' : `Bot Value: ${listingPricing.botValue.toFixed(2)} USDT · Allowed rental range: ${listingPricing.rentalPriceMin.toFixed(2)}–${listingPricing.rentalPriceMax.toFixed(2)} USDT for this period`}</small>}</label><button type="submit" disabled={listingSaving} style={{ ...buttonStyle, cursor: listingSaving ? 'wait' : 'pointer' }}>{listingSaving ? <InlineLoadingDots /> : 'Publish listing'}</button></form>}
         </section>
       </div><NowBar />
     </main>
