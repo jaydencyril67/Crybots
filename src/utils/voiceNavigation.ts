@@ -99,6 +99,23 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'ADMIN CHAT', route: '/admin/chat' },
 ];
 
+export const requestVoiceMicrophoneAccess = async () => {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    logVoiceDebug('error', 'Microphone access is unavailable in this app.');
+    return false;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach((track) => track.stop());
+    logVoiceDebug('info', 'Microphone permission granted');
+    return true;
+  } catch (error) {
+    logVoiceDebug('error', `Microphone permission failed: ${error instanceof Error ? error.message : String(error)}`);
+    return false;
+  }
+};
+
 export const getVoiceModeEnabled = () => {
   if (typeof window === 'undefined') return false;
   return window.localStorage.getItem(VOICE_MODE_STORAGE_KEY) === 'true';
