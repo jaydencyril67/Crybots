@@ -155,6 +155,7 @@ jobs:
           package com.kingshall.exchange;
 
           import android.os.Bundle;
+          import android.media.AudioManager;
 
           import com.getcapacitor.BridgeActivity;
 
@@ -163,6 +164,14 @@ jobs:
               public void onCreate(Bundle savedInstanceState) {
                   registerPlugin(MediaAudioPlugin.class);
                   super.onCreate(savedInstanceState);
+
+                  // Keep the entire CryBots app on Android's normal media output path.
+                  // Voice microphone capture may temporarily use communication audio,
+                  // but app playback must return to the same stream used by music/video.
+                  AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+                  if (audioManager != null) {
+                      audioManager.setMode(AudioManager.MODE_NORMAL);
+                  }
               }
           }
           JAVA
