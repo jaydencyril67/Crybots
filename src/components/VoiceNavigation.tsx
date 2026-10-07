@@ -189,14 +189,22 @@ const VoiceNavigation = () => {
         }
 
         debug('MIC', 'Requesting microphone stream');
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            channelCount: 1,
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          },
-        });
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              channelCount: 1,
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+            },
+          });
+        } catch (error) {
+          debug('MIC', 'Microphone request failed', {
+            name: error instanceof DOMException ? error.name : 'Error',
+            message: error instanceof Error ? error.message : String(error),
+          }, 'error');
+          throw error;
+        }
         if (!stream) throw new Error('Microphone access was not available.');
         debug('MIC', 'Microphone stream acquired', {
           tracks: stream.getAudioTracks().map((track) => ({
