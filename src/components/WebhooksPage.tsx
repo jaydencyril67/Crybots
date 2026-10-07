@@ -39,6 +39,8 @@ const WebhooksPage = () => {
   const [testEvent, setTestEvent] = useState('account.updated');
   const [isTestEventMenuOpen, setIsTestEventMenuOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState('');
+  const [loadingDeliveryId, setLoadingDeliveryId] = useState('');
+  const [copyingSecret, setCopyingSecret] = useState(false);
   const testEventMenuRef = React.useRef<HTMLDivElement | null>(null);
 
   const styles: Record<string, React.CSSProperties> = {
@@ -103,11 +105,14 @@ const WebhooksPage = () => {
   };
 
   const loadDeliveries = async (id: string) => {
+    setLoadingDeliveryId(id);
     try {
       const response = await api.get<{ deliveries: Delivery[] }>(`/api/developer/webhooks/${id}/deliveries?limit=50`);
       setDeliveries((current) => ({ ...current, [id]: response.data.deliveries }));
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to load delivery history.');
+    } finally {
+      setLoadingDeliveryId('');
     }
   };
 
@@ -298,7 +303,7 @@ const WebhooksPage = () => {
                   <p style={styles.note}>Copy this secret now. It will not be shown again.</p>
                   <code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                    <button type="button" onClick={() => void navigator.clipboard?.writeText(secret)} style={{ ...styles.button, borderRadius: 10 }}><Copy size={15} /> Copy</button>
+                    <button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button, borderRadius: 10 }}>{copyingSecret ? <InlineLoadingDots /> : <><Copy size={15} /> Copy</>}</button>
                     <button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Dismiss</button>
                   </div>
                 </div>
@@ -330,7 +335,7 @@ const WebhooksPage = () => {
                           setExpandedId(next);
                           if (next && !deliveries[webhook.id]) void loadDeliveries(webhook.id);
                         }} style={{ height: 30, flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '0 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
-                          {expandedId === webhook.id ? 'Hide' : 'View'}
+                          {expandedId === webhook.id ? 'Hide' : loadingDeliveryId === webhook.id ? <InlineLoadingDots /> : 'View'}
                         </button>
                       </div>
 
