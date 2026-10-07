@@ -175,8 +175,16 @@ export const getVoiceModeEnabled = () => {
   return window.localStorage.getItem(VOICE_MODE_STORAGE_KEY) === 'true';
 };
 
+type CapacitorVoice = {
+  name?: string;
+  lang?: string;
+  localService?: boolean;
+  voiceURI?: string;
+};
+
 type CapacitorPlugin = {
   speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number; voice?: number }) => Promise<void>;
+  getSupportedVoices?: () => Promise<{ voices?: CapacitorVoice[] }>;
 };
 
 type CapacitorBridge = {
@@ -247,17 +255,32 @@ const getTimeGreeting = () => {
 
 export const isVoiceWakeWord = (transcript: string) => /^(?:hi|hello|hey)$/i.test(normalizeVoiceText(transcript));
 
-const getPreferredMasculineVoice = (voices: SpeechSynthesisVoice[]) => {
-  const masculineVoicePattern = /(^|[\s_-])(alex|daniel|david|fred|george|james|mark|michael|oliver|thomas)([\s_-]|$)/i;
-  const englishVoicePattern = /^(en|en[-_])/i;
+const FEMALE_VOICE_PATTERN = /(^|[\\s_-])(female|samantha|zira|jenny|aria|ava|emma|susan|karen|victoria|sara|sarah|google us english)([\\s_-]|$)/i;
+const ENGLISH_VOICE_PATTERN = /^(en|en[-_])/i;
 
-  return voices
-    .filter((voice) => masculineVoicePattern.test(voice.name))
-    .sort((first, second) => {
-      const firstScore = (englishVoicePattern.test(first.lang) ? 2 : 0) + (first.localService ? 1 : 0);
-      const secondScore = (englishVoicePattern.test(second.lang) ? 2 : 0) + (second.localService ? 1 : 0);
-      return secondScore - firstScore;
-    })[0];
+const getPreferredFemaleWebVoice = (voices: SpeechSynthesisVoice[]) => voices
+  .filter((voice) => ENGLISH_VOICE_PATTERN.test(voice.lang))
+  .sort((first, second) => {
+    const firstFemale = FEMALE_VOICE_PATTERN.test(first.name) ? 2 : 0;
+    const secondFemale = FEMALE_VOICE_PATTERN.test(second.name) ? 2 : 0;
+    const firstLocal = first.localService ? 1 : 0;
+    const secondLocal = second.localService ? 1 : 0;
+    return (secondFemale + secondLocal) - (firstFemale + firstLocal);
+  })[0];
+
+const getPreferredFemaleNativeVoice = async (plugin: CapacitorPlugin) => {
+  if (!plugin.getSupportedVoices) return undefined;
+  try {
+    const result = await plugin.getSupportedVoices();
+    const voices = Array.isArray(result?.voices) ? result.voices : [];
+    const englishVoices = voices.filter((voice) => ENGLISH_VOICE_PATTERN.test(voice.lang || ''));
+    const preferred = englishVoices.find((voice) => FEMALE_VOICE_PATTERN.test(voice.name || ''))
+      || englishVoices.find((voice) => /female/i.test(voice.name || ''));
+    if (!preferred) return undefined;
+    return voices.indexOf(preferred);
+  } catch {
+    return undefined;
+  }
 };
 
 export const speakVoiceGreeting = () => {
@@ -271,7 +294,9 @@ export const speakVoiceGreeting = () => {
 
   if (nativeTextToSpeech?.speak) {
     if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-    void nativeTextToSpeech.speak({ text: message, lang: 'en-US', rate: 0.98, pitch: 0.72, volume: 1 })
+    void getPreferredFemaleNativeVoice(nativeTextToSpeech).then((voice) =>
+      nativeTextToSpeech.speak({ text: message, lang: 'en-US', rate: 0.98, pitch: 1.08, volume: 1, ...(voice !== undefined ? { voice } : {}) }),
+    )
       .catch(() => undefined)
       .finally(() => {
         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
@@ -281,9 +306,9 @@ export const speakVoiceGreeting = () => {
 
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(message);
-  const preferredMasculineVoice = getPreferredMasculineVoice(window.speechSynthesis.getVoices());
-  if (preferredMasculineVoice) utterance.voice = preferredMasculineVoice;
-  utterance.pitch = 0.72;
+  const preferredFemaleVoice = getPreferredFemaleWebVoice(window.speechSynthesis.getVoices());
+  if (preferredFemaleVoice) utterance.voice = preferredFemaleVoice;
+  utterance.pitch = 1.08;
   utterance.rate = 0.98;
   const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
   window.speechSynthesis.cancel();
@@ -302,7 +327,9 @@ export const speakVoiceResponse = (message: string) => {
   const nativeTextToSpeech = getCapacitorPlugin('TextToSpeech');
   if (nativeTextToSpeech?.speak) {
     if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-    void nativeTextToSpeech.speak({ text, lang: 'en-US', rate: 0.98, pitch: 0.72, volume: 1 })
+    void getPreferredFemaleNativeVoice(nativeTextToSpeech).then((voice) =>
+      nativeTextToSpeech.speak({ text, lang: 'en-US', rate: 0.98, pitch: 1.08, volume: 1, ...(voice !== undefined ? { voice } : {}) }),
+    )
       .catch(() => undefined)
       .finally(() => {
         if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
@@ -312,9 +339,9 @@ export const speakVoiceResponse = (message: string) => {
 
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(text);
-  const preferredMasculineVoice = getPreferredMasculineVoice(window.speechSynthesis.getVoices());
-  if (preferredMasculineVoice) utterance.voice = preferredMasculineVoice;
-  utterance.pitch = 0.72;
+  const preferredFemaleVoice = getPreferredFemaleWebVoice(window.speechSynthesis.getVoices());
+  if (preferredFemaleVoice) utterance.voice = preferredFemaleVoice;
+  utterance.pitch = 1.08;
   utterance.rate = 0.98;
   const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
   window.speechSynthesis.cancel();
