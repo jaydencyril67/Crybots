@@ -19,7 +19,7 @@ type SpeechRecognitionLike = {
 
 type NativeSpeechRecognition = {
   available?: () => Promise<{ available: boolean }>;
-  start: (options: { language: string; maxResults: number; prompt: string; popup: boolean }) => Promise<{ matches?: string[] }>;
+  start: (options: { language: string; maxResults: number; prompt: string; popup: boolean; partialResults?: boolean }) => Promise<{ matches?: string[] }>;
   stop?: () => Promise<void>;
 };
 
@@ -50,7 +50,7 @@ const VoiceNavigation = () => {
         if (nativeListening) return;
         nativeListening = true;
         setStatus(true);
-        void nativeRecognition.start({ language: 'en-US', maxResults: 3, prompt: 'Say a KingsHall page or say Kings for help.', popup: true })
+        void nativeRecognition.start({ language: 'en-US', maxResults: 3, prompt: 'Say a KingsHall page or say Kings for help.', popup: false, partialResults: false })
           .then((result) => {
             const transcript = result.matches?.[0]?.trim();
             if (transcript) {
