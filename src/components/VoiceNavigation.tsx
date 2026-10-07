@@ -259,7 +259,10 @@ const VoiceNavigation = () => {
 
             if (message.is_final && message.speech_final && transcript !== lastFinalTranscript) {
               lastFinalTranscript = transcript;
-              const navigated = navigateFromVoice(transcript);\n              if (!navigated) {\n                void askVoiceAssistant(transcript).catch(() => undefined);\n              }
+              const navigated = navigateFromVoice(transcript);
+              if (!navigated) {
+                void askVoiceAssistant(transcript).catch(() => undefined);
+              }
             }
           } catch (error) {
           }
