@@ -15,8 +15,13 @@ type RentalBot = {
   botId?: string;
   name: string;
   description?: string;
+  symbolType?: string;
   symbol?: string;
   efficiency?: number;
+  tradeDirection?: string;
+  minTradeAmount?: number;
+  maxTradeAmount?: number;
+  retainerAmount?: number;
   rentalPrice?: number;
   rentalDuration?: number;
   rentalDurationUnit?: 'hours' | 'days' | 'weeks' | 'months';
@@ -181,11 +186,15 @@ const RentalsPage = () => {
 
         {expanded && <div style={{ display: 'grid', gap: 10, paddingTop: 10, borderTop: `1px solid ${theme.borderGlass}` }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Market category</small><strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.symbolType || 'crypto'}</strong></div>
             <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trading symbol</small><strong style={{ fontSize: '0.88rem', overflowWrap: 'anywhere' }}>{bot.symbol || 'Not set'}</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Min activation</small><strong style={{ fontSize: '0.88rem' }}>{Number(bot.minTradeAmount ?? 0).toFixed(2)} USDT</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Max activation</small><strong style={{ fontSize: '0.88rem' }}>{Number(bot.maxTradeAmount ?? 0).toFixed(2)} USDT</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Retainer</small><strong style={{ fontSize: '0.88rem' }}>{Number(bot.retainerAmount ?? 0).toFixed(2)} USDT</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Trade direction</small><strong style={{ fontSize: '0.88rem', textTransform: 'capitalize' }}>{bot.tradeDirection || 'long'}</strong></div>
             <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Efficiency</small><strong style={{ fontSize: '0.88rem' }}>{bot.efficiency ?? 0}%</strong></div>
             <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Rental period</small><strong style={{ fontSize: '0.88rem' }}>{duration || 'Not set'}</strong></div>
-            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Rental price</small><strong style={{ fontSize: '0.88rem', color: theme.primary }}>{price !== undefined ? `${price} USDT` : 'Owner set'}</strong></div>
-            <div style={{ gridColumn: '1 / -1' }}><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Bot ID</small><strong style={{ fontSize: '0.88rem' }}>{bot.botId || 'Unavailable'}</strong></div>
+            <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Rental price</small><strong style={{ fontSize: '0.88rem', color: theme.primary }}>{price !== undefined ? String(price) + ' USDT' : 'Owner set'}</strong></div>
           </div>
           {bot.description && <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.45 }}>{bot.description}</p>}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
