@@ -8,6 +8,34 @@ export const VOICE_OUTPUT_EVENT = 'nowbar-voice-output-changed';
 export const NOWBAR_COMMAND_EVENT = 'nowbar-voice-command';
 export const VOICE_NAVIGATION_EVENT = 'nowbar-voice-navigation';
 
+export const VOICE_DEBUG_EVENT = 'nowbar-voice-debug';
+const VOICE_DEBUG_STORAGE_KEY = 'crybots_voice_debug_logs';
+export type VoiceDebugLog = { time: string; level: 'info' | 'error' | 'warn' | 'debug'; message: string };
+
+export const getVoiceDebugLogs = (): VoiceDebugLog[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(VOICE_DEBUG_STORAGE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.slice(-80) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const logVoiceDebug = (level: VoiceDebugLog['level'], message: string) => {
+  if (typeof window === 'undefined') return;
+  const entry: VoiceDebugLog = {
+    time: new Date().toLocaleTimeString(),
+    level,
+    message: message.slice(0, 1000),
+  };
+  const logs = [...getVoiceDebugLogs(), entry].slice(-80);
+  window.localStorage.setItem(VOICE_DEBUG_STORAGE_KEY, JSON.stringify(logs));
+  window.dispatchEvent(new CustomEvent(VOICE_DEBUG_EVENT));
+  if (level === 'error') console.error('[CryBots Voice]', message);
+  else console.log('[CryBots Voice]', message);
+};
+
 export type VoiceCommand = { label: string; route: string };
 
 // Canonical route catalog used by the command page. Keep one entry per application route.
@@ -299,11 +327,11 @@ export const speakVoiceResponse = (message: string) => {
 type VoiceAssistantAction = { type?: string; route?: string } | null;
 type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction };
 
-export const askVoiceAssistant = async (message: string) => {
+export const askVoiceAssistant = async (message: string) => {\n  logVoiceDebug('info', `Assistant request: ${message.trim().slice(0, 500)}`);
   const trimmed = message.trim();
   if (!trimmed) return false;
 
-  const response = await fetch(`${API_BASE_URL}/api/voice/assistant`, {
+  let response: Response;\n  try {\n    response = await fetch(`${API_BASE_URL}/api/voice/assistant`, {
     method: 'POST',
     headers: (() => {
       const headers = new Headers({ 'Content-Type': 'application/json' });
@@ -319,13 +347,13 @@ export const askVoiceAssistant = async (message: string) => {
   });
 
   const body = await response.json().catch(() => ({})) as VoiceAssistantResponse & { message?: string };
-  if (!response.ok) {
+  if (!response.ok) {\n    logVoiceDebug('error', `Assistant HTTP error ${response.status}: ${body.message || body.reply || 'no response body'}`);
     if (body.reply) speakVoiceResponse(body.reply);
     else if (response.status === 503) speakVoiceResponse('The conversational assistant is not configured yet.');
     return false;
   }
 
-  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';
+  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';\n  logVoiceDebug('info', `Assistant response: ${reply || '[empty reply]'}`);
   if (reply) {
     voiceConversationHistory.push({ role: 'user', content: trimmed });
     voiceConversationHistory.push({ role: 'assistant', content: reply });
@@ -334,7 +362,7 @@ export const askVoiceAssistant = async (message: string) => {
     speakVoiceResponse(reply);
   }
 
-  if (body.action?.type === 'navigate' && body.action.route) {
+  if (body.action?.type === 'navigate' && body.action.route) {\n    logVoiceDebug('info', `Assistant action: navigate ${body.action.route}`);
     navigate(body.action.route);
   }
 
