@@ -1,4 +1,5 @@
 import { navigate } from './navigate';
+import { API_BASE_URL, authHeaders } from '../api/axios';
 
 export const VOICE_MODE_STORAGE_KEY = 'nowbar_voice_navigation_enabled';
 export const VOICE_MODE_CHANGED_EVENT = 'nowbar-voice-mode-changed';
@@ -263,6 +264,80 @@ export const speakVoiceGreeting = () => {
 };
 
 export const isVoiceOutputActive = () => typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking;
+export const speakVoiceResponse = (message: string) => {
+  const text = message.trim();
+  if (!text) return;
+
+  const nativeTextToSpeech = getCapacitorPlugin('TextToSpeech');
+  if (nativeTextToSpeech?.speak) {
+    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
+    void nativeTextToSpeech.speak({ text, lang: 'en-US', rate: 0.98, pitch: 0.72, volume: 1 })
+      .catch(() => undefined)
+      .finally(() => {
+        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
+      });
+    return;
+  }
+
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  const preferredMasculineVoice = getPreferredMasculineVoice(window.speechSynthesis.getVoices());
+  if (preferredMasculineVoice) utterance.voice = preferredMasculineVoice;
+  utterance.pitch = 0.72;
+  utterance.rate = 0.98;
+  const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
+  window.speechSynthesis.cancel();
+  window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
+  utterance.onend = finish;
+  utterance.onerror = finish;
+  window.speechSynthesis.speak(utterance);
+};
+
+type VoiceAssistantAction = { type?: string; route?: string } | null;
+type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction };
+
+export const askVoiceAssistant = async (message: string) => {
+  const trimmed = message.trim();
+  if (!trimmed) return false;
+
+  const response = await fetch(`${API_BASE_URL}/api/voice/assistant`, {
+    method: 'POST',
+    headers: (() => {
+      const headers = new Headers({ 'Content-Type': 'application/json' });
+      const auth = authHeaders();
+      if (auth.Authorization) headers.set('Authorization', auth.Authorization);
+      return headers;
+    })(),
+    body: JSON.stringify({
+      message: trimmed,
+      currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
+      history: voiceConversationHistory.slice(-8),
+    }),
+  });
+
+  const body = await response.json().catch(() => ({})) as VoiceAssistantResponse & { message?: string };
+  if (!response.ok) {
+    if (body.reply) speakVoiceResponse(body.reply);
+    else if (response.status === 503) speakVoiceResponse('The conversational assistant is not configured yet.');
+    return false;
+  }
+
+  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';
+  if (reply) {
+    voiceConversationHistory.push({ role: 'user', content: trimmed });
+    voiceConversationHistory.push({ role: 'assistant', content: reply });
+    voiceConversationHistory = voiceConversationHistory.slice(-8);
+    window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening: false, transcript: reply, assistant: true } }));
+    speakVoiceResponse(reply);
+  }
+
+  if (body.action?.type === 'navigate' && body.action.route) {
+    navigate(body.action.route);
+  }
+
+  return Boolean(reply);
+};
+
 
 type NowBarCommand = 'expand' | 'collapse' | 'left' | 'right';
 
