@@ -75,7 +75,8 @@ const CommercePage = () => {
       .catch((requestError: any) => {
         if (!active) return;
         setListingPricing(null);
-        if (requestError?.response?.status === 404) window.alert('Bot ID not found.');
+        if (requestError?.response?.status === 404) setError('Bot ID not found.');
+        else if (requestError?.response?.status === 409) setError(requestError?.response?.data?.message || 'Deactivate this bot before listing it for sale.');
       })
       .finally(() => { if (active) setListingPricingLoading(false); });
     return () => { active = false; };
