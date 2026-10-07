@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import { useAppTheme } from './AppTheme';
 import api from '../api/axios';
@@ -168,96 +168,95 @@ const Portfolio = () => {
 
             {error && <NotificationBanner tone="error" title="Portfolio unavailable" message={error} />}
 
-            {loading ? (
-              <div style={{ ...styles.row, textAlign: 'center' }}>
-                <InlineLoadingDots />
+            <div style={{ display: 'grid', gap: 10 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+                <div style={styles.row}>
+                  <p style={styles.label}><Bot size={14} /> Total bots</p>
+                  <p style={styles.value}>{loading ? <LoadingDots /> : summary.totalBots}</p>
+                  <p style={styles.note}>{loading ? <LoadingDots /> : `${summary.ownedBots} owned · ${summary.rentedBots} rented`}</p>
+                </div>
+                <div style={styles.row}>
+                  <p style={styles.label}>Active bots</p>
+                  <p style={styles.value}>{loading ? <LoadingDots /> : summary.activeBots}</p>
+                  <p style={styles.note}>{loading ? <LoadingDots /> : `${summary.activatingBots} activating · ${summary.deactivatingBots} deactivating`}</p>
+                </div>
               </div>
-            ) : (
-              <>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
-                  <div style={styles.row}>
-                    <p style={styles.label}><Bot size={14} /> Total bots</p>
-                    <p style={styles.value}>{summary.totalBots}</p>
-                    <p style={styles.note}>{summary.ownedBots} owned · {summary.rentedBots} rented</p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+                <div style={styles.row}>
+                  <p style={styles.label}><Wallet size={14} /> Current bot capital</p>
+                  <p style={styles.value}>{loading ? <LoadingDots /> : money(summary.currentCapital)}</p>
+                </div>
+                <div style={styles.row}>
+                  <p style={styles.label}><CircleDollarSign size={14} /> Total invested</p>
+                  <p style={styles.value}>{loading ? <LoadingDots /> : money(summary.totalInvested)}</p>
+                </div>
+              </div>
+
+              <div style={styles.row}>
+                <p style={styles.label}>Performance</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
+                  <div>
+                    <p style={styles.note}>Profit</p>
+                    <p style={{ ...styles.value, marginTop: 4, color: theme.success }}>{loading ? <LoadingDots /> : `+${money(summary.grossProfit)}`}</p>
                   </div>
-                  <div style={styles.row}>
-                    <p style={styles.label}>Active bots</p>
-                    <p style={styles.value}>{summary.activeBots}</p>
-                    <p style={styles.note}>{summary.activatingBots} activating · {summary.deactivatingBots} deactivating</p>
+                  <div>
+                    <p style={styles.note}>Loss</p>
+                    <p style={{ ...styles.value, marginTop: 4, color: summary.grossLoss > 0 ? theme.danger : theme.text }}>{loading ? <LoadingDots /> : `-${money(summary.grossLoss)}`}</p>
+                  </div>
+                  <div>
+                    <p style={styles.note}>Net result</p>
+                    <p style={{ ...styles.value, marginTop: 4, color: summary.netResult >= 0 ? theme.success : theme.danger }}>
+                      {loading ? <LoadingDots /> : `${summary.netResult >= 0 ? '+' : '-'}${money(Math.abs(summary.netResult))}`}
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10, marginTop: 10 }}>
-                  <div style={styles.row}>
-                    <p style={styles.label}><Wallet size={14} /> Current bot capital</p>
-                    <p style={styles.value}>{money(summary.currentCapital)}</p>
-                  </div>
-                  <div style={styles.row}>
-                    <p style={styles.label}><CircleDollarSign size={14} /> Total invested</p>
-                    <p style={styles.value}>{money(summary.totalInvested)}</p>
-                  </div>
+              <div style={styles.row}>
+                <p style={styles.label}><TrendingDown size={14} /> Withdrawn from bots</p>
+                <p style={styles.value}>{loading ? <LoadingDots /> : money(summary.totalWithdrawn)}</p>
+                <p style={styles.note}>Funds already returned to your USDT balance while bots remained active.</p>
+              </div>
+
+              <div style={styles.row}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <TrendingUp size={16} color={theme.primary} />
+                  <p style={{ ...styles.value, fontSize: '0.9rem' }}>Bot activity</p>
                 </div>
-
-                <div style={{ ...styles.row, marginTop: 10 }}>
-                  <p style={styles.label}>Performance</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10 }}>
-                    <div>
-                      <p style={styles.note}>Profit</p>
-                      <p style={{ ...styles.value, marginTop: 4, color: theme.success }}>+{money(summary.grossProfit)}</p>
-                    </div>
-                    <div>
-                      <p style={styles.note}>Loss</p>
-                      <p style={{ ...styles.value, marginTop: 4, color: summary.grossLoss > 0 ? theme.danger : theme.text }}>-{money(summary.grossLoss)}</p>
-                    </div>
-                    <div>
-                      <p style={styles.note}>Net result</p>
-                      <p style={{ ...styles.value, marginTop: 4, color: summary.netResult >= 0 ? theme.success : theme.danger }}>
-                        {summary.netResult >= 0 ? '+' : '-'}{money(Math.abs(summary.netResult))}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ ...styles.row, marginTop: 10 }}>
-                  <p style={styles.label}><TrendingDown size={14} /> Withdrawn from bots</p>
-                  <p style={styles.value}>{money(summary.totalWithdrawn)}</p>
-                  <p style={styles.note}>Funds already returned to your USDT balance while bots remained active.</p>
-                </div>
-
-                <div style={{ ...styles.row, marginTop: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <TrendingUp size={16} color={theme.primary} />
-                    <p style={{ ...styles.value, fontSize: '0.9rem' }}>Bot activity</p>
-                  </div>
-                  {summary.investedBots === 0 ? (
-                    <p style={styles.note}>No bot investments yet. Activate a created, purchased or rented bot to start tracking activity here.</p>
-                  ) : (
-                    <div style={{ display: 'grid', gap: 8 }}>
-                      {bots.filter((bot) => bot.investment).map((bot) => {
-                        const investment = bot.investment!;
-                        const net = Number(investment.totalProfit || 0) - Number(investment.totalLoss || 0);
-                        const status = investment.lifecycleStatus || (investment.active ? 'active' : 'inactive');
-                        return (
-                          <div key={bot.botId} style={{ ...styles.row, padding: '11px 12px', background: theme.surfaceGlass }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
-                              <div style={{ minWidth: 0 }}>
-                                <p style={{ ...styles.value, fontSize: '0.86rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{bot.name}</p>
-                                <p style={{ ...styles.note, marginTop: 2 }}>ID {bot.botId} · {bot.source === 'rented' ? 'Rented' : 'Owned'}</p>
-                              </div>
-                              <span style={{ borderRadius: 999, padding: '5px 8px', fontSize: '0.66rem', fontWeight: 850, background: status === 'active' ? theme.success : theme.surfaceGlass, color: status === 'active' ? theme.textInverse : theme.textMuted, flexShrink: 0 }}>
-                                {status.toUpperCase()}
-                              </span>
+                {loading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: 14 }}><LoadingDots /></div>
+                ) : summary.investedBots === 0 ? (
+                  <p style={styles.note}>No bot investments yet. Activate a created, purchased or rented bot to start tracking activity here.</p>
+                ) : (
+                  <div style={{ display: 'grid', gap: 8 }}>
+                    {bots.filter((bot) => bot.investment).map((bot) => {
+                      const investment = bot.investment!;
+                      const net = Number(investment.totalProfit || 0) - Number(investment.totalLoss || 0);
+                      const status = investment.lifecycleStatus || (investment.active ? 'active' : 'inactive');
+                      return (
+                        <div key={bot.botId} style={{ ...styles.row, padding: '11px 12px', background: theme.surfaceGlass }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                            <div style={{ minWidth: 0 }}>
+                              <p style={{ ...styles.value, fontSize: '0.86rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{bot.name}</p>
+                              <p style={{ ...styles.note, marginTop: 2 }}>ID {bot.botId} · {bot.source === 'rented' ? 'Rented' : 'Owned'}</p>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-                              <div><p style={styles.note}>Capital</p><p style={{ ...styles.value, marginTop: 3, fontSize: '0.8rem' }}>{money(investment.currentCapital)}</p></div>
-                              <div><p style={styles.note}>Invested</p><p style={{ ...styles.value, marginTop: 3, fontSize: '0.8rem' }}>{money(investment.principal)}</p></div>
-                              <div><p style={styles.note}>Net</p><p style={{ ...styles.value, marginTop: 3, fontSize: '0.8rem', color: net >= 0 ? theme.success : theme.danger }}>{net >= 0 ? '+' : '-'}{money(Math.abs(net))}</p></div>
-                            </div>
+                            <span style={{ borderRadius: 999, padding: '5px 8px', fontSize: '0.66rem', fontWeight: 850, background: status === 'active' ? theme.success : theme.surfaceGlass, color: status === 'active' ? theme.textInverse : theme.textMuted, flexShrink: 0 }}>
+                              {status.toUpperCase()}
+                            </span>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+                            <div><p style={styles.note}>Capital</p><p style={{ ...styles.value, marginTop: 3, fontSize: '0.8rem' }}>{money(investment.currentCapital)}</p></div>
+                            <div><p style={styles.note}>Invested</p><p style={{ ...styles.value, marginTop: 3, fontSize: '0.8rem' }}>{money(investment.principal)}</p></div>
+                            <div><p style={styles.note}>Net</p><p style={{ ...styles.value, marginTop: 3, fontSize: '0.8rem', color: net >= 0 ? theme.success : theme.danger }}>{net >= 0 ? '+' : '-'}{money(Math.abs(net))}</p></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
                 </div>
               </>
             )}
