@@ -127,7 +127,7 @@ const HybridTheme = ({ mode = 'dark', children }: HybridThemeProps) => {
         color: theme.text,
       }}
     >
-      <style>{`html, body, #root, *, *::before, *::after { font-family: inherit !important; }`}</style>
+      <style>{`html, body, #root, *, *::before, *::after { font-family: "STIX Two Text" !important; font-synthesis: none !important; }`}</style>
       {children}
     </div>
   );
