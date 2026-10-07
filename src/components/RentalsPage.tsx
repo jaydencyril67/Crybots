@@ -197,8 +197,8 @@ const RentalsPage = () => {
             <div><small style={{ display: 'block', color: theme.textMuted, fontSize: '0.72rem' }}>Rental price</small><strong style={{ fontSize: '0.88rem', color: theme.primary }}>{price !== undefined ? String(price) + ' USDT' : 'Owner set'}</strong></div>
           </div>
           {bot.description && <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.45 }}>{bot.description}</p>}
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            {bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : showRentButton && <button type="button" disabled={rentingId === botId} onClick={() => void rentBot(bot)} style={buttonStyle}>{rentingId === botId ? <InlineLoadingDots /> : 'Rent bot'}</button>}
+          <div style={{ width: '100%' }}>
+            {bot.isOwner ? <button type="button" disabled={unlistingId === botId} onClick={() => void unlistBot(bot)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box', background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}`, cursor: unlistingId === botId ? 'wait' : 'pointer' }}>{unlistingId === botId ? <InlineLoadingDots /> : 'Unlist'}</button> : showRentButton && <button type="button" disabled={rentingId === botId} onClick={() => void rentBot(bot)} style={{ ...buttonStyle, width: '100%', boxSizing: 'border-box' }}>{rentingId === botId ? <InlineLoadingDots /> : 'Rent bot'}</button>}
           </div>
         </div>}
       </section>
