@@ -38,7 +38,7 @@ const features = [
 ];
 
 const steps = [
-  'Create your KingsHall profile in minutes.',
+  'Create your CryBots profile in minutes.',
   'Fund your account with crypto or supported payment rails.',
   'Trade, invest, and track your growth in one elegant dashboard.',
 ];
@@ -466,10 +466,10 @@ const LandingPage = () => {
     <HybridTheme>
       <>
         <Helmet>
-          <title>KingsHall | Crypto Trading Bots</title>
+          <title>CryBots | Crypto Trading Bots</title>
           <meta
             name="description"
-            content="KingsHall is a crypto trading bot platform where users can rent, build, and buy automated bots, monitor strategies, and manage digital assets. "
+            content="CryBots is a crypto trading bot platform where users can rent, build, and buy automated bots, monitor strategies, and manage digital assets. "
           />
         </Helmet>
 
@@ -492,7 +492,7 @@ const LandingPage = () => {
                 <span style={styles.gradientText}>Trade with a plan.</span>
               </h2>
               <p style={styles.lead}>
-                KingsHall brings together bot rentals, strategy building, bot purchases, crypto market automation, and account tools in a clean,
+                CryBots brings together bot rentals, strategy building, bot purchases, crypto market automation, and account tools in a clean,
                 modern experience built for serious users.
               </p>
 
