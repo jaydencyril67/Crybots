@@ -30,6 +30,11 @@ const WebhooksPage = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [rotateId, setRotateId] = useState<string | null>(null);
   const [rotatingId, setRotatingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editUrl, setEditUrl] = useState('');
+  const [editEvents, setEditEvents] = useState<string[]>([]);
+  const [testEvent, setTestEvent] = useState('account.updated');
 
   const styles: Record<string, React.CSSProperties> = {
     page: { minHeight: '100vh', overflowX: 'hidden', background: theme.background, color: theme.text, paddingBottom: '90px' },
@@ -94,7 +99,7 @@ const WebhooksPage = () => {
   const test = async (id: string) => {
     setError('');
     try {
-      await api.post(`/api/developer/webhooks/${id}/test`, { eventType: 'account.updated' });
+      await api.post(`/api/developer/webhooks/${id}/test`, { eventType: testEvent });
       setMessage('Test delivery sent.');
       await loadDeliveries(id);
       setExpandedId(id);
@@ -112,6 +117,40 @@ const WebhooksPage = () => {
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to retry delivery.');
     }
+  };
+
+  const update = async (id: string) => {
+    setSaving(true);
+    setError('');
+    try {
+      const response = await api.patch<{ webhook: Webhook }>(`/api/developer/webhooks/${id}`, { name: editName, url: editUrl, events: editEvents });
+      setWebhooks((current) => current.map((item) => item.id === id ? response.data.webhook : item));
+      setEditingId(null);
+      setMessage('Webhook configuration saved.');
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to save webhook configuration.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleEnabled = async (webhook: Webhook) => {
+    setError('');
+    try {
+      const response = await api.patch<{ webhook: Webhook }>(`/api/developer/webhooks/${webhook.id}`, { enabled: !webhook.enabled });
+      setWebhooks((current) => current.map((item) => item.id === webhook.id ? response.data.webhook : item));
+      setMessage(response.data.webhook.enabled ? 'Webhook enabled.' : 'Webhook disabled.');
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to change webhook status.');
+    }
+  };
+
+  const beginEdit = (webhook: Webhook) => {
+    setEditingId(webhook.id);
+    setEditName(webhook.name);
+    setEditUrl(webhook.url);
+    setEditEvents(webhook.events);
+    setError('');
   };
 
   const rotate = async (id: string) => {
@@ -269,10 +308,41 @@ const WebhooksPage = () => {
                             <p style={{ ...styles.note, marginTop: 6 }}>{webhook.events.join(' · ')}</p>
                           </div>
 
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                            <button type="button" onClick={() => void test(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><Send size={15} /> Send test</button>
-                            <button type="button" onClick={() => setRotateId(rotateId === webhook.id ? null : webhook.id)} disabled={rotatingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><RefreshCw size={15} /> Rotate secret</button>
+                          <div style={{ display: 'grid', gap: 8 }}>
+                            <label style={{ display: 'grid', gap: 6, fontWeight: 700 }}>
+                              Test event
+                              <select value={testEvent} onChange={(event) => setTestEvent(event.target.value)} style={styles.input}>
+                                {eventTypes.map((eventType) => <option key={eventType} value={eventType}>{eventType}</option>)}
+                              </select>
+                            </label>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+                              <button type="button" onClick={() => void test(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><Send size={15} /> Send test</button>
+                              <button type="button" onClick={() => beginEdit(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Edit</button>
+                              <button type="button" onClick={() => setRotateId(rotateId === webhook.id ? null : webhook.id)} disabled={rotatingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><RefreshCw size={15} /> Rotate</button>
+                            </div>
+                            <button type="button" onClick={() => void toggleEnabled(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
+                              {webhook.enabled ? 'Disable webhook' : 'Enable webhook'}
+                            </button>
                           </div>
+                          {editingId === webhook.id && (
+                            <div style={{ display: 'grid', gap: 9, padding: 12, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
+                              <p style={styles.label}>Edit configuration</p>
+                              <input minLength={2} value={editName} onChange={(event) => setEditName(event.target.value)} placeholder="Webhook name" style={styles.input} />
+                              <input type="url" value={editUrl} onChange={(event) => setEditUrl(event.target.value)} placeholder="https://example.com/events" style={styles.input} />
+                              <div style={{ display: 'grid', gap: 6 }}>
+                                {eventTypes.map((eventType) => (
+                                  <label key={eventType} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 9px', borderRadius: 9, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
+                                    <input type="checkbox" checked={editEvents.includes(eventType)} onChange={() => setEditEvents((current) => current.includes(eventType) ? current.filter((item) => item !== eventType) : [...current, eventType])} />
+                                    <span>{eventType}</span>
+                                  </label>
+                                ))}
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                                <button type="button" onClick={() => setEditingId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
+                                <button type="button" disabled={saving || !editName.trim() || !editUrl.trim() || !editEvents.length} onClick={() => void update(webhook.id)} style={{ ...styles.button, borderRadius: 10 }}>{saving ? <InlineLoadingDots /> : 'Save changes'}</button>
+                              </div>
+                            </div>
+                          )}
 
                           {rotateId === webhook.id && (
                             <div style={{ display: 'grid', gap: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
