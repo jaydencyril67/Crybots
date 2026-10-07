@@ -2,7 +2,7 @@ import React from 'react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { Helmet } from 'react-helmet-async';
-import { CheckCircle2, CircleDollarSign, ShieldCheck, Sparkles, TrendingUp, Users } from 'lucide-react';
+import { CheckCircle2, CircleDollarSign, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import InstallAppButton from './InstallAppButton';
 import { isTokenValid } from '../utils/auth';
 import { isAdminToken } from '../utils/adminAuth';
@@ -483,10 +483,6 @@ const LandingPage = () => {
 
           <div style={styles.heroGrid}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ ...styles.pill, justifyContent: 'center' }}>
-                <Sparkles style={styles.icon} />
-                Automated crypto trading for modern users
-              </div>
               <h2 style={styles.heading}>
                 Automate smarter.
                 <span style={styles.gradientText}>Trade with a plan.</span>
