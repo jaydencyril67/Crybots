@@ -48,9 +48,9 @@ jobs:
             /<svg[^>]*>/,
             '<svg width="400" height="400" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">',
           );
-          const crown = logo.replace(/<rect[^>]*\/>/, '');
+          const crown = logo;
 
-          // Keep the native splash visually aligned with the PWA initial splash:
+          // Keep the native splash visually aligned with the canonical CryBots logo:
           // black canvas, centered KingsHall mark, title and loading bar.
           const splash = `<svg width="2732" height="2732" viewBox="0 0 2732 2732" xmlns="http://www.w3.org/2000/svg">
             <rect width="2732" height="2732" fill="#000000"/>
@@ -62,10 +62,10 @@ jobs:
       <rect x="686" y="1715" width="1360" height="22" rx="11" fill="#ffffff"/>
           </svg>`;
           fs.writeFileSync('assets/splash.svg', splash);
-          fs.writeFileSync('assets/crown.svg', logo);
+          fs.writeFileSync('assets/icon.svg', logo);
 
           sharp('public/icons/ke-icon.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-only.png')
-            .then(() => sharp('assets/crown.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-foreground.png'))
+            .then(() => sharp('assets/icon.svg').resize(1024, 1024, { fit: 'contain' }).png().toFile('assets/icon-foreground.png'))
             .then(() => sharp({ create: { width: 1024, height: 1024, channels: 4, background: '#111827' } }).png().toFile('assets/icon-background.png'))
             .then(() => sharp('assets/splash.svg').png().toFile('assets/splash.png'))
             .catch(error => { console.error(error); process.exit(1); });
