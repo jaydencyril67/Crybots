@@ -310,18 +310,23 @@ export const speakVoiceResponse = (message: string) => {
         URL.revokeObjectURL(url);
         audioState.__crybotsVoiceAudioUrl = undefined;
         audioState.__crybotsVoiceAudio = undefined;
+        void releaseMediaOutput();
         window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
       };
       audio.onerror = () => {
         URL.revokeObjectURL(url);
         audioState.__crybotsVoiceAudioUrl = undefined;
         audioState.__crybotsVoiceAudio = undefined;
+        void releaseMediaOutput();
         window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
         logVoiceDebug('error', 'Deepgram TTS audio playback failed');
       };
+      await prepareMediaOutput();
+      logVoiceDebug('info', 'Prepared Android media audio output');
       return audio.play();
     })
     .catch((error) => {
+      void releaseMediaOutput();
       window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
       logVoiceDebug('error', error instanceof Error ? error.message : String(error));
     });
