@@ -261,7 +261,11 @@ const VoiceNavigation = () => {
               lastFinalTranscript = transcript;
               const navigated = navigateFromVoice(transcript);
               if (!navigated) {
-                void askVoiceAssistant(transcript).catch((error) => {\n                  const message = error instanceof Error ? error.message : 'I could not process that request right now.';\n                  setStatus(false, message);\n                  speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');\n                });
+                void askVoiceAssistant(transcript).catch((error) => {
+                  const message = error instanceof Error ? error.message : 'I could not process that request right now.';
+                  setStatus(false, message);
+                  speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');
+                });
               }
             }
           } catch (error) {
