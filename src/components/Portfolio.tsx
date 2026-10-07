@@ -257,9 +257,6 @@ const Portfolio = () => {
                 )}
               </div>
             </div>
-                </div>
-              </>
-            )}
           </section>
         </div>
         <NowBar />
