@@ -36,7 +36,7 @@ export const logVoiceDebug = (level: VoiceDebugLog['level'], message: string) =>
 
 export type VoiceCommand = { label: string; route: string };
 
-// Canonical route catalog used by the command page. Keep one entry per application route.
+// Route labels used by the NowBar UI.
 export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'SIGN UP', route: '/signup' },
   { label: 'SIGN UP CONFIRMATION', route: '/signup-confirmation-sent' },
@@ -97,73 +97,6 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'ALERT', route: '/alert' },
   { label: 'NOTIFICATION COLOR', route: '/notification-color' },
   { label: 'APP USAGE', route: '/app-usage' },
-  { label: 'ADMIN CHAT', route: '/admin/chat' },
-];
-
-const AUTHENTICATED_ROUTES = new Set([
-  '/home', '/details', '/manage', '/theme', '/nowbar', '/voice-commands',
-  '/nowbar-color', '/nowbar-button-color', '/profile', '/exit', '/auto-exit',
-  '/manual-exit', '/statistics', '/agent', '/tools', '/stats', '/menu', '/trade', '/chart', '/market', '/rentals', '/commerce', '/portfolio',
-  '/logs', '/help', '/faq', '/options', '/creation', '/bots',
-  '/store', '/about', '/dev', '/api-keys', '/webhooks', '/configure', '/asset',
-  '/danger', '/security', '/withdrawals', '/transfer', '/deposit', '/transactions',
-  '/notifications', '/alert', '/notification-color', '/app-usage', '/information', '/privacy-policy',
-  '/community-standards', '/admin/chat',
-]);
-
-// These are the authenticated routes represented by the NowBar.
-export const NOWBAR_ROUTES = new Set([
-  ...AUTHENTICATED_ROUTES,
-]);
-
-export const AUTHENTICATED_NOWBAR_PAGE_ROUTES = PAGE_ROUTES.filter(({ route }) =>
-  AUTHENTICATED_ROUTES.has(route) && NOWBAR_ROUTES.has(route),
-);
-
-export const VOICE_COMMANDS: VoiceCommand[] = [
-  { label: 'COMMAND', route: '/voice-commands' },
-  { label: 'COMMANDS', route: '/voice-commands' },
-  { label: 'HOME', route: '/home' },
-  { label: 'PROFILE', route: '/profile' },
-  { label: 'DETAILS', route: '/details' },
-  { label: 'STATISTICS', route: '/statistics' },
-  { label: 'AGENT', route: '/agent' },
-  { label: 'TRADE', route: '/trade' },
-  { label: 'CHART', route: '/chart' },
-  { label: 'MARKET', route: '/market' },
-  { label: 'PORTFOLIO', route: '/portfolio' },
-  { label: 'CREATION', route: '/creation' },
-  { label: 'RENTALS', route: '/rentals' },
-  { label: 'COMMERCE', route: '/commerce' },
-  { label: 'MY BOTS', route: '/bots' },
-  { label: 'BOTS', route: '/bots' },
-  { label: 'LOGS', route: '/logs' },
-  { label: 'ASSETS', route: '/asset' },
-  { label: 'ASSET', route: '/asset' },
-  { label: 'HELP', route: '/help' },
-  { label: 'OPTION', route: '/options' },
-  { label: 'OPTIONS', route: '/options' },
-  { label: 'STORE', route: '/store' },
-  { label: 'ABOUT', route: '/about' },
-  { label: 'DEV', route: '/dev' },
-  { label: 'EXIT', route: '/exit' },
-  { label: 'MANAGE', route: '/manage' },
-  { label: 'DEPOSIT', route: '/deposit' },
-  { label: 'WITHDRAW', route: '/withdrawals' },
-  { label: 'WITHDRAWALS', route: '/withdrawals' },
-  { label: 'TRANSFER', route: '/transfer' },
-  { label: 'SECURITY', route: '/security' },
-  { label: 'TRANSACTIONS', route: '/transactions' },
-  { label: 'NOTIFICATIONS', route: '/notifications' },
-  { label: 'ALERT', route: '/alert' },
-  { label: 'NOTIFICATION COLOR', route: '/notification-color' },
-  { label: 'APP USAGE', route: '/app-usage' },
-  { label: 'THEME', route: '/theme' },
-  { label: 'NOWBAR', route: '/nowbar' },
-  { label: 'FAQ', route: '/faq' },
-  { label: 'INFORMATION', route: '/information' },
-  { label: 'PRIVACY POLICY', route: '/privacy-policy' },
-  { label: 'COMMUNITY STANDARDS', route: '/community-standards' },
   { label: 'ADMIN CHAT', route: '/admin/chat' },
 ];
 
