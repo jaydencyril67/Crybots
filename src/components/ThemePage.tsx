@@ -41,7 +41,7 @@ const ThemePage = () => {
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
           <section style={styles.card}>
             <h2 style={styles.cardHeading}>Appearance theme</h2>
-            <p style={styles.cardText}>Choose how KingsHall Exchange should look. Your selected theme is applied immediately.</p>
+            <p style={styles.cardText}>Choose how CryBots should look. Your selected theme is applied immediately.</p>
             <div style={styles.list}>
               {themeOptions.map((option) => {
                 const previewTheme = HYBRID_THEME_TOKENS[option.preview];
