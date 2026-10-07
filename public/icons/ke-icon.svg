@@ -1,25 +1,17 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="silver" x1="118" y1="90" x2="394" y2="422" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#FFFFFF"/><stop offset="0.32" stop-color="#D9D9D9"/>
-      <stop offset="0.58" stop-color="#8F8F8F"/><stop offset="0.82" stop-color="#E8E8E8"/>
-      <stop offset="1" stop-color="#A5A5A5"/>
-    </linearGradient>
-    <radialGradient id="core" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(72)">
-      <stop stop-color="#FFFFFF"/><stop offset="0.55" stop-color="#C8C8C8"/><stop offset="1" stop-color="#6F6F6F"/>
-    </radialGradient>
-    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
-      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#000000" flood-opacity="0.35"/>
-    </filter>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="#000000"/>
-  <path d="M256 92L332 136L376 212L376 300L332 376L256 420L180 376L136 300L136 212L180 136L256 92Z" stroke="#5E5E5E" stroke-width="10" stroke-linejoin="round"/>
-  <path d="M256 118V184M394 256H328M256 394V328M118 256H184" stroke="url(#silver)" stroke-width="18" stroke-linecap="round"/>
-  <path d="M174 174L214 214M338 174L298 214M338 338L298 298M174 338L214 298" stroke="#AFAFAF" stroke-width="10" stroke-linecap="round"/>
-  <path d="M256 184L306 214V274L256 304L206 274V214L256 184Z" fill="url(#core)" stroke="#FFFFFF" stroke-width="7" stroke-linejoin="round" filter="url(#softShadow)"/>
-  <path d="M256 216L278 229V256L256 269L234 256V229L256 216Z" fill="#000000"/>
-  <circle cx="256" cy="108" r="14" fill="#FFFFFF"/>
-  <circle cx="404" cy="256" r="14" fill="#FFFFFF"/>
-  <circle cx="256" cy="404" r="14" fill="#FFFFFF"/>
-  <circle cx="108" cy="256" r="14" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <rect x="58" y="22" width="396" height="468" rx="76" fill="#000"/>
+  <rect x="58.5" y="22.5" width="395" height="467" rx="75.5" stroke="#151515"/>
+
+  <!-- Vertical orbital loops -->
+  <ellipse cx="229" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
+  <ellipse cx="256" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="5.5"/>
+  <ellipse cx="283" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
+
+  <!-- Horizontal orbital loops -->
+  <ellipse cx="256" cy="230" rx="177" ry="43" stroke="#fff" stroke-width="5.5"/>
+  <ellipse cx="256" cy="256" rx="177" ry="43" stroke="#fff" stroke-width="4.5"/>
+  <ellipse cx="256" cy="282" rx="177" ry="43" stroke="#fff" stroke-width="4.5"/>
+
+  <!-- Central intelligence core -->
+  <circle cx="256" cy="256" r="24" fill="#fff"/>
 </svg>
