@@ -171,6 +171,10 @@ jobs:
 
           import android.os.Bundle;
           import android.media.AudioManager;
+          import android.util.Log;
+
+          import androidx.webkit.WebSettingsCompat;
+          import androidx.webkit.WebViewFeature;
 
           import com.getcapacitor.BridgeActivity;
 
@@ -180,12 +184,23 @@ jobs:
                   registerPlugin(MediaAudioPlugin.class);
                   super.onCreate(savedInstanceState);
 
-                  // Keep the entire CryBots app on Android's normal media output path.
-                  // Voice microphone capture may temporarily use communication audio,
-                  // but app playback must return to the same stream used by music/video.
                   AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
                   if (audioManager != null) {
                       audioManager.setMode(AudioManager.MODE_NORMAL);
+                  }
+
+                  // WebView disables WebAuthn by default. Explicitly enable the
+                  // app-scoped WebAuthn bridge when the installed WebView supports it.
+                  if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
+                      WebSettingsCompat.setWebAuthenticationSupport(
+                              getBridge().getWebView().getSettings(),
+                              WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP
+                      );
+                      Log.i("CryBotsWebAuthn", "WebAuthn support: " +
+                              WebSettingsCompat.getWebAuthenticationSupport(
+                                      getBridge().getWebView().getSettings()));
+                  } else {
+                      Log.w("CryBotsWebAuthn", "Installed Android WebView does not support WebAuthn.");
                   }
               }
           }
