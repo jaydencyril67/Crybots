@@ -38,6 +38,14 @@ const styles = {
     height: '30px',
     flexShrink: 0,
   },
+  headerLogo: {
+    width: '30px',
+    height: '30px',
+    borderRadius: '50%',
+    overflow: 'hidden',
+    display: 'block',
+    flexShrink: 0,
+  },
   unreadArtwork: {
     position: 'absolute' as const,
     top: '-8px',
@@ -309,7 +317,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   };
   const renderArtwork = () => (
     <span style={styles.artworkContainer}>
-      <KHLogo size={30} label="CryBots" />
+      <span style={styles.headerLogo}><KHLogo size={30} label="CryBots" /></span>
       {unreadCount > 0 ? <span style={artworkStyle} aria-label={`${unreadCount} unread notifications`}>{unreadCount}</span> : null}
     </span>
   );
@@ -338,7 +346,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       </div>
 
       <div style={styles.rightArtwork}>
-        <KHLogo size={30} label="CryBots" />
+        <span style={styles.headerLogo}><KHLogo size={30} label="CryBots" /></span>
       </div>
 
       </header>
