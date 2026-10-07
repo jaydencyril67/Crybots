@@ -1,17 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
-  <rect x="58" y="22" width="396" height="468" rx="76" fill="#000"/>
-  <rect x="58.5" y="22.5" width="395" height="467" rx="75.5" stroke="#151515"/>
+  <rect x="32" y="32" width="448" height="448" rx="92" fill="#000"/>
+  <rect x="32.75" y="32.75" width="446.5" height="446.5" rx="91.25" fill="none" stroke="#151515" stroke-width="1.5"/>
 
-  <!-- Vertical orbital loops -->
   <ellipse cx="229" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
   <ellipse cx="256" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="5.5"/>
   <ellipse cx="283" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
 
-  <!-- Horizontal orbital loops -->
   <ellipse cx="256" cy="230" rx="177" ry="43" stroke="#fff" stroke-width="5.5"/>
   <ellipse cx="256" cy="256" rx="177" ry="43" stroke="#fff" stroke-width="4.5"/>
   <ellipse cx="256" cy="282" rx="177" ry="43" stroke="#fff" stroke-width="4.5"/>
 
-  <!-- Central intelligence core -->
   <circle cx="256" cy="256" r="24" fill="#fff"/>
 </svg>
