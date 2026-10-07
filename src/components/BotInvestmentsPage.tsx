@@ -7,6 +7,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
 import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 
 type Investment = {
@@ -338,7 +339,7 @@ const BotInvestmentsPage = () => {
                 {loading ? (
                   <div style={styles.row}>
                     <div style={{ textAlign: 'center' }}>
-                      <InlineLoadingDots />
+                      <LoadingDots />
                     </div>
                   </div>
                 ) : bots.length ? (
