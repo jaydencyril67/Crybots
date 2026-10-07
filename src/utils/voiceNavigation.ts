@@ -177,109 +177,69 @@ export const executeVoiceUiAction = (action: { type?: string; target?: string } 
   return true;
 };
 
-type CapacitorVoice = {
-  name?: string;
-  lang?: string;
-  localService?: boolean;
-  voiceURI?: string;
-};
+export const isVoiceOutputActive = () => typeof window !== 'undefined' && Boolean((window as Window & { __crybotsVoiceAudio?: HTMLAudioElement }).__crybotsVoiceAudio?.paused === false);
 
-type CapacitorPlugin = {
-  speak?: (options: { text: string; lang: string; rate: number; pitch: number; volume: number; voice?: number }) => Promise<void>;
-  getSupportedVoices?: () => Promise<{ voices?: CapacitorVoice[] }>;
-};
-
-type CapacitorBridge = {
-  Plugins?: Record<string, CapacitorPlugin>;
-  registerPlugin?: (name: string) => CapacitorPlugin;
-};
-
-const getCapacitorPlugin = (name: 'TextToSpeech'): CapacitorPlugin | null => {
-  if (typeof window === 'undefined') return null;
-  const capacitor = (window as Window & { Capacitor?: CapacitorBridge }).Capacitor;
-  return capacitor?.Plugins?.[name] || capacitor?.registerPlugin?.(name) || null;
-};
-
-export const requestVoiceMicrophoneAccess = async () => {
-  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return false;
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    stream.getTracks().forEach((track) => track.stop());
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-let voiceConversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];
-
-export const disableVoiceMode = () => {
-  voiceConversationHistory = [];
-  if (typeof window === 'undefined' || !getVoiceModeEnabled()) return;
-  window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
-  window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
-};
-
-export const normalizeVoiceText = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-
-const FEMALE_VOICE_PATTERN = /(^|[\s_-])(female|samantha|zira|jenny|aria|ava|emma|susan|karen|victoria|sara|sarah|google us english)([\s_-]|$)/i;
-const ENGLISH_VOICE_PATTERN = /^(en|en[-_])/i;
-
-const getPreferredFemaleWebVoice = (voices: SpeechSynthesisVoice[]) => voices
-  .filter((voice) => ENGLISH_VOICE_PATTERN.test(voice.lang))
-  .sort((first, second) => {
-    const firstFemale = FEMALE_VOICE_PATTERN.test(first.name) ? 2 : 0;
-    const secondFemale = FEMALE_VOICE_PATTERN.test(second.name) ? 2 : 0;
-    const firstLocal = first.localService ? 1 : 0;
-    const secondLocal = second.localService ? 1 : 0;
-    return (secondFemale + secondLocal) - (firstFemale + firstLocal);
-  })[0];
-
-const getPreferredFemaleNativeVoice = async (plugin: CapacitorPlugin) => {
-  if (!plugin.getSupportedVoices) return undefined;
-  try {
-    const result = await plugin.getSupportedVoices();
-    const voices = Array.isArray(result?.voices) ? result.voices : [];
-    const englishVoices = voices.filter((voice) => ENGLISH_VOICE_PATTERN.test(voice.lang || ''));
-    const preferred = englishVoices.find((voice) => FEMALE_VOICE_PATTERN.test(voice.name || ''))
-      || englishVoices.find((voice) => /female/i.test(voice.name || ''));
-    if (!preferred) return undefined;
-    return voices.indexOf(preferred);
-  } catch {
-    return undefined;
-  }
-};
-
-export const isVoiceOutputActive = () => typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking;
 export const speakVoiceResponse = (message: string) => {
   const text = message.trim();
-  if (!text) return;
+  if (!text || typeof window === 'undefined') return;
 
-  const nativeTextToSpeech = getCapacitorPlugin('TextToSpeech');
-  if (nativeTextToSpeech?.speak) {
-    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-    void getPreferredFemaleNativeVoice(nativeTextToSpeech).then((voice) =>
-      nativeTextToSpeech.speak({ text, lang: 'en-US', rate: 0.98, pitch: 1.08, volume: 1, ...(voice !== undefined ? { voice } : {}) }),
-    )
-      .catch(() => undefined)
-      .finally(() => {
-        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
-      });
-    return;
+  const audioState = window as Window & { __crybotsVoiceAudio?: HTMLAudioElement; __crybotsVoiceAudioUrl?: string };
+  if (audioState.__crybotsVoiceAudio) {
+    audioState.__crybotsVoiceAudio.pause();
+    audioState.__crybotsVoiceAudio.currentTime = 0;
+  }
+  if (audioState.__crybotsVoiceAudioUrl) {
+    URL.revokeObjectURL(audioState.__crybotsVoiceAudioUrl);
+    audioState.__crybotsVoiceAudioUrl = undefined;
   }
 
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  const preferredFemaleVoice = getPreferredFemaleWebVoice(window.speechSynthesis.getVoices());
-  if (preferredFemaleVoice) utterance.voice = preferredFemaleVoice;
-  utterance.pitch = 1.08;
-  utterance.rate = 0.98;
-  const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
-  window.speechSynthesis.cancel();
   window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-  utterance.onend = finish;
-  utterance.onerror = finish;
-  window.speechSynthesis.speak(utterance);
+  logVoiceDebug('info', 'Requesting Gemini TTS audio');
+
+  const headers = (() => {
+    const result = new Headers();
+    const auth = authHeaders();
+    if (auth.Authorization) result.set('Authorization', auth.Authorization);
+    result.set('Content-Type', 'application/json');
+    return result;
+  })();
+
+  void fetch(`${API_BASE_URL}/api/voice/tts`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ text: text.slice(0, 2000) }),
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new Error(`Gemini TTS HTTP ${response.status}: ${detail.slice(0, 300)}`);
+      }
+      return response.blob();
+    })
+    .then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioState.__crybotsVoiceAudio = audio;
+      audioState.__crybotsVoiceAudioUrl = url;
+      audio.onended = () => {
+        URL.revokeObjectURL(url);
+        audioState.__crybotsVoiceAudioUrl = undefined;
+        audioState.__crybotsVoiceAudio = undefined;
+        window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
+      };
+      audio.onerror = () => {
+        URL.revokeObjectURL(url);
+        audioState.__crybotsVoiceAudioUrl = undefined;
+        audioState.__crybotsVoiceAudio = undefined;
+        window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
+        logVoiceDebug('error', 'Gemini TTS audio playback failed');
+      };
+      return audio.play();
+    })
+    .catch((error) => {
+      window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
+      logVoiceDebug('error', error instanceof Error ? error.message : String(error));
+    });
 };
 
 type VoiceAssistantAction = { type?: string; route?: string; target?: string } | null;
