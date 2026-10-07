@@ -490,7 +490,29 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
     window.addEventListener('storage', syncButtonColor);
     window.addEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
     window.addEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
+    const handleVoiceNowBarScroll = (event: Event) => {
+      const detail = (event as CustomEvent<{ direction?: number; amount?: number }>).detail || {};
+      const direction = detail.direction === -1 ? -1 : 1;
+      const amount = Math.max(100, Math.min(Number(detail.amount) || 500, 1200));
+      barRef.current?.scrollBy({ left: direction * amount, behavior: 'smooth' });
+    };
+
+    const handleVoiceNowBarMode = (event: Event) => {
+      const detail = (event as CustomEvent<{ mode?: NowBarMode }>).detail || {};
+      if (!expandModeEnabled) {
+        setMode('compact');
+        return;
+      }
+      if (detail.mode === 'expanded' || detail.mode === 'compact') {
+        setView('actions');
+        setMode(detail.mode);
+        handleInteraction();
+      }
+    };
+
     window.addEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
+    window.addEventListener('crybots-voice-nowbar-scroll', handleVoiceNowBarScroll);
+    window.addEventListener('crybots-voice-nowbar-mode', handleVoiceNowBarMode);
 
     return () => {
       window.removeEventListener('popstate', syncPath);
@@ -501,6 +523,8 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
       window.removeEventListener('nowbar-edge-light-changed', syncEdgeLight as EventListener);
       window.removeEventListener('nowbar-button-color-changed', syncButtonColor as EventListener);
       window.removeEventListener('nowbar-feature-settings-changed', syncFeatureSettings as EventListener);
+      window.removeEventListener('crybots-voice-nowbar-scroll', handleVoiceNowBarScroll);
+      window.removeEventListener('crybots-voice-nowbar-mode', handleVoiceNowBarMode);
 
     };
   }, []);
