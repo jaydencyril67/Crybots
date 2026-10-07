@@ -4,22 +4,31 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#050816" />
+    <link rel="preload" href="/fonts/STIXTwoText-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/STIXTwoText-Bold.woff2" as="font" type="font/woff2" crossorigin />
 <style>
       /* One typography source for both the browser build and the Android WebView APK. */
+      /*
+       * STIX Two Text is the only application typeface.
+       * The app uses many UI weights (750–950), but the APK ships only
+       * the real Regular and Bold STIX faces. Map the full weight ranges
+       * to those bundled faces so Android WebView never falls back to a
+       * device font for an unsupported weight.
+       */
       @font-face {
         font-family: "STIX Two Text";
         src: url("/fonts/STIXTwoText-Regular.woff2") format("woff2");
-        font-weight: 400;
+        font-weight: 100 699;
         font-style: normal;
-        font-display: swap;
+        font-display: block;
       }
 
       @font-face {
         font-family: "STIX Two Text";
         src: url("/fonts/STIXTwoText-Bold.woff2") format("woff2");
-        font-weight: 700;
+        font-weight: 700 1000;
         font-style: normal;
-        font-display: swap;
+        font-display: block;
       }
 
       :root {
