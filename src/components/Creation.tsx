@@ -198,7 +198,7 @@ const Creation = () => {
         <div style={{ ...outerCardStyle, display: 'flex', gap: 8, marginTop: 18, padding: 5 }}>
           {(['create', 'creation'] as const).map((view) => (
             <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, fontSize: '0.84rem', lineHeight: 'normal', cursor: 'pointer', ...(activeView === view ? { borderColor: theme.primary, color: theme.primary } : {}) }}>
-              {view === 'create' ? 'Create' : 'Creation'}
+              {view === 'create' ? 'Create' : 'Gallery'}
             </button>
           ))}
         </div>
