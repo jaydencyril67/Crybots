@@ -96,7 +96,6 @@ const ApiKeysPage = () => {
     .join(' · ') || 'No permissions';
 
   return <HybridTheme mode={themeMode}>
-    <Helmet><title>API Keys | KingsHall</title></Helmet>
     <main style={styles.page}>
       <div style={styles.shell}>
         <button type="button" onClick={() => navigate('/dev')} style={styles.back}><ArrowLeft size={17} /> Dev</button>
