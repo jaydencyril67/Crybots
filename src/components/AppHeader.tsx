@@ -298,7 +298,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       ['--notification-color' as string]: notificationColor,
     }
     : styles.header;
-  const headerTitle = voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'KingsHall Exchange';
+  const headerTitle = voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'CryBots';
   const headerSubtitle = voiceModeEnabled && voiceTranscript ? `“${voiceTranscript}”` : null;
   const artworkStyle = {
     ...styles.unreadArtwork,
