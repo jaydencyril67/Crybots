@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Copy, Globe, KeyRound, Plus, RefreshCw, Send, Webhook as WebhookIcon } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Copy, Globe, KeyRound, Plus, RefreshCw, Send, Webhook as WebhookIcon } from 'lucide-react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
@@ -35,6 +35,8 @@ const WebhooksPage = () => {
   const [editUrl, setEditUrl] = useState('');
   const [editEvents, setEditEvents] = useState<string[]>([]);
   const [testEvent, setTestEvent] = useState('account.updated');
+  const [isTestEventMenuOpen, setIsTestEventMenuOpen] = useState(false);
+  const testEventMenuRef = React.useRef<HTMLDivElement | null>(null);
 
   const styles: Record<string, React.CSSProperties> = {
     page: { minHeight: '100vh', overflowX: 'hidden', background: theme.background, color: theme.text, paddingBottom: '90px' },
@@ -63,6 +65,16 @@ const WebhooksPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (testEventMenuRef.current && !testEventMenuRef.current.contains(event.target as Node)) {
+        setIsTestEventMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   useEffect(() => { void load(); }, []);
 
@@ -309,12 +321,73 @@ const WebhooksPage = () => {
                           </div>
 
                           <div style={{ display: 'grid', gap: 8 }}>
-                            <label style={{ display: 'grid', gap: 6, fontWeight: 700 }}>
-                              Test event
-                              <select value={testEvent} onChange={(event) => setTestEvent(event.target.value)} style={styles.input}>
-                                {eventTypes.map((eventType) => <option key={eventType} value={eventType}>{eventType}</option>)}
-                              </select>
-                            </label>
+                            <div ref={testEventMenuRef} style={{ display: 'grid', gap: 6, position: 'relative', zIndex: isTestEventMenuOpen ? 100 : 1 }}>
+                              <span style={{ fontWeight: 700 }}>Test event</span>
+                              <button
+                                type="button"
+                                style={{
+                                  border: `1px solid ${theme.border}`,
+                                  background: theme.surfaceMuted,
+                                  color: theme.text,
+                                  borderRadius: 14,
+                                  padding: '10px 12px',
+                                  fontSize: '0.9rem',
+                                  width: '100%',
+                                  boxSizing: 'border-box',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  gap: 10,
+                                  cursor: 'pointer',
+                                }}
+                                onClick={() => setIsTestEventMenuOpen((current) => !current)}
+                              >
+                                <span>{testEvent}</span>
+                                <ChevronDown size={17} style={{ transform: isTestEventMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+                              </button>
+                              {isTestEventMenuOpen ? (
+                                <div style={{
+                                  position: 'absolute',
+                                  zIndex: 1000,
+                                  top: 'calc(100% + 6px)',
+                                  left: 0,
+                                  right: 0,
+                                  display: 'grid',
+                                  gap: 6,
+                                  padding: 8,
+                                  borderRadius: 16,
+                                  background: theme.surfaceMuted,
+                                  border: `1px solid ${theme.border}`,
+                                  maxHeight: 260,
+                                  overflowY: 'auto',
+                                  overscrollBehavior: 'contain',
+                                  boxShadow: '0 18px 40px rgba(0, 0, 0, 0.35)',
+                                }}>
+                                  {eventTypes.map((eventType) => (
+                                    <button
+                                      key={eventType}
+                                      type="button"
+                                      style={{
+                                        border: `1px solid ${theme.border}`,
+                                        background: testEvent === eventType ? theme.surfaceGlass : theme.surfaceGlass,
+                                        color: theme.text,
+                                        borderRadius: 12,
+                                        padding: '10px 12px',
+                                        width: '100%',
+                                        textAlign: 'left',
+                                        cursor: 'pointer',
+                                      }}
+                                      onClick={() => {
+                                        setTestEvent(eventType);
+                                        setIsTestEventMenuOpen(false);
+                                      }}
+                                    >
+                                      {eventType}
+                                    </button>
+                                  ))}
+                                </div>
+                              ) : null}
+                            </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
                               <button type="button" onClick={() => void test(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><Send size={15} /> Send test</button>
                               <button type="button" onClick={() => beginEdit(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Edit</button>
