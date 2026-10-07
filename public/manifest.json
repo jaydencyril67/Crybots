@@ -1,7 +1,7 @@
 {
-  "name": "KingsHall Exchange",
-  "short_name": "KingsHall",
-  "description": "KingsHall Exchange is a modern crypto exchange and investment app built for secure trading, fast transfers, and premium portfolio growth.",
+  "name": "CryBots",
+  "short_name": "CryBots",
+  "description": "CryBots is a crypto trading bot platform built for automated trading strategies and portfolio management.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
