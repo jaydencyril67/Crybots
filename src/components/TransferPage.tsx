@@ -227,7 +227,7 @@ const TransferPage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <div style={styles.page}>
-        <Helmet><title>Transfer | KingsHall Exchange</title></Helmet>
+        <Helmet><title>Transfer | CryBots</title></Helmet>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/asset')}><ArrowLeft size={17} /> Assets</button>
           <div style={styles.body}>
