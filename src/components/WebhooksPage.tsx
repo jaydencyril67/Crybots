@@ -431,24 +431,25 @@ const WebhooksPage = () => {
                               <button type="button" onClick={() => beginEdit(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Edit</button>
                               <button type="button" onClick={() => setRotateId(rotateId === webhook.id ? null : webhook.id)} disabled={rotatingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><RefreshCw size={15} /> Rotate</button>
                             </div>
-                            <button type="button" onClick={() => void toggleEnabled(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
-                              {webhook.enabled ? 'Disable webhook' : 'Enable webhook'}
-                            </button>
-
                             {deleteId === webhook.id ? (
                               <div style={{ display: 'grid', gap: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
                                 <p style={{ ...styles.note, color: theme.text }}>Delete this webhook permanently? Its delivery history will also be removed.</p>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
                                   <button type="button" onClick={() => setDeleteId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
                                   <button type="button" onClick={() => void remove(webhook.id)} disabled={deletingId === webhook.id} style={{ ...styles.button, borderRadius: 10, background: theme.danger }}>
-                                    {deletingId === webhook.id ? <InlineLoadingDots /> : 'Delete webhook'}
+                                    {deletingId === webhook.id ? <InlineLoadingDots /> : 'Delete'}
                                   </button>
                                 </div>
                               </div>
                             ) : (
-                              <button type="button" onClick={() => setDeleteId(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
-                                Delete webhook
-                              </button>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                                <button type="button" onClick={() => void toggleEnabled(webhook)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
+                                  {actionLoading === `toggle:${webhook.id}` ? <InlineLoadingDots /> : (webhook.enabled ? 'Disable' : 'Enable')}
+                                </button>
+                                <button type="button" onClick={() => setDeleteId(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
+                                  Delete
+                                </button>
+                              </div>
                             )}
                           </div>
                           {editingId === webhook.id && (
