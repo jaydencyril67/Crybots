@@ -43,7 +43,7 @@ const LegalPage = ({ title, eyebrow, summary, updated, sections }: LegalPageProp
 
   return (
     <HybridTheme>
-      <Helmet><title>{title} | KingsHall</title><meta name="description" content={summary} /></Helmet>
+      <Helmet><title>{title} | CryBots</title><meta name="description" content={summary} /></Helmet>
       <div style={styles.page}>
         <main style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/about')}><ArrowLeft size={16} aria-hidden="true" /> About</button>
@@ -56,7 +56,7 @@ const LegalPage = ({ title, eyebrow, summary, updated, sections }: LegalPageProp
           <div style={styles.layout}>
             {sections.map((section) => <section key={section.title} style={styles.section}><h2 style={styles.sectionTitle}>{section.title}</h2><div style={styles.body}>{section.content}</div></section>)}
           </div>
-          <div style={styles.note}><ShieldCheck size={19} color={theme.primary} aria-hidden="true" /><span>These pages explain KingsHall’s current practices in plain language. They do not replace any agreement, risk disclosure, or legal advice that may apply to your use of digital-asset services.</span></div>
+          <div style={styles.note}><ShieldCheck size={19} color={theme.primary} aria-hidden="true" /><span>These pages explain CryBots’s current practices in plain language. They do not replace any agreement, risk disclosure, or legal advice that may apply to your use of digital-asset services.</span></div>
         </main>
         <NowBar />
       </div>
