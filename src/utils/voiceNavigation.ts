@@ -5,8 +5,6 @@ export const VOICE_MODE_STORAGE_KEY = 'nowbar_voice_navigation_enabled';
 export const VOICE_MODE_CHANGED_EVENT = 'nowbar-voice-mode-changed';
 export const VOICE_STATUS_EVENT = 'nowbar-voice-status-changed';
 export const VOICE_OUTPUT_EVENT = 'nowbar-voice-output-changed';
-export const NOWBAR_COMMAND_EVENT = 'nowbar-voice-command';
-export const VOICE_NAVIGATION_EVENT = 'nowbar-voice-navigation';
 
 export const VOICE_DEBUG_EVENT = 'nowbar-voice-debug';
 const VOICE_DEBUG_STORAGE_KEY = 'crybots_voice_debug_logs';
@@ -53,7 +51,6 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'EDGE LIGHTING', route: '/nowbar-color' },
   { label: 'BUTTON COLOR', route: '/nowbar-button-color' },
   { label: 'NOWBAR', route: '/nowbar' },
-  { label: 'COMMANDS', route: '/voice-commands' },
   { label: 'NOWBAR COLOR', route: '/nowbar-color' },
   { label: 'NOWBAR BUTTON COLOR', route: '/nowbar-button-color' },
   { label: 'STATISTICS', route: '/statistics' },
@@ -220,41 +217,6 @@ export const disableVoiceMode = () => {
 
 export const normalizeVoiceText = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-const VOICE_PROMPTS = [
-  'Where would you like to navigate today?',
-  'What is your interest today?',
-  'What is on your mind today?',
-  'Which part of CryBots would you like to explore?',
-  'How may I help with your navigation journey today?',
-  'What would you like to discover next?',
-  'Which page may I open for you?',
-  'Where shall we go from here?',
-];
-
-const getVoiceIdentity = () => {
-  if (typeof window === 'undefined') return { name: 'there', title: '' };
-  try {
-    const user = JSON.parse(window.localStorage.getItem('user') || '{}') as { firstName?: string; gender?: string };
-    const name = window.localStorage.getItem('firstName')?.trim() || user.firstName?.trim() || 'there';
-    const gender = user.gender?.toLowerCase();
-    const title = gender === 'male' || gender === 'man' || gender === 'm'
-      ? 'Sir'
-      : gender === 'female' || gender === 'woman' || gender === 'f' ? 'Mrs' : '';
-    return { name, title };
-  } catch {
-    return { name: 'there', title: '' };
-  }
-};
-
-const getTimeGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 18) return 'Good afternoon';
-  return 'Good evening';
-};
-
-export const isVoiceWakeWord = (transcript: string) => /^(?:hi|hello|hey)$/i.test(normalizeVoiceText(transcript));
-
 const FEMALE_VOICE_PATTERN = /(^|[\\s_-])(female|samantha|zira|jenny|aria|ava|emma|susan|karen|victoria|sara|sarah|google us english)([\\s_-]|$)/i;
 const ENGLISH_VOICE_PATTERN = /^(en|en[-_])/i;
 
@@ -281,42 +243,6 @@ const getPreferredFemaleNativeVoice = async (plugin: CapacitorPlugin) => {
   } catch {
     return undefined;
   }
-};
-
-export const speakVoiceGreeting = () => {
-  const nativeTextToSpeech = getCapacitorPlugin('TextToSpeech');
-  const { name, title } = getVoiceIdentity();
-  const address = title ? `${name}, ${title}` : name;
-  const lastPrompt = typeof window !== 'undefined' ? window.sessionStorage.getItem('kingshall_voice_prompt') : null;
-  const availablePrompts = VOICE_PROMPTS.filter((prompt) => prompt !== lastPrompt);
-  const prompt = availablePrompts[Math.floor(Math.random() * availablePrompts.length)];
-  const message = `${getTimeGreeting()} ${address}. ${prompt} If you need help, kindly say Command and I will display the full page menu for you.`;
-
-  if (nativeTextToSpeech?.speak) {
-    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-    void getPreferredFemaleNativeVoice(nativeTextToSpeech).then((voice) =>
-      nativeTextToSpeech.speak({ text: message, lang: 'en-US', rate: 0.98, pitch: 1.08, volume: 1, ...(voice !== undefined ? { voice } : {}) }),
-    )
-      .catch(() => undefined)
-      .finally(() => {
-        if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
-      });
-    return;
-  }
-
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-  const utterance = new SpeechSynthesisUtterance(message);
-  const preferredFemaleVoice = getPreferredFemaleWebVoice(window.speechSynthesis.getVoices());
-  if (preferredFemaleVoice) utterance.voice = preferredFemaleVoice;
-  utterance.pitch = 1.08;
-  utterance.rate = 0.98;
-  const finish = () => window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
-  window.speechSynthesis.cancel();
-  window.sessionStorage.setItem('kingshall_voice_prompt', prompt);
-  window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-  utterance.onend = finish;
-  utterance.onerror = finish;
-  window.speechSynthesis.speak(utterance);
 };
 
 export const isVoiceOutputActive = () => typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking;
@@ -409,71 +335,3 @@ export const askVoiceAssistant = async (message: string) => {
 };
 
 
-type NowBarCommand = 'expand' | 'collapse' | 'left' | 'right';
-
-const dispatchNowBarCommand = (command: NowBarCommand) => {
-  window.dispatchEvent(new CustomEvent(NOWBAR_COMMAND_EVENT, { detail: { command } }));
-};
-
-// A recognition session can deliver the same final result more than once while it
-// restarts. Keep one utterance from moving back multiple history entries.
-const BACK_COMMAND_DEBOUNCE_MS = 1000;
-let lastBackCommandAt = 0;
-
-export const navigateFromVoice = (transcript: string) => {
-  const normalized = normalizeVoiceText(transcript);
-  if (isVoiceWakeWord(transcript)) {
-    speakVoiceGreeting();
-    return true;
-  }
-  const normalizedTranscript = ` ${normalized} `;
-
-  if (normalizedTranscript.includes(' off ') || normalizedTranscript.includes(' of ')) {
-    window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
-    window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
-    return true;
-  }
-  if (/(^|\s)(go\s+)?back(\s|$)/.test(normalized) || normalizedTranscript.includes(' previous page ')) {
-    const now = Date.now();
-    if (now - lastBackCommandAt < BACK_COMMAND_DEBOUNCE_MS) return true;
-    lastBackCommandAt = now;
-    window.history.back();
-    return true;
-  }
-  if (normalizedTranscript.includes(' up ') || normalizedTranscript.includes(' scroll up ')) {
-    window.scrollBy({ top: -Math.round(window.innerHeight * 0.8), behavior: 'smooth' });
-    return true;
-  }
-  if (normalizedTranscript.includes(' down ') || normalizedTranscript.includes(' scroll down ')) {
-    window.scrollBy({ top: Math.round(window.innerHeight * 0.8), behavior: 'smooth' });
-    return true;
-  }
-  const nowBarCommand = (['expand', 'collapse', 'left', 'right'] as NowBarCommand[]).find((command) =>
-    normalizedTranscript.includes(` ${command} `),
-  );
-  if (nowBarCommand) {
-    dispatchNowBarCommand(nowBarCommand);
-    return true;
-  }
-  const commandsBySpecificity = [...VOICE_COMMANDS, ...AUTHENTICATED_NOWBAR_PAGE_ROUTES]
-    .map((command) => ({
-      ...command,
-      normalizedLabel: normalizeVoiceText(command.label),
-    }))
-    .sort((first, second) => second.normalizedLabel.length - first.normalizedLabel.length);
-  const directNavigation = /^(?:open|go to|goto|show|take me to|navigate to|launch)\s+/.test(normalized);
-  const directCommand = /^(?:open|go to|goto|show|take me to|navigate to|launch)\s+/.test(normalized)
-    ? normalized.replace(/^(?:open|go to|goto|show|take me to|navigate to|launch)\s+/, '').trim()
-    : normalized;
-
-  const command = directNavigation
-    ? commandsBySpecificity.find(({ normalizedLabel }) =>
-        directCommand === normalizedLabel || directCommand.includes(` ${normalizedLabel} `),
-      )
-    : null;
-
-  if (!command) return false;
-  window.dispatchEvent(new CustomEvent(VOICE_NAVIGATION_EVENT, { detail: { label: command.label, route: command.route } }));
-  navigate(command.route);
-  return true;
-};
