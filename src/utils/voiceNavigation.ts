@@ -379,6 +379,16 @@ export const askVoiceAssistant = async (message: string) => {
       navigate(body.action.route);
     }
 
+    if (body.action?.type === 'back') {
+      logVoiceDebug('info', 'Assistant action: browser back');
+      window.history.back();
+    }
+
+    if (body.action?.type === 'forward') {
+      logVoiceDebug('info', 'Assistant action: browser forward');
+      window.history.forward();
+    }
+
     if (body.action?.type === 'click') {
       logVoiceDebug('info', `Assistant action: click ${body.action.target || ''}`);
       executeVoiceUiAction(body.action);
@@ -388,8 +398,16 @@ export const askVoiceAssistant = async (message: string) => {
       const direction = body.action.direction === 'up' || body.action.direction === 'left' ? -1 : 1;
       const amount = Math.max(100, Math.min(Number(body.action.amount) || 500, 1200));
       if (body.action.type === 'scroll_page') {
-        window.scrollBy({ top: direction * amount, behavior: 'smooth' });
-        logVoiceDebug('info', `Brain scrolled page ${direction < 0 ? 'up' : 'down'} ${amount}px`);
+        if (body.action.position === 'top') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          logVoiceDebug('info', 'Brain scrolled page to top');
+        } else if (body.action.position === 'bottom') {
+          window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+          logVoiceDebug('info', 'Brain scrolled page to bottom');
+        } else {
+          window.scrollBy({ top: direction * amount, behavior: 'smooth' });
+          logVoiceDebug('info', `Brain scrolled page ${direction < 0 ? 'up' : 'down'} ${amount}px`);
+        }
       } else {
         window.dispatchEvent(new CustomEvent('crybots-voice-nowbar-scroll', {
           detail: { direction: body.action.direction === 'left' ? -1 : 1, amount },
