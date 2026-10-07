@@ -173,7 +173,7 @@ export const requestVoiceMicrophoneAccess = async () => {
   }
 };
 
-export const disableVoiceMode = () => {
+let voiceConversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];\n\nexport const disableVoiceMode = () => {
   if (typeof window === 'undefined' || !getVoiceModeEnabled()) return;
   window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
   window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
