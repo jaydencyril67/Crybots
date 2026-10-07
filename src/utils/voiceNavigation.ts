@@ -213,7 +213,7 @@ const getTimeGreeting = () => {
   return 'Good evening';
 };
 
-export const isVoiceWakeWord = (transcript: string) => /(^|\s)kings?(?=\s|$)/i.test(transcript.trim());
+export const isVoiceWakeWord = (transcript: string) => /^(?:hi|hello|hey)$/i.test(normalizeVoiceText(transcript));
 
 const getPreferredMasculineVoice = (voices: SpeechSynthesisVoice[]) => {
   const masculineVoicePattern = /(^|[\s_-])(alex|daniel|david|fred|george|james|mark|michael|oliver|thomas)([\s_-]|$)/i;
