@@ -394,9 +394,16 @@ export const navigateFromVoice = (transcript: string) => {
       normalizedLabel: normalizeVoiceText(command.label),
     }))
     .sort((first, second) => second.normalizedLabel.length - first.normalizedLabel.length);
-  const command = commandsBySpecificity.find(({ normalizedLabel }) =>
-    normalizedTranscript.includes(` ${normalizedLabel} `),
-  );
+  const directNavigation = /^(?:open|go to|goto|show|take me to|navigate to|launch)\s+/.test(normalized);
+  const directCommand = /^(?:open|go to|goto|show|take me to|navigate to|launch)\s+/.test(normalized)
+    ? normalized.replace(/^(?:open|go to|goto|show|take me to|navigate to|launch)\s+/, '').trim()
+    : normalized;
+
+  const command = directNavigation
+    ? commandsBySpecificity.find(({ normalizedLabel }) =>
+        directCommand === normalizedLabel || directCommand.includes(` ${normalizedLabel} `),
+      )
+    : null;
 
   if (!command) return false;
   window.dispatchEvent(new CustomEvent(VOICE_NAVIGATION_EVENT, { detail: { label: command.label, route: command.route } }));
