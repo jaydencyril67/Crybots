@@ -326,17 +326,13 @@ const VoiceNavigation = () => {
             if (message.is_final && message.speech_final && transcript !== lastFinalTranscript) {
               lastFinalTranscript = transcript;
               logVoiceDebug('info', `Processing final transcript: ${transcript}`);
-              const navigated = navigateFromVoice(transcript);
-              logVoiceDebug('info', `Direct navigation handled: ${navigated}`);
-              if (!navigated) {
-                logVoiceDebug('info', 'Sending transcript to /api/voice/assistant');
-                void askVoiceAssistant(transcript).catch((error) => {
-                  const message = error instanceof Error ? error.message : 'I could not process that request right now.';
-                  logVoiceDebug('error', `Assistant request failed: ${message}`);
-                  setStatus(false, message);
-                  speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');
-                });
-              }
+              logVoiceDebug('info', 'Sending transcript to /api/voice/assistant');
+              void askVoiceAssistant(transcript).catch((error) => {
+                const message = error instanceof Error ? error.message : 'I could not process that request right now.';
+                logVoiceDebug('error', `Assistant request failed: ${message}`);
+                setStatus(false, message);
+                speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');
+              });
             }
           } catch (error) {
           }
