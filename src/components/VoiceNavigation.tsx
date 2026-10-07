@@ -36,6 +36,7 @@ const VoiceNavigation = () => {
     let starting = false;
     let reconnectTimer: number | null = null;
     let lastFinalTranscript = '';
+    let keepAliveTimer: number | null = null;
 
     const setStatus = (listening: boolean, transcript = '') => {
       window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening, transcript } }));
@@ -64,6 +65,10 @@ const VoiceNavigation = () => {
         } catch {}
       }
       socket = null;
+      if (keepAliveTimer !== null) {
+        window.clearInterval(keepAliveTimer);
+        keepAliveTimer = null;
+      }
     };
 
     const cleanup = () => {
@@ -136,7 +141,7 @@ const VoiceNavigation = () => {
           params.append('keyterm', term);
         });
 
-        socket = new WebSocket(`wss://api.deepgram.com/v1/listen?${params.toString()}`, ['token', token]);
+        socket = new WebSocket(`wss://api.deepgram.com/v1/listen?${params.toString()}`, ['bearer', token]);
 
         socket.onopen = () => {
           if (!socket || !stream || !enabled || stopped || voiceOutputActive || isVoiceOutputActive()) {
@@ -162,6 +167,11 @@ const VoiceNavigation = () => {
 
           recorder.start(250);
           setStatus(true);
+          keepAliveTimer = window.setInterval(() => {
+            if (socket?.readyState === WebSocket.OPEN) {
+              try { socket.send(JSON.stringify({ type: 'KeepAlive' })); } catch {}
+            }
+          }, 8000);
         };
 
         socket.onmessage = (event) => {
@@ -169,6 +179,11 @@ const VoiceNavigation = () => {
             const message = JSON.parse(event.data) as DeepgramResult;
             if (message.type === 'Error') {
               console.error('[voice/deepgram]', message.description || 'Deepgram error');
+              setStatus(false, message.description || 'Voice service error');
+              return;
+            }
+            if (message.type === 'SpeechStarted') {
+              setStatus(true);
               return;
             }
 
