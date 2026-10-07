@@ -301,7 +301,7 @@ export const speakVoiceResponse = (message: string) => {
       }
       return response.blob();
     })
-    .then((blob) => {
+    .then(async (blob) => {
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       audioState.__crybotsVoiceAudio = audio;
