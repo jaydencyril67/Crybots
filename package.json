@@ -40,7 +40,8 @@
     "sitemap": "^8.0.0",
     "react-helmet-async": "^1.3.0",
     "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "@capacitor/core": "7.6.9"
   },
   "devDependencies": {
     "@types/node": "^24.0.3",
