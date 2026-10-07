@@ -389,7 +389,7 @@ const WebhooksPage = () => {
                               ) : null}
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-                              <button type="button" onClick={() => void test(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><Send size={15} /> Send test</button>
+                              <button type="button" onClick={() => void test(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><Send size={15} /> Test</button>
                               <button type="button" onClick={() => beginEdit(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Edit</button>
                               <button type="button" onClick={() => setRotateId(rotateId === webhook.id ? null : webhook.id)} disabled={rotatingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><RefreshCw size={15} /> Rotate</button>
                             </div>
