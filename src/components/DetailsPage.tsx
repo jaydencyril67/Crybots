@@ -120,7 +120,7 @@ const DetailsPage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <>
-        <Helmet><title>KingsHall Exchange | Details</title></Helmet>
+        <Helmet><title>CryBots | Details</title></Helmet>
         {avatarCropSource ? <ProfileImageCropModal imageUrl={avatarCropSource} onCancel={handleAvatarCropCancel} onDone={async (file) => { URL.revokeObjectURL(avatarCropSource); await handleAvatarCropDone(file); }} /> : null}
         <main style={styles.page}>
           <div style={styles.shell}>
