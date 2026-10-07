@@ -148,15 +148,63 @@ const getButtonLabel = (button: HTMLButtonElement) =>
   );
 
 const getButtonContext = (button: HTMLButtonElement) => {
-  const row = button.closest('[role="row"], li, tr, section, article, div');
-  if (!row) return '';
+  const buttonLabel = getButtonLabel(button);
+  const candidates: string[] = [];
 
-  const texts = Array.from(row.querySelectorAll<HTMLElement>('p, h1, h2, h3, h4, h5, label, span'))
-    .map((element) => normalizeButtonLabel(element.innerText || element.textContent || ''))
-    .filter(Boolean)
-    .filter((text) => text !== getButtonLabel(button));
+  const addCandidate = (value: string | null | undefined) => {
+    const text = normalizeButtonLabel(value || '');
+    if (!text || text === buttonLabel || text.length > 120) return;
+    if (!candidates.includes(text)) candidates.push(text);
+  };
 
-  return texts.slice(0, 2).join(' — ');
+  // Prefer semantic metadata when a page already provides it.
+  addCandidate(button.getAttribute('data-label'));
+  addCandidate(button.getAttribute('data-name'));
+  addCandidate(button.getAttribute('data-section'));
+  addCandidate(button.getAttribute('data-title'));
+
+  // Walk up through meaningful containers so repeated labels inherit the
+  // card, setting, row, or section they actually belong to.
+  let container: HTMLElement | null = button.parentElement;
+  let depth = 0;
+  while (container && depth < 5) {
+    const heading = container.querySelector<HTMLElement>(
+      ':scope > h1, :scope > h2, :scope > h3, :scope > h4, :scope > h5, :scope > h6, :scope > legend, :scope > [role="heading"]',
+    );
+    if (heading) addCandidate(heading.innerText || heading.textContent);
+
+    const labelledBy = container.getAttribute('aria-labelledby');
+    if (labelledBy) {
+      labelledBy.split(/\\s+/).forEach((id) => addCandidate(document.getElementById(id)?.innerText));
+    }
+
+    const label = container.querySelector<HTMLElement>(':scope > label');
+    if (label) addCandidate(label.innerText || label.textContent);
+
+    const descriptive = container.querySelector<HTMLElement>(
+      ':scope > p, :scope > small, :scope > [data-description], :scope > [role="note"]',
+    );
+    if (descriptive) addCandidate(descriptive.innerText || descriptive.textContent);
+
+    const siblings = Array.from(container.children)
+      .filter((child) => child !== button && !(child as HTMLElement).querySelector('button'))
+      .map((child) => (child as HTMLElement).innerText || child.textContent || '')
+      .flatMap((text) => text.split(/\\n+/))
+      .map((text) => normalizeButtonLabel(text))
+      .filter((text) => text && text !== buttonLabel && text.length <= 100);
+    siblings.slice(0, 2).forEach(addCandidate);
+
+    container = container.parentElement;
+    depth += 1;
+  }
+
+  // Page-level heading is a final fallback for otherwise unlabelled controls.
+  const pageHeading = document.querySelector<HTMLElement>(
+    'main h1, main h2, [role="main"] h1, [role="main"] h2, body > h1, body > h2',
+  );
+  if (pageHeading) addCandidate(pageHeading.innerText || pageHeading.textContent);
+
+  return candidates.slice(0, 3).join(' — ');
 };
 
 const isVisibleButton = (button: HTMLButtonElement) => {
