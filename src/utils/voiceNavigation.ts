@@ -1,4 +1,5 @@
 import { navigate } from './navigate';
+import { prepareMediaOutput, releaseMediaOutput } from './mediaAudio';
 import { API_BASE_URL, authHeaders } from '../api/axios';
 
 export const VOICE_MODE_STORAGE_KEY = 'nowbar_voice_navigation_enabled';
