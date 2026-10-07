@@ -38,6 +38,7 @@ const WebhooksPage = () => {
   const [editEvents, setEditEvents] = useState<string[]>([]);
   const [testEvent, setTestEvent] = useState('account.updated');
   const [isTestEventMenuOpen, setIsTestEventMenuOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState('');
   const testEventMenuRef = React.useRef<HTMLDivElement | null>(null);
 
   const styles: Record<string, React.CSSProperties> = {
@@ -111,6 +112,7 @@ const WebhooksPage = () => {
   };
 
   const test = async (id: string) => {
+    setActionLoading(`test:${id}`);
     setError('');
     try {
       await api.post(`/api/developer/webhooks/${id}/test`, { eventType: testEvent });
@@ -119,10 +121,13 @@ const WebhooksPage = () => {
       setExpandedId(id);
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to send test delivery.');
+    } finally {
+      setActionLoading('');
     }
   };
 
   const retry = async (id: string, deliveryId: string) => {
+    setActionLoading(`retry:${deliveryId}`);
     setError('');
     try {
       await api.post(`/api/developer/webhooks/${id}/deliveries/${deliveryId}/retry`);
@@ -130,6 +135,8 @@ const WebhooksPage = () => {
       await loadDeliveries(id);
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to retry delivery.');
+    } finally {
+      setActionLoading('');
     }
   };
 
@@ -149,6 +156,7 @@ const WebhooksPage = () => {
   };
 
   const toggleEnabled = async (webhook: Webhook) => {
+    setActionLoading(`toggle:${webhook.id}`);
     setError('');
     try {
       const response = await api.patch<{ webhook: Webhook }>(`/api/developer/webhooks/${webhook.id}`, { enabled: !webhook.enabled });
@@ -156,6 +164,8 @@ const WebhooksPage = () => {
       setMessage(response.data.webhook.enabled ? 'Webhook enabled.' : 'Webhook disabled.');
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to change webhook status.');
+    } finally {
+      setActionLoading('');
     }
   };
 
@@ -412,7 +422,7 @@ const WebhooksPage = () => {
                               ) : null}
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-                              <button type="button" onClick={() => void test(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><Send size={15} /> Test</button>
+                              <button type="button" onClick={() => void test(webhook.id)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>{actionLoading === `test:${webhook.id}` ? <InlineLoadingDots /> : <><Send size={15} /> Test</>}</button>
                               <button type="button" onClick={() => beginEdit(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Edit</button>
                               <button type="button" onClick={() => setRotateId(rotateId === webhook.id ? null : webhook.id)} disabled={rotatingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><RefreshCw size={15} /> Rotate</button>
                             </div>
@@ -478,7 +488,7 @@ const WebhooksPage = () => {
                                     <p style={{ ...styles.note, overflowWrap: 'anywhere' }}>{delivery.eventId}</p>
                                     <p style={styles.note}>{delivery.status} · {delivery.attempts} attempts{delivery.responseStatus ? ` · HTTP ${delivery.responseStatus}` : ''}{delivery.responseTimeMs ? ` · ${delivery.responseTimeMs}ms` : ''}</p>
                                     {delivery.lastError && <p style={{ ...styles.note, color: theme.danger }}>{delivery.lastError}</p>}
-                                    {delivery.status === 'failed' && <button type="button" onClick={() => void retry(webhook.id, delivery._id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Retry delivery</button>}
+                                    {delivery.status === 'failed' && <button type="button" onClick={() => void retry(webhook.id, delivery._id)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>{actionLoading === `retry:${delivery._id}` ? <InlineLoadingDots /> : 'Retry delivery'}</button>}
                                   </div>
                                 ))}
                               </div>
