@@ -1,12 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2732" height="2732" viewBox="0 0 2732 2732" fill="none">
   <rect width="2732" height="2732" fill="#050816"/>
-  <g transform="translate(866 866) scale(1.953125)">
-    <ellipse cx="256" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
-    <ellipse cx="256" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="5.5" transform="translate(-27 0)"/>
-    <ellipse cx="256" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5" transform="translate(27 0)"/>
-    <ellipse cx="256" cy="256" rx="177" ry="43" stroke="#fff" stroke-width="5.5" transform="translate(0 -26)"/>
+
+  <!-- CryBots launch mark, positioned to match the PWA splash on a 20:9 phone. -->
+  <g transform="translate(1176 1038) scale(0.7421875)">
+    <rect x="32" y="32" width="448" height="448" rx="92" fill="#000"/>
+    <rect x="32.75" y="32.75" width="446.5" height="446.5" rx="91.25" fill="none" stroke="#151515" stroke-width="1.5"/>
+    <ellipse cx="229" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
+    <ellipse cx="256" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="5.5"/>
+    <ellipse cx="283" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
+    <ellipse cx="256" cy="230" rx="177" ry="43" stroke="#fff" stroke-width="5.5"/>
     <ellipse cx="256" cy="256" rx="177" ry="43" stroke="#fff" stroke-width="4.5"/>
-    <ellipse cx="256" cy="256" rx="177" ry="43" stroke="#fff" stroke-width="4.5" transform="translate(0 26)"/>
+    <ellipse cx="256" cy="282" rx="177" ry="43" stroke="#fff" stroke-width="4.5"/>
     <circle cx="256" cy="256" r="24" fill="#fff"/>
   </g>
+
+  <text x="1366" y="2330"
+        text-anchor="middle"
+        fill="#fff"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="58"
+        font-weight="700">CryBots</text>
 </svg>
