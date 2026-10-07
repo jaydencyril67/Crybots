@@ -10,23 +10,24 @@ const KHLogo = ({ size = 32, label = 'CryBots' }: KHLogoProps) => {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 100 100"
+      viewBox="0 0 512 512"
       role="img"
       aria-label={label}
-      style={{ display: 'block', flexShrink: 0, overflow: 'visible' }}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ display: 'block', width: size, height: size, flexShrink: 0 }}
     >
-      <rect x="5" y="5" width="90" height="90" rx="17" fill="#000" />
-      <rect x="5.5" y="5.5" width="89" height="89" rx="16.5" fill="none" stroke="#151515" strokeWidth="1" />
+      <rect x="32" y="32" width="448" height="448" rx="92" fill="#000" />
+      <rect x="32.75" y="32.75" width="446.5" height="446.5" rx="91.25" fill="none" stroke="#151515" strokeWidth="1.5" />
 
-      <ellipse cx="44.7" cy="50" rx="8.2" ry="34.6" fill="none" stroke="#fff" strokeWidth="1.15" />
-      <ellipse cx="50" cy="50" rx="8.2" ry="34.6" fill="none" stroke="#fff" strokeWidth="1.35" />
-      <ellipse cx="55.3" cy="50" rx="8.2" ry="34.6" fill="none" stroke="#fff" strokeWidth="1.15" />
+      <ellipse cx="229" cy="256" rx="42" ry="177" fill="none" stroke="#fff" strokeWidth="4.5" />
+      <ellipse cx="256" cy="256" rx="42" ry="177" fill="none" stroke="#fff" strokeWidth="5.5" />
+      <ellipse cx="283" cy="256" rx="42" ry="177" fill="none" stroke="#fff" strokeWidth="4.5" />
 
-      <ellipse cx="50" cy="44.7" rx="34.6" ry="8.2" fill="none" stroke="#fff" strokeWidth="1.35" />
-      <ellipse cx="50" cy="50" rx="34.6" ry="8.2" fill="none" stroke="#fff" strokeWidth="1.15" />
-      <ellipse cx="50" cy="55.3" rx="34.6" ry="8.2" fill="none" stroke="#fff" strokeWidth="1.15" />
+      <ellipse cx="256" cy="230" rx="177" ry="43" fill="none" stroke="#fff" strokeWidth="5.5" />
+      <ellipse cx="256" cy="256" rx="177" ry="43" fill="none" stroke="#fff" strokeWidth="4.5" />
+      <ellipse cx="256" cy="282" rx="177" ry="43" fill="none" stroke="#fff" strokeWidth="4.5" />
 
-      <circle cx="50" cy="50" r="4.7" fill="#fff" />
+      <circle cx="256" cy="256" r="24" fill="#fff" />
     </svg>
   );
 };
