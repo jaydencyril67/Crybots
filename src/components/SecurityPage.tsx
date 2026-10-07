@@ -787,7 +787,7 @@ const SecurityPage = () => {
       <div style={styles.page}>
         <div style={styles.shell}>
           <Helmet>
-            <title>KingsHall Exchange | Security</title>
+            <title>CryBots | Security</title>
           </Helmet>
           
           <div style={styles.content}>
