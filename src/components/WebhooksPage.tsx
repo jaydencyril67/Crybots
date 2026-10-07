@@ -54,7 +54,7 @@ const WebhooksPage = () => {
     value: { margin: 0, color: theme.text, fontSize: '0.94rem', fontWeight: 800, lineHeight: 1.5, wordBreak: 'break-word', overflowWrap: 'anywhere' },
     note: { margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.4 },
     input: { width: '100%', boxSizing: 'border-box', borderRadius: 12, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem', font: 'inherit' },
-    button: { height: 30, border: 'none', borderRadius: 999, padding: '0 12px', fontWeight: 700, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, fontSize: '0.88rem', font: 'inherit' },
+    button: { border: 'none', borderRadius: 999, padding: '9px 13px', fontWeight: 800, cursor: 'pointer', width: '100%', minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: theme.primary, color: theme.textInverse, font: 'inherit' },
     mutedButton: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text },
   };
 
@@ -289,8 +289,8 @@ const WebhooksPage = () => {
                     </div>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                    <button type="button" onClick={() => setShowCreate(false)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
-                    <button disabled={saving || !events.length} style={{ ...styles.button, borderRadius: 10 }}>{saving ? <InlineLoadingDots /> : 'Create webhook'}</button>
+                    <button type="button" onClick={() => setShowCreate(false)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
+                    <button disabled={saving || !events.length} style={{ ...styles.button }}>{saving ? <InlineLoadingDots /> : 'Create webhook'}</button>
                   </div>
                 </form>
               )}
@@ -303,8 +303,8 @@ const WebhooksPage = () => {
                   <p style={styles.note}>Copy this secret now. It will not be shown again.</p>
                   <code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                    <button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button, borderRadius: 10 }}>{copyingSecret ? <InlineLoadingDots /> : <><Copy size={15} /> Copy</>}</button>
-                    <button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Dismiss</button>
+                    <button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button }}>{copyingSecret ? <InlineLoadingDots /> : <><Copy size={15} /> Copy</>}</button>
+                    <button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton }}>Dismiss</button>
                   </div>
                 </div>
               </div>
@@ -334,7 +334,7 @@ const WebhooksPage = () => {
                           const next = expandedId === webhook.id ? '' : webhook.id;
                           setExpandedId(next);
                           if (next && !deliveries[webhook.id]) void loadDeliveries(webhook.id);
-                        }} style={{ height: 30, flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '0 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
+                        }} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceGlass, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
                           {expandedId === webhook.id ? 'Hide' : loadingDeliveryId === webhook.id ? <InlineLoadingDots /> : 'View'}
                         </button>
                       </div>
@@ -427,15 +427,15 @@ const WebhooksPage = () => {
                               ) : null}
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-                              <button type="button" onClick={() => void test(webhook.id)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>{actionLoading === `test:${webhook.id}` ? <InlineLoadingDots /> : <><Send size={15} /> Test</>}</button>
-                              <button type="button" onClick={() => beginEdit(webhook)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Edit</button>
-                              <button type="button" onClick={() => setRotateId(rotateId === webhook.id ? null : webhook.id)} disabled={rotatingId !== null} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}><RefreshCw size={15} /> Rotate</button>
+                              <button type="button" onClick={() => void test(webhook.id)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton }}>{actionLoading === `test:${webhook.id}` ? <InlineLoadingDots /> : <><Send size={15} /> Test</>}</button>
+                              <button type="button" onClick={() => beginEdit(webhook)} style={{ ...styles.button, ...styles.mutedButton }}>Edit</button>
+                              <button type="button" onClick={() => setRotateId(rotateId === webhook.id ? null : webhook.id)} disabled={rotatingId !== null} style={{ ...styles.button, ...styles.mutedButton }}><RefreshCw size={15} /> Rotate</button>
                             </div>
                             {deleteId === webhook.id ? (
                               <div style={{ display: 'grid', gap: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
                                 <p style={{ ...styles.note, color: theme.text }}>Delete this webhook permanently? Its delivery history will also be removed.</p>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                                  <button type="button" onClick={() => setDeleteId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
+                                  <button type="button" onClick={() => setDeleteId(null)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
                                   <button type="button" onClick={() => void remove(webhook.id)} disabled={deletingId === webhook.id} style={{ ...styles.button, borderRadius: 10, background: theme.danger }}>
                                     {deletingId === webhook.id ? <InlineLoadingDots /> : 'Delete'}
                                   </button>
@@ -443,10 +443,10 @@ const WebhooksPage = () => {
                               </div>
                             ) : (
                               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                                <button type="button" onClick={() => void toggleEnabled(webhook)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
+                                <button type="button" onClick={() => void toggleEnabled(webhook)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton }}>
                                   {actionLoading === `toggle:${webhook.id}` ? <InlineLoadingDots /> : (webhook.enabled ? 'Disable' : 'Enable')}
                                 </button>
-                                <button type="button" onClick={() => setDeleteId(webhook.id)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>
+                                <button type="button" onClick={() => setDeleteId(webhook.id)} style={{ ...styles.button, ...styles.mutedButton }}>
                                   Delete
                                 </button>
                               </div>
@@ -466,8 +466,8 @@ const WebhooksPage = () => {
                                 ))}
                               </div>
                               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                                <button type="button" onClick={() => setEditingId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
-                                <button type="button" disabled={saving || !editName.trim() || !editUrl.trim() || !editEvents.length} onClick={() => void update(webhook.id)} style={{ ...styles.button, borderRadius: 10 }}>{saving ? <InlineLoadingDots /> : 'Save changes'}</button>
+                                <button type="button" onClick={() => setEditingId(null)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
+                                <button type="button" disabled={saving || !editName.trim() || !editUrl.trim() || !editEvents.length} onClick={() => void update(webhook.id)} style={{ ...styles.button }}>{saving ? <InlineLoadingDots /> : 'Save changes'}</button>
                               </div>
                             </div>
                           )}
@@ -476,8 +476,8 @@ const WebhooksPage = () => {
                             <div style={{ display: 'grid', gap: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass }}>
                               <p style={styles.note}>Rotating invalidates the previous secret. Your external application must be updated with the new secret.</p>
                               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-                                <button type="button" onClick={() => setRotateId(null)} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
-                                <button type="button" onClick={() => { setRotateId(null); void rotate(webhook.id); }} disabled={rotatingId === webhook.id} style={{ ...styles.button, borderRadius: 10 }}>
+                                <button type="button" onClick={() => setRotateId(null)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
+                                <button type="button" onClick={() => { setRotateId(null); void rotate(webhook.id); }} disabled={rotatingId === webhook.id} style={{ ...styles.button }}>
                                   {rotatingId === webhook.id ? <InlineLoadingDots /> : 'Confirm rotate'}
                                 </button>
                               </div>
@@ -494,7 +494,7 @@ const WebhooksPage = () => {
                                     <p style={{ ...styles.note, overflowWrap: 'anywhere' }}>{delivery.eventId}</p>
                                     <p style={styles.note}>{delivery.status} · {delivery.attempts} attempts{delivery.responseStatus ? ` · HTTP ${delivery.responseStatus}` : ''}{delivery.responseTimeMs ? ` · ${delivery.responseTimeMs}ms` : ''}</p>
                                     {delivery.lastError && <p style={{ ...styles.note, color: theme.danger }}>{delivery.lastError}</p>}
-                                    {delivery.status === 'failed' && <button type="button" onClick={() => void retry(webhook.id, delivery._id)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>{actionLoading === `retry:${delivery._id}` ? <InlineLoadingDots /> : 'Retry delivery'}</button>}
+                                    {delivery.status === 'failed' && <button type="button" onClick={() => void retry(webhook.id, delivery._id)} disabled={actionLoading !== ''} style={{ ...styles.button, ...styles.mutedButton }}>{actionLoading === `retry:${delivery._id}` ? <InlineLoadingDots /> : 'Retry delivery'}</button>}
                                   </div>
                                 ))}
                               </div>
