@@ -32,7 +32,6 @@ import ThemePage from './components/ThemePage';
 import NowBarPage from './components/NowBarPage';
 import VoiceCommandsPage from './components/VoiceCommandsPage';
 import VoiceNavigation from './components/VoiceNavigation';
-import VoiceDebugPanel from './components/VoiceDebugPanel';
 import { disableVoiceMode } from './utils/voiceNavigation';
 import NowBarColorPage from './components/NowBarColorPage';
 import NowBarButtonColorPage from './components/NowBarButtonColorPage';
@@ -647,7 +646,6 @@ root.render(
       <AppThemeProvider>
         <InitialSplashCleanup />
         <VoiceNavigation />
-        <VoiceDebugPanel />
         <RouteTransition />
       </AppThemeProvider>
     </HelmetProvider>
