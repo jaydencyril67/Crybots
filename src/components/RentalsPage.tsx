@@ -67,15 +67,23 @@ const RentalsPage = () => {
   const buttonStyle: React.CSSProperties = { border: 0, borderRadius: 999, padding: '9px 13px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer', font: 'inherit' };
 
   useEffect(() => {
-    if (!/^\d{6}$/.test(listingBotId.trim()) || !listingDuration || !Number.isInteger(Number(listingDuration)) || Number(listingDuration) < 1) {
+    if (!/^\d{6}$/.test(listingBotId.trim())) {
       setListingPricing(null);
       return;
     }
     let active = true;
-    setListingPricingLoading(true);
-    api.get('/api/rentals/pricing', { params: { botId: listingBotId.trim(), duration: Number(listingDuration), unit: listingDurationUnit } })
-      .then((response) => { if (active) setListingPricing(response.data || null); })
-      .catch(() => { if (active) setListingPricing(null); })
+    api.get('/api/market/check-owned-id', { params: { botId: listingBotId.trim() } })
+      .then(() => {
+        if (!active || !listingDuration || !Number.isInteger(Number(listingDuration)) || Number(listingDuration) < 1) return;
+        setListingPricingLoading(true);
+        return api.get('/api/rentals/pricing', { params: { botId: listingBotId.trim(), duration: Number(listingDuration), unit: listingDurationUnit } });
+      })
+      .then((response) => { if (active && response) setListingPricing(response.data || null); })
+      .catch((requestError: any) => {
+        if (!active) return;
+        setListingPricing(null);
+        if (requestError?.response?.status === 404) window.alert('Bot ID not found.');
+      })
       .finally(() => { if (active) setListingPricingLoading(false); });
     return () => { active = false; };
   }, [listingBotId, listingDuration, listingDurationUnit]);
