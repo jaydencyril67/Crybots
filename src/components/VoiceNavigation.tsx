@@ -182,7 +182,7 @@ const VoiceNavigation = () => {
           params.append('keyterm', term);
         });
 
-        socket = new WebSocket(`wss://api.deepgram.com/v1/listen?${params.toString()}`, ['bearer', token]);
+        socket = new WebSocket(`wss://api.deepgram.com/v1/listen?${params.toString()}`, ['token', token]);
 
         socket.onopen = async () => {
           if (!socket || !stream || !enabled || stopped || voiceOutputActive || isVoiceOutputActive()) {
@@ -191,7 +191,7 @@ const VoiceNavigation = () => {
           }
 
           if (!audioContext) {
-            audioContext = new AudioContext({ sampleRate: 16000 });
+            audioContext = new AudioContext();
           }
           await audioContext.resume();
 
