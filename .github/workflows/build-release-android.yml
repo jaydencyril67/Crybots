@@ -100,7 +100,7 @@ jobs:
         run: |
           mkdir -p assets
           cp public/icons/android-icon.svg assets/icon.svg
-          cp public/icons/ke-icon.svg assets/splash.svg
+          cp public/icons/android-splash.svg assets/splash.svg
           npx capacitor-assets generate --android
 
       - name: Sync Capacitor
