@@ -1,5 +1,5 @@
-const CACHE_NAME = 'kingshall-pwa-v7-muted-crown';
-const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/ke-icon.svg'];
+const CACHE_NAME = 'crybots-pwa-v8-intelligence-mark';
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/ke-icon.svg?v=2'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
 self.addEventListener('install', (event) => {
@@ -36,8 +36,8 @@ self.addEventListener('push', (event) => {
   const title = payload.title || payload.notification?.title || 'KingsHall alert';
   const options = {
     body: payload.message || payload.notification?.message || 'You have a new notification.',
-    icon: '/icons/ke-icon.svg',
-    badge: '/icons/ke-icon.svg',
+    icon: '/icons/ke-icon.svg?v=2',
+    badge: '/icons/ke-icon.svg?v=2',
     data: { url: '/notifications' },
   };
   event.waitUntil(self.registration.showNotification(title, options));
