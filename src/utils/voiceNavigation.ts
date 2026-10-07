@@ -36,7 +36,6 @@ export const logVoiceDebug = (level: VoiceDebugLog['level'], message: string) =>
 
 export type VoiceCommand = { label: string; route: string };
 
-// Route labels used by the NowBar UI.
 export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'SIGN UP', route: '/signup' },
   { label: 'SIGN UP CONFIRMATION', route: '/signup-confirmation-sent' },
@@ -105,6 +104,79 @@ export const getVoiceModeEnabled = () => {
   return window.localStorage.getItem(VOICE_MODE_STORAGE_KEY) === 'true';
 };
 
+export type VoiceUiButton = {
+  id: string;
+  label: string;
+  disabled: boolean;
+};
+
+const normalizeButtonLabel = (value: string) => value.toLowerCase().replace(/\s+/g, ' ').trim();
+
+const getButtonLabel = (button: HTMLButtonElement) =>
+  normalizeButtonLabel(
+    button.getAttribute('aria-label')
+      || button.getAttribute('title')
+      || button.innerText
+      || button.textContent
+      || '',
+  );
+
+const isVisibleButton = (button: HTMLButtonElement) => {
+  if (button.disabled || button.dataset.voiceExclude === 'true') return false;
+  const style = window.getComputedStyle(button);
+  const rect = button.getBoundingClientRect();
+  return style.display !== 'none'
+    && style.visibility !== 'hidden'
+    && Number(style.opacity) > 0
+    && rect.width > 0
+    && rect.height > 0;
+};
+
+export const getVisibleVoiceButtons = (): VoiceUiButton[] => {
+  if (typeof document === 'undefined') return [];
+  const counts = new Map<string, number>();
+  return Array.from(document.querySelectorAll<HTMLButtonElement>('button'))
+    .filter(isVisibleButton)
+    .map((button) => {
+      const label = getButtonLabel(button) || 'unlabelled button';
+      const base = normalizeButtonLabel(label).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'button';
+      const count = (counts.get(base) || 0) + 1;
+      counts.set(base, count);
+      const id = `voice-button-${base}-${count}`;
+      button.dataset.voiceId = id;
+      return { id, label, disabled: button.disabled };
+    })
+    .slice(0, 60);
+};
+
+const isSensitiveVoiceButton = (label: string) =>
+  /\b(withdraw|transfer|delete|remove|disable|revoke|reset|change password|security code|confirm deletion|close account)\b/i.test(label);
+
+export const executeVoiceUiAction = (action: { type?: string; target?: string } | null | undefined) => {
+  if (!action || action.type !== 'click' || !action.target || typeof document === 'undefined') return false;
+  const buttons = getVisibleVoiceButtons();
+  const button = buttons.find((item) => item.id === action.target);
+  if (!button) {
+    logVoiceDebug('warn', `Voice click target not found: ${action.target}`);
+    return false;
+  }
+  if (isSensitiveVoiceButton(button.label)) {
+    logVoiceDebug('warn', `Blocked sensitive voice click: ${button.label}`);
+    speakVoiceResponse('That button requires your explicit confirmation before I can activate it.');
+    return false;
+  }
+
+  const element = document.querySelector<HTMLButtonElement>(`button[data-voice-id="${CSS.escape(action.target)}"]`);
+  if (!element || !isVisibleButton(element)) {
+    logVoiceDebug('warn', `Voice click target is no longer visible: ${action.target}`);
+    return false;
+  }
+
+  logVoiceDebug('info', `Executing Gemini UI click: ${button.label} (${action.target})`);
+  element.click();
+  return true;
+};
+
 type CapacitorVoice = {
   name?: string;
   lang?: string;
@@ -150,7 +222,7 @@ export const disableVoiceMode = () => {
 
 export const normalizeVoiceText = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-const FEMALE_VOICE_PATTERN = /(^|[\\s_-])(female|samantha|zira|jenny|aria|ava|emma|susan|karen|victoria|sara|sarah|google us english)([\\s_-]|$)/i;
+const FEMALE_VOICE_PATTERN = /(^|[\s_-])(female|samantha|zira|jenny|aria|ava|emma|susan|karen|victoria|sara|sarah|google us english)([\s_-]|$)/i;
 const ENGLISH_VOICE_PATTERN = /^(en|en[-_])/i;
 
 const getPreferredFemaleWebVoice = (voices: SpeechSynthesisVoice[]) => voices
@@ -210,7 +282,7 @@ export const speakVoiceResponse = (message: string) => {
   window.speechSynthesis.speak(utterance);
 };
 
-type VoiceAssistantAction = { type?: string; route?: string } | null;
+type VoiceAssistantAction = { type?: string; route?: string; target?: string } | null;
 type VoiceAssistantResponse = { reply?: string; action?: VoiceAssistantAction; debug?: { requestId?: string; elapsedMs?: number; providerStatus?: number } };
 
 export const askVoiceAssistant = async (message: string) => {
@@ -218,53 +290,55 @@ export const askVoiceAssistant = async (message: string) => {
   const trimmed = message.trim();
   if (!trimmed) return false;
 
-  let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}/api/voice/assistant`, {
-    method: 'POST',
-    headers: (() => {
-      const headers = new Headers({ 'Content-Type': 'application/json' });
-      const auth = authHeaders();
-      if (auth.Authorization) headers.set('Authorization', auth.Authorization);
-      return headers;
-    })(),
-    body: JSON.stringify({
-      message: trimmed,
-      currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
-      history: voiceConversationHistory.slice(-8),
-    }),
-  });
+    const response = await fetch(`${API_BASE_URL}/api/voice/assistant`, {
+      method: 'POST',
+      headers: (() => {
+        const headers = new Headers({ 'Content-Type': 'application/json' });
+        const auth = authHeaders();
+        if (auth.Authorization) headers.set('Authorization', auth.Authorization);
+        return headers;
+      })(),
+      body: JSON.stringify({
+        message: trimmed,
+        currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
+        uiButtons: getVisibleVoiceButtons(),
+        history: voiceConversationHistory.slice(-8),
+      }),
+    });
 
-  const body = await response.json().catch(() => ({})) as VoiceAssistantResponse & { message?: string };
-  if (!response.ok) {
-    logVoiceDebug('error', `Assistant HTTP error ${response.status}: ${body.message || body.reply || 'no response body'}`);
-    if (body.reply) speakVoiceResponse(body.reply);
-    else if (response.status === 503) speakVoiceResponse('The conversational assistant is not configured yet.');
-    return false;
-  }
+    const body = await response.json().catch(() => ({})) as VoiceAssistantResponse & { message?: string };
+    if (!response.ok) {
+      logVoiceDebug('error', `Assistant HTTP error ${response.status}: ${body.message || body.reply || 'no response body'}`);
+      if (body.reply) speakVoiceResponse(body.reply);
+      else if (response.status === 503) speakVoiceResponse('The conversational assistant is not configured yet.');
+      return false;
+    }
 
-  const reply = typeof body.reply === 'string' ? body.reply.trim() : '';
-  logVoiceDebug('info', `Assistant response: ${reply || '[empty reply]'}`);
-  if (body.debug?.requestId) logVoiceDebug('debug', `Backend request ${body.debug.requestId}${typeof body.debug.elapsedMs === 'number' ? ` (${body.debug.elapsedMs}ms)` : ''}`);
-  if (reply) {
-    voiceConversationHistory.push({ role: 'user', content: trimmed });
-    voiceConversationHistory.push({ role: 'assistant', content: reply });
-    voiceConversationHistory = voiceConversationHistory.slice(-8);
-    window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening: false, transcript: reply, assistant: true } }));
-    speakVoiceResponse(reply);
-  }
+    const reply = typeof body.reply === 'string' ? body.reply.trim() : '';
+    logVoiceDebug('info', `Assistant response: ${reply || '[empty reply]'}`);
+    if (body.debug?.requestId) logVoiceDebug('debug', `Backend request ${body.debug.requestId}${typeof body.debug.elapsedMs === 'number' ? ` (${body.debug.elapsedMs}ms)` : ''}`);
+    if (reply) {
+      voiceConversationHistory.push({ role: 'user', content: trimmed });
+      voiceConversationHistory.push({ role: 'assistant', content: reply });
+      voiceConversationHistory = voiceConversationHistory.slice(-8);
+      window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening: false, transcript: reply, assistant: true } }));
+      speakVoiceResponse(reply);
+    }
 
-  if (body.action?.type === 'navigate' && body.action.route) {
-    logVoiceDebug('info', `Assistant action: navigate ${body.action.route}`);
-    navigate(body.action.route);
-  }
+    if (body.action?.type === 'navigate' && body.action.route) {
+      logVoiceDebug('info', `Assistant action: navigate ${body.action.route}`);
+      navigate(body.action.route);
+    }
 
-  return Boolean(reply);
+    if (body.action?.type === 'click') {
+      executeVoiceUiAction(body.action);
+    }
+
+    return Boolean(reply);
   } catch (error) {
     logVoiceDebug('error', `Assistant request failed: ${error instanceof Error ? error.message : String(error)}`);
     speakVoiceResponse('I could not reach the voice assistant right now.');
     return false;
   }
 };
-
-
