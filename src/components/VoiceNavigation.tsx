@@ -239,10 +239,10 @@ const VoiceNavigation = () => {
         debug('WEBSOCKET', 'Connecting to Deepgram', {
           model: VOICE_MODEL,
           sampleRate: 16000,
-          protocol: 'token',
+          protocol: 'bearer',
         });
 
-        socket = new WebSocket(deepgramUrl, ['token', token]);
+        socket = new WebSocket(deepgramUrl, ['bearer', token]);
 
         socket.onopen = async () => {
           debug('WEBSOCKET', 'Deepgram WebSocket opened', undefined, 'success');
