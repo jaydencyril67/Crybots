@@ -586,7 +586,7 @@ const ForgotPasswordPage = () => {
   return (
     <>
       <Helmet>
-        <title>Forgot Password | Kingshall</title>
+        <title>Forgot Password | CryBots</title>
         <meta
           name="description"
           content="Reset your account password by verifying your email, full name, and a 4-digit recovery code."
@@ -601,7 +601,7 @@ const ForgotPasswordPage = () => {
               <ArrowLeft style={styles.icon} />
             </button>
             <div style={styles.brandBlock}>
-              <p style={hybridStyles.brandKicker}>Kingshall</p>
+              <p style={hybridStyles.brandKicker}>CryBots</p>
               <p style={hybridStyles.brandSub}>Secure recovery flow</p>
             </div>
           </header>
