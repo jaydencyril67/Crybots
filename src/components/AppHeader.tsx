@@ -233,7 +233,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
           const payload = JSON.parse((event as MessageEvent).data) as { unreadCount?: number; notification?: { title: string; message: string; channels?: string[] } };
           const nextCount = Number(payload.unreadCount || 0);
           if (payload.notification?.channels?.includes('push') && 'Notification' in window && Notification.permission === 'granted') {
-            new Notification(payload.notification.title, { body: payload.notification.message, icon: '/icons/ke-icon.svg?v=2' });
+            new Notification(payload.notification.title, { body: payload.notification.message, icon: '/icons/ke-icon.svg?v=3' });
           }
           // Every notification event is new by definition. Do not depend on the
           // unread-count comparison, because another tab can mark it as read
