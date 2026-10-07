@@ -551,7 +551,7 @@ const HomePage = () => {
   return (
     <HybridTheme mode={themeMode}>
       <Helmet>
-        <title>KingsHall Exchange | Home</title>
+        <title>CryBots | Home</title>
       </Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>
