@@ -1,4 +1,6 @@
-# KingsHall Exchange
+# CryBots
+
+Powered by KingsHall
 
 ## Environment variables
 
