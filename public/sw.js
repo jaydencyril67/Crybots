@@ -30,10 +30,10 @@ self.addEventListener('push', (event) => {
   try {
     payload = event.data ? event.data.json() : {};
   } catch {
-    payload = { title: 'KingsHall alert', message: event.data?.text() || 'You have a new notification.' };
+    payload = { title: 'CryBots alert', message: event.data?.text() || 'You have a new notification.' };
   }
 
-  const title = payload.title || payload.notification?.title || 'KingsHall alert';
+  const title = payload.title || payload.notification?.title || 'CryBots alert';
   const options = {
     body: payload.message || payload.notification?.message || 'You have a new notification.',
     icon: '/icons/ke-icon.svg?v=4',
