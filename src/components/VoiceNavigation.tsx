@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { API_BASE_URL, authHeaders } from '../api/axios';
-import { getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type DeepgramResult = {
   type?: string;
@@ -151,15 +151,6 @@ const VoiceNavigation = () => {
           throw new Error('Microphone access is unavailable in this APK WebView.');
         }
 
-        const granted = await requestVoiceMicrophoneAccess();
-        if (!granted) {
-          setStatus(false);
-          return;
-        }
-
-        const token = await fetchToken();
-        if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive()) return;
-
         stream = await navigator.mediaDevices.getUserMedia({
           audio: {
             channelCount: 1,
@@ -169,6 +160,9 @@ const VoiceNavigation = () => {
           },
         });
         if (!stream) throw new Error('Microphone access was not available.');
+
+        const token = await fetchToken();
+        if (!enabled || stopped || voiceOutputActive || isVoiceOutputActive()) return;
 
         const params = new URLSearchParams({
           model: VOICE_MODEL,
