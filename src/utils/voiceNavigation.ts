@@ -260,7 +260,7 @@ export const executeVoiceUiAction = (action: { type?: string; target?: string } 
     return false;
   }
 
-  logVoiceDebug('info', `Executing Gemini UI click: ${button.label} (${action.target})`);
+  logVoiceDebug('info', `Executing Brain UI click: ${button.label} (${action.target})`);
   element.click();
   return true;
 };
@@ -282,7 +282,7 @@ export const speakVoiceResponse = (message: string) => {
   }
 
   window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: true } }));
-  logVoiceDebug('info', 'Requesting Gemini TTS audio');
+  logVoiceDebug('info', 'Requesting Deepgram TTS audio');
 
   const headers = (() => {
     const result = new Headers();
@@ -300,7 +300,7 @@ export const speakVoiceResponse = (message: string) => {
     .then(async (response) => {
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
-        throw new Error(`Gemini TTS HTTP ${response.status}: ${detail.slice(0, 300)}`);
+        throw new Error(`Deepgram TTS HTTP ${response.status}: ${detail.slice(0, 300)}`);
       }
       return response.blob();
     })
@@ -320,7 +320,7 @@ export const speakVoiceResponse = (message: string) => {
         audioState.__crybotsVoiceAudioUrl = undefined;
         audioState.__crybotsVoiceAudio = undefined;
         window.dispatchEvent(new CustomEvent(VOICE_OUTPUT_EVENT, { detail: { active: false } }));
-        logVoiceDebug('error', 'Gemini TTS audio playback failed');
+        logVoiceDebug('error', 'Deepgram TTS audio playback failed');
       };
       return audio.play();
     })
@@ -348,7 +348,7 @@ export const askVoiceAssistant = async (message: string) => {
         return headers;
       })(),
       body: JSON.stringify({
-        message: trimmed,
+        transcript: trimmed,
         currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
         uiButtons: getVisibleVoiceButtons(),
         history: voiceConversationHistory.slice(-8),
@@ -389,12 +389,12 @@ export const askVoiceAssistant = async (message: string) => {
       const amount = Math.max(100, Math.min(Number(body.action.amount) || 500, 1200));
       if (body.action.type === 'scroll_page') {
         window.scrollBy({ top: direction * amount, behavior: 'smooth' });
-        logVoiceDebug('info', `Gemini scrolled page ${direction < 0 ? 'up' : 'down'} ${amount}px`);
+        logVoiceDebug('info', `Brain scrolled page ${direction < 0 ? 'up' : 'down'} ${amount}px`);
       } else {
         window.dispatchEvent(new CustomEvent('crybots-voice-nowbar-scroll', {
           detail: { direction: body.action.direction === 'left' ? -1 : 1, amount },
         }));
-        logVoiceDebug('info', `Gemini scrolled NowBar ${body.action.direction === 'left' ? 'left' : 'right'} ${amount}px`);
+        logVoiceDebug('info', `Brain scrolled NowBar ${body.action.direction === 'left' ? 'left' : 'right'} ${amount}px`);
       }
     }
 
@@ -402,7 +402,7 @@ export const askVoiceAssistant = async (message: string) => {
       window.dispatchEvent(new CustomEvent('crybots-voice-nowbar-mode', {
         detail: { mode: body.action.type === 'expand_nowbar' ? 'expanded' : 'compact' },
       }));
-      logVoiceDebug('info', `Gemini set NowBar mode: ${body.action.type === 'expand_nowbar' ? 'expanded' : 'compact'}`);
+      logVoiceDebug('info', `Brain set NowBar mode: ${body.action.type === 'expand_nowbar' ? 'expanded' : 'compact'}`);
     }
 
     return Boolean(reply);
