@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { API_BASE_URL, authHeaders } from '../api/axios';
-import { askVoiceAssistant, getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { askVoiceAssistant, getVoiceModeEnabled, isVoiceOutputActive, navigateFromVoice, speakVoiceResponse, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
 type DeepgramResult = {
   type?: string;
@@ -261,7 +261,7 @@ const VoiceNavigation = () => {
               lastFinalTranscript = transcript;
               const navigated = navigateFromVoice(transcript);
               if (!navigated) {
-                void askVoiceAssistant(transcript).catch(() => undefined);
+                void askVoiceAssistant(transcript).catch((error) => {\n                  const message = error instanceof Error ? error.message : 'I could not process that request right now.';\n                  setStatus(false, message);\n                  speakVoiceResponse('Sorry, I could not process that request right now. Please try again.');\n                });
               }
             }
           } catch (error) {
