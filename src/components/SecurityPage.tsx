@@ -958,8 +958,28 @@ const SecurityPage = () => {
                         <p style={styles.note}>Scan this QR code in Google Authenticator, Authy, or another TOTP app.</p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' as const }}>
                           <p style={{ ...styles.note, wordBreak: 'break-all' as const, margin: 0 }}>Manual key: {twoFactorSecret}</p>
-                          <button type="button" style={{ ...styles.button, padding: '8px 12px', minWidth: 'auto' }} onClick={() => void handleCopyTwoFactorKey()} disabled={!twoFactorSecret} aria-label="Copy manual key">
-                            <Copy size={14} /> {twoFactorKeyCopied ? 'Copied' : 'Copy'}
+                          <button
+                            type="button"
+                            onClick={() => void handleCopyTwoFactorKey()}
+                            disabled={!twoFactorSecret}
+                            aria-label={twoFactorKeyCopied ? 'Manual key copied' : 'Copy manual key'}
+                            title={twoFactorKeyCopied ? 'Copied' : 'Copy manual key'}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '30px',
+                              height: '30px',
+                              padding: 0,
+                              border: 'none',
+                              borderRadius: '8px',
+                              background: 'transparent',
+                              color: twoFactorKeyCopied ? theme.success : theme.textMuted,
+                              cursor: twoFactorSecret ? 'pointer' : 'not-allowed',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Copy size={16} />
                           </button>
                         </div>
                       </div>
