@@ -37,6 +37,14 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Capacitor Android runs the bundled app at https://localhost.
+  // Tell the WebAuthn API which RP configuration to use without affecting
+  // normal browser requests on crybots.kingshall.online.
+  if (window.location.hostname === 'localhost') {
+    config.headers['X-Kingshall-WebAuthn-Platform'] = 'android';
+  }
+
   return config;
 }, (error) => {
   return Promise.reject(error);
