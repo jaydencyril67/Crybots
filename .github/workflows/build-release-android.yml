@@ -243,48 +243,8 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Configure Android 12+ CryBots splash
-        run: |
-          mkdir -p android/app/src/main/res/drawable android/app/src/main/res/values-v31
-
-          cat > android/app/src/main/res/values-v31/crybots_splash.xml <<'XML'
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-                  <item name="windowSplashScreenBackground">@color/crybots_splash_background</item>
-                  <item name="windowSplashScreenAnimatedIcon">@drawable/crybots_splash_icon</item>
-                  <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
-              </style>
-          </resources>
-          XML
-
-          cat > android/app/src/main/res/drawable/crybots_splash_icon.xml <<'XML'
-          <?xml version="1.0" encoding="utf-8"?>
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="288dp"
-              android:height="288dp"
-              android:viewportWidth="512"
-              android:viewportHeight="512">
-              <path
-                  android:fillColor="#000000"
-                  android:pathData="M202,32 H310 C410,32 480,102 480,202 V310 C480,410 410,480 310,480 H202 C102,480 32,410 32,310 V202 C32,102 102,32 202,32 Z" />
-              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M229,79 C252.2,79 271,158.2 271,256 C271,353.8 252.2,433 229,433 C205.8,433 187,353.8 187,256 C187,158.2 205.8,79 229,79 Z" />
-              <path android:strokeColor="#FFFFFF" android:strokeWidth="5.5" android:fillColor="@android:color/transparent" android:pathData="M256,79 C279.2,79 298,158.2 298,256 C298,353.8 279.2,433 256,433 C232.8,433 214,353.8 214,256 C214,158.2 232.8,79 256,79 Z" />
-              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M283,79 C306.2,79 325,158.2 325,256 C325,353.8 306.2,433 283,433 C259.8,433 241,353.8 241,256 C241,158.2 259.8,79 283,79 Z" />
-              <path android:strokeColor="#FFFFFF" android:strokeWidth="5.5" android:fillColor="@android:color/transparent" android:pathData="M79,230 C79,206.2 158.2,187 256,187 C353.8,187 433,206.2 433,230 C433,253.8 353.8,273 256,273 C158.2,273 79,253.8 79,230 Z" />
-              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M79,256 C79,232.2 158.2,213 256,213 C353.8,213 433,232.2 433,256 C433,279.8 353.8,299 256,299 C158.2,299 79,279.8 79,256 Z" />
-              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M79,282 C79,258.2 158.2,239 256,239 C353.8,239 433,258.2 433,282 C433,305.8 353.8,325 256,325 C158.2,325 79,305.8 79,282 Z" />
-              <path android:fillColor="#FFFFFF" android:pathData="M280,256 C280,269.3 269.3,280 256,280 C242.7,280 232,269.3 232,256 C232,242.7 242.7,232 256,232 C269.3,232 280,242.7 280,256 Z" />
-          </vector>
-          XML
-
-          cat > android/app/src/main/res/values/crybots_splash_colors.xml <<'XML'
-          <?xml version="1.0" encoding="utf-8"?>
-          <resources>
-              <color name="crybots_splash_background">#050817</color>
-          </resources>
-          XML
-
+      # Use the single CryBots splash asset generated above for every Android version.
+      # Do not add an Android-version-specific splash override here.
 
       - name: Prepare release signing
         env:
