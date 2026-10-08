@@ -254,6 +254,40 @@ jobs:
               p.write_text(s)
           PY
 
+      - name: Configure Android 12+ CryBots splash
+        run: |
+          mkdir -p android/app/src/main/res/drawable android/app/src/main/res/values-v31
+
+          cat > android/app/src/main/res/values-v31/crybots_splash.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+                  <item name="windowSplashScreenBackground">@color/crybots_splash_background</item>
+                  <item name="windowSplashScreenAnimatedIcon">@drawable/crybots_splash_icon</item>
+                  <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+              </style>
+          </resources>
+          XML
+
+          cat > android/app/src/main/res/drawable/crybots_splash_icon.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="288dp"
+              android:height="288dp"
+              android:viewportWidth="512"
+              android:viewportHeight="512">
+              <path android:fillColor="#000000" android:pathData="M256,32 A224,224 0,1 0,256,480 A224,224 0,1 0,256,32 Z" />
+              <circle android:fillColor="#FFFFFF" android:cx="256" android:cy="256" android:r="24" />
+          </vector>
+          XML
+
+          cat > android/app/src/main/res/values/crybots_splash_colors.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="crybots_splash_background">#050816</color>
+          </resources>
+          XML
+
 
       - name: Prepare release signing
         env:
