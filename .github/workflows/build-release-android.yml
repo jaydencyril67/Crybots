@@ -254,10 +254,6 @@ jobs:
                   <item name="windowSplashScreenBackground">@color/crybots_splash_background</item>
                   <item name="windowSplashScreenAnimatedIcon">@drawable/crybots_splash_icon</item>
                   <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
-                  <item name="android:statusBarColor">@color/crybots_splash_background</item>
-                  <item name="android:navigationBarColor">#000000</item>
-                  <item name="android:windowLightStatusBar">false</item>
-                  <item name="android:windowLightNavigationBar">false</item>
               </style>
           </resources>
           XML
