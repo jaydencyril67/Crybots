@@ -266,7 +266,13 @@ jobs:
               android:viewportWidth="512"
               android:viewportHeight="512">
               <path android:fillColor="#000000" android:pathData="M256,32 A224,224 0,1 0,256,480 A224,224 0,1 0,256,32 Z" />
-              <circle android:fillColor="#FFFFFF" android:cx="256" android:cy="256" android:r="24" />
+              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M229,79 C252.2,79 271,158.2 271,256 C271,353.8 252.2,433 229,433 C205.8,433 187,353.8 187,256 C187,158.2 205.8,79 229,79 Z" />
+              <path android:strokeColor="#FFFFFF" android:strokeWidth="5.5" android:fillColor="@android:color/transparent" android:pathData="M256,79 C279.2,79 298,158.2 298,256 C298,353.8 279.2,433 256,433 C232.8,433 214,353.8 214,256 C214,158.2 232.8,79 256,79 Z" />
+              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M283,79 C306.2,79 325,158.2 325,256 C325,353.8 306.2,433 283,433 C259.8,433 241,353.8 241,256 C241,158.2 259.8,79 283,79 Z" />
+              <path android:strokeColor="#FFFFFF" android:strokeWidth="5.5" android:fillColor="@android:color/transparent" android:pathData="M79,230 C79,206.2 158.2,187 256,187 C353.8,187 433,206.2 433,230 C433,253.8 353.8,273 256,273 C158.2,273 79,253.8 79,230 Z" />
+              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M79,256 C79,232.2 158.2,213 256,213 C353.8,213 433,232.2 433,256 C433,279.8 353.8,299 256,299 C158.2,299 79,279.8 79,256 Z" />
+              <path android:strokeColor="#FFFFFF" android:strokeWidth="4.5" android:fillColor="@android:color/transparent" android:pathData="M79,282 C79,258.2 158.2,239 256,239 C353.8,239 433,258.2 433,282 C433,305.8 353.8,325 256,325 C158.2,325 79,305.8 79,282 Z" />
+              <path android:fillColor="#FFFFFF" android:pathData="M280,256 C280,269.3 269.3,280 256,280 C242.7,280 232,269.3 232,256 C232,242.7 242.7,232 256,232 C269.3,232 280,242.7 280,256 Z" />
           </vector>
           XML
 
