@@ -3,8 +3,9 @@
 
   <!-- CryBots launch mark, positioned to match the PWA splash on a 20:9 phone. -->
   <g transform="translate(1176 1038) scale(0.7421875)">
-    <rect x="32" y="32" width="448" height="448" rx="92" fill="#000"/>
-    <rect x="32.75" y="32.75" width="446.5" height="446.5" rx="91.25" fill="none" stroke="#151515" stroke-width="1.5"/>
+    <!-- Circular black logo background; transparent corners let the splash background show through. -->
+    <circle cx="256" cy="256" r="224" fill="#000"/>
+    <circle cx="256" cy="256" r="223.25" fill="none" stroke="#151515" stroke-width="1.5"/>
     <ellipse cx="229" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
     <ellipse cx="256" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="5.5"/>
     <ellipse cx="283" cy="256" rx="42" ry="177" stroke="#fff" stroke-width="4.5"/>
