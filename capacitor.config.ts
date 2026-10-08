@@ -5,7 +5,10 @@ const config: CapacitorConfig = {
   appName: 'CryBots',
   webDir: 'build',
   server: {
-    // Keep the Android WebView on a secure origin so API requests use HTTPS.
+    // Use the real RP domain as the Android WebView origin.
+    // This keeps WebAuthn scoped to crybots.kingshall.online instead of
+    // the default https://localhost origin.
+    hostname: 'crybots.kingshall.online',
     androidScheme: 'https',
   },
   plugins: {
