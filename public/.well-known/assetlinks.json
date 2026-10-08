@@ -1,0 +1,24 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kingshall.exchange",
+      "sha256_cert_fingerprints": [
+        "F2:8B:51:D6:AB:53:3A:23:B8:69:5C:CF:86:01:0E:0F:D5:9E:EF:68:C0:9D:1A:F6:46:DE:D3:31:EB:F3:BD:B4"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "web",
+      "site": "https://crybots.kingshall.online"
+    }
+  }
+]
