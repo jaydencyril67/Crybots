@@ -260,8 +260,8 @@ jobs:
               <group
                   android:pivotX="216"
                   android:pivotY="216"
-                  android:scaleX="0.57"
-                  android:scaleY="0.57">
+                  android:scaleX="0.54642845"
+                  android:scaleY="0.54642845">
                   <group
                       android:translateX="0"
                       android:translateY="0">
@@ -353,8 +353,8 @@ jobs:
                   android:gravity="center"
                   android:drawable="@drawable/crybots_splash_icon" />
               <item
-                  android:width="180dp"
-                  android:height="72dp"
+                  android:width="170dp"
+                  android:height="68dp"
                   android:gravity="center|bottom"
                   android:bottom="32dp"
                   android:drawable="@drawable/crybots_branding" />
