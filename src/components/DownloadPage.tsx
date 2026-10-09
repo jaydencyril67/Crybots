@@ -1,4 +1,6 @@
 import React from 'react';
+import { Capacitor } from '@capacitor/core';
+import { NativeAppUpdate } from '../utils/nativeAppUpdate';
 import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
@@ -25,6 +27,28 @@ const downloadOptions = [
 
 const DownloadPage = () => {
   const { themeMode } = useAppTheme();
+  const [apkActionMessage, setApkActionMessage] = React.useState('');
+
+  const handleDownloadClick = async (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    option: typeof downloadOptions[number],
+  ) => {
+    if (option.title !== 'Android APK' || !Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
+
+    event.preventDefault();
+    setApkActionMessage('Preparing the APK update…');
+    try {
+      const result = await NativeAppUpdate.downloadAndInstall({ url: option.url });
+      if (result.requiresPermission) {
+        setApkActionMessage('Allow CryBots to install unknown apps in Android settings, return here, then tap Download / Update again.');
+      } else {
+        setApkActionMessage('The APK is downloading. Android will ask you to approve the update when it finishes.');
+      }
+    } catch {
+      setApkActionMessage('The in-app installer could not start. Opening the direct APK download instead.');
+      window.setTimeout(() => window.open(option.url, '_blank', 'noopener,noreferrer'), 500);
+    }
+  };
   const theme = HYBRID_THEME_TOKENS[themeMode];
 
   const styles = {
@@ -129,10 +153,14 @@ const DownloadPage = () => {
                     href={option.url}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(event) => { void handleDownloadClick(event, option); }}
                     style={styles.downloadButton}
                   >
                     {option.title === 'Android APK' ? 'Download / Update' : 'Download'}
                   </a>
+                  {option.title === 'Android APK' && apkActionMessage ? (
+                    <p role="status" style={styles.description}>{apkActionMessage}</p>
+                  ) : null}
                 </section>
               </div>
             ))}
