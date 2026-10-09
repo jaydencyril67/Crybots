@@ -1,3 +1,14 @@
+import { Capacitor, registerPlugin } from '@capacitor/core';
+
+interface NativeWebAuthnPlugin {
+  create(options: { options: string }): Promise<{ responseJson: string }>;
+  get(options: { options: string }): Promise<{ responseJson: string }>;
+}
+
+const NativeWebAuthn = registerPlugin<NativeWebAuthnPlugin>('NativeWebAuthn');
+
+const isNativeAndroid = () => Capacitor.getPlatform() === 'android';
+
 const base64UrlToBuffer = (value: string) => {
   const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
   const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
@@ -12,9 +23,22 @@ const bufferToBase64Url = (value: ArrayBuffer) => {
   return window.btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
 
-export const isWebAuthnAvailable = () => Boolean(window.PublicKeyCredential && navigator.credentials);
+export const isWebAuthnAvailable = () => isNativeAndroid() || Boolean(window.PublicKeyCredential && navigator.credentials);
+
+const parseNativeCredential = (responseJson: string) => {
+  try {
+    return JSON.parse(responseJson);
+  } catch {
+    throw new Error('Android returned an invalid passkey response.');
+  }
+};
 
 export const createPasskey = async (options: any) => {
+  if (isNativeAndroid()) {
+    const result = await NativeWebAuthn.create({ options: JSON.stringify(options) });
+    return parseNativeCredential(result.responseJson);
+  }
+
   const publicKey: PublicKeyCredentialCreationOptions = {
     ...options,
     challenge: base64UrlToBuffer(options.challenge),
@@ -38,6 +62,11 @@ export const createPasskey = async (options: any) => {
 };
 
 export const authenticateWithPasskey = async (options: any) => {
+  if (isNativeAndroid()) {
+    const result = await NativeWebAuthn.get({ options: JSON.stringify(options) });
+    return parseNativeCredential(result.responseJson);
+  }
+
   const publicKey: PublicKeyCredentialRequestOptions = {
     ...options,
     challenge: base64UrlToBuffer(options.challenge),

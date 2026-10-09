@@ -747,7 +747,7 @@ const SecurityPage = () => {
         extensionsPresent: Boolean(options?.extensions),
       });
 
-      logWebAuthnDebug('credential-create', 'info', 'Calling navigator.credentials.create()', {
+      logWebAuthnDebug('credential-create', 'info', 'Starting passkey credential creation', {
         origin: window.location.origin,
         isSecureContext: window.isSecureContext,
         rpId: options?.rp?.id,
@@ -756,7 +756,7 @@ const SecurityPage = () => {
       });
       const createStartedAt = Date.now();
       const credential = await createPasskey(options);
-      logWebAuthnDebug('credential-create', 'success', 'navigator.credentials.create() resolved', {
+      logWebAuthnDebug('credential-create', 'success', 'Passkey credential creation resolved', {
         elapsedMs: Date.now() - createStartedAt,
         credentialType: credential?.type,
         responseType: credential?.response ? 'attestation' : 'missing',
