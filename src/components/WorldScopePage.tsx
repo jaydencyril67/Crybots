@@ -129,7 +129,9 @@ const WorldScopePage = () => {
     footer: { marginTop: 14, color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
   };
 
+  const loaderStyle = `@keyframes worldscopeDotPulse { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } } .worldscope-dot-loader { width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; animation: worldscopeDotPulse 1s infinite ease-in-out; } .worldscope-dot-loader:nth-child(2) { animation-delay: .15s; } .worldscope-dot-loader:nth-child(3) { animation-delay: .3s; }`;
   return <HybridTheme mode={themeMode}>
+    <style>{loaderStyle}</style>
     <div style={styles.page}>
       <main style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate(isRankingsPage ? '/worldscope' : '/store')}><ArrowLeft size={16} /> {isRankingsPage ? 'WorldScope' : 'Store'}</button>
@@ -145,7 +147,7 @@ const WorldScopePage = () => {
         {error && <div role="alert" style={{ ...styles.message, borderColor: '#ef4444' }}>{error}</div>}
         {message && <div role="status" style={styles.message}>{message}</div>}
 
-        {!isRankingsPage && screen === 'intro' && !accessActive && <>
+        {!isRankingsPage && screen === 'intro' && <>
           <h2 style={styles.sectionTitle}>What WorldScope gives you</h2>
           <div style={styles.grid}>
             <div style={styles.outerCard}><article style={styles.card}><div style={styles.eyebrow}><Bot size={17} /> Bot performance</div><h3 style={{ margin: 0 }}>See what is working</h3><p style={styles.subtitle}>Compare the five bots with the strongest recorded realized profit and loss across settlement history.</p></article></div>
@@ -158,21 +160,11 @@ const WorldScopePage = () => {
             <div style={styles.card}>
               <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 900 }}>Choose when you're ready</h2>
               <p style={styles.subtitle}>Preview the subscription plans first. You can choose Moderate Scope for core rankings or Advance Scope for all five categories.</p>
-              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => setScreen('payments')}>Preview payment plans <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></button>
+              <button type="button" disabled={loading} style={{ ...styles.button, ...styles.primaryButton, opacity: loading ? 0.8 : 1 }} onClick={() => accessActive ? navigate('/worldscope-rankings') : setScreen('payments')}>{loading ? <span aria-label="Loading" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /></span> : accessActive ? <>View WorldScope Rankings <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></> : <>Preview payment plans <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></>}</button>
             </div>
           </div>
         </>}
 
-        {!isRankingsPage && screen === 'intro' && accessActive && <>
-          <div style={{ ...styles.outerCard, marginBottom: 14 }}>
-            <div style={styles.card}>
-              <div style={styles.status}><CheckCircle2 size={16} color="#22c55e" /> <strong>{tier === 'advanced' ? 'Advance Scope' : 'Moderate Scope'} subscription active</strong></div>
-              <div style={styles.status}>Wallet balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>{expiresAt && <> · Expires {expiresAt.toLocaleDateString()}</>}</div>
-              <p style={styles.subtitle}>Your subscription is ready. Open your separate rankings page to explore the categories included in your plan.</p>
-              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => navigate('/worldscope-rankings')}>Open WorldScope Rankings <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></button>
-            </div>
-          </div>
-        </>}
         {!isRankingsPage && screen === 'payments' && <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <h2 style={styles.sectionTitle}>WorldScope subscription</h2>
