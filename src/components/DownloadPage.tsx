@@ -18,8 +18,8 @@ const downloadOptions = [
   },
   {
     title: 'Android APK',
-    description: 'Get the Android installation package from the project releases page.',
-    url: 'https://github.com/jaydencyril67/Kingshall/releases',
+    description: 'Download the latest signed CryBots APK. Android will guide you through updating the installed app.',
+    url: 'https://github.com/jaydencyril67/Kingshall/releases/latest/download/CryBots.apk',
   },
 ];
 
