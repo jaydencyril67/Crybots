@@ -297,7 +297,7 @@ const childNavigationGroups: NavigationGroup[] = [
   { routes: ['/information', '/privacy-policy', '/community-standards'] },
   { routes: ['/api-keys', '/webhooks', '/configure'] },
   { routes: ['/nowbar-color', '/nowbar-button-color'] },
-  { routes: ['/download', '/worldscope'] },
+  { routes: ['/download', '/worldscope', '/worldscope-rankings'] },
 ];
 
 const getActivePath = () => {
@@ -352,7 +352,7 @@ const getCurrentPageTitle = (path: string) => {
   if (path === '/faq') return 'FAQ';
   if (path === '/options') return 'OPTION';
   if (path === '/store') return 'STORE';
-  if (path === '/worldscope') return 'WORLDSCOPE';
+  if (path === '/worldscope' || path === '/worldscope-rankings') return 'WORLDSCOPE';
   if (path === '/about') return 'ABOUT';
   if (path === '/dev') return 'DEV';
   if (path === '/api-keys') return 'API KEYS';
