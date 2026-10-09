@@ -131,7 +131,7 @@ const DownloadPage = () => {
                     rel="noopener noreferrer"
                     style={styles.downloadButton}
                   >
-                    Download
+                    {option.title === 'Android APK' ? 'Download / Update' : 'Download'}
                   </a>
                 </section>
               </div>
