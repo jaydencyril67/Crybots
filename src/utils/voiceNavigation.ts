@@ -75,6 +75,7 @@ export const PAGE_ROUTES: VoiceCommand[] = [
   { label: 'FAQ', route: '/faq' },
   { label: 'OPTIONS', route: '/options' },
   { label: 'STORE', route: '/store' },
+  { label: 'DOWNLOAD', route: '/download' },
   { label: 'ABOUT', route: '/about' },
   { label: 'INFORMATION', route: '/information' },
   { label: 'PRIVACY POLICY', route: '/privacy-policy' },
