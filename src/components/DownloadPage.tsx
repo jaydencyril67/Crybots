@@ -2,6 +2,7 @@ import React from 'react';
 import { Capacitor } from '@capacitor/core';
 import { NativeAppUpdate, type NativeAppUpdateEvent } from '../utils/nativeAppUpdate';
 import { ArrowLeft } from 'lucide-react';
+import InstallAppButton from './InstallAppButton';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
@@ -186,6 +187,18 @@ const DownloadPage = () => {
                 </section>
               </div>
             ))}
+            <div style={styles.outerCard}>
+              <section style={styles.downloadCard}>
+                <h3 style={styles.title}>PWA (Web App)</h3>
+                <p style={styles.description}>
+                  Install CryBots directly from your browser as an app, without downloading an APK.
+                  If the install button is unavailable, open your browser menu and choose “Install app” or “Add to Home screen”.
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '5px' }}>
+                  <InstallAppButton />
+                </div>
+              </section>
+            </div>
           </div>
         </div>
         <NowBar />
