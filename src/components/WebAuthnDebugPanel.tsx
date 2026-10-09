@@ -138,58 +138,32 @@ const WebAuthnDebugPanel = () => {
     };
   }, []);
 
+  // Keep this action browser-only. Calling optional WebAuthn availability/capability
+  // methods or the native bridge has caused the APK to close on some WebView builds.
+  // Re-enable native probing only after isolating and fixing that crash.
   const runDiagnostics = useCallback(async () => {
     setRunning(true);
-    logWebAuthnDebug('diagnostics', 'info', 'Starting browser and native diagnostics');
-    const result: Record<string, unknown> = { browser: getBrowserDiagnostics() };
-    const pkc = window.PublicKeyCredential as typeof PublicKeyCredential & {
-      isUserVerifyingPlatformAuthenticatorAvailable?: () => Promise<boolean>;
-      isConditionalMediationAvailable?: () => Promise<boolean>;
-      isPasskeyPlatformAuthenticatorAvailable?: () => Promise<boolean>;
-      getClientCapabilities?: () => Promise<Record<string, unknown>>;
-    };
-
-    const runCheck = async (name: string, fn?: () => Promise<unknown>) => {
-      if (!fn) {
-        result[name] = { supported: false, reason: 'API method is not exposed in this runtime' };
-        return;
-      }
-      try {
-        result[name] = { supported: true, result: await fn() };
-      } catch (error) {
-        result[name] = { supported: true, rejected: true, error: error instanceof Error
-          ? { name: error.name, message: error.message, stack: error.stack }
-          : String(error) };
-      }
-    };
-
-    await runCheck('platformAuthenticatorAvailability', pkc?.isUserVerifyingPlatformAuthenticatorAvailable?.bind(pkc));
-    await runCheck('conditionalMediationAvailability', pkc?.isConditionalMediationAvailable?.bind(pkc));
-    await runCheck('passkeyPlatformAuthenticatorAvailability', pkc?.isPasskeyPlatformAuthenticatorAvailable?.bind(pkc));
-    await runCheck('webAuthnClientCapabilities', pkc?.getClientCapabilities?.bind(pkc));
-
-    if (Capacitor.isNativePlatform()) {
-      try {
-        const native = await NativeWebAuthnDiagnostics.getDiagnostics();
-        result.nativeAndroid = native;
-        logWebAuthnDebug('native-diagnostics', 'success', 'Native Android diagnostics returned', native);
-      } catch (error) {
-        result.nativeAndroid = { bridgeCallFailed: true, error: error instanceof Error
-          ? { name: error.name, message: error.message, stack: error.stack }
-          : String(error) };
-        logWebAuthnDebug('native-diagnostics', 'error', 'Native diagnostics bridge failed', result.nativeAndroid);
-      }
-    } else {
-      result.nativeAndroid = { skipped: true, reason: 'Not running inside a native Capacitor platform' };
+    try {
+      const browser = getBrowserDiagnostics();
+      const result: Record<string, unknown> = {
+        browser,
+        nativeAndroid: {
+          skipped: true,
+          reason: 'Native diagnostics are temporarily disabled to prevent APK crashes. Use the browser snapshot and backend logs for now.',
+        },
+        note: 'Safe mode: no WebAuthn authenticator APIs or native diagnostic bridge were invoked.',
+      };
+      setDiagnostics(result);
+      logWebAuthnDebug('diagnostics', 'success', 'Safe browser-only diagnostics completed', {
+        secureContext: window.isSecureContext,
+        origin: window.location.origin,
+        nativeProbeSkipped: true,
+      });
+    } catch (error) {
+      logWebAuthnDebug('diagnostics', 'error', 'Browser-only diagnostics failed', error);
+    } finally {
+      setRunning(false);
     }
-
-    setDiagnostics(result);
-    logWebAuthnDebug('diagnostics', 'success', 'Diagnostics completed', {
-      secureContext: window.isSecureContext,
-      origin: window.location.origin,
-      nativeDiagnosticsReturned: Boolean(result.nativeAndroid && !(result.nativeAndroid as { skipped?: boolean }).skipped),
-    });
-    setRunning(false);
   }, []);
 
   const copyLogs = async () => {
@@ -253,7 +227,7 @@ const WebAuthnDebugPanel = () => {
       <div style={{ display: 'grid', gap: 7 }}>
         <div style={{ fontSize: 13, fontWeight: 800 }}>Runtime snapshot</div>
         <pre style={{ margin: 0, padding: 10, borderRadius: 9, background: '#0a0e1b', color: '#dbe6ff', fontSize: 11, lineHeight: 1.5, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: 320, overflow: 'auto' }}>
-          {JSON.stringify(diagnostics ?? { browser: getBrowserDiagnostics(), nativeAndroid: 'Tap Run diagnostics to query native Android' }, null, 2)}
+          {JSON.stringify(diagnostics ?? { browser: getBrowserDiagnostics(), nativeAndroid: 'Native probe temporarily disabled to prevent APK crashes' }, null, 2)}
         </pre>
       </div>
       <div style={{ display: 'grid', gap: 7 }}>
@@ -263,7 +237,7 @@ const WebAuthnDebugPanel = () => {
         </pre>
       </div>
       <div style={{ fontSize: 11, color: '#bdc7e3', lineHeight: 1.5 }}>
-        Note: browser JavaScript cannot inspect every Android system/WebView log. The native snapshot below reports the WebView package and WebAuthn support setting exposed by the APK.
+        Note: browser JavaScript cannot inspect every Android system/WebView log. Native probing is temporarily disabled because it can crash the APK; browser diagnostics and backend logs remain available.
       </div>
     </section>
   );
