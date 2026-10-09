@@ -67,7 +67,11 @@ const WorldScopePage = () => {
     }
   }, []);
 
-  useEffect(() => { void loadWorldScope(); }, [loadWorldScope]);
+  useEffect(() => {
+    void loadWorldScope();
+    const refreshInterval = window.setInterval(() => { void loadWorldScope(); }, 60_000);
+    return () => window.clearInterval(refreshInterval);
+  }, [loadWorldScope]);
 
   const tier = data?.access?.tier || null;
   const canUseAdvanced = tier === 'advanced';
