@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Download, ExternalLink } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
@@ -131,9 +131,7 @@ const DownloadPage = () => {
                     rel="noopener noreferrer"
                     style={styles.downloadButton}
                   >
-                    <Download size={17} />
                     Download
-                    <ExternalLink size={15} />
                   </a>
                 </section>
               </div>
