@@ -394,8 +394,9 @@ jobs:
                   String url = call.getString("url");
                   Uri parsed = url == null ? null : Uri.parse(url);
                   if (parsed == null || !"https".equalsIgnoreCase(parsed.getScheme()) ||
-                          parsed.getHost() == null || !"github.com".equalsIgnoreCase(parsed.getHost())) {
-                      call.reject("The update URL is not a trusted CryBots GitHub release URL.");
+                          parsed.getHost() == null ||
+                          !"crybots.kingshall.online".equalsIgnoreCase(parsed.getHost())) {
+                      call.reject("The update URL is not a trusted CryBots download URL.");
                       return;
                   }
 
