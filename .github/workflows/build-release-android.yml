@@ -1064,9 +1064,21 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+      - name: Verify release publishing credentials
+        env:
+          GH_TOKEN: ${{ secrets.CRYBOTS_RELEASE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::Missing repository secret CRYBOTS_RELEASE_TOKEN."
+            echo "Create a fine-grained token for this repository with Contents: Read and write, then add it under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "Dedicated release token is configured."
+
       - name: Publish CryBots GitHub Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.CRYBOTS_RELEASE_TOKEN }}
           APP_VERSION: ${{ inputs.app_version }}
         run: |
           set -euo pipefail
