@@ -905,7 +905,7 @@ jobs:
                   android:width="160dp"
                   android:height="64dp"
                   android:gravity="center|bottom"
-                  android:bottom="36dp"
+                  android:bottom="44dp"
                   android:drawable="@drawable/crybots_branding" />
           </layer-list>
           XML
