@@ -84,17 +84,18 @@ const AppUpdateMonitor = () => {
     try {
       const result = await NativeAppUpdate.downloadAndInstall({ url: update.downloadUrl });
       if (result.requiresPermission) {
+        setInstalling(false);
         setActionMessage('Allow CryBots to install unknown apps in Android settings, return here, then tap Update now again.');
       } else {
+        // Keep the panel in downloading state while Android handles the background APK download.
         setActionMessage('The APK is downloading. Android will ask you to approve the update when it finishes.');
       }
     } catch {
+      setInstalling(false);
       setActionMessage('The in-app installer could not start. You can download the APK from the Download page.');
       window.setTimeout(() => {
         if (update.downloadUrl) window.open(update.downloadUrl, '_blank', 'noopener,noreferrer');
       }, 500);
-    } finally {
-      setInstalling(false);
     }
   };
 
@@ -122,6 +123,7 @@ const AppUpdateMonitor = () => {
         backdropFilter: 'blur(22px)',
       }}
     >
+      <style>{'@keyframes kh-update-spin { to { transform: rotate(360deg); } }'}</style>
       <div style={{ minWidth: 0 }}>
         <strong style={{ display: 'block', fontSize: '0.9rem', fontWeight: 900 }}>CryBots update available</strong>
         <p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.8rem', lineHeight: 1.45 }}>
@@ -130,14 +132,24 @@ const AppUpdateMonitor = () => {
         {actionMessage ? <p style={{ margin: '7px 0 0', color: theme.primary, fontSize: '0.78rem', lineHeight: 1.45 }}>{actionMessage}</p> : null}
       </div>
       <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-        <button
-          type="button"
-          onClick={() => void startUpdate()}
-          disabled={installing}
-          style={{ flex: 1, border: `1px solid ${theme.primary}`, borderRadius: '999px', padding: '9px 12px', background: theme.primary, color: theme.textInverse, fontWeight: 850, fontSize: '0.82rem', cursor: installing ? 'wait' : 'pointer', opacity: installing ? 0.75 : 1 }}
-        >
-          {installing ? 'Starting…' : 'Update now'}
-        </button>
+        {installing ? (
+          <div
+            role="status"
+            aria-live="polite"
+            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: `1px solid ${theme.borderGlass}`, borderRadius: '999px', padding: '9px 12px', background: theme.surfaceMuted, color: theme.text, fontWeight: 850, fontSize: '0.82rem' }}
+          >
+            <span aria-hidden="true" style={{ width: '13px', height: '13px', border: `2px solid ${theme.borderGlass}`, borderTopColor: theme.primary, borderRadius: '50%', animation: 'kh-update-spin 0.8s linear infinite' }} />
+            APK downloading…
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void startUpdate()}
+            style={{ flex: 1, border: `1px solid ${theme.primary}`, borderRadius: '999px', padding: '9px 12px', background: theme.primary, color: theme.textInverse, fontWeight: 850, fontSize: '0.82rem', cursor: 'pointer' }}
+          >
+            Update now
+          </button>
+        )}
         <button
           type="button"
           onClick={() => setHidden(true)}
