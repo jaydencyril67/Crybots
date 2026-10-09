@@ -25,6 +25,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 
 const ThemePage = () => {
   const { themeMode, themePreference, setThemePreference } = useAppTheme();
+  const [shiftPreviewMode, setShiftPreviewMode] = useState<'dark' | 'light'>(() => {
+    const hour = new Date().getHours();
+    return hour >= 6 && hour < 18 ? 'light' : 'dark';
+  });
   const [systemPreviewMode, setSystemPreviewMode] = useState<'dark' | 'light'>(() => typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
 
   useEffect(() => {
@@ -35,13 +39,23 @@ const ThemePage = () => {
     return () => mediaQuery.removeEventListener('change', updateSystemPreview);
   }, []);
 
+  useEffect(() => {
+    const updateShiftPreview = () => {
+      const hour = new Date().getHours();
+      setShiftPreviewMode(hour >= 6 && hour < 18 ? 'light' : 'dark');
+    };
+    updateShiftPreview();
+    const timer = window.setInterval(updateShiftPreview, 60 * 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const themeOptions: Array<{ key: AppThemePreference; name: string; description: string; preview: 'dark' | 'light' }> = [
     { key: 'dark', name: 'Dark', description: 'A focused black canvas with high-contrast surfaces for a calm, immersive workspace.', preview: 'dark' },
     { key: 'light', name: 'Light', description: 'A warm, bright interface with soft surfaces designed for daytime clarity.', preview: 'light' },
     { key: 'system', name: 'System', description: 'Automatically follows the light or dark appearance selected on your device.', preview: systemPreviewMode },
-    { key: 'shift', name: 'Shift', description: 'Adapts throughout the day: light during daytime hours and dark overnight.', preview: themeMode },
+    { key: 'shift', name: 'Shift', description: 'Adapts throughout the day: light during daytime hours and dark overnight.', preview: shiftPreviewMode },
   ];
 
   return (
