@@ -42,15 +42,19 @@ const DownloadPage = () => {
 
     event.preventDefault();
     setApkActionMessage('Preparing the APK update…');
+    pushDebugLog('INFO', 'User tapped Download / Update.', { url: option.url });
     try {
       const result = await NativeAppUpdate.downloadAndInstall({ url: option.url });
       if (result.requiresPermission) {
         setApkActionMessage('Allow CryBots to install unknown apps in Android settings, return here, then tap Download / Update again.');
       } else {
         setApkActionMessage('The APK is downloading. Android will ask you to approve the update when it finishes.');
+        pushDebugLog('INFO', 'Native download plugin accepted the request.', result);
       }
-    } catch {
-      setApkActionMessage('The in-app installer could not start. Opening the direct APK download instead.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      pushDebugLog('ERROR', 'Native download plugin rejected the request.', message);
+      setApkActionMessage('The in-app installer could not start: ' + message + '. Opening the direct APK download instead.');
       window.setTimeout(() => window.open(option.url, '_blank', 'noopener,noreferrer'), 500);
     }
   };
@@ -108,7 +112,7 @@ const DownloadPage = () => {
     const report = JSON.stringify({
       exportedAt: new Date().toISOString(),
       platform: Capacitor.getPlatform(),
-      appUrl: window.location.href,
+      appUrl: window.location.origin + window.location.pathname,
       diagnostics: debugDiagnostics,
       endpointProbe: probeResult,
       logs: debugLogs,
