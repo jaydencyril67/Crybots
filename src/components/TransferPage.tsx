@@ -280,7 +280,7 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Security code</span>
-                  <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeBound} />
+                  <input style={{ ...styles.input, opacity: securityCodeBound ? 1 : 0.65, cursor: securityCodeBound ? 'text' : 'not-allowed', WebkitTextSecurity: 'disc' } as React.CSSProperties} type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeBound ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeBound} />
                 </div>
                 <div style={styles.buttonRow}>
                   <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !amountIsValid || !securityCodeBound || !securityCode}>
