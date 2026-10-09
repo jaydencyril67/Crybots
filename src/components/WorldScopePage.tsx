@@ -147,7 +147,7 @@ const WorldScopePage = () => {
           </div>
         </>}
 
-        {screen === 'payments' && !accessActive && <>
+        {screen === 'payments' && <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <h2 style={styles.sectionTitle}>WorldScope subscription</h2>
             <button type="button" style={{ ...styles.button, width: 'auto', padding: '8px 11px' }} onClick={() => setScreen('intro')}><ArrowLeft size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Overview</button>
