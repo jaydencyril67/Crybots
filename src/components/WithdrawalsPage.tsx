@@ -284,7 +284,8 @@ const WithdrawPage = () => {
             </div>
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Amount</span>
-              <input style={styles.input} type="number" min="1" step="1" inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="1 USDT" />
+              <input style={styles.input} type="number" min="10" step="1" inputMode="numeric" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="10 USDT" />
+              <span style={styles.helper}>Minimum withdrawal: 10 USDT.</span>
             </div>
             <div style={styles.field as React.CSSProperties}>
               <span style={styles.label}>Bound wallets</span>
@@ -305,7 +306,7 @@ const WithdrawPage = () => {
               <input style={{ ...styles.input, opacity: securityCodeSet ? 1 : 0.65, cursor: securityCodeSet ? 'text' : 'not-allowed' }} type="password" value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={securityCodeSet ? '6-digit security code' : 'Set security code to continue'} disabled={!securityCodeSet} />
             </div>
             <div style={styles.buttonRow}>
-              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || !availableDestination || (wallets.length > 0 && !selectedWalletId) || !securityCodeSet || !securityCode}>
+              <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || Number(amount) < 10 || !Number.isInteger(Number(amount)) || !availableDestination || (wallets.length > 0 && !selectedWalletId) || !securityCodeSet || !securityCode}>
                 {withdrawing ? <InlineLoadingDots /> : 'Submit withdrawal'}
               </button>
             </div>
