@@ -316,30 +316,8 @@ const TransactionHistoryPage = () => {
                                     <div><span style={styles.label}>Direction</span><p style={styles.cardText}>{transaction.direction === 'inbound' ? 'Inbound' : 'Outbound'}</p></div>
                                     <div><span style={styles.label}>Currency</span><p style={styles.cardText}>{transaction.currency}</p></div>
                                     <div><span style={styles.label}>Counterpart</span><p style={styles.cardText}>{transaction.counterpart || '—'}</p></div>
-                                    <div><span style={styles.label}>Reference</span><p style={{ ...styles.cardText, wordBreak: 'break-all' }}>{transaction.reference}</p></div>
+                                    <div><div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={styles.label}>Reference</span><button type="button" aria-label="Copy reference" title="Copy reference" onClick={() => { void (async () => { try { if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(transaction.reference); else { const textArea = document.createElement('textarea'); textArea.value = transaction.reference; textArea.style.position = 'fixed'; textArea.style.opacity = '0'; document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea); } setAlert({ tone: 'success', title: 'Reference copied', message: 'The transaction reference has been copied to your clipboard.' }); } catch { setAlert({ tone: 'error', title: 'Copy failed', message: 'The transaction reference could not be copied. Please try again.' }); } })(); }} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent', color: theme.textMuted, cursor: 'pointer', lineHeight: 1 }}><Copy size={14} /></button></div><p style={{ ...styles.cardText, wordBreak: 'break-all' }}>{transaction.reference}</p></div>
                                     <div><span style={styles.label}>Date & time</span><p style={styles.cardText}>{transaction.date} {transaction.time}</p></div>
-                                    <div style={{ gridColumn: '1 / -1' }}>
-                                      <button type="button" style={{ ...styles.selectOption, display: 'inline-flex', alignItems: 'center', gap: '7px', width: 'fit-content' }} onClick={() => {
-                                        void (async () => {
-                                          try {
-                                            if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(transaction.reference);
-                                            else {
-                                              const textArea = document.createElement('textarea');
-                                              textArea.value = transaction.reference;
-                                              textArea.style.position = 'fixed';
-                                              textArea.style.opacity = '0';
-                                              document.body.appendChild(textArea);
-                                              textArea.select();
-                                              document.execCommand('copy');
-                                              document.body.removeChild(textArea);
-                                            }
-                                            setAlert({ tone: 'success', title: 'Reference copied', message: 'The transaction reference has been copied to your clipboard.' });
-                                          } catch {
-                                            setAlert({ tone: 'error', title: 'Copy failed', message: 'The transaction reference could not be copied. Please try again.' });
-                                          }
-                                        })();
-                                      }}><Copy size={16} /> Copy reference</button>
-                                    </div>
                                   </div>
                                 </td>
                               </tr>
