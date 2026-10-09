@@ -1,23 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Capacitor, registerPlugin } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
 import api from '../api/axios';
+import { NativeAppUpdate } from '../utils/nativeAppUpdate';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
-
-type NativeAppInfo = {
-  versionName: string;
-  versionCode: number;
-};
-
-type NativeAppUpdatePlugin = {
-  getAppInfo(): Promise<NativeAppInfo>;
-  downloadAndInstall(options: { url: string }): Promise<{
-    status?: string;
-    downloadId?: number;
-    requiresPermission?: boolean;
-  }>;
-  addListener?(eventName: 'downloadError', listener: (event: { message?: string }) => void): Promise<{ remove: () => Promise<void> }>;
-};
 
 type UpdateCheckResponse = {
   updateAvailable: boolean;
@@ -26,8 +12,6 @@ type UpdateCheckResponse = {
   downloadUrl?: string;
   releaseNotes?: string;
 };
-
-const NativeAppUpdate = registerPlugin<NativeAppUpdatePlugin>('NativeAppUpdate');
 
 const AppUpdateMonitor = () => {
   const { themeMode } = useAppTheme();
