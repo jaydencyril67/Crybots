@@ -5,10 +5,10 @@ const config: CapacitorConfig = {
   appName: 'CryBots',
   webDir: 'build',
   server: {
-    // Capacitor serves bundled assets locally. Keep this on localhost instead
-    // of impersonating the production domain with a local WebView certificate.
-    // The production RP ID is associated separately through assetlinks.json.
-    hostname: 'localhost',
+    // Serve bundled app content under the same HTTPS origin as the WebAuthn RP.
+    // WebAuthn related-origin lists require registrable web domains; localhost
+    // cannot be delegated to crybots.kingshall.online through /.well-known/webauthn.
+    hostname: 'crybots.kingshall.online',
     androidScheme: 'https',
   },
   plugins: {
