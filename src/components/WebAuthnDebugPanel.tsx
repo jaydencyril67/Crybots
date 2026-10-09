@@ -259,7 +259,7 @@ const WebAuthnDebugPanel = () => {
       <div style={{ display: 'grid', gap: 7 }}>
         <div style={{ fontSize: 13, fontWeight: 800 }}>Event log ({entries.length})</div>
         <pre style={{ margin: 0, padding: 10, borderRadius: 9, background: '#0a0e1b', color: '#dbe6ff', fontSize: 11, lineHeight: 1.5, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', maxHeight: 360, overflow: 'auto' }}>
-          {entries.length ? entries.map((entry) => `[${entry.time}] [${entry.level.toUpperCase()}] ${entry.stage}: ${entry.message}${entry.details === undefined ? '' : `\\n${JSON.stringify(entry.details, null, 2)}`}`).join('\\n\\n') : 'No events logged yet.'}
+          {entries.length ? entries.map((entry) => `[${entry.time}] [${entry.level.toUpperCase()}] ${entry.stage}: ${entry.message}${entry.details === undefined ? '' : `\n${JSON.stringify(entry.details, null, 2)}`}`).join('\n\n') : 'No events logged yet.'}
         </pre>
       </div>
       <div style={{ fontSize: 11, color: '#bdc7e3', lineHeight: 1.5 }}>
