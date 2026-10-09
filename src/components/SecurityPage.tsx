@@ -13,6 +13,8 @@ import ReusableConfirmationPage from './ReusableConfirmationPage';
 import NotificationBanner from './NotificationBanner';
 import { createPasskey, isWebAuthnAvailable } from '../utils/webauthn';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
+import WebAuthnDebugPanel from './WebAuthnDebugPanel';
+import { logWebAuthnDebug } from '../utils/webauthnDebug';
 
 type SecurityDevice = {
   id?: string;
@@ -700,23 +702,94 @@ const SecurityPage = () => {
   };
 
   const handleToggleBiometric = async () => {
-    if (!isWebAuthnAvailable()) return showStatus('error', 'Passkeys are not supported by this browser.', 'biometric');
+    logWebAuthnDebug('biometric-click', 'info', 'Biometric security button tapped', {
+      mode: biometricEnabled && passkeys.length ? 'disable' : 'register',
+      passkeyCount: passkeys.length,
+      origin: window.location.origin,
+      isSecureContext: window.isSecureContext,
+      publicKeyCredentialAvailable: typeof window.PublicKeyCredential !== 'undefined',
+      credentialsApiAvailable: typeof navigator.credentials !== 'undefined',
+      credentialsCreateAvailable: typeof navigator.credentials?.create === 'function',
+    });
+    if (!isWebAuthnAvailable()) {
+      logWebAuthnDebug('availability-check', 'error', 'WebAuthn APIs unavailable before registration', {
+        publicKeyCredentialType: typeof window.PublicKeyCredential,
+        credentialsType: typeof navigator.credentials,
+        isSecureContext: window.isSecureContext,
+      });
+      return showStatus('error', 'Passkeys are not supported by this browser.', 'biometric');
+    }
     setSavingBiometric(true);
     try {
       if (biometricEnabled && passkeys.length) {
+        logWebAuthnDebug('disable-passkey', 'info', 'Requesting removal of saved passkey', { credentialCount: passkeys.length });
         await api.delete(`/api/webauthn/credentials/${encodeURIComponent(passkeys[0].id)}`);
+        logWebAuthnDebug('disable-passkey', 'success', 'Backend confirmed passkey removal');
         setPasskeys([]);
         setBiometricEnabled(false);
         showStatus('success', 'Biometric security disabled.', 'biometric');
         return;
       }
-      const { data: options } = await api.post('/api/webauthn/register/options');
+
+      logWebAuthnDebug('registration-options', 'info', 'Requesting WebAuthn registration options');
+      const optionsResponse = await api.post('/api/webauthn/register/options');
+      const options = optionsResponse.data;
+      logWebAuthnDebug('registration-options', 'success', 'Registration options received', {
+        httpStatus: optionsResponse.status,
+        rp: options?.rp ? { id: options.rp.id, name: options.rp.name } : null,
+        challengeLength: typeof options?.challenge === 'string' ? options.challenge.length : null,
+        userIdLength: typeof options?.user?.id === 'string' ? options.user.id.length : null,
+        userNamePresent: Boolean(options?.user?.name),
+        timeout: options?.timeout,
+        authenticatorSelection: options?.authenticatorSelection,
+        attestation: options?.attestation,
+        excludeCredentialsCount: Array.isArray(options?.excludeCredentials) ? options.excludeCredentials.length : 0,
+        extensionsPresent: Boolean(options?.extensions),
+      });
+
+      logWebAuthnDebug('credential-create', 'info', 'Calling navigator.credentials.create()', {
+        origin: window.location.origin,
+        isSecureContext: window.isSecureContext,
+        rpId: options?.rp?.id,
+        timeout: options?.timeout,
+        authenticatorSelection: options?.authenticatorSelection,
+      });
+      const createStartedAt = Date.now();
       const credential = await createPasskey(options);
-      const { data } = await api.post('/api/webauthn/register/verify', credential);
-      setPasskeys(data.credentials ?? []);
+      logWebAuthnDebug('credential-create', 'success', 'navigator.credentials.create() resolved', {
+        elapsedMs: Date.now() - createStartedAt,
+        credentialType: credential?.type,
+        responseType: credential?.response ? 'attestation' : 'missing',
+        transportCount: Array.isArray(credential?.response?.transports) ? credential.response.transports.length : 0,
+      });
+
+      logWebAuthnDebug('registration-verify', 'info', 'Submitting credential attestation to backend', {
+        credentialType: credential?.type,
+        responsePresent: Boolean(credential?.response),
+      });
+      const verifyResponse = await api.post('/api/webauthn/register/verify', credential);
+      logWebAuthnDebug('registration-verify', 'success', 'Backend verified registration', {
+        httpStatus: verifyResponse.status,
+        returnedCredentialCount: Array.isArray(verifyResponse.data?.credentials) ? verifyResponse.data.credentials.length : null,
+      });
+      setPasskeys(verifyResponse.data.credentials ?? []);
       setBiometricEnabled(true);
       showStatus('success', 'Biometric security enabled with a passkey.', 'biometric');
     } catch (error: any) {
+      const response = error?.response;
+      logWebAuthnDebug('biometric-flow-error', 'error', 'Biometric registration flow failed', {
+        name: error?.name,
+        message: error?.message,
+        stack: error?.stack,
+        code: error?.code,
+        isAxiosError: Boolean(error?.isAxiosError),
+        httpStatus: response?.status,
+        responseData: response?.data,
+        requestUrl: error?.config?.url,
+        requestMethod: error?.config?.method,
+        currentOrigin: window.location.origin,
+        isSecureContext: window.isSecureContext,
+      });
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to update biometric security. Please try again.'), 'biometric');
     } finally {
       setSavingBiometric(false);
@@ -1014,6 +1087,8 @@ const SecurityPage = () => {
                 {renderStatus('biometric')}
                 </div>
               </div>
+
+              <WebAuthnDebugPanel />
 
               <div style={styles.card}>
                 <div style={styles.row}>
