@@ -484,7 +484,7 @@ jobs:
                   text-anchor="middle"
                   fill="#ffffff"
                   font-family="sans-serif"
-                  font-size="112"
+                  font-size="101"
                   font-weight="700">CryBots</text>
           </svg>
           SVG
@@ -505,15 +505,15 @@ jobs:
           <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
               <item android:drawable="@color/crybots_splash_background" />
               <item
-                  android:width="224dp"
-                  android:height="224dp"
+                  android:width="213dp"
+                  android:height="213dp"
                   android:gravity="center"
                   android:drawable="@drawable/crybots_splash_icon" />
               <item
                   android:width="160dp"
                   android:height="64dp"
                   android:gravity="center|bottom"
-                  android:bottom="32dp"
+                  android:bottom="36dp"
                   android:drawable="@drawable/crybots_branding" />
           </layer-list>
           XML
