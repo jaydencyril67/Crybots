@@ -14,7 +14,7 @@ type WorldScopeResponse = {
   access?: { tier: ScopeTier | null; active: boolean; prices: Record<BillingCycle, Record<ScopeTier, number>>; billingCycle?: BillingCycle | null; paidAmount?: number; purchasedAt?: string; expiresAt?: string | null; lifetimeAccess?: boolean };
   walletBalance?: number; asOf?: string; timezone?: string; windows?: Record<string, string>; rankings?: Rankings | null; message?: string;
 };
-type RankingSection = { id: keyof Rankings; title: string; subtitle: string; icon: React.ComponentType<{ size?: number }>; tier: ScopeTier; columns: { key: string; label: string; format?: 'usdt' | 'percent' | 'date' }[] };
+type RankingSection = { id: keyof Rankings; title: string; subtitle: string; icon: React.ComponentType<{ size?: string | number }>; tier: ScopeTier; columns: { key: string; label: string; format?: 'usdt' | 'percent' | 'date' }[] };
 
 const sections: RankingSection[] = [
   { id: 'profitableBots', title: 'Most Profitable Bots', subtitle: 'Top bots by total recorded realized settlement profit and loss.', icon: Bot, tier: 'moderate', columns: [{ key: 'name', label: 'Bot' }, { key: 'symbol', label: 'Symbol' }, { key: 'realizedProfit', label: 'Net P/L', format: 'usdt' }, { key: 'settlementDays', label: 'Settlements' }] },
