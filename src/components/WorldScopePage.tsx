@@ -40,6 +40,7 @@ const WorldScopePage = () => {
   const [screen, setScreen] = useState<'intro' | 'payments'>(() => new URLSearchParams(window.location.search).get('plans') === '1' ? 'payments' : 'intro');
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly');
   const [selectedTier, setSelectedTier] = useState<ScopeTier>('moderate');
+  const [confirmTier, setConfirmTier] = useState<ScopeTier | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [error, setError] = useState('');
@@ -107,6 +108,11 @@ const WorldScopePage = () => {
     card: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, borderRadius: 15, padding: 14, display: 'grid', alignContent: 'start', gap: 12, minWidth: 0, boxSizing: 'border-box' as const },
     button: { width: '100%', minWidth: 108, border: 'none', borderRadius: 999, padding: '11px 16px', color: theme.text, background: theme.surfaceMuted, fontWeight: 700, fontSize: '.88rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxSizing: 'border-box' as const },
     primaryButton: { background: theme.primary, color: theme.textInverse, borderColor: theme.primary },
+    confirmPanel: { display: 'grid', gap: 10, padding: 12, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, marginTop: 10 },
+    confirmPrompt: { margin: 0, color: theme.textMuted, fontSize: '.86rem', lineHeight: 1.5 },
+    confirmActions: { display: 'flex', gap: 8, width: '100%' },
+    cancelConfirm: { flex: 1, borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '8px 13px', fontSize: '.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer' },
+    confirmPurchase: { flex: 1, borderRadius: 999, border: `1px solid ${theme.primary}`, padding: '8px 13px', fontSize: '.82rem', fontWeight: 800, color: theme.textInverse, background: theme.primary, cursor: 'pointer' },
     featureList: { display: 'grid', gap: 8, padding: 0, margin: 0, listStyle: 'none', color: theme.textMuted, fontSize: '.88rem', lineHeight: 1.5 },
     notice: { border: `1px solid ${theme.borderGlass}`, borderRadius: 13, background: theme.surfaceMuted, color: theme.textMuted, padding: '12px 13px', fontSize: '.82rem', lineHeight: 1.5, marginTop: 12 },
     status: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const, color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
@@ -185,7 +191,18 @@ const WorldScopePage = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><h3 style={{ margin: 0, fontSize: '1.03rem' }}>{advanced ? 'Advance Scope' : 'Moderate Scope'}</h3>{advanced ? <Crown size={19} color="#a855f7" /> : <ShieldCheck size={19} color={theme.primary} />}</div>
                 <div><span style={{ fontSize: '1.8rem', fontWeight: 900 }}>{price.toFixed(2).replace(/\.00$/, '')}</span> <strong>USDT</strong><div style={styles.muted}>per {billingCycle === 'monthly' ? 'month' : 'year'}</div></div>
                 <ul style={styles.featureList}>{features.map(feature => <li key={feature}>✓ {feature}</li>)}</ul>
-                <button type="button" disabled={loading || purchasing} style={{ ...styles.button, ...(selectedTier === plan ? styles.primaryButton : {}) }} onClick={() => { setSelectedTier(plan); void purchase(plan); }}>{purchasing && selectedTier === plan ? 'Activating subscription…' : `Subscribe · ${price.toFixed(2).replace(/\.00$/, '')} USDT`}</button>
+                <button type="button" disabled={loading || purchasing} style={{ ...styles.button, ...(selectedTier === plan ? styles.primaryButton : {}) }} onClick={() => { setSelectedTier(plan); setConfirmTier(plan); setError(''); setMessage(''); }}>{confirmTier === plan ? 'Confirmation open' : `Subscribe · ${price.toFixed(2).replace(/\.00$/, '')} USDT`}</button>
+                {confirmTier === plan ? <div style={styles.confirmPanel} role="alertdialog" aria-label={`Confirm ${advanced ? 'Advance Scope' : 'Moderate Scope'} subscription`}>
+                  <p style={styles.confirmPrompt}>Confirm your WorldScope subscription before payment.</p>
+                  <div style={styles.status}><strong>Plan:</strong> {advanced ? 'Advance Scope' : 'Moderate Scope'} · {billingCycle === 'monthly' ? 'Monthly' : 'Yearly'}</div>
+                  <div style={styles.status}><strong>Charge:</strong> {price.toFixed(2).replace(/\.00$/, '')} USDT</div>
+                  <div style={styles.status}><strong>Available balance:</strong> {Number(data?.walletBalance || 0).toFixed(2)} USDT</div>
+                  <p style={styles.confirmPrompt}>Your in-app USDT balance will be charged only after you confirm. This plan does not renew automatically.</p>
+                  <div style={styles.confirmActions}>
+                    <button type="button" style={styles.cancelConfirm} disabled={purchasing} onClick={() => setConfirmTier(null)}>Cancel</button>
+                    <button type="button" style={styles.confirmPurchase} disabled={loading || purchasing} onClick={() => void purchase(plan)}>{purchasing ? 'Activating…' : 'Confirm subscription'}</button>
+                  </div>
+                </div> : null}
               </article></div>;
             })}
           </div>
