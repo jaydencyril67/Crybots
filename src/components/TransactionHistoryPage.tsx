@@ -302,8 +302,8 @@ const TransactionHistoryPage = () => {
                               <td style={styles.td}><strong>{transaction.title}</strong></td>
                               <td style={styles.td}><span style={{ ...styles.pill, ...getStatusStyle(theme, transaction.status) }}>{transaction.status}</span></td>
                               <td style={styles.td}>
-                                <button type="button" style={{ ...styles.selectOption, display: 'inline-flex', alignItems: 'center', gap: '7px', width: 'fit-content' }} onClick={() => setExpandedTransactionId(expanded ? null : transaction.id)}>
-                                  <ChevronDown size={16} style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} /> {expanded ? 'Hide' : 'View'}
+                                <button type="button" style={{ ...styles.selectOption, display: 'inline-flex', alignItems: 'center', width: 'fit-content' }} onClick={() => setExpandedTransactionId(expanded ? null : transaction.id)}>
+                                  {expanded ? 'Hide' : 'View'}
                                 </button>
                               </td>
                             </tr>
