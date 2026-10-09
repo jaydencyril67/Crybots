@@ -532,7 +532,7 @@ jobs:
                   registerPlugin(MediaAudioPlugin.class);
                   registerPlugin(WebAuthnDiagnosticsPlugin.class);
                   registerPlugin(NativeWebAuthnPlugin.class);
-          registerPlugin(NativeAppUpdatePlugin.class);
+                  registerPlugin(NativeAppUpdatePlugin.class);
                   super.onCreate(savedInstanceState);
 
                   AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
