@@ -187,8 +187,8 @@
         margin: 0;
         padding: 0 16px;
         box-sizing: border-box;
-        color: #ffffff;
-        font-family: "STIX Two Text", sans-serif !important;
+        color: inherit;
+        font: inherit;
         font-size: 12px;
         font-weight: 700;
         line-height: 1.4;
@@ -211,6 +211,14 @@
       @keyframes initial-splash-shimmer {
         0%, 100% { transform: scaleX(0.72); opacity: 0.45; }
         50% { transform: scaleX(1); opacity: 1; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .initial-splash-shimmer {
+          animation: none;
+          opacity: 0.7;
+          transform: none;
+        }
       }
     </style>
 
@@ -309,7 +317,6 @@
         <div class="initial-splash-shimmer" aria-hidden="true"></div>
       </div>
       <p class="initial-splash-powered">Powered by KingsHall</p>
-      </div>
     </div>
     <div id="root" style="min-height: 100vh;"></div>
   </body>
