@@ -49,12 +49,15 @@ const AppUpdateMonitor = () => {
       if (document.visibilityState === 'visible') void checkForUpdate();
     };
     const onAuthChanged = () => { void checkForUpdate(); };
+    const onUpdateNotification = () => { void checkForUpdate(); };
     window.addEventListener('focus', onVisibilityChange);
     window.addEventListener('ke:auth-changed', onAuthChanged);
+    window.addEventListener('ke:app-update-check-now', onUpdateNotification);
     return () => {
       window.clearInterval(interval);
       window.removeEventListener('focus', onVisibilityChange);
       window.removeEventListener('ke:auth-changed', onAuthChanged);
+      window.removeEventListener('ke:app-update-check-now', onUpdateNotification);
     };
   }, [checkForUpdate]);
 
