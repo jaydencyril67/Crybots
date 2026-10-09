@@ -98,7 +98,8 @@ const WorldScopePage = () => {
     sectionTitle: { margin: '20px 0 10px', fontSize: '1.05rem', fontWeight: 900 },
     muted: { color: theme.textMuted, fontSize: '.8rem', lineHeight: 1.6 },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 12 },
-    card: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, borderRadius: 17, padding: 16, display: 'grid', alignContent: 'start', gap: 12, minWidth: 0 },
+    outerCard: { padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, minWidth: 0 },
+    card: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, borderRadius: 15, padding: 14, display: 'grid', alignContent: 'start', gap: 12, minWidth: 0, boxSizing: 'border-box' as const },
     button: { width: '100%', border: `1px solid ${theme.borderGlass}`, borderRadius: 11, padding: '12px 13px', color: theme.text, background: theme.surfaceMuted, fontWeight: 850, cursor: 'pointer' },
     primaryButton: { background: theme.primary, color: theme.textInverse, borderColor: theme.primary },
     featureList: { display: 'grid', gap: 9, padding: 0, margin: 0, listStyle: 'none', color: theme.textMuted, fontSize: '.86rem', lineHeight: 1.5 },
@@ -134,16 +135,18 @@ const WorldScopePage = () => {
         {screen === 'intro' && !accessActive && <>
           <h2 style={styles.sectionTitle}>What WorldScope gives you</h2>
           <div style={styles.grid}>
-            <article style={styles.card}><div style={styles.eyebrow}><Bot size={17} /> Bot performance</div><h3 style={{ margin: 0 }}>See what is working</h3><p style={styles.subtitle}>Compare the five bots with the strongest recorded realized profit and loss across settlement history.</p></article>
-            <article style={styles.card}><div style={styles.eyebrow}><BarChart3 size={17} /> Daily activity</div><h3 style={{ margin: 0 }}>Track active symbols</h3><p style={styles.subtitle}>See which five symbols rank highest by recorded bot settlement performance for the current UTC day.</p></article>
-            <article style={styles.card}><div style={styles.eyebrow}><Users size={17} /> Creator insights</div><h3 style={{ margin: 0 }}>Discover top creators</h3><p style={styles.subtitle}>Compare creators by the realized performance of bots they originally created. Creator identifiers are anonymized.</p></article>
-            <article style={styles.card}><div style={styles.eyebrow}><Crown size={17} /> Advanced listings</div><h3 style={{ margin: 0 }}>Compare bots to buy or rent</h3><p style={styles.subtitle}>Advance Scope adds the five highest-efficiency currently available Commerce bots and five available Rentals bots.</p></article>
+            <div style={styles.outerCard}><article style={styles.card}><div style={styles.eyebrow}><Bot size={17} /> Bot performance</div><h3 style={{ margin: 0 }}>See what is working</h3><p style={styles.subtitle}>Compare the five bots with the strongest recorded realized profit and loss across settlement history.</p></article></div>
+            <div style={styles.outerCard}><article style={styles.card}><div style={styles.eyebrow}><BarChart3 size={17} /> Daily activity</div><h3 style={{ margin: 0 }}>Track active symbols</h3><p style={styles.subtitle}>See which five symbols rank highest by recorded bot settlement performance for the current UTC day.</p></article></div>
+            <div style={styles.outerCard}><article style={styles.card}><div style={styles.eyebrow}><Users size={17} /> Creator insights</div><h3 style={{ margin: 0 }}>Discover top creators</h3><p style={styles.subtitle}>Compare creators by the realized performance of bots they originally created. Creator identifiers are anonymized.</p></article></div>
+            <div style={styles.outerCard}><article style={styles.card}><div style={styles.eyebrow}><Crown size={17} /> Advanced listings</div><h3 style={{ margin: 0 }}>Compare bots to buy or rent</h3><p style={styles.subtitle}>Advance Scope adds the five highest-efficiency currently available Commerce bots and five available Rentals bots.</p></article></div>
           </div>
           <div style={styles.notice}><ShieldCheck size={15} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> WorldScope is a paid feature. Rankings are based on recorded CryBots data; they do not guarantee future profits or trading results. Your in-app USDT balance is charged when you confirm a plan.</div>
-          <div style={{ ...styles.card, marginTop: 14 }}>
-            <h2 style={{ margin: 0, fontSize: '1.08rem' }}>Choose when you're ready</h2>
-            <p style={styles.subtitle}>Preview the subscription plans first. You can choose Moderate Scope for core rankings or Advance Scope for all five categories.</p>
-            <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => setScreen('payments')}>Preview payment plans <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></button>
+          <div style={{ ...styles.outerCard, marginTop: 14 }}>
+            <div style={styles.card}>
+              <h2 style={{ margin: 0, fontSize: '1.08rem' }}>Choose when you're ready</h2>
+              <p style={styles.subtitle}>Preview the subscription plans first. You can choose Moderate Scope for core rankings or Advance Scope for all five categories.</p>
+              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => setScreen('payments')}>Preview payment plans <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></button>
+            </div>
           </div>
         </>}
 
@@ -161,34 +164,38 @@ const WorldScopePage = () => {
               const advanced = plan === 'advanced';
               const price = prices[billingCycle][plan];
               const features = advanced ? ['All three Moderate rankings', 'Top 5 highest-efficiency bots for sale', 'Top 5 highest-efficiency bots for rent'] : ['Top 5 most profitable bots', 'Top 5 daily bot-traded symbols', 'Top 5 creators by recorded bot performance'];
-              return <article key={plan} style={{ ...styles.card, borderColor: selectedTier === plan ? theme.primary : theme.borderGlass }}>
+              return <div key={plan} style={styles.outerCard}><article style={{ ...styles.card, borderColor: selectedTier === plan ? theme.primary : theme.borderGlass }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><h3 style={{ margin: 0, fontSize: '1.03rem' }}>{advanced ? 'Advance Scope' : 'Moderate Scope'}</h3>{advanced ? <Crown size={19} color="#a855f7" /> : <ShieldCheck size={19} color={theme.primary} />}</div>
                 <div><span style={{ fontSize: '2rem', fontWeight: 950 }}>{price.toFixed(2).replace(/\.00$/, '')}</span> <strong>USDT</strong><div style={styles.muted}>per {billingCycle === 'monthly' ? 'month' : 'year'}</div></div>
                 <ul style={styles.featureList}>{features.map(feature => <li key={feature}>✓ {feature}</li>)}</ul>
                 <button type="button" disabled={loading || purchasing} style={{ ...styles.button, ...(selectedTier === plan ? styles.primaryButton : {}) }} onClick={() => { setSelectedTier(plan); void purchase(plan); }}>{purchasing && selectedTier === plan ? 'Activating subscription…' : `Subscribe · ${price.toFixed(2).replace(/\.00$/, '')} USDT`}</button>
-              </article>;
+              </article></div>;
             })}
           </div>
           <div style={styles.notice}><LockKeyhole size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> Available balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>. Monthly pricing is 1 USDT for Moderate and 2.50 USDT for Advance; yearly pricing is 10 USDT and 25 USDT respectively. Yearly plans cost less than paying monthly for 12 months.</div>
         </>}
 
         {(screen === 'dashboard' || accessActive) && accessActive && <>
-          <div style={{ ...styles.card, marginBottom: 14 }}>
+          <div style={{ ...styles.outerCard, marginBottom: 14 }}>
+            <div style={styles.card}>
             <div style={styles.status}><CheckCircle2 size={16} color="#22c55e" /> <strong>{tier === 'advanced' ? 'Advance Scope' : 'Moderate Scope'} active</strong> · {data?.access?.lifetimeAccess ? 'Legacy lifetime access' : `${data?.access?.billingCycle || 'subscription'} plan`}</div>
             <div style={styles.status}>Wallet balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>{expiresAt && <> · Expires {expiresAt.toLocaleDateString()}</>}</div>
             {tier !== 'advanced' && <button type="button" style={styles.button} onClick={() => { setScreen('payments'); setSelectedTier('advanced'); }}>Upgrade to Advance Scope</button>}
             {expiresAt && expiresAt.getTime() <= Date.now() + 7 * 86400000 && <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => setScreen('payments')}>Renew subscription</button>}
+            </div>
           </div>
           <h2 style={styles.sectionTitle}>Your live rankings</h2>
           <div style={styles.status}>{loading ? <><RefreshCw size={14} /> Refreshing…</> : data?.asOf ? <><Clock3 size={14} /> Snapshot {new Date(data.asOf).toLocaleString()} · UTC daily window</> : 'Waiting for ranking data'} <button type="button" onClick={() => void loadWorldScope()} disabled={loading} style={{ border: 0, background: 'transparent', color: theme.primary, fontWeight: 800, cursor: 'pointer' }}><RefreshCw size={13} /> Refresh</button></div>
           <div style={styles.tabRow} role="tablist" aria-label="WorldScope rankings">
             {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { color: theme.text, borderColor: theme.primary, background: theme.surfaceMuted } : {}) }} onClick={() => setActiveSection(section.id)}>{section.title}</button>)}
           </div>
-          <section style={styles.rankingCard}>
+          <div style={styles.outerCard}>
+          <section style={{ ...styles.rankingCard, background: theme.surfaceMuted }}>
             <div style={styles.rankingHead}><div style={styles.iconBox}><SectionIcon size={20} /></div><div style={{ flex: 1, minWidth: 0 }}><h3 style={{ margin: 0, fontSize: '.98rem', fontWeight: 900 }}>{selectedSection.title}</h3><p style={{ ...styles.subtitle, fontSize: '.82rem', marginTop: 4 }}>{selectedSection.subtitle}</p></div>{selectedSection.tier === 'advanced' && <span style={{ fontSize: '.65rem', fontWeight: 900, color: '#a855f7' }}>ADVANCE</span>}</div>
             {loading ? <div style={styles.message}>Loading current rankings…</div> : activeRows.length === 0 ? <div style={styles.message}>No qualifying records are available for this ranking yet. No sample numbers are shown.</div> : <div style={styles.tableWrap}><table style={styles.table}><thead><tr><th style={styles.th}>Rank</th>{selectedSection.columns.map(column => <th key={column.key} style={styles.th}>{column.label}</th>)}</tr></thead><tbody>{activeRows.slice(0, 5).map((row, index) => <tr key={String(row.botId || row.symbol || row.creator || index)}><td style={{ ...styles.td, fontWeight: 900 }}>#{index + 1}</td>{selectedSection.columns.map(column => <td key={column.key} style={styles.td}>{formatCell(row[column.key], column.format)}</td>)}</tr>)}</tbody></table></div>}
             <div style={styles.muted}>Window: {data?.windows?.[selectedSection.id === 'profitableBots' ? 'botProfitability' : selectedSection.id === 'dailySymbols' ? 'dailySymbols' : selectedSection.id === 'topCreators' ? 'creatorProfitability' : 'listings'] || 'server-recorded data'}.</div>
           </section>
+          </div>
           <div style={styles.footer}><Sparkles size={13} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> Profit rankings use recorded settlement entries. Daily symbol ranking uses the current UTC date. Listing rankings only include currently available bots. Rankings describe recorded app activity and are not a promise of future returns.</div>
         </>}
       </main>
