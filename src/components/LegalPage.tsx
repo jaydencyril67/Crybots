@@ -25,7 +25,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: '7px', border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', padding: '9px 12px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontWeight: 750 },
   hero: { marginTop: '26px', padding: 'clamp(22px, 4vw, 42px)', border: `1px solid ${theme.borderGlass}`, borderRadius: '26px', background: `linear-gradient(135deg, ${theme.surfaceElevated}, ${theme.surfaceGlass})`, boxShadow: '0 18px 50px rgba(0,0,0,0.16)' },
   eyebrow: { margin: 0, color: theme.primary, fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.14em', textTransform: 'uppercase' as const },
-  title: { margin: '10px 0 12px', fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: 1.05, letterSpacing: '-0.04em', fontWeight: 950 },
+  title: { margin: '10px 0 12px', fontSize: '1.45rem', lineHeight: 1.25, letterSpacing: '-0.03em', fontWeight: 900 },
   summary: { margin: 0, maxWidth: '75ch', color: theme.textMuted, lineHeight: 1.75, fontSize: '1rem' },
   updated: { margin: '18px 0 0', color: theme.textMuted, fontSize: '0.8rem' },
   layout: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '14px', marginTop: '18px', padding: '10px', border: `1px solid ${theme.borderGlass}`, borderRadius: '16px', background: theme.surfaceGlass, boxSizing: 'border-box' as const },
