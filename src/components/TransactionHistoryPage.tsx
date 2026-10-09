@@ -351,14 +351,12 @@ const TransactionHistoryPage = () => {
                   </table>
                 </div>
                 {filteredTransactions.length > transactionHistoryPageSize ? (
-                  <div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '12px', alignItems: 'center' }}>
-                      <p style={styles.cardText}>Showing {transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredTransactions.length)} of {filteredTransactions.length} transactions</p>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
-                        <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => setTransactionHistoryPage((current) => Math.max(1, current - 1))} disabled={transactionHistoryCurrentPage === 1}>Prev</button>
-                        {transactionHistoryPageItems.map((item, index) => item === 'ellipsis' ? <span key={`transaction-ellipsis-${index}`} style={styles.muted}>…</span> : <button key={item} type="button" style={{ ...styles.selectOption, minWidth: '42px', ...(item === transactionHistoryCurrentPage ? { borderColor: theme.primary, background: theme.primarySoft } : {}) }} onClick={() => { setTransactionHistoryPage(item); setExpandedTransactionId(null); }}>{item}</button>)}
-                        <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => { setTransactionHistoryPage((current) => Math.min(transactionHistoryTotalPages, current + 1)); setExpandedTransactionId(null); }} disabled={transactionHistoryCurrentPage === transactionHistoryTotalPages}>Next</button>
-                      </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%' }}>
+                    <p style={{ ...styles.cardText, textAlign: 'center' }}>Showing {transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredTransactions.length)} of {filteredTransactions.length} transactions</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', alignItems: 'center', width: '100%' }}>
+                      <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => setTransactionHistoryPage((current) => Math.max(1, current - 1))} disabled={transactionHistoryCurrentPage === 1}>Prev</button>
+                      <span style={styles.muted}>Page {transactionHistoryCurrentPage} / {transactionHistoryTotalPages}</span>
+                      <button type="button" style={styles.selectOption as React.CSSProperties} onClick={() => { setTransactionHistoryPage((current) => Math.min(transactionHistoryTotalPages, current + 1)); setExpandedTransactionId(null); }} disabled={transactionHistoryCurrentPage === transactionHistoryTotalPages}>Next</button>
                     </div>
                   </div>
                 ) : null}
