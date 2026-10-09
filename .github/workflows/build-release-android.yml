@@ -730,6 +730,13 @@ jobs:
                       audioManager.setMode(AudioManager.MODE_NORMAL);
                   }
 
+                  // Hide the native Android WebView scroll indicators completely.
+                  // CSS scrollbar rules do not suppress every native overlay indicator.
+                  if (getBridge() != null && getBridge().getWebView() != null) {
+                      getBridge().getWebView().setVerticalScrollBarEnabled(false);
+                      getBridge().getWebView().setHorizontalScrollBarEnabled(false);
+                  }
+
                   // WebView disables WebAuthn by default. Explicitly enable the
                   // app-scoped WebAuthn bridge when the installed WebView supports it.
                   if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION)) {
