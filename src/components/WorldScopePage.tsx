@@ -70,7 +70,7 @@ const WorldScopePage = () => {
   const selectedSection = visibleSections.find(section => section.id === activeSection) || visibleSections[0] || sections[0];
   const SectionIcon = selectedSection.icon;
   const activeRows = (data?.rankings?.[selectedSection.id] || []) as RankRow[];
-  const prices = data?.access?.prices || { monthly: { moderate: 1.25, advanced: 3.25 }, yearly: { moderate: 10, advanced: 25 } };
+  const prices = data?.access?.prices || { monthly: { moderate: 1, advanced: 2.5 }, yearly: { moderate: 10, advanced: 25 } };
   const expiresAt = data?.access?.expiresAt ? new Date(data.access.expiresAt) : null;
 
   const purchase = async (requestedTier: ScopeTier) => {
@@ -169,7 +169,7 @@ const WorldScopePage = () => {
               </article>;
             })}
           </div>
-          <div style={styles.notice}><LockKeyhole size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> Available balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>. Monthly pricing is 1.25 USDT for Moderate and 3.25 USDT for Advance; yearly pricing is 10 USDT and 25 USDT respectively. Yearly plans cost less than paying monthly for 12 months.</div>
+          <div style={styles.notice}><LockKeyhole size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> Available balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>. Monthly pricing is 1 USDT for Moderate and 2.50 USDT for Advance; yearly pricing is 10 USDT and 25 USDT respectively. Yearly plans cost less than paying monthly for 12 months.</div>
         </>}
 
         {(screen === 'dashboard' || accessActive) && accessActive && <>
