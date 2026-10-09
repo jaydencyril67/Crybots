@@ -206,10 +206,10 @@ const TradeHistory = () => {
                               {entry.symbol ? <div><span style={styles.label}>Trading pair</span><p style={styles.cardText}>{entry.symbol}</p></div> : null}
                               {entry.tradeDirection ? <div><span style={styles.label}>Bot direction</span><p style={styles.cardText}>{entry.tradeDirection.toUpperCase()}</p></div> : null}
                               {entry.dailyRate !== null && entry.dailyRate !== undefined ? <div><span style={styles.label}>Daily rate</span><p style={styles.cardText}>{(entry.dailyRate * 100).toFixed(2)}%</p></div> : null}
-                              <div><span style={styles.label}>Reference</span><p style={{ ...styles.cardText, wordBreak: 'break-all' }}>{entry.reference}</p></div>
+                              <div><div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={styles.label}>Reference</span><button type="button" aria-label="Copy reference" title="Copy reference" onClick={() => { void copyReference(entry.reference); }} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent', color: theme.textMuted, cursor: 'pointer', lineHeight: 1 }}><Copy size={14} /></button></div><p style={{ ...styles.cardText, wordBreak: 'break-all' }}>{entry.reference}</p></div>
                               <div><span style={styles.label}>Date & time</span><p style={styles.cardText}>{dateTime.date} {dateTime.time}</p></div>
                               <div style={{ gridColumn: '1 / -1' }}><span style={styles.label}>Details</span><p style={styles.cardText}>{entry.description}</p></div>
-                              <div style={{ gridColumn: '1 / -1' }}><button type="button" style={styles.button} onClick={() => { void copyReference(entry.reference); }}><Copy size={16} /> Copy reference</button></div>
+                              
                             </div>
                           </td></tr> : null}
                         </React.Fragment>;
