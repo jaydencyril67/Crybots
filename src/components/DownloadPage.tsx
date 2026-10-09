@@ -21,7 +21,7 @@ const downloadOptions = [
   {
     title: 'Android APK',
     description: 'Download the latest signed CryBots APK. Android will guide you through updating the installed app.',
-    url: 'https://github.com/jaydencyril67/Kingshall/releases/latest/download/CryBots.apk',
+    url: 'https://kingshalls.onrender.com/api/notifications/apk-download',
   },
 ];
 
