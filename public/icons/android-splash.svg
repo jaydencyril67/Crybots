@@ -2,7 +2,7 @@
   <rect width="2732" height="2732" fill="#050817"/>
 
   <!-- CryBots Android launch splash. -->
-  <g transform="translate(1176 1093) scale(0.7421875)">
+  <g transform="translate(1176 1176) scale(0.7421875)">
     <!-- Circular black launch mark. -->
     <circle cx="256" cy="256" r="224" fill="#000"/>
     <circle cx="256" cy="256" r="223.25" fill="none" stroke="#151515" stroke-width="1.5"/>
