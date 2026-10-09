@@ -255,6 +255,7 @@ const routeToKey = (path: string) => {
   if (path === '/faq' || path === '#/faq') return 'faq';
   if (path === '/options' || path === '#/options') return 'options';
   if (path === '/store' || path === '#/store') return 'store';
+  if (path === '/download' || path === '#/download') return 'download';
   if (path === '/about' || path === '#/about') return 'about';
   if (path === '/information' || path === '#/information') return 'information';
   if (path === '/privacy-policy' || path === '#/privacy-policy') return 'privacy-policy';
