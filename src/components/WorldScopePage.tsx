@@ -164,7 +164,6 @@ const WorldScopePage = () => {
               <div style={styles.status}>Wallet balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>{expiresAt && <> · Expires {expiresAt.toLocaleDateString()}</>}</div>
               <p style={styles.subtitle}>Your subscription is ready. Open your separate rankings page to explore the categories included in your plan.</p>
               <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => navigate('/worldscope-rankings')}>Open WorldScope Rankings <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></button>
-              <button type="button" style={styles.button} onClick={() => setScreen('payments')}>{tier === 'advanced' ? 'Renew or manage plan' : 'Upgrade or renew plan'}</button>
             </div>
           </div>
         </>}
