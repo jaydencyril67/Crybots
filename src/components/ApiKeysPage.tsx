@@ -201,7 +201,7 @@ const ApiKeysPage = () => {
                 {deleteId === key.id ? (
                   <div style={{ display: 'grid', gap: 10, marginTop: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
                     <p style={styles.note}>Permanently delete this API key? This cannot be undone.</p>
-                    <label style={{ display: 'grid', gap: 7, fontWeight: 700 }}>Security code<input type="password" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit security code" style={styles.input} /></label>
+                    <label style={{ display: 'grid', gap: 7, fontWeight: 700 }}>Security code<input type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit security code" style={{ ...styles.input, WebkitTextSecurity: 'disc' } as React.CSSProperties} /></label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
                       <button type="button" onClick={() => { setDeleteId(null); setSecurityCode(''); }} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
                       <button type="button" onClick={() => void deleteKey(key.id)} disabled={deletingId === key.id || securityCode.length !== 6} style={{ ...styles.button, background: theme.danger }}>{deletingId === key.id ? <InlineLoadingDots /> : 'Delete API key'}</button>
