@@ -14,8 +14,6 @@ export type NativeAppUpdateEvent = {
 
 export type NativeAppUpdatePlugin = {
   getAppInfo(): Promise<NativeAppInfo>;
-  getDownloadDiagnostics(): Promise<Record<string, unknown>>;
-  probeDownloadEndpoint(options: { url: string }): Promise<Record<string, unknown>>;
   downloadAndInstall(options: { url: string }): Promise<{
     status?: string;
     downloadId?: number;
@@ -24,7 +22,7 @@ export type NativeAppUpdatePlugin = {
     queuedAt?: number;
   }>;
   addListener?(
-    eventName: 'downloadError' | 'downloadLog',
+    eventName: 'downloadError',
     listener: (event: NativeAppUpdateEvent) => void,
   ): Promise<{ remove: () => Promise<void> }>;
 };
