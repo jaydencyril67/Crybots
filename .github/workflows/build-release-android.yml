@@ -15,7 +15,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
   actions: read
 
 concurrency:
@@ -873,3 +873,23 @@ jobs:
           path: CryBots.apk
           if-no-files-found: error
           retention-days: 7
+
+      - name: Publish CryBots GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_VERSION: ${{ inputs.app_version }}
+        run: |
+          set -euo pipefail
+          tag="v${APP_VERSION}"
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Release $tag already exists. Choose a new app_version so every APK has a unique release tag."
+            exit 1
+          fi
+
+          gh release create "$tag" CryBots.apk \
+            --target "$GITHUB_SHA" \
+            --title "CryBots $APP_VERSION" \
+            --notes "CryBots Android release $APP_VERSION.
+
+          Download CryBots.apk and install it to update the existing app. Android may ask you to confirm installation."
