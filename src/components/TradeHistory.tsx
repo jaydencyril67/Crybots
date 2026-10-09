@@ -194,7 +194,7 @@ const TradeHistory = () => {
                           <tr style={{ background: index % 2 === 0 ? theme.surfaceShine : 'transparent' }}>
                             <td style={styles.td}><strong>{entry.title}</strong></td>
                             <td style={styles.td}><span style={{ ...styles.pill, ...statusStyle, border: `1px solid ${statusStyle.borderColor}`, background: theme.primarySoft }}>{entry.status}</span></td>
-                            <td style={styles.td}><button type="button" style={styles.button} onClick={() => setExpandedId(expanded ? null : entry.id)}><ChevronDown size={16} style={{ transform: expanded ? 'rotate(180deg)' : 'none' }} />{expanded ? 'Hide' : 'View'}</button></td>
+                            <td style={styles.td}><button type="button" style={styles.button} onClick={() => setExpandedId(expanded ? null : entry.id)}>{expanded ? 'Hide' : 'View'}</button></td>
                           </tr>
                           {expanded ? <tr><td colSpan={3} style={{ ...styles.td, background: theme.surfaceGlass }}>
                             <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
