@@ -36,7 +36,8 @@ const WorldScopePage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [data, setData] = useState<WorldScopeResponse | null>(null);
   const [activeSection, setActiveSection] = useState<keyof Rankings>('profitableBots');
-  const [screen, setScreen] = useState<'intro' | 'payments' | 'dashboard'>('intro');
+  const isRankingsPage = window.location.pathname === '/worldscope-rankings' || window.location.hash.startsWith('#/worldscope-rankings');
+  const [screen, setScreen] = useState<'intro' | 'payments'>(() => new URLSearchParams(window.location.search).get('plans') === '1' ? 'payments' : 'intro');
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly');
   const [selectedTier, setSelectedTier] = useState<ScopeTier>('moderate');
   const [loading, setLoading] = useState(true);
@@ -50,11 +51,15 @@ const WorldScopePage = () => {
     try {
       const response = await api.get<WorldScopeResponse>('/api/worldscope');
       setData(response.data);
-      if (response.data?.access?.active) setScreen('dashboard');
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to load WorldScope. Please sign in and try again.');
     } finally { setLoading(false); }
   }, []);
+
+  useEffect(() => {
+    if (isRankingsPage) return;
+    setScreen(new URLSearchParams(window.location.search).get('plans') === '1' ? 'payments' : 'intro');
+  }, [isRankingsPage]);
 
   useEffect(() => {
     void loadWorldScope();
@@ -81,7 +86,7 @@ const WorldScopePage = () => {
       await loadWorldScope();
       setSelectedTier(requestedTier);
       setActiveSection(requestedTier === 'advanced' ? 'commerceEfficiency' : 'profitableBots');
-      setScreen('dashboard');
+      navigate('/worldscope-rankings');
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to purchase this WorldScope plan. Please try again.');
     } finally { setPurchasing(false); }
@@ -121,12 +126,12 @@ const WorldScopePage = () => {
   return <HybridTheme mode={themeMode}>
     <div style={styles.page}>
       <main style={styles.shell}>
-        <button type="button" style={styles.back} onClick={() => navigate('/store')}><ArrowLeft size={16} /> Store</button>
+        <button type="button" style={styles.back} onClick={() => navigate(isRankingsPage ? '/worldscope' : '/store')}><ArrowLeft size={16} /> {isRankingsPage ? 'WorldScope' : 'Store'}</button>
         <div style={{ ...styles.outerCard, marginBottom: 16 }}>
           <section style={{ ...styles.hero, marginBottom: 0, background: theme.surfaceMuted }}>
             <div style={styles.eyebrow}><Activity size={15} /> CryBots platform intelligence</div>
-            <h1 style={styles.title}>WorldScope</h1>
-            <p style={styles.subtitle}>Understand what is happening across the platform. WorldScope brings together rankings from recorded bot settlements and currently available Commerce and Rentals listings, so you can compare real app activity instead of relying on guesswork.</p>
+            <h1 style={styles.title}>{isRankingsPage ? 'WorldScope Rankings' : 'WorldScope'}</h1>
+            <p style={styles.subtitle}>{isRankingsPage ? 'Explore platform rankings built from recorded bot settlements and currently available Commerce and Rentals listings.' : 'Understand what is happening across the platform. WorldScope brings together rankings from recorded bot settlements and currently available Commerce and Rentals listings, so you can compare real app activity instead of relying on guesswork.'}</p>
             <div style={styles.status}>{loading ? <><RefreshCw size={14} /> Checking your access…</> : accessActive ? <><CheckCircle2 size={14} color="#22c55e" /> Subscription active</> : <><LockKeyhole size={14} /> Paid subscription required</>} {data?.asOf && <>· Data snapshot {new Date(data.asOf).toLocaleString()}</>}</div>
           </section>
         </div>
@@ -134,7 +139,7 @@ const WorldScopePage = () => {
         {error && <div role="alert" style={{ ...styles.message, borderColor: '#ef4444' }}>{error}</div>}
         {message && <div role="status" style={styles.message}>{message}</div>}
 
-        {screen === 'intro' && !accessActive && <>
+        {!isRankingsPage && screen === 'intro' && !accessActive && <>
           <h2 style={styles.sectionTitle}>What WorldScope gives you</h2>
           <div style={styles.grid}>
             <div style={styles.outerCard}><article style={styles.card}><div style={styles.eyebrow}><Bot size={17} /> Bot performance</div><h3 style={{ margin: 0 }}>See what is working</h3><p style={styles.subtitle}>Compare the five bots with the strongest recorded realized profit and loss across settlement history.</p></article></div>
@@ -152,7 +157,18 @@ const WorldScopePage = () => {
           </div>
         </>}
 
-        {screen === 'payments' && <>
+        {!isRankingsPage && screen === 'intro' && accessActive && <>
+          <div style={{ ...styles.outerCard, marginBottom: 14 }}>
+            <div style={styles.card}>
+              <div style={styles.status}><CheckCircle2 size={16} color="#22c55e" /> <strong>{tier === 'advanced' ? 'Advance Scope' : 'Moderate Scope'} subscription active</strong></div>
+              <div style={styles.status}>Wallet balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>{expiresAt && <> · Expires {expiresAt.toLocaleDateString()}</>}</div>
+              <p style={styles.subtitle}>Your subscription is ready. Open your separate rankings page to explore the categories included in your plan.</p>
+              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => navigate('/worldscope-rankings')}>Open WorldScope Rankings <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></button>
+              <button type="button" style={styles.button} onClick={() => setScreen('payments')}>{tier === 'advanced' ? 'Renew or manage plan' : 'Upgrade or renew plan'}</button>
+            </div>
+          </div>
+        </>}
+        {!isRankingsPage && screen === 'payments' && <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <h2 style={styles.sectionTitle}>WorldScope subscription</h2>
             <button type="button" style={{ ...styles.button, width: 'auto', minWidth: 0, padding: '9px 12px' }} onClick={() => setScreen('intro')}><ArrowLeft size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Overview</button>
@@ -177,13 +193,24 @@ const WorldScopePage = () => {
           <div style={styles.notice}><LockKeyhole size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> Available balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>. Monthly pricing is 1 USDT for Moderate and 2.50 USDT for Advance; yearly pricing is 10 USDT and 25 USDT respectively. Yearly plans cost less than paying monthly for 12 months.</div>
         </>}
 
-        {(screen === 'dashboard' || accessActive) && accessActive && <>
+        {isRankingsPage && !accessActive && <>
+          <div style={styles.outerCard}>
+            <section style={{ ...styles.card, textAlign: 'center' as const, justifyItems: 'center' }}>
+              <div style={styles.iconBox}><LockKeyhole size={20} /></div>
+              <h2 style={{ ...styles.sectionTitle, marginTop: 0 }}>Subscription required</h2>
+              <p style={styles.subtitle}>{loading ? 'Checking your WorldScope subscription…' : 'WorldScope Rankings are available to users with an active Moderate Scope or Advance Scope subscription.'}</p>
+              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => navigate('/worldscope?plans=1')}>View subscription plans</button>
+              <button type="button" style={styles.button} onClick={() => navigate('/worldscope')}>Back to WorldScope overview</button>
+            </section>
+          </div>
+        </>}
+        {isRankingsPage && accessActive && <>
           <div style={{ ...styles.outerCard, marginBottom: 14 }}>
             <div style={styles.card}>
             <div style={styles.status}><CheckCircle2 size={16} color="#22c55e" /> <strong>{tier === 'advanced' ? 'Advance Scope' : 'Moderate Scope'} active</strong> · {data?.access?.lifetimeAccess ? 'Legacy lifetime access' : `${data?.access?.billingCycle || 'subscription'} plan`}</div>
             <div style={styles.status}>Wallet balance: <strong>{Number(data?.walletBalance || 0).toFixed(2)} USDT</strong>{expiresAt && <> · Expires {expiresAt.toLocaleDateString()}</>}</div>
-            {tier !== 'advanced' && <button type="button" style={styles.button} onClick={() => { setScreen('payments'); setSelectedTier('advanced'); }}>Upgrade to Advance Scope</button>}
-            {expiresAt && expiresAt.getTime() <= Date.now() + 7 * 86400000 && <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => setScreen('payments')}>Renew subscription</button>}
+            {tier !== 'advanced' && <button type="button" style={styles.button} onClick={() => navigate('/worldscope?plans=1')}>Upgrade to Advance Scope</button>}
+            {expiresAt && expiresAt.getTime() <= Date.now() + 7 * 86400000 && <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => navigate('/worldscope?plans=1')}>Renew subscription</button>}
             </div>
           </div>
           <h2 style={styles.sectionTitle}>Your live rankings</h2>
