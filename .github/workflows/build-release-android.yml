@@ -166,6 +166,75 @@ jobs:
           }
           JAVA
 
+          cat > android/app/src/main/java/com/kingshall/exchange/WebAuthnDiagnosticsPlugin.java <<'JAVA'
+          package com.kingshall.exchange;
+
+          import android.os.Build;
+          import android.webkit.WebView;
+          import android.content.pm.PackageInfo;
+          import android.content.pm.PackageManager;
+          import android.util.Log;
+
+          import androidx.webkit.WebSettingsCompat;
+          import androidx.webkit.WebViewFeature;
+
+          import com.getcapacitor.JSObject;
+          import com.getcapacitor.Plugin;
+          import com.getcapacitor.PluginCall;
+          import com.getcapacitor.annotation.CapacitorPlugin;
+          import com.getcapacitor.PluginMethod;
+
+          @CapacitorPlugin(name = "WebAuthnDiagnostics")
+          public class WebAuthnDiagnosticsPlugin extends Plugin {
+              @PluginMethod
+              public void getDiagnostics(PluginCall call) {
+                  JSObject result = new JSObject();
+                  result.put("platform", "android");
+                  result.put("androidVersion", Build.VERSION.RELEASE);
+                  result.put("androidSdkInt", Build.VERSION.SDK_INT);
+                  result.put("manufacturer", Build.MANUFACTURER);
+                  result.put("model", Build.MODEL);
+
+                  WebView webView = getBridge() != null ? getBridge().getWebView() : null;
+                  result.put("webViewAvailable", webView != null);
+                  if (webView != null) {
+                      result.put("webViewUrl", webView.getUrl() == null ? "" : webView.getUrl());
+                      result.put("webViewTitle", webView.getTitle() == null ? "" : webView.getTitle());
+                      result.put("webViewJavaScriptEnabled", webView.getSettings().getJavaScriptEnabled());
+                  }
+
+                  try {
+                      PackageInfo packageInfo = WebView.getCurrentWebViewPackage();
+                      if (packageInfo != null) {
+                          result.put("webViewPackage", packageInfo.packageName);
+                          result.put("webViewVersion", packageInfo.versionName == null ? "" : packageInfo.versionName);
+                      } else {
+                          result.put("webViewPackage", "unknown");
+                      }
+                  } catch (Exception error) {
+                      result.put("webViewPackageLookupError", error.toString());
+                  }
+
+                  boolean supported = WebViewFeature.isFeatureSupported(WebViewFeature.WEB_AUTHENTICATION);
+                  result.put("webAuthenticationFeatureSupported", supported);
+                  if (supported && webView != null) {
+                      try {
+                          int support = WebSettingsCompat.getWebAuthenticationSupport(webView.getSettings());
+                          result.put("webAuthenticationSupport", support);
+                          result.put("webAuthenticationSupportLabel",
+                                  support == WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_APP ? "WEB_AUTHENTICATION_SUPPORT_FOR_APP" :
+                                  support == WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER ? "WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER" :
+                                  support == WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_NONE ? "WEB_AUTHENTICATION_SUPPORT_NONE" : "UNKNOWN");
+                      } catch (Exception error) {
+                          result.put("webAuthenticationSupportReadError", error.toString());
+                          Log.e("CryBotsWebAuthn", "Unable to read WebAuthn support setting", error);
+                      }
+                  }
+                  call.resolve(result);
+              }
+          }
+          JAVA
+
           cat > android/app/src/main/java/com/kingshall/exchange/MainActivity.java <<'JAVA'
           package com.kingshall.exchange;
 
