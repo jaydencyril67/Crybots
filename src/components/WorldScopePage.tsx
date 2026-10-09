@@ -171,7 +171,7 @@ const WorldScopePage = () => {
         {!isRankingsPage && screen === 'payments' && <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <h2 style={styles.sectionTitle}>WorldScope subscription</h2>
-            <button type="button" style={{ ...styles.button, width: 'auto', minWidth: 0, padding: '9px 12px' }} onClick={() => setScreen('intro')}><ArrowLeft size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Overview</button>
+            <button type="button" style={{ ...styles.button, width: 'auto', minWidth: 0, padding: '9px 12px' }} onClick={() => { window.history.replaceState({}, '', '/worldscope'); setScreen('intro'); }}><ArrowLeft size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Overview</button>
           </div>
           <p style={styles.subtitle}>Select a billing period, then choose the access level you want. Subscriptions expire at the end of the selected period and are not automatically renewed.</p>
           <div style={{ display: 'flex', gap: 8, margin: '14px 0', padding: 4, borderRadius: 999, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }}>
