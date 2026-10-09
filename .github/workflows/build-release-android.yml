@@ -251,6 +251,7 @@ jobs:
               @Override
               public void onCreate(Bundle savedInstanceState) {
                   registerPlugin(MediaAudioPlugin.class);
+                  registerPlugin(WebAuthnDiagnosticsPlugin.class);
                   super.onCreate(savedInstanceState);
 
                   AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
