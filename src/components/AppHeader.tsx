@@ -241,6 +241,9 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
         try {
           const payload = JSON.parse((event as MessageEvent).data) as { unreadCount?: number; notification?: { title: string; message: string; channels?: string[] } };
           const nextCount = Number(payload.unreadCount || 0);
+          if (payload.notification?.title === 'CryBots update available') {
+            window.dispatchEvent(new Event('ke:app-update-check-now'));
+          }
           if (payload.notification?.channels?.includes('push') && 'Notification' in window && Notification.permission === 'granted') {
             new Notification(payload.notification.title, { body: payload.notification.message, icon: '/icons/ke-icon.svg?v=3' });
           }
