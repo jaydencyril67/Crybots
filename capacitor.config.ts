@@ -1,17 +1,14 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-const androidWebViewHostname =
-  process.env.CAPACITOR_APP_HOSTNAME?.trim() || 'crybots.kingshall.online';
-
 const config: CapacitorConfig = {
   appId: 'com.kingshall.exchange',
   appName: 'CryBots',
   webDir: 'build',
   server: {
-    // Keep the bundled APK origin on the production HTTPS domain.
-    // This makes the WebAuthn RP ID a direct match instead of forcing
-    // a Related Origin Request from https://localhost.
-    hostname: androidWebViewHostname,
+    // Capacitor serves bundled assets locally. Keep this on localhost instead
+    // of impersonating the production domain with a local WebView certificate.
+    // The production RP ID is associated separately through assetlinks.json.
+    hostname: 'localhost',
     androidScheme: 'https',
   },
   plugins: {
