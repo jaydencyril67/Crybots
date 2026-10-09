@@ -56,7 +56,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   overviewValue: { margin: 0, fontSize: '1rem', fontWeight: 900, textAlign: 'right' as const, flexShrink: 0 },
   pill: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '6px 10px', borderRadius: '999px', fontSize: '0.76rem', fontWeight: 800, whiteSpace: 'nowrap' as const },
   tableWrap: { overflowX: 'auto' as const, width: '100%', boxSizing: 'border-box' as const },
-  table: { width: '100%', borderCollapse: 'collapse' as const, minWidth: '560px', fontSize: '0.78rem' },
+  table: { width: '100%', borderCollapse: 'collapse' as const, minWidth: '360px', fontSize: '0.78rem' },
   th: { textAlign: 'left' as const, fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: theme.textMuted, padding: '10px 12px', borderBottom: `1px solid ${theme.border}`, background: theme.surfaceMuted },
   td: { padding: '12px', borderBottom: `1px solid ${theme.border}`, verticalAlign: 'top' as const, fontSize: '0.78rem' },
   loadingState: { padding: '24px 18px', textAlign: 'center' as const, color: theme.textMuted, fontSize: '0.92rem' },
@@ -292,18 +292,15 @@ const TransactionHistoryPage = () => {
                 {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
                 <div style={styles.tableWrap}>
                   <table style={styles.table}>
-                    <thead><tr><th style={styles.th}>Transaction</th><th style={styles.th}>Amount</th><th style={styles.th}>Status</th><th style={styles.th}>Date</th><th style={styles.th}>Time</th><th style={styles.th}>Action</th></tr></thead>
+                    <thead><tr><th style={styles.th}>Transaction</th><th style={styles.th}>Status</th><th style={styles.th}>Action</th></tr></thead>
                     <tbody>
-                      {loading ? <tr><td style={styles.loadingState} colSpan={6}><LoadingDots /></td></tr> : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => {
+                      {loading ? <tr><td style={styles.loadingState} colSpan={3}><LoadingDots /></td></tr> : transactionHistoryRows.length > 0 ? transactionHistoryRows.map((transaction, index) => {
                         const expanded = expandedTransactionId === transaction.id;
                         return (
                           <React.Fragment key={transaction.id}>
                             <tr style={{ background: index % 2 === 0 ? theme.surfaceShine : 'transparent' }}>
                               <td style={styles.td}><strong>{transaction.title}</strong></td>
-                              <td style={styles.td}><strong>{transaction.amount}</strong></td>
                               <td style={styles.td}><span style={{ ...styles.pill, ...getStatusStyle(theme, transaction.status) }}>{transaction.status}</span></td>
-                              <td style={styles.td}>{transaction.date}</td>
-                              <td style={styles.td}>{transaction.time}</td>
                               <td style={styles.td}>
                                 <button type="button" style={{ ...styles.selectOption, display: 'inline-flex', alignItems: 'center', gap: '7px', width: 'fit-content' }} onClick={() => setExpandedTransactionId(expanded ? null : transaction.id)}>
                                   <ChevronDown size={16} style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} /> {expanded ? 'Hide' : 'View'}
@@ -312,8 +309,9 @@ const TransactionHistoryPage = () => {
                             </tr>
                             {expanded ? (
                               <tr>
-                                <td colSpan={6} style={{ ...styles.td, background: theme.surfaceGlass }}>
+                                <td colSpan={3} style={{ ...styles.td, background: theme.surfaceGlass }}>
                                   <div style={{ display: 'grid', gap: '10px', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+                                    <div><span style={styles.label}>Amount</span><p style={styles.cardText}>{transaction.amount}</p></div>
                                     <div><span style={styles.label}>Type</span><p style={styles.cardText}>{getTypeLabel(transaction.type)}</p></div>
                                     <div><span style={styles.label}>Direction</span><p style={styles.cardText}>{transaction.direction === 'inbound' ? 'Inbound' : 'Outbound'}</p></div>
                                     <div><span style={styles.label}>Currency</span><p style={styles.cardText}>{transaction.currency}</p></div>
@@ -348,7 +346,7 @@ const TransactionHistoryPage = () => {
                             ) : null}
                           </React.Fragment>
                         );
-                      }) : <tr><td style={styles.td} colSpan={6}><div style={{ padding: '18px 0', textAlign: 'center' }}><p style={{ margin: 0, fontWeight: 800 }}>No transactions found</p><p style={{ margin: '8px 0 0', color: theme.textMuted, fontSize: '0.92rem' }}>Try changing your search, type, or status filters.</p></div></td></tr>}
+                      }) : <tr><td style={styles.td} colSpan={3}><div style={{ padding: '18px 0', textAlign: 'center' }}><p style={{ margin: 0, fontWeight: 800 }}>No transactions found</p><p style={{ margin: '8px 0 0', color: theme.textMuted, fontSize: '0.92rem' }}>Try changing your search, type, or status filters.</p></div></td></tr>}
                     </tbody>
                   </table>
                 </div>
