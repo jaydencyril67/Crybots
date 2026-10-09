@@ -122,12 +122,14 @@ const WorldScopePage = () => {
     <div style={styles.page}>
       <main style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate('/store')}><ArrowLeft size={16} /> Store</button>
-        <section style={styles.hero}>
-          <div style={styles.eyebrow}><Activity size={15} /> CryBots platform intelligence</div>
-          <h1 style={styles.title}>WorldScope</h1>
-          <p style={styles.subtitle}>Understand what is happening across the platform. WorldScope brings together rankings from recorded bot settlements and currently available Commerce and Rentals listings, so you can compare real app activity instead of relying on guesswork.</p>
-          <div style={styles.status}>{loading ? <><RefreshCw size={14} /> Checking your access…</> : accessActive ? <><CheckCircle2 size={14} color="#22c55e" /> Subscription active</> : <><LockKeyhole size={14} /> Paid subscription required</>} {data?.asOf && <>· Data snapshot {new Date(data.asOf).toLocaleString()}</>}</div>
-        </section>
+        <div style={{ ...styles.outerCard, marginBottom: 16 }}>
+          <section style={{ ...styles.hero, marginBottom: 0, background: theme.surfaceMuted }}>
+            <div style={styles.eyebrow}><Activity size={15} /> CryBots platform intelligence</div>
+            <h1 style={styles.title}>WorldScope</h1>
+            <p style={styles.subtitle}>Understand what is happening across the platform. WorldScope brings together rankings from recorded bot settlements and currently available Commerce and Rentals listings, so you can compare real app activity instead of relying on guesswork.</p>
+            <div style={styles.status}>{loading ? <><RefreshCw size={14} /> Checking your access…</> : accessActive ? <><CheckCircle2 size={14} color="#22c55e" /> Subscription active</> : <><LockKeyhole size={14} /> Paid subscription required</>} {data?.asOf && <>· Data snapshot {new Date(data.asOf).toLocaleString()}</>}</div>
+          </section>
+        </div>
 
         {error && <div role="alert" style={{ ...styles.message, borderColor: '#ef4444' }}>{error}</div>}
         {message && <div role="status" style={styles.message}>{message}</div>}
