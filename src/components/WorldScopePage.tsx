@@ -165,7 +165,7 @@ const WorldScopePage = () => {
             {(['moderate', 'advanced'] as ScopeTier[]).map(plan => {
               const advanced = plan === 'advanced';
               const price = prices[billingCycle][plan];
-              const features = advanced ? ['All three Moderate rankings', 'Top 5 highest-efficiency bots for sale', 'Top 5 highest-efficiency bots for rent'] : ['Top 5 most profitable bots', 'Top 5 daily bot-traded symbols', 'Top 5 creators by recorded bot performance'];
+              const features = advanced ? ['Top 5 most profitable bots', 'Top 5 daily bot-traded symbols', 'Top 5 creators by recorded bot performance', 'Top 5 highest-efficiency bots for sale', 'Top 5 highest-efficiency bots for rent'] : ['Top 5 most profitable bots', 'Top 5 daily bot-traded symbols', 'Top 5 creators by recorded bot performance'];
               return <div key={plan} style={styles.outerCard}><article style={{ ...styles.card, borderColor: selectedTier === plan ? theme.primary : theme.borderGlass }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><h3 style={{ margin: 0, fontSize: '1.03rem' }}>{advanced ? 'Advance Scope' : 'Moderate Scope'}</h3>{advanced ? <Crown size={19} color="#a855f7" /> : <ShieldCheck size={19} color={theme.primary} />}</div>
                 <div><span style={{ fontSize: '2rem', fontWeight: 950 }}>{price.toFixed(2).replace(/\.00$/, '')}</span> <strong>USDT</strong><div style={styles.muted}>per {billingCycle === 'monthly' ? 'month' : 'year'}</div></div>
