@@ -217,9 +217,9 @@ const TradeHistory = () => {
                     </tbody>
                   </table>
                 </div>
-                {filteredEntries.length > pageSize ? <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-                  <p style={styles.cardText}>Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredEntries.length)} of {filteredEntries.length} activities</p>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                {filteredEntries.length > pageSize ? <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%' }}>
+                  <p style={{ ...styles.cardText, textAlign: 'center' }}>Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredEntries.length)} of {filteredEntries.length} activities</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', alignItems: 'center', width: '100%' }}>
                     <button type="button" style={styles.button} disabled={currentPage === 1} onClick={() => { setPage((value) => Math.max(1, value - 1)); setExpandedId(null); }}>Prev</button>
                     <span style={styles.muted}>Page {currentPage} / {totalPages}</span>
                     <button type="button" style={styles.button} disabled={currentPage === totalPages} onClick={() => { setPage((value) => Math.min(totalPages, value + 1)); setExpandedId(null); }}>Next</button>
