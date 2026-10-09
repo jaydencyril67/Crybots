@@ -4,6 +4,7 @@ import api, { API_BASE_URL } from '../api/axios';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import KHLogo from './KHLogo';
+import AppUpdateMonitor from './AppUpdateMonitor';
 import { NOTIFICATIONS_CHANGED_EVENT, AUTH_CHANGED_EVENT } from '../utils/notificationEvents';
 import { getVoiceModeEnabled, VOICE_MODE_CHANGED_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
 
@@ -324,6 +325,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
 
   return (
     <>
+      <AppUpdateMonitor />
       <style>{`@keyframes ke-header-alert {
         0%, 100% { opacity: 1; box-shadow: 0 0 0 1px color-mix(in srgb, var(--notification-color) 72%, transparent), 0 0 16px color-mix(in srgb, var(--notification-color) 48%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px color-mix(in srgb, var(--notification-color) 34%, transparent)); }
         50% { opacity: 0.9; box-shadow: 0 0 0 2px color-mix(in srgb, var(--notification-color) 78%, transparent), 0 0 22px color-mix(in srgb, var(--notification-color) 62%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--notification-color) 48%, transparent)); }
