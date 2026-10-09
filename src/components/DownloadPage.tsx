@@ -9,14 +9,9 @@ import { useAppTheme } from './AppTheme';
 
 const downloadOptions = [
   {
-    title: 'Playstore',
-    description: 'Find the Android app on Google Play.',
-    url: 'https://play.google.com/store/search?q=CryBots&c=apps',
-  },
-  {
-    title: 'Appstore',
-    description: 'Find the iPhone app on the Apple App Store.',
-    url: 'https://apps.apple.com/us/search?term=CryBots',
+    title: 'KingsStore',
+    description: 'Your home for KingsHall apps. The store is coming soon.',
+    url: '',
   },
   {
     title: 'Android APK',
@@ -166,13 +161,23 @@ const DownloadPage = () => {
                   <h3 style={styles.title}>{option.title}</h3>
                   <p style={styles.description}>{option.description}</p>
                   <a
-                    href={option.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(event) => { void handleDownloadClick(event, option); }}
-                    style={styles.downloadButton}
+                    href={option.url || undefined}
+                    target={option.url ? '_blank' : undefined}
+                    rel={option.url ? 'noopener noreferrer' : undefined}
+                    aria-disabled={!option.url}
+                    onClick={(event) => {
+                      if (!option.url) {
+                        event.preventDefault();
+                        return;
+                      }
+                      void handleDownloadClick(event, option);
+                    }}
+                    style={{
+                      ...styles.downloadButton,
+                      ...(option.url ? {} : { opacity: 0.65, cursor: 'not-allowed' }),
+                    }}
                   >
-                    {option.title === 'Android APK' ? 'Download / Update' : 'Download'}
+                    {option.title === 'Android APK' ? 'Download / Update' : 'Coming soon'}
                   </a>
                   {option.title === 'Android APK' && apkActionMessage ? (
                     <p role="status" style={styles.description}>{apkActionMessage}</p>
