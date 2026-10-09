@@ -38,7 +38,7 @@ const AppUpdateMonitor = () => {
   const [installing, setInstalling] = useState(false);
 
   const checkForUpdate = useCallback(async () => {
-    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android' || !localStorage.getItem('token')) return;
+    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
 
     try {
       const appInfo = await NativeAppUpdate.getAppInfo();
