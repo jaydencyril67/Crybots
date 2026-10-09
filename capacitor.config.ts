@@ -5,10 +5,9 @@ const config: CapacitorConfig = {
   appName: 'CryBots',
   webDir: 'build',
   server: {
-    // Serve bundled app content under the same HTTPS origin as the WebAuthn RP.
-    // WebAuthn related-origin lists require registrable web domains; localhost
-    // cannot be delegated to crybots.kingshall.online through /.well-known/webauthn.
-    hostname: 'crybots.kingshall.online',
+    // Keep Capacitor's default localhost hostname. Its bundled certificate is
+    // issued for localhost; using the production hostname here makes Android
+    // WebAuthn reject navigator.credentials.create() for a TLS error.
     androidScheme: 'https',
   },
   plugins: {
