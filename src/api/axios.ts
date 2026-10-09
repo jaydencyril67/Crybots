@@ -31,12 +31,28 @@ const api = axios.create({
   }
 });
 
-// Add an interceptor to include the auth token when available.
+// Tag requests with the actual app surface so the backend can distinguish
+// APK, installed PWA, and ordinary browser sessions even when they share an IP.
+const getKingsHallClientType = (): 'APK' | 'PWA' | 'Web' => {
+  if (typeof window === 'undefined') return 'Web';
+
+  const capacitor = (window as Window & {
+    Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string };
+  }).Capacitor;
+  if (capacitor?.isNativePlatform?.() && capacitor.getPlatform?.() === 'android') return 'APK';
+
+  const isStandalone = window.matchMedia?.('(display-mode: standalone)').matches
+    || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+  return isStandalone ? 'PWA' : 'Web';
+};
+
+// Add auth and client identity headers when available.
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  config.headers['X-KingsHall-Client'] = getKingsHallClientType();
 
   return config;
 }, (error) => {
