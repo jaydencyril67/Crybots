@@ -5,15 +5,11 @@ const config: CapacitorConfig = {
   appName: 'CryBots',
   webDir: 'build',
   server: {
-    // WebAuthn requires a real, certificate-valid HTTPS origin. Capacitor's
-    // synthetic local HTTPS origin cannot present the production domain's TLS
-    // certificate, even when hostname is changed to that domain. Load the live
-    // site in the release WebView so Android validates the real TLS certificate
-    // and WebAuthn sees the exact production RP origin.
-    url: 'https://crybots.kingshall.online',
-    cleartext: false,
+    // Serve bundled app content under the same HTTPS origin as the WebAuthn RP.
+    // WebAuthn related-origin lists require registrable web domains; localhost
+    // cannot be delegated to crybots.kingshall.online through /.well-known/webauthn.
+    hostname: 'crybots.kingshall.online',
     androidScheme: 'https',
-    allowNavigation: ['crybots.kingshall.online'],
   },
   plugins: {
     SplashScreen: {
