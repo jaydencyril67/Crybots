@@ -91,7 +91,7 @@ const TradeHistory = () => {
     overviewValue: { margin: 0, fontSize: '1rem', fontWeight: 900, textAlign: 'right' as const, flexShrink: 0 },
     pill: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '6px 10px', borderRadius: '999px', fontSize: '0.76rem', fontWeight: 800, whiteSpace: 'nowrap' as const },
     tableWrap: { overflowX: 'auto' as const, width: '100%', boxSizing: 'border-box' as const },
-    table: { width: '100%', borderCollapse: 'collapse' as const, minWidth: '560px', fontSize: '0.78rem' },
+    table: { width: '100%', borderCollapse: 'collapse' as const, minWidth: '340px', fontSize: '0.78rem' },
     th: { textAlign: 'left' as const, fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: theme.textMuted, padding: '10px 12px', borderBottom: `1px solid ${theme.border}`, background: theme.surfaceMuted },
     td: { padding: '12px', borderBottom: `1px solid ${theme.border}`, verticalAlign: 'top' as const, fontSize: '0.78rem' },
     muted: { color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
@@ -183,23 +183,22 @@ const TradeHistory = () => {
                 {alert ? <NotificationBanner tone={alert.tone} title={alert.title} message={alert.message} /> : null}
                 <div style={styles.tableWrap}>
                   <table style={styles.table}>
-                    <thead><tr><th style={styles.th}>Activity</th><th style={styles.th}>Amount</th><th style={styles.th}>Status</th><th style={styles.th}>Date</th><th style={styles.th}>Time</th><th style={styles.th}>Action</th></tr></thead>
+                    <thead><tr><th style={styles.th}>Activity</th><th style={styles.th}>Status</th><th style={styles.th}>Action</th></tr></thead>
                     <tbody>
-                      {loading ? <tr><td style={{ ...styles.td, textAlign: 'center' }} colSpan={6}><LoadingDots /></td></tr> : rows.length ? rows.map((entry, index) => {
+                      {loading ? <tr><td style={{ ...styles.td, textAlign: 'center' }} colSpan={3}><LoadingDots /></td></tr> : rows.length ? rows.map((entry, index) => {
                         const expanded = expandedId === entry.id;
                         const dateTime = localDateTime(entry.date);
                         const positive = entry.amountValue >= 0;
                         const statusStyle = entry.status === 'completed' ? { color: theme.success, borderColor: theme.success } : entry.status === 'pending' ? { color: theme.warning, borderColor: theme.warning } : { color: theme.danger, borderColor: theme.danger };
                         return <React.Fragment key={entry.id}>
                           <tr style={{ background: index % 2 === 0 ? theme.surfaceShine : 'transparent' }}>
-                            <td style={styles.td}><strong>{entry.title}</strong><p style={styles.cardText}>{entry.kind === 'performance' ? 'Daily settlement' : 'Bot financial activity'}</p></td>
-                            <td style={{ ...styles.td, color: positive ? theme.success : theme.danger, fontWeight: 800 }}>{money(entry.amountValue, entry.currency)}</td>
+                            <td style={styles.td}><strong>{entry.title}</strong></td>
                             <td style={styles.td}><span style={{ ...styles.pill, ...statusStyle, border: `1px solid ${statusStyle.borderColor}`, background: theme.primarySoft }}>{entry.status}</span></td>
-                            <td style={styles.td}>{dateTime.date}</td><td style={styles.td}>{dateTime.time}</td>
                             <td style={styles.td}><button type="button" style={styles.button} onClick={() => setExpandedId(expanded ? null : entry.id)}><ChevronDown size={16} style={{ transform: expanded ? 'rotate(180deg)' : 'none' }} />{expanded ? 'Hide' : 'View'}</button></td>
                           </tr>
-                          {expanded ? <tr><td colSpan={6} style={{ ...styles.td, background: theme.surfaceGlass }}>
+                          {expanded ? <tr><td colSpan={3} style={{ ...styles.td, background: theme.surfaceGlass }}>
                             <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
+                              <div><span style={styles.label}>Amount</span><p style={{ ...styles.cardText, color: positive ? theme.success : theme.danger, fontWeight: 800 }}>{money(entry.amountValue, entry.currency)}</p></div>
                               <div><span style={styles.label}>Activity type</span><p style={styles.cardText}>{entry.kind === 'performance' ? (entry.amountValue >= 0 ? 'Bot profit' : 'Bot loss') : 'Bot financial activity'}</p></div>
                               <div><span style={styles.label}>Direction</span><p style={styles.cardText}>{entry.direction === 'inbound' ? 'Inbound' : 'Outbound'}</p></div>
                               <div><span style={styles.label}>Currency</span><p style={styles.cardText}>{entry.currency}</p></div>
@@ -214,7 +213,7 @@ const TradeHistory = () => {
                             </div>
                           </td></tr> : null}
                         </React.Fragment>;
-                      }) : <tr><td style={styles.td} colSpan={6}><div style={{ padding: '18px 0', textAlign: 'center' }}><p style={{ margin: 0, fontWeight: 800 }}>No bot activity found</p><p style={{ ...styles.cardText, marginTop: '8px' }}>Bot profits, losses, and financial activities will appear here when records exist. Try changing the filters if you expected a record.</p></div></td></tr>}
+                      }) : <tr><td style={styles.td} colSpan={3}><div style={{ padding: '18px 0', textAlign: 'center' }}><p style={{ margin: 0, fontWeight: 800 }}>No bot activity found</p><p style={{ ...styles.cardText, marginTop: '8px' }}>Bot profits, losses, and financial activities will appear here when records exist. Try changing the filters if you expected a record.</p></div></td></tr>}
                     </tbody>
                   </table>
                 </div>
