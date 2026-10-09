@@ -51,6 +51,21 @@ const DownloadPage = () => {
   };
   const theme = HYBRID_THEME_TOKENS[themeMode];
 
+  React.useEffect(() => {
+    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android' || !NativeAppUpdate.addListener) return;
+    let listenerHandle: { remove: () => Promise<void> } | undefined;
+    void NativeAppUpdate.addListener('downloadError', (event) => {
+      setApkActionMessage(event.message || 'The APK download or installer could not complete.');
+    }).then((handle) => {
+      listenerHandle = handle;
+    }).catch(() => {
+      // The native listener is optional; the download link remains available.
+    });
+    return () => {
+      if (listenerHandle) void listenerHandle.remove();
+    };
+  }, []);
+
   const styles = {
     page: {
       minHeight: '100vh',
