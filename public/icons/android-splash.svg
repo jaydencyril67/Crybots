@@ -18,7 +18,7 @@
     <circle cx="256" cy="256" r="24" fill="#fff"/>
   </g>
 
-  <text x="1366" y="2390"
+  <text x="1366" y="2350"
         text-anchor="middle"
         fill="#fff"
         font-family="Arial, Helvetica, sans-serif"
