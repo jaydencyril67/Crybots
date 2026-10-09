@@ -122,22 +122,12 @@ const AppUpdateMonitor = () => {
         backdropFilter: 'blur(22px)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <strong style={{ display: 'block', fontSize: '0.9rem', fontWeight: 900 }}>CryBots update available</strong>
-          <p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.8rem', lineHeight: 1.45 }}>
-            Version {update.latestVersion} is ready. Update without uninstalling your current app.
-          </p>
-          {actionMessage ? <p style={{ margin: '7px 0 0', color: theme.primary, fontSize: '0.78rem', lineHeight: 1.45 }}>{actionMessage}</p> : null}
-        </div>
-        <button
-          type="button"
-          onClick={() => { setHidden(true); setActionMessage(''); }}
-          aria-label="Dismiss update notice"
-          style={{ border: 0, background: 'transparent', color: theme.textMuted, fontSize: '1.1rem', lineHeight: 1, cursor: 'pointer', padding: '2px 4px' }}
-        >
-          ×
-        </button>
+      <div style={{ minWidth: 0 }}>
+        <strong style={{ display: 'block', fontSize: '0.9rem', fontWeight: 900 }}>CryBots update available</strong>
+        <p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.8rem', lineHeight: 1.45 }}>
+          Version {update.latestVersion} is ready. Update without uninstalling your current app.
+        </p>
+        {actionMessage ? <p style={{ margin: '7px 0 0', color: theme.primary, fontSize: '0.78rem', lineHeight: 1.45 }}>{actionMessage}</p> : null}
       </div>
       <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
         <button
