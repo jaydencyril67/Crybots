@@ -88,34 +88,34 @@ const WorldScopePage = () => {
   };
 
   const styles: Record<string, React.CSSProperties> = {
-    page: { minHeight: '100vh', paddingBottom: 100, overflowX: 'hidden', background: theme.background, color: theme.text },
-    shell: { width: '100%', maxWidth: 980, margin: '0 auto', padding: 'clamp(14px, 3vw, 28px)', boxSizing: 'border-box' },
-    back: { display: 'inline-flex', alignItems: 'center', gap: 7, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: 10, padding: '8px 11px', fontWeight: 750, marginBottom: 16, cursor: 'pointer' },
+    page: { minHeight: '100vh', paddingBottom: 90, overflowX: 'hidden', overflowY: 'auto', background: theme.background, color: theme.text },
+    shell: { width: '100%', maxWidth: 920, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' },
+    back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: 10, padding: '7px 10px', fontSize: '.84rem', fontWeight: 700, marginBottom: 12, cursor: 'pointer' },
     hero: { border: `1px solid ${theme.borderGlass}`, background: 'linear-gradient(135deg, rgba(56,189,248,0.14), rgba(168,85,247,0.17))', borderRadius: 20, padding: 'clamp(18px, 4vw, 28px)', display: 'grid', gap: 13, marginBottom: 16 },
     eyebrow: { display: 'inline-flex', alignItems: 'center', gap: 7, color: theme.primary, fontSize: '.74rem', fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' as const },
-    title: { margin: 0, fontSize: 'clamp(1.7rem, 5vw, 2.35rem)', lineHeight: 1.1, letterSpacing: '-.04em', fontWeight: 950 },
-    subtitle: { margin: 0, color: theme.textMuted, fontSize: '.93rem', lineHeight: 1.7, maxWidth: '72ch' },
-    sectionTitle: { margin: '20px 0 10px', fontSize: '1.05rem', fontWeight: 900 },
-    muted: { color: theme.textMuted, fontSize: '.8rem', lineHeight: 1.6 },
+    title: { margin: 0, fontSize: 'clamp(1.15rem, 3vw, 1.45rem)', lineHeight: 1.25, letterSpacing: '-.03em', fontWeight: 900 },
+    subtitle: { margin: 0, color: theme.textMuted, fontSize: '.92rem', lineHeight: 1.7, maxWidth: '64ch' },
+    sectionTitle: { margin: '14px 0 10px', fontSize: 'clamp(1.15rem, 3vw, 1.45rem)', fontWeight: 900, letterSpacing: '-.03em' },
+    muted: { color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 12 },
     outerCard: { padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, minWidth: 0 },
     card: { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, borderRadius: 15, padding: 14, display: 'grid', alignContent: 'start', gap: 12, minWidth: 0, boxSizing: 'border-box' as const },
-    button: { width: '100%', border: `1px solid ${theme.borderGlass}`, borderRadius: 11, padding: '12px 13px', color: theme.text, background: theme.surfaceMuted, fontWeight: 850, cursor: 'pointer' },
+    button: { width: '100%', minWidth: 108, border: 'none', borderRadius: 999, padding: '11px 16px', color: theme.text, background: theme.surfaceMuted, fontWeight: 700, fontSize: '.88rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxSizing: 'border-box' as const },
     primaryButton: { background: theme.primary, color: theme.textInverse, borderColor: theme.primary },
-    featureList: { display: 'grid', gap: 9, padding: 0, margin: 0, listStyle: 'none', color: theme.textMuted, fontSize: '.86rem', lineHeight: 1.5 },
-    notice: { border: `1px solid ${theme.borderGlass}`, borderRadius: 12, background: theme.surfaceMuted, color: theme.textMuted, padding: '12px 13px', fontSize: '.82rem', lineHeight: 1.6, marginTop: 12 },
-    status: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const, color: theme.textMuted, fontSize: '.78rem' },
-    tabRow: { display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 5, marginBottom: 12 },
-    tab: { flex: '0 0 auto', border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '9px 12px', background: theme.surfaceGlass, color: theme.textMuted, fontSize: '.78rem', fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' as const },
-    rankingCard: { border: `1px solid ${theme.borderGlass}`, borderRadius: 16, padding: 15, background: theme.surfaceGlass, display: 'grid', gap: 10, marginBottom: 10, minWidth: 0 },
+    featureList: { display: 'grid', gap: 8, padding: 0, margin: 0, listStyle: 'none', color: theme.textMuted, fontSize: '.88rem', lineHeight: 1.5 },
+    notice: { border: `1px solid ${theme.borderGlass}`, borderRadius: 13, background: theme.surfaceMuted, color: theme.textMuted, padding: '12px 13px', fontSize: '.82rem', lineHeight: 1.5, marginTop: 12 },
+    status: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const, color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
+    tabRow: { display: 'flex', flexWrap: 'wrap' as const, gap: 8, paddingBottom: 5, marginBottom: 12, width: '100%' },
+    tab: { flex: '1 1 auto', minWidth: 0, minHeight: 42, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '11px 12px', background: theme.surfaceGlass, color: theme.textMuted, fontSize: '.88rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'normal' as const, boxSizing: 'border-box' as const },
+    rankingCard: { border: `1px solid ${theme.borderGlass}`, borderRadius: 15, padding: 14, background: theme.surfaceGlass, display: 'grid', gap: 10, marginBottom: 10, minWidth: 0, boxSizing: 'border-box' as const },
     rankingHead: { display: 'flex', alignItems: 'flex-start', gap: 11 },
     iconBox: { width: 38, height: 38, flex: '0 0 38px', display: 'grid', placeItems: 'center', borderRadius: 12, background: 'rgba(56,189,248,.12)', color: theme.primary },
     tableWrap: { overflowX: 'auto' as const, width: '100%' },
     table: { width: '100%', minWidth: 430, borderCollapse: 'collapse' as const, fontSize: '.8rem' },
     th: { textAlign: 'left' as const, color: theme.textMuted, fontSize: '.7rem', textTransform: 'uppercase' as const, letterSpacing: '.06em', padding: '10px 8px', borderBottom: `1px solid ${theme.borderGlass}` },
     td: { padding: '11px 8px', borderBottom: `1px solid ${theme.borderGlass}`, verticalAlign: 'top' as const },
-    message: { borderRadius: 11, padding: '11px 12px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, fontSize: '.84rem', lineHeight: 1.5, margin: '10px 0' },
-    footer: { marginTop: 16, color: theme.textMuted, fontSize: '.76rem', lineHeight: 1.6 },
+    message: { borderRadius: 13, padding: '12px 13px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, fontSize: '.88rem', lineHeight: 1.5, margin: '10px 0' },
+    footer: { marginTop: 14, color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
   };
 
   return <HybridTheme mode={themeMode}>
@@ -145,7 +145,7 @@ const WorldScopePage = () => {
           <div style={styles.notice}><ShieldCheck size={15} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> WorldScope is a paid feature. Rankings are based on recorded CryBots data; they do not guarantee future profits or trading results. Your in-app USDT balance is charged when you confirm a plan.</div>
           <div style={{ ...styles.outerCard, marginTop: 14 }}>
             <div style={styles.card}>
-              <h2 style={{ margin: 0, fontSize: '1.08rem' }}>Choose when you're ready</h2>
+              <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 900 }}>Choose when you're ready</h2>
               <p style={styles.subtitle}>Preview the subscription plans first. You can choose Moderate Scope for core rankings or Advance Scope for all five categories.</p>
               <button type="button" style={{ ...styles.button, ...styles.primaryButton }} onClick={() => setScreen('payments')}>Preview payment plans <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></button>
             </div>
@@ -155,11 +155,11 @@ const WorldScopePage = () => {
         {screen === 'payments' && <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
             <h2 style={styles.sectionTitle}>WorldScope subscription</h2>
-            <button type="button" style={{ ...styles.button, width: 'auto', padding: '8px 11px' }} onClick={() => setScreen('intro')}><ArrowLeft size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Overview</button>
+            <button type="button" style={{ ...styles.button, width: 'auto', minWidth: 0, padding: '9px 12px' }} onClick={() => setScreen('intro')}><ArrowLeft size={14} style={{ display: 'inline', verticalAlign: 'middle' }} /> Overview</button>
           </div>
           <p style={styles.subtitle}>Select a billing period, then choose the access level you want. Subscriptions expire at the end of the selected period and are not automatically renewed.</p>
-          <div style={{ display: 'flex', gap: 8, margin: '14px 0', padding: 4, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }}>
-            {(['monthly', 'yearly'] as BillingCycle[]).map(cycle => <button key={cycle} type="button" onClick={() => setBillingCycle(cycle)} style={{ ...styles.button, flex: 1, textTransform: 'capitalize', ...(billingCycle === cycle ? styles.primaryButton : { background: 'transparent', borderColor: 'transparent' }) }}>{cycle}{cycle === 'yearly' ? ' · Save more' : ''}</button>)}
+          <div style={{ display: 'flex', gap: 8, margin: '14px 0', padding: 4, borderRadius: 999, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted }}>
+            {(['monthly', 'yearly'] as BillingCycle[]).map(cycle => <button key={cycle} type="button" onClick={() => setBillingCycle(cycle)} style={{ ...styles.button, flex: 1, textTransform: 'capitalize', ...(billingCycle === cycle ? styles.primaryButton : { background: 'transparent', color: theme.textMuted }) }}>{cycle}{cycle === 'yearly' ? ' · Save more' : ''}</button>)}
           </div>
           <div style={styles.grid}>
             {(['moderate', 'advanced'] as ScopeTier[]).map(plan => {
@@ -168,7 +168,7 @@ const WorldScopePage = () => {
               const features = advanced ? ['Top 5 most profitable bots', 'Top 5 daily bot-traded symbols', 'Top 5 creators by recorded bot performance', 'Top 5 highest-efficiency bots for sale', 'Top 5 highest-efficiency bots for rent'] : ['Top 5 most profitable bots', 'Top 5 daily bot-traded symbols', 'Top 5 creators by recorded bot performance'];
               return <div key={plan} style={styles.outerCard}><article style={{ ...styles.card, borderColor: selectedTier === plan ? theme.primary : theme.borderGlass }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><h3 style={{ margin: 0, fontSize: '1.03rem' }}>{advanced ? 'Advance Scope' : 'Moderate Scope'}</h3>{advanced ? <Crown size={19} color="#a855f7" /> : <ShieldCheck size={19} color={theme.primary} />}</div>
-                <div><span style={{ fontSize: '2rem', fontWeight: 950 }}>{price.toFixed(2).replace(/\.00$/, '')}</span> <strong>USDT</strong><div style={styles.muted}>per {billingCycle === 'monthly' ? 'month' : 'year'}</div></div>
+                <div><span style={{ fontSize: '1.8rem', fontWeight: 900 }}>{price.toFixed(2).replace(/\.00$/, '')}</span> <strong>USDT</strong><div style={styles.muted}>per {billingCycle === 'monthly' ? 'month' : 'year'}</div></div>
                 <ul style={styles.featureList}>{features.map(feature => <li key={feature}>✓ {feature}</li>)}</ul>
                 <button type="button" disabled={loading || purchasing} style={{ ...styles.button, ...(selectedTier === plan ? styles.primaryButton : {}) }} onClick={() => { setSelectedTier(plan); void purchase(plan); }}>{purchasing && selectedTier === plan ? 'Activating subscription…' : `Subscribe · ${price.toFixed(2).replace(/\.00$/, '')} USDT`}</button>
               </article></div>;
@@ -189,11 +189,11 @@ const WorldScopePage = () => {
           <h2 style={styles.sectionTitle}>Your live rankings</h2>
           <div style={styles.status}>{loading ? <><RefreshCw size={14} /> Refreshing…</> : data?.asOf ? <><Clock3 size={14} /> Snapshot {new Date(data.asOf).toLocaleString()} · UTC daily window</> : 'Waiting for ranking data'} <button type="button" onClick={() => void loadWorldScope()} disabled={loading} style={{ border: 0, background: 'transparent', color: theme.primary, fontWeight: 800, cursor: 'pointer' }}><RefreshCw size={13} /> Refresh</button></div>
           <div style={styles.tabRow} role="tablist" aria-label="WorldScope rankings">
-            {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { color: theme.text, borderColor: theme.primary, background: theme.surfaceMuted } : {}) }} onClick={() => setActiveSection(section.id)}>{section.title}</button>)}
+            {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { color: theme.textInverse, borderColor: theme.primary, background: theme.primary } : {}) }} onClick={() => setActiveSection(section.id)}>{section.title}</button>)}
           </div>
           <div style={styles.outerCard}>
           <section style={{ ...styles.rankingCard, background: theme.surfaceMuted }}>
-            <div style={styles.rankingHead}><div style={styles.iconBox}><SectionIcon size={20} /></div><div style={{ flex: 1, minWidth: 0 }}><h3 style={{ margin: 0, fontSize: '.98rem', fontWeight: 900 }}>{selectedSection.title}</h3><p style={{ ...styles.subtitle, fontSize: '.82rem', marginTop: 4 }}>{selectedSection.subtitle}</p></div>{selectedSection.tier === 'advanced' && <span style={{ fontSize: '.65rem', fontWeight: 900, color: '#a855f7' }}>ADVANCE</span>}</div>
+            <div style={styles.rankingHead}><div style={styles.iconBox}><SectionIcon size={20} /></div><div style={{ flex: 1, minWidth: 0 }}><h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900 }}>{selectedSection.title}</h3><p style={{ ...styles.subtitle, fontSize: '.88rem', marginTop: 5 }}>{selectedSection.subtitle}</p></div>{selectedSection.tier === 'advanced' && <span style={{ fontSize: '.74rem', fontWeight: 900, color: '#a855f7' }}>ADVANCE</span>}</div>
             {loading ? <div style={styles.message}>Loading current rankings…</div> : activeRows.length === 0 ? <div style={styles.message}>No qualifying records are available for this ranking yet. No sample numbers are shown.</div> : <div style={styles.tableWrap}><table style={styles.table}><thead><tr><th style={styles.th}>Rank</th>{selectedSection.columns.map(column => <th key={column.key} style={styles.th}>{column.label}</th>)}</tr></thead><tbody>{activeRows.slice(0, 5).map((row, index) => <tr key={String(row.botId || row.symbol || row.creator || index)}><td style={{ ...styles.td, fontWeight: 900 }}>#{index + 1}</td>{selectedSection.columns.map(column => <td key={column.key} style={styles.td}>{formatCell(row[column.key], column.format)}</td>)}</tr>)}</tbody></table></div>}
             <div style={styles.muted}>Window: {data?.windows?.[selectedSection.id === 'profitableBots' ? 'botProfitability' : selectedSection.id === 'dailySymbols' ? 'dailySymbols' : selectedSection.id === 'topCreators' ? 'creatorProfitability' : 'listings'] || 'server-recorded data'}.</div>
           </section>
