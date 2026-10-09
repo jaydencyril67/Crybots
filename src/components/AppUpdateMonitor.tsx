@@ -16,6 +16,7 @@ type NativeAppUpdatePlugin = {
     downloadId?: number;
     requiresPermission?: boolean;
   }>;
+  addListener?(eventName: 'downloadError', listener: (event: { message?: string }) => void): Promise<{ remove: () => Promise<void> }>;
 };
 
 type UpdateCheckResponse = {
@@ -59,7 +60,7 @@ const AppUpdateMonitor = () => {
 
   useEffect(() => {
     void checkForUpdate();
-    const interval = window.setInterval(() => { void checkForUpdate(); }, 6 * 60 * 60 * 1000);
+    const interval = window.setInterval(() => { void checkForUpdate(); }, 15 * 60 * 1000);
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') void checkForUpdate();
     };
@@ -72,6 +73,22 @@ const AppUpdateMonitor = () => {
       window.removeEventListener('ke:auth-changed', onAuthChanged);
     };
   }, [checkForUpdate]);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android' || !NativeAppUpdate.addListener) return;
+    let listenerHandle: { remove: () => Promise<void> } | undefined;
+    void NativeAppUpdate.addListener('downloadError', (event) => {
+      setInstalling(false);
+      setActionMessage(event.message || 'The APK download or installer could not complete.');
+    }).then((handle) => {
+      listenerHandle = handle;
+    }).catch(() => {
+      // The native listener is optional; update checks and the download button remain usable.
+    });
+    return () => {
+      if (listenerHandle) void listenerHandle.remove();
+    };
+  }, []);
 
   const startUpdate = async () => {
     if (!update?.downloadUrl || installing) return;
