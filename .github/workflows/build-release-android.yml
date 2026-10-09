@@ -893,7 +893,7 @@ jobs:
             --notes "CryBots Android release $APP_VERSION.
 
           Download CryBots.apk and install it to update the existing app. Android may ask you to confirm installation."
-- name: Notify CryBots users about this release
+      - name: Notify CryBots users about this release
         env:
           API_URL: ${{ vars.CRYBOTS_API_URL || 'https://kingshalls.onrender.com' }}
           RELEASE_SECRET: ${{ secrets.CRYBOTS_RELEASE_WEBHOOK_SECRET }}
