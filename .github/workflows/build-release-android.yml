@@ -543,11 +543,24 @@ jobs:
                               } else {
                                   java.io.InputStream input = connection.getInputStream();
                                   if (input != null) {
-                                      input.read();
+                                      byte[] sample = new byte[4];
+                                      int count = input.read(sample);
+                                      StringBuilder hex = new StringBuilder();
+                                      for (int i = 0; i < count; i++) {
+                                          if (i > 0) hex.append(' ');
+                                          hex.append(String.format("%02X", sample[i] & 0xFF));
+                                      }
+                                      result.put("firstBytesHex", hex.toString());
+                                      result.put("looksLikeApkZip", count >= 2 && sample[0] == 0x50 && sample[1] == 0x4B);
                                       input.close();
+                                  } else {
+                                      result.put("firstBytesHex", "");
+                                      result.put("looksLikeApkZip", false);
                                   }
                               }
-                          } catch (Exception ignored) {}
+                          } catch (Exception sampleError) {
+                              result.put("sampleReadError", sampleError.getClass().getSimpleName() + ": " + String.valueOf(sampleError.getMessage()));
+                          }
                           call.resolve(result);
                       } catch (Exception error) {
                           JSObject result = new JSObject();
