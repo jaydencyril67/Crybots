@@ -176,6 +176,7 @@ const getRouteKey = () => {
   if (pathname === '/options' || hash === '#/options') return 'options';
   if (pathname === '/store' || hash === '#/store') return 'store';
   if (pathname === '/download' || hash === '#/download') return 'download';
+  if (pathname === '/worldscope-rankings' || hash === '#/worldscope-rankings') return 'worldscope-rankings';
   if (pathname === '/worldscope' || hash === '#/worldscope') return 'worldscope';
   if (pathname === '/about' || hash === '#/about') return 'about';
   if (pathname === '/information' || hash === '#/information') return 'information';
@@ -258,6 +259,7 @@ const routeToKey = (path: string) => {
   if (path === '/options' || path === '#/options') return 'options';
   if (path === '/store' || path === '#/store') return 'store';
   if (normalizedPath === '/download' || normalizedPath === '#/download') return 'download';
+  if (normalizedPath === '/worldscope-rankings' || normalizedPath === '#/worldscope-rankings') return 'worldscope-rankings';
   if (normalizedPath === '/worldscope' || normalizedPath === '#/worldscope') return 'worldscope';
   if (path === '/about' || path === '#/about') return 'about';
   if (path === '/information' || path === '#/information') return 'information';
@@ -571,7 +573,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'options') return <ProtectedRoute><OptionsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'store') return <ProtectedRoute><StorePage /></ProtectedRoute>;
     if (displayedRouteKey === 'download') return <ProtectedRoute><DownloadPage /></ProtectedRoute>;
-    if (displayedRouteKey === 'worldscope') return <ProtectedRoute><WorldScopePage /></ProtectedRoute>;
+    if (displayedRouteKey === 'worldscope' || displayedRouteKey === 'worldscope-rankings') return <ProtectedRoute><WorldScopePage /></ProtectedRoute>;
     if (displayedRouteKey === 'about') return <ProtectedRoute><AboutPage /></ProtectedRoute>;
     if (displayedRouteKey === 'information') return <ProtectedRoute><InformationPage /></ProtectedRoute>;
     if (displayedRouteKey === 'privacy-policy') return <ProtectedRoute><PrivacyPolicyPage /></ProtectedRoute>;
@@ -596,7 +598,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'alert') return <ProtectedRoute><AlertPage /></ProtectedRoute>;
     if (displayedRouteKey === 'app-usage') return <ProtectedRoute><AppUsagePage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['home', 'details', 'manage', 'theme', 'nowbar', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'about', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'alert', 'app-usage'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['home', 'details', 'manage', 'theme', 'nowbar', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'worldscope-rankings', 'about', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'alert', 'app-usage'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
@@ -604,7 +606,7 @@ const RouteTransition = () => {
   }, [displayedRouteKey, isAuthenticated]);
 
   const showNowBar = displayedRouteKey === 'admin-users' || displayedRouteKey === 'admin-chat' || displayedRouteKey === 'admin-deposits' || displayedRouteKey === 'admin-deposit-stats' || displayedRouteKey === 'admin-alert' || displayedRouteKey === 'admin-tickets' || displayedRouteKey === 'admin-ticket-stats' || displayedRouteKey === 'admin-alert-send' || displayedRouteKey === 'admin-funds' || displayedRouteKey === 'admin-funds-send' || displayedRouteKey === 'admin-user-stats' || displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'theme' || displayedRouteKey === 'nowbar' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'notification-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'chart' || displayedRouteKey === 'market' || displayedRouteKey === 'creation' || displayedRouteKey === 'rentals' || displayedRouteKey === 'bots' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'trade-history' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'download' || displayedRouteKey === 'worldscope' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'api-keys' || displayedRouteKey === 'webhooks' || displayedRouteKey === 'configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'tickets' || displayedRouteKey === 'notification' || displayedRouteKey === 'alert' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['admin-users', 'admin-chat', 'admin-chat-user', 'admin-deposits', 'admin-deposit-stats', 'admin-alert', 'admin-tickets', 'admin-ticket-stats', 'admin-alert-send', 'admin-funds', 'admin-funds-send', 'admin-user-stats', 'home', 'details', 'manage', 'theme', 'nowbar', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'notification', 'alert', 'app-usage'].includes(displayedRouteKey);
+  const isProtectedPage = ['admin-users', 'admin-chat', 'admin-chat-user', 'admin-deposits', 'admin-deposit-stats', 'admin-alert', 'admin-tickets', 'admin-ticket-stats', 'admin-alert-send', 'admin-funds', 'admin-funds-send', 'admin-user-stats', 'home', 'details', 'manage', 'theme', 'nowbar', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'worldscope-rankings', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'notification', 'alert', 'app-usage'].includes(displayedRouteKey);
   const usagePagePath = displayedRouteKey === 'exit' ? '/exit' : displayedRouteKey === 'statistics' ? '/statistics' : displayedRouteKey === 'tools' ? '/tools' : displayedRouteKey === 'stats' ? '/stats' : displayedRouteKey === 'menu' ? '/menu' : displayedRouteKey === 'nowbar' ? '/nowbar' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   useEffect(() => {
