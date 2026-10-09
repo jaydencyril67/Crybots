@@ -13,7 +13,6 @@ import ReusableConfirmationPage from './ReusableConfirmationPage';
 import NotificationBanner from './NotificationBanner';
 import { createPasskey, isWebAuthnAvailable } from '../utils/webauthn';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
-import WebAuthnDebugPanel from './WebAuthnDebugPanel';
 import { logWebAuthnDebug } from '../utils/webauthnDebug';
 
 type SecurityDevice = {
@@ -1087,8 +1086,6 @@ const SecurityPage = () => {
                 {renderStatus('biometric')}
                 </div>
               </div>
-
-              <WebAuthnDebugPanel />
 
               <div style={styles.card}>
                 <div style={styles.row}>
