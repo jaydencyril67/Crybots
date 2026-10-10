@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ArrowRight, Check, ShieldCheck, Fingerprint, KeyRound, Wallet, UserRound, Bell, Sparkles, SkipForward, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ShieldCheck, Fingerprint, KeyRound, Wallet, UserRound, Bell, Sparkles, SkipForward, Palette, type LucideIcon } from 'lucide-react';
 import { useAppTheme, type AppThemePreference } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { navigate } from '../utils/navigate';
@@ -8,6 +8,7 @@ import { navigate } from '../utils/navigate';
 type SetupStep = { id: string; title: string; description: string; detail: string; route: string; icon: LucideIcon };
 
 const setupSteps: SetupStep[] = [
+  { id: 'theme', title: 'Choose your appearance', description: 'Make CryBots feel right for you.', detail: 'Preview and apply your preferred theme. You can change it any time in Options.', route: '', icon: Palette },
   { id: 'profile', title: 'Add a profile photo', description: 'Make your account feel like yours.', detail: 'Choose a clear photo or avatar in your profile details.', route: '/details', icon: UserRound },
   { id: 'security-code', title: 'Create a security code', description: 'Add an extra check for sensitive account actions.', detail: 'You can create or manage your security code in Security.', route: '/security', icon: KeyRound },
   { id: 'biometric', title: 'Enable biometric security', description: 'Use a passkey where your device supports it.', detail: 'Fingerprint, face unlock, or a compatible security key may be available.', route: '/security', icon: Fingerprint },
@@ -77,6 +78,11 @@ const OnboardingWizard = () => {
     }
   };
   const openStep = () => {
+    if (current.id === 'theme') {
+      setOpening(false);
+      setStepIndex((previous) => Math.min(previous + 1, setupSteps.length - 1));
+      return;
+    }
     setOpening(true);
     localStorage.setItem('crybots_onboarding_return_step', current.id);
     navigate(current.route);
@@ -96,31 +102,32 @@ const OnboardingWizard = () => {
               <p style={styles.eyebrow}><Sparkles size={13} style={{ verticalAlign: 'middle', marginRight: '5px' }} /> Your account, your way</p>
               <h1 style={styles.heading}>Let’s get your account ready.</h1>
               <p style={styles.muted}>A few quick steps can make your account safer and easier to use. Do what you can now — every step can be skipped, and you can return later.</p>
-              <section style={styles.themeCard}>
-                <div style={{ fontWeight: 850, fontSize: '14px' }}>Choose your appearance</div>
-                <p style={{ ...styles.muted, marginTop: '4px', fontSize: '12px' }}>Preview and apply your preferred CryBots theme. You can change it any time in Options.</p>
-                <div style={styles.themeGrid}>
-                  {themeChoices.map((choice) => {
-                    const previewTheme = HYBRID_THEME_TOKENS[choice.preview];
-                    const selected = themePreference === choice.key;
-                    return <button key={choice.key} type="button" aria-pressed={selected} onClick={() => setThemePreference(choice.key)} style={{ ...styles.themeChoice, borderColor: selected ? theme.primary : theme.borderGlass, boxShadow: selected ? '0 0 0 1px ' + theme.primary : 'none' }}>
-                      <div style={{ ...styles.themeSwatch, background: previewTheme.background, boxShadow: 'inset 0 -10px 0 ' + previewTheme.surfaceGlass }} />
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px', fontWeight: 850, fontSize: '13px' }}>{choice.label}{selected ? <Check size={15} /> : null}</div>
-                      <div style={{ color: theme.textMuted, fontSize: '11px', lineHeight: 1.4, marginTop: '4px' }}>{choice.description}</div>
-                    </button>;
-                  })}
-                </div>
-              </section>
               <div style={styles.progressTrack}><div style={styles.progress} /></div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '9px', color: theme.textMuted, fontSize: '12px' }}><span>Step {stepIndex + 1} of {setupSteps.length}</span><span>{completedCount} skipped</span></div>
               <article style={styles.stepCard}>
                 <div style={styles.icon}><current.icon size={23} /></div>
                 <h2 style={styles.stepTitle}>{current.title}</h2>
                 <p style={styles.muted}>{current.description}</p>
-                <p style={{ ...styles.muted, marginTop: '10px', fontSize: '13px' }}>{current.detail}</p>
+                {current.id === 'theme' ? (
+                  <section style={styles.themeCard}>
+                    <div style={styles.themeGrid}>
+                      {themeChoices.map((choice) => {
+                        const previewTheme = HYBRID_THEME_TOKENS[choice.preview];
+                        const selected = themePreference === choice.key;
+                        return <button key={choice.key} type="button" aria-pressed={selected} onClick={() => setThemePreference(choice.key)} style={{ ...styles.themeChoice, borderColor: selected ? theme.primary : theme.borderGlass, boxShadow: selected ? '0 0 0 1px ' + theme.primary : 'none' }}>
+                          <div style={{ ...styles.themeSwatch, background: previewTheme.background, boxShadow: 'inset 0 -10px 0 ' + previewTheme.surfaceGlass }} />
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px', fontWeight: 850, fontSize: '13px' }}>{choice.label}{selected ? <Check size={15} /> : null}</div>
+                          <div style={{ color: theme.textMuted, fontSize: '11px', lineHeight: 1.4, marginTop: '4px' }}>{choice.description}</div>
+                        </button>;
+                      })}
+                    </div>
+                  </section>
+                ) : (
+                  <p style={{ ...styles.muted, marginTop: '10px', fontSize: '13px' }}>{current.detail}</p>
+                )}
                 <div style={styles.actions}>
                   <button type="button" style={styles.secondary} onClick={skipStep}><SkipForward size={16} /> Skip this</button>
-                  <button type="button" style={styles.primary} onClick={openStep} disabled={opening}>{opening ? 'Opening…' : <>Set up <ArrowRight size={16} /></>}</button>
+                  <button type="button" style={styles.primary} onClick={openStep} disabled={opening}>{opening ? 'Opening…' : <>{current.id === 'theme' ? 'Save & continue' : 'Set up'} <ArrowRight size={16} /></>}</button>
                 </div>
               </article>
               <div style={styles.list}>
