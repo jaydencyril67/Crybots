@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, CheckCircle2, CreditCard, Lock, Mail } from 'lucide-react';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import ReusableDatePage from './ReusableDatePage';
 import { navigate } from '../utils/navigate';
@@ -738,7 +738,7 @@ const SignupPage = () => {
                         cursor: canContinue && !isCheckingEmail ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      {isCheckingEmail ? <InlineLoadingDots /> : <>Next <ArrowRight style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} /></>}
+                      {isCheckingEmail ? <LoadingDots /> : <>Next <ArrowRight style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} /></>}
                     </button>
                   ) : (
                     <button
@@ -752,7 +752,7 @@ const SignupPage = () => {
                         cursor: canContinue && !isSubmitting ? 'pointer' : 'not-allowed',
                       }}
                     >
-                      {isSubmitting ? <InlineLoadingDots /> : <>Finish <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} /></>}
+                      {isSubmitting ? <LoadingDots /> : <>Finish <CheckCircle2 style={{ ...styles.icon, display: 'inline-block', marginLeft: '6px' }} /></>}
                     </button>
                   )}
                 </div>
