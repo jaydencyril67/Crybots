@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { pickNativeImage } from '../utils/nativeImagePicker';
+import { isNativeGalleryAvailable } from '../utils/nativeImagePicker';
+import NativeGalleryModal from './NativeGalleryModal';
 
 type ImagePickerButtonProps = {
   accept?: string;
@@ -13,23 +14,15 @@ type ImagePickerButtonProps = {
 
 const ImagePickerButton = ({ accept = 'image/*', disabled = false, onImageSelected, children, style, title, 'aria-label': ariaLabel }: ImagePickerButtonProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [opening, setOpening] = useState(false);
+  const [nativeGalleryOpen, setNativeGalleryOpen] = useState(false);
 
-  const openPicker = async () => {
-    if (disabled || opening) return;
-    setOpening(true);
-    try {
-      const nativeFile = await pickNativeImage();
-      if (nativeFile) {
-        await onImageSelected(nativeFile);
-        return;
-      }
-      inputRef.current?.click();
-    } catch {
-      inputRef.current?.click();
-    } finally {
-      setOpening(false);
+  const openPicker = () => {
+    if (disabled) return;
+    if (isNativeGalleryAvailable()) {
+      setNativeGalleryOpen(true);
+      return;
     }
+    inputRef.current?.click();
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,10 +33,11 @@ const ImagePickerButton = ({ accept = 'image/*', disabled = false, onImageSelect
 
   return (
     <>
-      <button type="button" onClick={openPicker} disabled={disabled || opening} style={style} title={title} aria-label={ariaLabel}>
+      <button type="button" onClick={openPicker} disabled={disabled} style={style} title={title} aria-label={ariaLabel}>
         {children}
       </button>
       <input ref={inputRef} type="file" accept={accept} onChange={handleFileChange} disabled={disabled} style={{ display: 'none' }} />
+      {nativeGalleryOpen && <NativeGalleryModal onClose={() => setNativeGalleryOpen(false)} onSelect={onImageSelected} />}
     </>
   );
 };
