@@ -123,6 +123,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isOnline, setIsOnline] = useState(() => typeof navigator === 'undefined' ? true : navigator.onLine);
   const [isAlertActive, setIsAlertActive] = useState(false);
   const [voiceModeEnabled, setVoiceModeEnabled] = useState(getVoiceModeEnabled);
   const [isListening, setIsListening] = useState(false);
@@ -131,6 +132,17 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   const previousCount = useRef(0);
   const hasLoadedCount = useRef(false);
   const alertTimeout = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
+    };
+  }, []);
 
   useEffect(() => {
     const handleVoiceStatus = (event: Event) => {
@@ -310,8 +322,8 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       ['--notification-color' as string]: notificationColor,
     }
     : styles.header;
-  const headerTitle = voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'CryBots';
-  const headerSubtitle = voiceModeEnabled && voiceTranscript ? `“${voiceTranscript}”` : null;
+  const headerTitle = !isOnline ? 'No Internet' : voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Notification' : 'CryBots';
+  const headerSubtitle = !isOnline ? 'Check your connection' : voiceModeEnabled && voiceTranscript ? `“${voiceTranscript}”` : null;
   const artworkStyle = {
     ...styles.unreadArtwork,
     color: theme.textInverse,
