@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, Check, ShieldCheck, Fingerprint, KeyRound, Wallet, UserRound, Bell, Sparkles, SkipForward } from 'lucide-react';
-import { useAppTheme } from './AppTheme';
+import { useAppTheme, type AppThemePreference } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { navigate } from '../utils/navigate';
 
@@ -17,12 +17,18 @@ const setupSteps: SetupStep[] = [
 ];
 
 const OnboardingWizard = () => {
-  const { themeMode } = useAppTheme();
+  const { themeMode, themePreference, setThemePreference } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [stepIndex, setStepIndex] = useState(0);
   const [skipped, setSkipped] = useState<string[]>([]);
   const [finished, setFinished] = useState(false);
   const [opening, setOpening] = useState(false);
+  const themeChoices: Array<{ key: AppThemePreference; label: string; description: string; preview: 'dark' | 'light' }> = [
+    { key: 'dark', label: 'Dark', description: 'Deep, focused surfaces', preview: 'dark' },
+    { key: 'light', label: 'Light', description: 'Bright and easy to read', preview: 'light' },
+    { key: 'system', label: 'System', description: 'Follow your device', preview: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark' },
+    { key: 'shift', label: 'Shift', description: 'Light by day, dark at night', preview: new Date().getHours() >= 6 && new Date().getHours() < 18 ? 'light' : 'dark' },
+  ];
   const current = setupSteps[stepIndex];
   const completedCount = skipped.length;
   const progress = Math.round(((stepIndex + 1) / setupSteps.length) * 100);
@@ -37,6 +43,10 @@ const OnboardingWizard = () => {
     eyebrow: { color: theme.primary, fontSize: '11px', fontWeight: 800, letterSpacing: '.16em', textTransform: 'uppercase' as const, margin: '0 0 10px' },
     heading: { fontSize: 'clamp(1.65rem, 5vw, 2.4rem)', lineHeight: 1.08, letterSpacing: '-.04em', margin: '0 0 12px' },
     muted: { color: theme.textMuted, lineHeight: 1.65, fontSize: '14px', margin: 0 },
+    themeCard: { marginTop: '20px', border: '1px solid ' + theme.borderGlass, background: theme.surfaceMuted, borderRadius: '18px', padding: '15px' },
+    themeGrid: { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '9px', marginTop: '12px' },
+    themeChoice: { minWidth: 0, textAlign: 'left' as const, borderRadius: '13px', padding: '11px', cursor: 'pointer', background: theme.surface, color: theme.text, border: '1px solid ' + theme.borderGlass },
+    themeSwatch: { height: '32px', borderRadius: '8px', marginBottom: '9px', border: '1px solid ' + theme.borderGlass },
     stepCard: { marginTop: '22px', border: '1px solid ' + theme.borderGlass, background: theme.surfaceMuted, borderRadius: '20px', padding: '18px' },
     icon: { width: '48px', height: '48px', borderRadius: '15px', background: theme.primarySoft, color: theme.primary, display: 'grid', placeItems: 'center', marginBottom: '16px' },
     stepTitle: { margin: '0 0 8px', fontSize: '1.25rem', fontWeight: 850 },
@@ -86,6 +96,21 @@ const OnboardingWizard = () => {
               <p style={styles.eyebrow}><Sparkles size={13} style={{ verticalAlign: 'middle', marginRight: '5px' }} /> Your account, your way</p>
               <h1 style={styles.heading}>Let’s get your account ready.</h1>
               <p style={styles.muted}>A few quick steps can make your account safer and easier to use. Do what you can now — every step can be skipped, and you can return later.</p>
+              <section style={styles.themeCard}>
+                <div style={{ fontWeight: 850, fontSize: '14px' }}>Choose your appearance</div>
+                <p style={{ ...styles.muted, marginTop: '4px', fontSize: '12px' }}>Preview and apply your preferred CryBots theme. You can change it any time in Options.</p>
+                <div style={styles.themeGrid}>
+                  {themeChoices.map((choice) => {
+                    const previewTheme = HYBRID_THEME_TOKENS[choice.preview];
+                    const selected = themePreference === choice.key;
+                    return <button key={choice.key} type="button" aria-pressed={selected} onClick={() => setThemePreference(choice.key)} style={{ ...styles.themeChoice, borderColor: selected ? theme.primary : theme.borderGlass, boxShadow: selected ? '0 0 0 1px ' + theme.primary : 'none' }}>
+                      <div style={{ ...styles.themeSwatch, background: previewTheme.background, boxShadow: 'inset 0 -10px 0 ' + previewTheme.surfaceGlass }} />
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '5px', fontWeight: 850, fontSize: '13px' }}>{choice.label}{selected ? <Check size={15} /> : null}</div>
+                      <div style={{ color: theme.textMuted, fontSize: '11px', lineHeight: 1.4, marginTop: '4px' }}>{choice.description}</div>
+                    </button>;
+                  })}
+                </div>
+              </section>
               <div style={styles.progressTrack}><div style={styles.progress} /></div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '9px', color: theme.textMuted, fontSize: '12px' }}><span>Step {stepIndex + 1} of {setupSteps.length}</span><span>{completedCount} skipped</span></div>
               <article style={styles.stepCard}>
