@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Check, ChevronDown, Copy } from 'lucide-react';
 import LoadingDots from './LoadingDots';
-import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import HybridTheme, { HYBRID_THEME_TOKENS, createHybridCardStyles } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -357,7 +356,7 @@ const DepositPage = () => {
         </div>}
       </div>
       {message ? <NotificationBanner tone="error" title="Deposit update" message={message} /> : null}
-      <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '8px' }} disabled={loading}>{loading ? <InlineLoadingDots /> : 'Create deposit address'}</button>
+      <button type="submit" style={{ ...styles.primaryButton, ...(loading ? styles.primaryButtonDisabled : {}), marginTop: '8px' }} disabled={loading}>{loading ? <LoadingDots /> : 'Create deposit address'}</button>
     </form>
   );
 
