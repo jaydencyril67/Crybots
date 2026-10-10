@@ -14,9 +14,8 @@ const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.A
 
 const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
-  return isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail)
-    ? '/admin-home'
-    : '/home';
+  if (isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail)) return '/admin-home';
+  return localStorage.getItem('crybots_onboarding_completed') === 'true' ? '/home' : '/onboarding';
 };
 
 const supportedEmailDomains = new Set([
