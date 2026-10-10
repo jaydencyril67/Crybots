@@ -265,6 +265,20 @@ const getVisibleVoiceButtons = (): VoiceUiButton[] => {
     .slice(0, 60);
 };
 
+const getVisibleInterfaceFingerprint = () => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return '';
+  const snapshot = getRuntimePageSnapshot();
+  const buttons = getVisibleVoiceButtons().map(button => ({ label: button.label, disabled: button.disabled }));
+  return JSON.stringify({
+    route: window.location.pathname,
+    title: snapshot?.title || '',
+    headings: snapshot?.headings || [],
+    states: snapshot?.states || [],
+    forms: snapshot?.forms || [],
+    buttons,
+  });
+};
+
 const isSensitiveVoiceButton = (label: string) =>
   /\b(withdraw|transfer|delete|remove|disable|revoke|reset|change password|security code|confirm deletion|close account)\b/i.test(label);
 
@@ -424,7 +438,8 @@ export const askVoiceAssistant = async (message: string) => {
       voiceConversationHistory.push({ role: 'assistant', content: reply });
       voiceConversationHistory = voiceConversationHistory.slice(-8);
       window.dispatchEvent(new CustomEvent(VOICE_STATUS_EVENT, { detail: { listening: false, transcript: reply, assistant: true } }));
-      speakVoiceResponse(reply);
+      // For clicks, wait for the UI check below so we don't announce success before observing the result.
+      if (body.action?.type !== 'click') speakVoiceResponse(reply);
     }
 
     if (body.action?.type === 'navigate' && body.action.route) {
@@ -444,7 +459,23 @@ export const askVoiceAssistant = async (message: string) => {
 
     if (body.action?.type === 'click') {
       logVoiceDebug('info', `Assistant action: click ${body.action.target || ''}`);
-      executeVoiceUiAction(body.action);
+      const before = getVisibleInterfaceFingerprint();
+      const executed = executeVoiceUiAction(body.action);
+      if (!executed) {
+        speakVoiceResponse('I could not safely activate that control, so no action was taken.');
+      } else {
+        const clickedLabel = getVisibleVoiceButtons().find(button => button.id === body.action?.target)?.label || 'the selected control';
+        window.setTimeout(() => {
+          const after = getVisibleInterfaceFingerprint();
+          if (after !== before) {
+            logVoiceDebug('info', `Visible interface changed after click: ${clickedLabel}`);
+            speakVoiceResponse('The visible interface changed after I clicked ' + clickedLabel + '. I can verify that the screen changed, but I cannot claim the underlying operation completed without a confirmed app result.');
+          } else {
+            logVoiceDebug('warn', `No visible result detected after click: ${clickedLabel}`);
+            speakVoiceResponse('I clicked ' + clickedLabel + ', but I could not detect a visible change. I cannot confirm that the action completed.');
+          }
+        }, 1000);
+      }
     }
 
     if (body.action?.type === 'scroll_page' || body.action?.type === 'scroll_nowbar') {
