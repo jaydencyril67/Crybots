@@ -10,6 +10,7 @@ import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import ImagePickerButton from './ImagePickerButton';
 import ProfileImageCropModal from './ProfileImageCropModal';
+import ImagePreviewModal from './ImagePreviewModal';
 
 const baseStyles = {
   page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '90px' },
@@ -69,6 +70,7 @@ const DetailsPage = () => {
   const [balanceLoading, setBalanceLoading] = useState(true); const [balanceError, setBalanceError] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null); const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null); const [avatarCropSource, setAvatarCropSource] = useState<string | null>(null);
+  const [viewingAvatarUrl, setViewingAvatarUrl] = useState('');
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({ usdtBalance: null }));
 
   useEffect(() => {
@@ -122,6 +124,7 @@ const DetailsPage = () => {
       <>
         <Helmet><title>CryBots | Details</title></Helmet>
         {avatarCropSource ? <ProfileImageCropModal imageUrl={avatarCropSource} onCancel={handleAvatarCropCancel} onDone={async (file) => { URL.revokeObjectURL(avatarCropSource); await handleAvatarCropDone(file); }} /> : null}
+        {viewingAvatarUrl ? <ImagePreviewModal imageUrl={viewingAvatarUrl} onClose={() => setViewingAvatarUrl('')} /> : null}
         <main style={styles.page}>
           <div style={styles.shell}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
@@ -130,7 +133,7 @@ const DetailsPage = () => {
                 <div style={{ ...styles.row, ...styles.profileIdentity }}>
 
                   <div style={styles.profileAvatarFrame}>
-                    {avatarPicture ? <img src={avatarPicture} alt={`${fullName || 'User'} profile`} style={styles.profileAvatar} /> : <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder"><CircleUserRound size={58} strokeWidth={1.6} /></div>}
+                    {avatarPicture ? <button type="button" onClick={() => setViewingAvatarUrl(avatarPicture)} aria-label="Preview profile picture" title="Tap to preview profile picture" style={{ display: 'block', width: '100%', height: '100%', padding: 0, border: 0, borderRadius: '15px', background: 'transparent', cursor: 'zoom-in', overflow: 'hidden' }}><img src={avatarPicture} alt={`${fullName || 'User'} profile — tap to preview`} style={styles.profileAvatar} /></button> : <div style={styles.profileAvatarFallback} aria-label="Profile picture placeholder"><CircleUserRound size={58} strokeWidth={1.6} /></div>}
                     <ImagePickerButton accept="image/*" onImageSelected={handleAvatarFileChange} disabled={avatarUploading} style={styles.avatarCameraButton} aria-label={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'} title={avatarUploading ? 'Uploading profile photo' : 'Change profile photo'}><Camera size={17} strokeWidth={2.2} /></ImagePickerButton>
                     {avatarUploading ? <div style={styles.avatarUploadingOverlay} aria-label="Uploading profile photo"><LoadingDots /></div> : null}
                     </div>
