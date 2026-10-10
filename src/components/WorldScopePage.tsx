@@ -224,7 +224,7 @@ const WorldScopePage = () => {
           <h2 style={styles.sectionTitle}>Your live rankings</h2>
           <div style={styles.status}>{loading ? <><span aria-label="Loading" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /></span> Fetching selected ranking…</> : data?.asOf ? <><Clock3 size={14} /> Snapshot {new Date(data.asOf).toLocaleString()} · UTC daily window</> : 'Waiting for ranking data'}</div>
           <div style={styles.tabRow} role="tablist" aria-label="WorldScope rankings">
-            {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { color: theme.textInverse, borderColor: theme.primary, background: theme.primary } : {}) }} onClick={() => { if (selectedSection.id === section.id || loading) return; setActiveSection(section.id); void loadWorldScope(); }}>{section.title}</button>)}
+            {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { color: theme.textInverse, borderColor: theme.primary, background: theme.primary } : {}) }} onClick={() => { if (selectedSection.id === section.id) return; setActiveSection(section.id); void loadWorldScope(); }}>{section.title}</button>)}
           </div>
           <div style={styles.outerCard}>
           <section style={{ ...styles.rankingCard, background: theme.surfaceMuted }}>
