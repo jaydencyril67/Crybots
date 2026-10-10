@@ -1,7 +1,21 @@
-import { useEffect } from 'react';
-import { API_BASE_URL, authHeaders } from '../api/axios';
+import { useEffect, useRef, useState } from 'react';
+import api, { API_BASE_URL, authHeaders } from '../api/axios';
 import { releaseMediaOutput } from '../utils/mediaAudio';
-import { askVoiceAssistant, getVoiceModeEnabled, isVoiceOutputActive, logVoiceDebug, speakVoiceResponse, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+import { askVoiceAssistant, getVoiceModeEnabled, isVoiceOutputActive, logVoiceDebug, speakVoiceResponse, VOICE_API_CONFIRMATION_EVENT, VOICE_MODE_CHANGED_EVENT, VOICE_OUTPUT_EVENT, VOICE_STATUS_EVENT } from '../utils/voiceNavigation';
+
+type PendingBrainApiAction = {
+  type: 'api';
+  operation: 'bot_activate' | 'bot_deactivate' | 'bot_withdraw';
+  target: string;
+  parameters?: Record<string, string>;
+  requiresConfirmation: true;
+};
+
+const actionTitle = (action: PendingBrainApiAction) => {
+  if (action.operation === 'bot_activate') return 'Activate bot investment';
+  if (action.operation === 'bot_deactivate') return 'Request bot deactivation';
+  return 'Withdraw available bot funds';
+};
 
 type DeepgramResult = {
   type?: string;
@@ -44,6 +58,115 @@ const downsampleTo16kPcm = (input: Float32Array, inputSampleRate: number) => {
 };
 
 const VoiceNavigation = () => {
+  const [pendingApiAction, setPendingApiAction] = useState<PendingBrainApiAction | null>(null);
+  const [executingApiAction, setExecutingApiAction] = useState(false);
+  const pendingApiActionRef = useRef<PendingBrainApiAction | null>(null);
+
+  const clearPendingApiAction = () => {
+    pendingApiActionRef.current = null;
+    setPendingApiAction(null);
+  };
+
+  useEffect(() => {
+    const handleApiConfirmationRequest = (event: Event) => {
+      const raw = (event as CustomEvent<unknown>).detail;
+      if (!raw || typeof raw !== 'object') return;
+      const candidate = raw as Partial<PendingBrainApiAction>;
+      const operations = ['bot_activate', 'bot_deactivate', 'bot_withdraw'];
+      if (
+        candidate.type !== 'api'
+        || !candidate.requiresConfirmation
+        || !candidate.target
+        || !/^[a-z0-9][a-z0-9._-]{2,119}$/i.test(candidate.target)
+        || !candidate.operation
+        || !operations.includes(candidate.operation)
+      ) {
+        logVoiceDebug('warn', 'Discarded an invalid Brain API confirmation request');
+        return;
+      }
+      if (pendingApiActionRef.current) {
+        logVoiceDebug('warn', 'Ignored a second Brain API proposal while another is awaiting a decision');
+        speakVoiceResponse('Please approve or cancel the current operation before preparing another one.');
+        return;
+      }
+      const parameters = candidate.parameters && typeof candidate.parameters === 'object'
+        ? candidate.parameters
+        : {};
+      if (candidate.operation !== 'bot_deactivate') {
+        const amount = Number(parameters.amount);
+        if (!Number.isFinite(amount) || amount <= 0) {
+          logVoiceDebug('warn', 'Discarded a Brain API action with an invalid amount');
+          speakVoiceResponse('The requested amount is invalid, so I did not prepare an executable action.');
+          return;
+        }
+      }
+      const action = {
+        type: 'api' as const,
+        operation: candidate.operation as PendingBrainApiAction['operation'],
+        target: candidate.target,
+        parameters: candidate.operation === 'bot_deactivate' ? {} : { amount: String(Number(parameters.amount)) },
+        requiresConfirmation: true as const,
+      };
+      pendingApiActionRef.current = action;
+      setPendingApiAction(action);
+      logVoiceDebug('info', `Showing confirmation panel for ${action.operation} on bot ${action.target}`);
+    };
+
+    window.addEventListener(VOICE_API_CONFIRMATION_EVENT, handleApiConfirmationRequest);
+    return () => window.removeEventListener(VOICE_API_CONFIRMATION_EVENT, handleApiConfirmationRequest);
+  }, []);
+
+  const confirmApiAction = async () => {
+    const action = pendingApiActionRef.current;
+    if (!action || executingApiAction) return;
+    setExecutingApiAction(true);
+    logVoiceDebug('info', `User approved Brain API action ${action.operation} for ${action.target}`);
+    try {
+      let response;
+      const botPath = `/api/bot-investments/${encodeURIComponent(action.target)}`;
+      if (action.operation === 'bot_activate') {
+        response = await api.post(`${botPath}/activate`, { amount: Number(action.parameters?.amount) });
+      } else if (action.operation === 'bot_deactivate') {
+        response = await api.post(`${botPath}/deactivate`);
+      } else {
+        response = await api.post(`${botPath}/withdraw`, { amount: Number(action.parameters?.amount) });
+      }
+
+      if (response.status < 200 || response.status >= 300 || typeof response.data?.message !== 'string' || !response.data.message.trim()) {
+        clearPendingApiAction();
+        logVoiceDebug('warn', `Brain API request returned HTTP ${response.status} without a clear operation result`);
+        speakVoiceResponse('CryBots returned a response without a clear result message. Please check My Bots and your transaction history before repeating the request.');
+        return;
+      }
+
+      const resultMessage = response.data.message.trim();
+      clearPendingApiAction();
+      logVoiceDebug('info', `CryBots API accepted ${action.operation} for ${action.target}: HTTP ${response.status}`);
+      speakVoiceResponse(resultMessage);
+    } catch (error) {
+      const failure = error as { response?: { status?: number; data?: { message?: string } }; message?: string };
+      clearPendingApiAction();
+      if (failure.response?.status) {
+        const message = failure.response.data?.message || `CryBots rejected the request (HTTP ${failure.response.status}).`;
+        logVoiceDebug('warn', `Brain API request rejected: HTTP ${failure.response.status}: ${message}`);
+        speakVoiceResponse(message);
+      } else {
+        logVoiceDebug('error', `Brain API request outcome is unknown: ${failure.message || 'network error'}`);
+        speakVoiceResponse('I could not verify the server response. Check My Bots and your transaction history before trying again.');
+      }
+    } finally {
+      setExecutingApiAction(false);
+    }
+  };
+
+  const cancelApiAction = () => {
+    if (executingApiAction) return;
+    const action = pendingApiActionRef.current;
+    clearPendingApiAction();
+    if (action) logVoiceDebug('info', `User cancelled Brain API action ${action.operation} for ${action.target}; no request sent`);
+    speakVoiceResponse('Cancelled. I did not send that operation to CryBots.');
+  };
+
   useEffect(() => {
     let stream: MediaStream | null = null;
     let recorder: MediaRecorder | null = null;
@@ -364,7 +487,82 @@ const VoiceNavigation = () => {
     };
   }, []);
 
-  return null;
+  return pendingApiAction ? (
+    <div
+      role="presentation"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 100000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '18px',
+        background: 'rgba(2, 6, 23, 0.78)',
+        backdropFilter: 'blur(10px)',
+      }}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="crybots-brain-api-title"
+        style={{
+          width: '100%',
+          maxWidth: '420px',
+          borderRadius: '20px',
+          padding: '22px',
+          background: 'var(--surface, #10182b)',
+          color: 'var(--text, #f8fafc)',
+          border: '1px solid rgba(148, 163, 184, 0.35)',
+          boxShadow: '0 24px 80px rgba(0, 0, 0, 0.48)',
+        }}
+      >
+        <p style={{ margin: '0 0 7px', fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.72 }}>
+          CryBots Brain · API execution
+        </p>
+        <h2 id="crybots-brain-api-title" style={{ margin: '0 0 14px', fontSize: '1.2rem', lineHeight: 1.35 }}>
+          Review before execution
+        </h2>
+        <div style={{ display: 'grid', gap: '10px', padding: '14px', borderRadius: '14px', background: 'rgba(148, 163, 184, 0.09)' }}>
+          <div>
+            <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.7 }}>Operation</p>
+            <p style={{ margin: '4px 0 0', fontWeight: 750 }}>{actionTitle(pendingApiAction)}</p>
+          </div>
+          <div>
+            <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.7 }}>Bot ID</p>
+            <p style={{ margin: '4px 0 0', fontWeight: 750, overflowWrap: 'anywhere' }}>{pendingApiAction.target}</p>
+          </div>
+          {pendingApiAction.operation !== 'bot_deactivate' && (
+            <div>
+              <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.7 }}>Amount</p>
+              <p style={{ margin: '4px 0 0', fontWeight: 750 }}>{Number(pendingApiAction.parameters?.amount).toLocaleString(undefined, { maximumFractionDigits: 8 })} USDT</p>
+            </div>
+          )}
+        </div>
+        <p style={{ margin: '14px 0 0', fontSize: '0.84rem', lineHeight: 1.5, opacity: 0.82 }}>
+          Confirming sends this request to the authenticated CryBots API. CryBots will recheck account access, bot eligibility, balances, and its own operation rules. If the response cannot be verified, check your records before retrying.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '18px' }}>
+          <button
+            type="button"
+            disabled={executingApiAction}
+            onClick={cancelApiAction}
+            style={{ minHeight: '44px', borderRadius: '12px', border: '1px solid rgba(148, 163, 184, 0.45)', background: 'transparent', color: 'inherit', font: 'inherit', fontWeight: 700, cursor: executingApiAction ? 'not-allowed' : 'pointer', opacity: executingApiAction ? 0.55 : 1 }}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={executingApiAction}
+            onClick={() => { void confirmApiAction(); }}
+            style={{ minHeight: '44px', borderRadius: '12px', border: 'none', background: '#7357ff', color: '#fff', font: 'inherit', fontWeight: 750, cursor: executingApiAction ? 'wait' : 'pointer', opacity: executingApiAction ? 0.7 : 1 }}
+          >
+            {executingApiAction ? 'Sending…' : 'Approve & execute'}
+          </button>
+        </div>
+      </section>
+    </div>
+  ) : null;
 };
 
 export default VoiceNavigation;
