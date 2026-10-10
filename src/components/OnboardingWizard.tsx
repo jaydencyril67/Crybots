@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, Check, ShieldCheck, Fingerprint, KeyRound, Wallet, UserRound, Bell, Sparkles, SkipForward, Palette, type LucideIcon } from 'lucide-react';
 import { useAppTheme, type AppThemePreference } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { navigate } from '../utils/navigate';
+import { completeOnboardingStep } from '../utils/onboarding';
 
 type SetupStep = { id: string; title: string; description: string; detail: string; route: string; icon: LucideIcon };
 
@@ -20,8 +21,16 @@ const setupSteps: SetupStep[] = [
 const OnboardingWizard = () => {
   const { themeMode, themePreference, setThemePreference } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const [stepIndex, setStepIndex] = useState(0);
-  const [skipped, setSkipped] = useState<string[]>([]);
+  const [stepIndex, setStepIndex] = useState(() => {
+    const saved = Number(localStorage.getItem('crybots_onboarding_step_index'));
+    return Number.isInteger(saved) && saved >= 0 && saved < setupSteps.length ? saved : 0;
+  });
+  const [skipped, setSkipped] = useState<string[]>(() => {
+    try { const value = JSON.parse(localStorage.getItem('crybots_onboarding_skipped_steps') || '[]'); return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []; } catch { return []; }
+  });
+  const [completed, setCompleted] = useState<string[]>(() => {
+    try { const value = JSON.parse(localStorage.getItem('crybots_onboarding_completed_steps') || '[]'); return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []; } catch { return []; }
+  });
   const [finished, setFinished] = useState(false);
   const [opening, setOpening] = useState(false);
   const themeChoices: Array<{ key: AppThemePreference; label: string; description: string; preview: 'dark' | 'light' }> = [
@@ -32,6 +41,25 @@ const OnboardingWizard = () => {
   ];
   const current = setupSteps[stepIndex];
   const completedCount = skipped.length;
+
+  useEffect(() => {
+    const returnStep = localStorage.getItem('crybots_onboarding_return_step');
+    if (!returnStep) return;
+    const returnedIndex = setupSteps.findIndex((step) => step.id === returnStep);
+    if (returnedIndex >= 0) {
+      const nextIndex = Math.min(returnedIndex + 1, setupSteps.length - 1);
+      setStepIndex(nextIndex);
+      setCompleted((previous) => previous.includes(returnStep) ? previous : [...previous, returnStep]);
+      localStorage.setItem('crybots_onboarding_step_index', String(nextIndex));
+    }
+    localStorage.removeItem('crybots_onboarding_return_step');
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('crybots_onboarding_step_index', String(stepIndex));
+    localStorage.setItem('crybots_onboarding_skipped_steps', JSON.stringify(skipped));
+    localStorage.setItem('crybots_onboarding_completed_steps', JSON.stringify(completed));
+  }, [stepIndex, skipped, completed]);
   const progress = Math.round(((stepIndex + 1) / setupSteps.length) * 100);
   const styles = useMemo(() => ({
     page: { minHeight: '100vh', padding: 'clamp(16px, 4vw, 36px) 14px 32px', boxSizing: 'border-box' as const, background: theme.background, color: theme.text },
@@ -131,7 +159,7 @@ const OnboardingWizard = () => {
                 </div>
               </article>
               <div style={styles.list}>
-                {setupSteps.map((step, index) => <div key={step.id} style={{ ...styles.listRow, borderColor: index === stepIndex ? theme.primary : theme.borderGlass }}><span style={{ ...styles.dot, background: skipped.includes(step.id) ? theme.textMuted : index < stepIndex ? theme.primary : theme.borderGlass }} /> <span style={{ flex: 1 }}>{step.title}</span>{skipped.includes(step.id) ? <span style={{ color: theme.textMuted, fontSize: '11px' }}>Skipped</span> : index === stepIndex ? <span style={{ color: theme.primary, fontSize: '11px', fontWeight: 800 }}>CURRENT</span> : null}</div>)}
+                {setupSteps.map((step, index) => <div key={step.id} style={{ ...styles.listRow, borderColor: index === stepIndex ? theme.primary : theme.borderGlass }}><span style={{ ...styles.dot, background: skipped.includes(step.id) ? theme.textMuted : index < stepIndex ? theme.primary : theme.borderGlass }} /> <span style={{ flex: 1 }}>{step.title}</span>{skipped.includes(step.id) ? <span style={{ color: theme.textMuted, fontSize: '11px' }}>Skipped</span> : completed.includes(step.id) ? <span style={{ color: theme.primary, fontSize: '11px', fontWeight: 800 }}>DONE</span> : index === stepIndex ? <span style={{ color: theme.primary, fontSize: '11px', fontWeight: 800 }}>CURRENT</span> : null}</div>)}
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', marginTop: '18px' }}>
                 <button type="button" style={styles.secondary} disabled={stepIndex === 0} onClick={() => { setOpening(false); setStepIndex((previous) => Math.max(0, previous - 1)); }}><ArrowLeft size={16} /> Back</button>
