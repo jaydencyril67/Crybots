@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ImagePlus, Send, X } from 'lucide-react';
+import { ArrowLeft, ImagePlus, Send } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import { API_BASE_URL } from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -9,6 +9,7 @@ import { uploadChatImage } from '../utils/chatImageUpload';
 import LoadingDots from './LoadingDots';
 import ImagePickerButton from './ImagePickerButton';
 import ProfileImageCropModal from './ProfileImageCropModal';
+import ImagePreviewModal from './ImagePreviewModal';
 
 type ChatMessage = {
   id: string;
@@ -114,7 +115,7 @@ const ChatPage = () => {
       </div>
     </main>
     {editingImageUrl && <ProfileImageCropModal imageUrl={editingImageUrl} onCancel={() => { URL.revokeObjectURL(editingImageUrl); setEditingImageUrl(''); }} onDone={async (file) => { URL.revokeObjectURL(editingImageUrl); setEditingImageUrl(''); await sendImage(file); }} />}
-    {viewingImageUrl && <div role="dialog" aria-modal="true" aria-label="Image preview" onClick={() => setViewingImageUrl('')} onKeyDown={(event) => { if (event.key === 'Escape') setViewingImageUrl(''); }} tabIndex={-1} style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,.92)' }}><button type="button" onClick={() => setViewingImageUrl('')} aria-label="Close image preview" style={{ position: 'absolute', top: 16, right: 16, border: 0, borderRadius: 999, padding: 10, background: 'rgba(255,255,255,.14)', color: '#fff', cursor: 'pointer' }}><X size={24} /></button><img src={viewingImageUrl} alt="Full-size chat attachment" onClick={(event) => event.stopPropagation()} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 8 }} /></div>}
+    {viewingImageUrl && <ImagePreviewModal imageUrl={viewingImageUrl} onClose={() => setViewingImageUrl('')} />}
   </div></HybridTheme>;
 };
 
