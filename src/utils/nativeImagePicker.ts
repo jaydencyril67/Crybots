@@ -1,59 +1,38 @@
-export type NativeImageResult = {
-  dataUrl?: string;
-  webPath?: string;
-  format?: string;
+import { Capacitor, registerPlugin } from '@capacitor/core';
+
+export type NativeGalleryPhoto = {
+  id: string;
+  name: string;
+  album: string;
+  dateAdded: number;
+  thumbnail?: string;
 };
 
-type NativeCameraPlugin = {
-  getPhoto: (options: {
-    source: 'PHOTOS';
-    resultType: 'DATA_URL';
-    quality: number;
-    allowEditing: false;
-  }) => Promise<NativeImageResult>;
+type NativeGalleryPlugin = {
+  getPhotos: () => Promise<{ photos: NativeGalleryPhoto[] }>;
+  getImage: (options: { id: string }) => Promise<{ dataUrl: string; name?: string }>;
 };
 
-type CapacitorWindow = Window & {
-  Capacitor?: {
-    isNativePlatform?: () => boolean;
-    Plugins?: { Camera?: NativeCameraPlugin };
-  };
-};
+const NativeGallery = registerPlugin<NativeGalleryPlugin>('NativeGallery');
 
-export const hasNativeImagePicker = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  const capacitor = (window as CapacitorWindow).Capacitor;
-  return Boolean(capacitor?.isNativePlatform?.() && capacitor.Plugins?.Camera);
-};
+export const isNativeGalleryAvailable = (): boolean => Capacitor.isNativePlatform();
 
-const getNativeCamera = (): NativeCameraPlugin | null => {
-  if (!hasNativeImagePicker()) return null;
-  return (window as CapacitorWindow).Capacitor?.Plugins?.Camera || null;
-};
-
-const dataUrlToFile = (dataUrl: string, format = 'jpeg'): File => {
+const dataUrlToFile = (dataUrl: string, name = 'photo.jpg'): File => {
   const [metadata, encoded] = dataUrl.split(',');
-  const mimeType = metadata.match(/data:(.*?);/)?.[1] || `image/${format}`;
+  const mimeType = metadata.match(/data:(.*?);/)?.[1] || 'image/jpeg';
   const binary = window.atob(encoded);
   const bytes = new Uint8Array(binary.length);
   for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
-  return new File([bytes], `photo.${format}`, { type: mimeType });
+  return new File([bytes], name, { type: mimeType });
 };
 
-export const pickNativeImage = async (): Promise<File | null> => {
-  const camera = getNativeCamera();
-  if (!camera) return null;
-  const result = await camera.getPhoto({
-    source: 'PHOTOS',
-    resultType: 'DATA_URL',
-    quality: 90,
-    allowEditing: false,
-  });
-  if (result.dataUrl) return dataUrlToFile(result.dataUrl, result.format);
-  if (result.webPath) {
-    const response = await fetch(result.webPath);
-    const blob = await response.blob();
-    return new File([blob], `photo.${result.format || 'jpeg'}`, { type: blob.type || `image/${result.format || 'jpeg'}` });
-  }
-  return null;
+export const loadNativeGalleryPhotos = async (): Promise<NativeGalleryPhoto[]> => {
+  const result = await NativeGallery.getPhotos();
+  return result.photos || [];
+};
+
+export const loadNativeGalleryImage = async (photo: NativeGalleryPhoto): Promise<File> => {
+  const result = await NativeGallery.getImage({ id: photo.id });
+  if (!result.dataUrl) throw new Error('The selected photo could not be loaded.');
+  return dataUrlToFile(result.dataUrl, result.name || photo.name || 'photo.jpg');
 };
