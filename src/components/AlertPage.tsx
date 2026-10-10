@@ -6,7 +6,7 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 import NotificationBanner from './NotificationBanner';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 
 const preferenceTopics = [
@@ -170,7 +170,7 @@ const AlertPage = () => {
                     </div>
                   </div>
                   <button type="button" disabled={loading || savingKey !== null || key === 'security'} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label}`} aria-pressed={preferences[key]} style={{ ...styles.enableButton, ...(preferences[key] ? styles.enabledButton : {}), ...(loading || savingKey !== null || key === 'security' ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>
-                    {savingKey === key ? <InlineLoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
+                    {savingKey === key ? <LoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
                   </button>
                 </div>
               ))}
@@ -191,7 +191,7 @@ const AlertPage = () => {
                     </div>
                   </div>
                   <button type="button" disabled={loading || savingKey !== null} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label} notifications`} aria-pressed={preferences[key]} style={{ ...styles.enableButton, ...(preferences[key] ? styles.enabledButton : {}), ...(loading || savingKey !== null ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>
-                    {savingKey === key ? <InlineLoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
+                    {savingKey === key ? <LoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
                   </button>
                 </div>
               ))}
