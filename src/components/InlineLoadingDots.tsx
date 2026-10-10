@@ -1,35 +1,19 @@
 import React from 'react';
 
-const styles = {
-  wrap: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  dot: {
-    width: '6px',
-    height: '6px',
-    borderRadius: '999px',
-    background: 'currentColor',
-    opacity: 0.35,
-    animation: 'inline-loading-dots 1.2s infinite steps(1, end)',
-  },
-  activeDot: {
-    opacity: 1,
-  },
-} as const;
+const loaderStyle = `@keyframes worldscopeDotPulse { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } } .worldscope-dot-loader { width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; animation: worldscopeDotPulse 1s infinite ease-in-out; } .worldscope-dot-loader:nth-child(2) { animation-delay: .15s; } .worldscope-dot-loader:nth-child(3) { animation-delay: .3s; }`;
 
-const InlineLoadingDots = () => {
-  return (
-    <>
-      <style>{`@keyframes inline-loading-dots { 0%, 100% { opacity: 0.35; } 33% { opacity: 1; } 66% { opacity: 0.35; } }`}</style>
-      <span style={styles.wrap} aria-hidden="true">
-      <span style={{ ...styles.dot, ...styles.activeDot }} />
-      <span style={styles.dot} />
-      <span style={styles.dot} />
-      </span>
-    </>
-  );
-};
+const InlineLoadingDots = () => (
+  <>
+    <style>{loaderStyle}</style>
+    <span
+      aria-label="Loading"
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+    >
+      <span className="worldscope-dot-loader" />
+      <span className="worldscope-dot-loader" />
+      <span className="worldscope-dot-loader" />
+    </span>
+  </>
+);
 
 export default InlineLoadingDots;
