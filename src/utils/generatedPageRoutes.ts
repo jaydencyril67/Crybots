@@ -3,11 +3,11 @@
 export type DiscoveredPageRoute = { label: string; route: string };
 export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
   {
-    "label": "SIGNUP",
+    "label": "SIGN UP",
     "route": "/signup"
   },
   {
-    "label": "SIGNUP CONFIRMATION SENT",
+    "label": "SIGN UP CONFIRMATION",
     "route": "/signup-confirmation-sent"
   },
   {
@@ -19,7 +19,7 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/account-confirmed"
   },
   {
-    "label": "SIGNIN",
+    "label": "SIGN IN",
     "route": "/signin"
   },
   {
@@ -43,20 +43,16 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/theme"
   },
   {
-    "label": "NOWBAR",
-    "route": "/nowbar"
-  },
-  {
-    "label": "NOWBAR COLOR",
+    "label": "EDGE LIGHTING",
     "route": "/nowbar-color"
   },
   {
-    "label": "NOWBAR BUTTON COLOR",
+    "label": "BUTTON COLOR",
     "route": "/nowbar-button-color"
   },
   {
-    "label": "NOTIFICATION COLOR",
-    "route": "/notification-color"
+    "label": "NOWBAR",
+    "route": "/nowbar"
   },
   {
     "label": "STATISTICS",
@@ -79,6 +75,10 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/manual-exit"
   },
   {
+    "label": "AGENT",
+    "route": "/agent"
+  },
+  {
     "label": "STATS",
     "route": "/stats"
   },
@@ -89,10 +89,6 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
   {
     "label": "MENU",
     "route": "/menu"
-  },
-  {
-    "label": "AGENT",
-    "route": "/agent"
   },
   {
     "label": "TRADE",
@@ -107,6 +103,10 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/market"
   },
   {
+    "label": "PORTFOLIO",
+    "route": "/portfolio"
+  },
+  {
     "label": "CREATION",
     "route": "/creation"
   },
@@ -119,12 +119,8 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/commerce"
   },
   {
-    "label": "PORTFOLIO",
-    "route": "/portfolio"
-  },
-  {
-    "label": "TRADE HISTORY",
-    "route": "/trade/history"
+    "label": "MY BOTS",
+    "route": "/bots"
   },
   {
     "label": "LOGS",
@@ -151,10 +147,6 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/download"
   },
   {
-    "label": "WORLDSCOPE RANKINGS",
-    "route": "/worldscope-rankings"
-  },
-  {
     "label": "WORLDSCOPE",
     "route": "/worldscope"
   },
@@ -175,6 +167,10 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/community-standards"
   },
   {
+    "label": "DEV",
+    "route": "/dev"
+  },
+  {
     "label": "API KEYS",
     "route": "/api-keys"
   },
@@ -187,11 +183,7 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/configure"
   },
   {
-    "label": "DEV",
-    "route": "/dev"
-  },
-  {
-    "label": "ASSET",
+    "label": "ASSETS",
     "route": "/asset"
   },
   {
@@ -235,15 +227,27 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/tickets"
   },
   {
-    "label": "CHAT",
-    "route": "/chat"
-  },
-  {
     "label": "ALERT",
     "route": "/alert"
   },
   {
+    "label": "NOTIFICATION COLOR",
+    "route": "/notification-color"
+  },
+  {
     "label": "APP USAGE",
     "route": "/app-usage"
+  },
+  {
+    "label": "TRADE HISTORY",
+    "route": "/trade/history"
+  },
+  {
+    "label": "WORLDSCOPE RANKINGS",
+    "route": "/worldscope-rankings"
+  },
+  {
+    "label": "CHAT",
+    "route": "/chat"
   }
 ];
