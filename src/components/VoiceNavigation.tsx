@@ -100,12 +100,15 @@ const VoiceNavigation = () => {
           return;
         }
       }
-      const action = {
-        type: 'api' as const,
+      const actionParameters: Record<string, string> = candidate.operation === 'bot_deactivate'
+        ? {}
+        : { amount: String(Number(parameters.amount)) };
+      const action: PendingBrainApiAction = {
+        type: 'api',
         operation: candidate.operation as PendingBrainApiAction['operation'],
         target: candidate.target,
-        parameters: candidate.operation === 'bot_deactivate' ? {} : { amount: String(Number(parameters.amount)) },
-        requiresConfirmation: true as const,
+        parameters: actionParameters,
+        requiresConfirmation: true,
       };
       pendingApiActionRef.current = action;
       setPendingApiAction(action);
