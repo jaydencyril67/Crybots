@@ -18,7 +18,7 @@ const add = (label, route) => {
 const arrayStart = oldText.indexOf('= [');
 const arrayEnd = oldText.lastIndexOf('];');
 if (arrayStart >= 0 && arrayEnd > arrayStart) {
-  const existing = JSON.parse(oldText.slice(arrayStart + 2, arrayEnd));
+  const existing = JSON.parse(oldText.slice(arrayStart + 2, arrayEnd + 1));
   for (const item of existing) add(item.label, item.route);
 }
 
