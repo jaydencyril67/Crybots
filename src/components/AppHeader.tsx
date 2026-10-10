@@ -322,7 +322,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       ['--notification-color' as string]: notificationColor,
     }
     : styles.header;
-  const headerTitle = !isOnline ? 'No Internet' : voiceModeEnabled ? (isListening ? 'Listening..' : 'Voice Mode') : unreadCount > 0 ? 'New Alert' : 'CryBots';
+  const headerTitle = !isOnline ? 'No Internet' : voiceModeEnabled ? (isListening ? 'Listening..' : 'AI MODE') : unreadCount > 0 ? 'New Alert' : 'CryBots';
   const headerSubtitle = !isOnline ? 'Check your connection' : voiceModeEnabled && voiceTranscript ? `“${voiceTranscript}”` : null;
   const artworkStyle = {
     ...styles.unreadArtwork,
