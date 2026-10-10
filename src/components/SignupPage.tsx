@@ -310,6 +310,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     cursor: 'pointer',
   },
   button: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    whiteSpace: 'nowrap' as const,
+    boxSizing: 'border-box' as const,
+    lineHeight: 1.2,
+    minHeight: '44px',
     border: 'none',
     borderRadius: '999px',
     padding: '11px 16px',
