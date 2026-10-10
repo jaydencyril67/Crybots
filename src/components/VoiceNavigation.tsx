@@ -145,7 +145,7 @@ const VoiceNavigation = () => {
       logVoiceDebug('info', `CryBots API accepted ${action.operation} for ${action.target}: HTTP ${response.status}; checking authoritative bot records`);
 
       try {
-        const verification = await api.post('/api/brain/verify-operation', {
+        const verification = await api.post('/api/voice/verify-operation', {
           operation: action.operation,
           botId: action.target,
           amount: action.operation === 'bot_deactivate' ? undefined : Number(action.parameters?.amount),
