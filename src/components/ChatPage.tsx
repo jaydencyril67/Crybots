@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ImagePlus, Send } from 'lucide-react';
+import { ArrowLeft, ImagePlus, Send, X } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import { API_BASE_URL } from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -29,7 +29,8 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [imagePreview, setImagePreview] = useState('');
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
+  const [pendingImagePreview, setPendingImagePreview] = useState('');
   const [editingImageUrl, setEditingImageUrl] = useState('');
   const [viewingImageUrl, setViewingImageUrl] = useState('');
   const [connected, setConnected] = useState(false);
@@ -63,6 +64,10 @@ const ChatPage = () => {
 
   const sendMessage = (event: React.FormEvent) => {
     event.preventDefault();
+    if (pendingImageFile) {
+      void sendImage(pendingImageFile, draft.trim());
+      return;
+    }
     const content = draft.trim();
     if (!content || !socketRef.current || !connected) return;
     setSending(true);
@@ -77,28 +82,26 @@ const ChatPage = () => {
     setEditingImageUrl(URL.createObjectURL(file));
   };
 
-  const sendImage = async (file: File) => {
+  const sendImage = async (file: File, caption = '') => {
     if (!socketRef.current || !connected) return;
-    const previewUrl = URL.createObjectURL(file);
-    setImagePreview(previewUrl);
     setUploading(true);
     setSending(true);
     setError('');
     try {
       const imageUrl = await uploadChatImage(file);
       if (!socketRef.current || !connected) throw new Error('Chat connection was lost. Please try again.');
-      await new Promise<void>((resolve) => {
-        socketRef.current?.emit('chat:send', { imageUrl }, (response: { ok: boolean; error?: string }) => {
-          if (!response?.ok) setError(response?.error || 'Unable to send your image.');
-          resolve();
-        });
+      const response = await new Promise<{ ok: boolean; error?: string }>((resolve) => {
+        socketRef.current?.emit('chat:send', { imageUrl, message: caption }, resolve);
       });
+      if (!response?.ok) throw new Error(response?.error || 'Unable to send your image.');
+      setDraft('');
+      setPendingImageFile(null);
+      if (pendingImagePreview) URL.revokeObjectURL(pendingImagePreview);
+      setPendingImagePreview('');
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : 'Unable to upload image.');
     } finally {
       setSending(false);
-      URL.revokeObjectURL(previewUrl);
-      setImagePreview('');
       setUploading(false);
     }
   };
@@ -110,11 +113,11 @@ const ChatPage = () => {
         <div style={{ padding: '10px 14px', borderBottom: `1px solid ${theme.borderGlass}`, color: connected ? theme.success : theme.textMuted, fontSize: '.82rem' }}>{connected ? '● Live connection' : '○ Connecting…'}</div>
         <div ref={chatListRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', padding: 16, boxSizing: 'border-box' }}>
           {error && <p style={{ margin: '0 0 10px', color: theme.danger, fontSize: '.84rem' }}>{error}</p>}
-          {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}><LoadingDots /></div> : messages.length === 0 ? <p style={{ color: theme.textMuted, textAlign: 'center', padding: 40 }}>Start a conversation with support.</p> : messages.map((message) => <div key={message.id} style={{ display: 'flex', justifyContent: message.senderRole === 'user' ? 'flex-end' : 'flex-start', marginBottom: 12 }}><div style={{ maxWidth: '78%', padding: '10px 13px', borderRadius: 14, background: message.senderRole === 'user' ? theme.primary : theme.surfaceMuted, color: message.senderRole === 'user' ? theme.textInverse : theme.text, overflowWrap: 'anywhere' }}><div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>{(message.type === 'image' || message.imageUrl) && message.imageUrl ? <button type="button" onClick={() => setViewingImageUrl(message.imageUrl || '')} aria-label="Preview chat image" style={{ display: 'block', padding: 0, border: 0, background: 'transparent', cursor: 'zoom-in', maxWidth: '100%' }}><img src={message.imageUrl} alt="Chat attachment — tap to preview" style={{ display: 'block', maxWidth: '100%', maxHeight: 320, borderRadius: 10, objectFit: 'contain' }} /></button> : message.message}</div><small style={{ display: 'block', marginTop: 5, opacity: .65 }}>{new Date(message.createdAt).toLocaleString()}</small></div></div>)}</div>
-        {imagePreview && <div style={{ padding: '8px 12px 0', borderTop: `1px solid ${theme.borderGlass}` }}><img src={imagePreview} alt="Selected attachment preview" style={{ maxWidth: 120, maxHeight: 80, borderRadius: 8 }} /></div>}<form onSubmit={sendMessage} style={{ display: 'flex', flexShrink: 0, gap: 8, padding: '12px 12px calc(12px + env(safe-area-inset-bottom))', borderTop: `1px solid ${theme.borderGlass}` }}><ImagePickerButton accept="image/*" onImageSelected={handleImageSelected} disabled={!connected || sending || uploading} style={{ alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '0 12px', color: theme.text, background: 'transparent', cursor: connected && !uploading ? 'pointer' : 'not-allowed', opacity: connected && !uploading ? 1 : .5 }} title="Send image" aria-label="Send image">{uploading ? <LoadingDots /> : <ImagePlus size={18} />}</ImagePickerButton><textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Write a message…" rows={2} disabled={!connected || sending || uploading} style={{ flex: 1, resize: 'none', border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: 10, background: theme.surfaceMuted, color: theme.text, font: 'inherit' }} /><button type="submit" disabled={!connected || sending || uploading || !draft.trim()} style={{ alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '0 15px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 800 }}>{sending ? <LoadingDots /> : <><Send size={16} /> Send</>}</button></form>
+          {loading ? <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}><LoadingDots /></div> : messages.length === 0 ? <p style={{ color: theme.textMuted, textAlign: 'center', padding: 40 }}>Start a conversation with support.</p> : messages.map((message) => <div key={message.id} style={{ display: 'flex', justifyContent: message.senderRole === 'user' ? 'flex-end' : 'flex-start', marginBottom: 12 }}><div style={{ maxWidth: '78%', padding: '10px 13px', borderRadius: 14, background: message.senderRole === 'user' ? theme.primary : theme.surfaceMuted, color: message.senderRole === 'user' ? theme.textInverse : theme.text, overflowWrap: 'anywhere' }}><div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.45 }}>{(message.type === 'image' || message.imageUrl) && message.imageUrl ? <><button type="button" onClick={() => setViewingImageUrl(message.imageUrl || '')} aria-label="Preview chat image" style={{ display: 'block', padding: 0, border: 0, background: 'transparent', cursor: 'zoom-in', maxWidth: '100%' }}><img src={message.imageUrl} alt="Chat attachment — tap to preview" style={{ display: 'block', maxWidth: '100%', maxHeight: 320, borderRadius: 10, objectFit: 'contain' }} /></button>{message.message && <div style={{ marginTop: 7, whiteSpace: 'pre-wrap' }}>{message.message}</div>}</> : message.message}</div><small style={{ display: 'block', marginTop: 5, opacity: .65 }}>{new Date(message.createdAt).toLocaleString()}</small></div></div>)}</div>
+        {pendingImagePreview && <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px 0', borderTop: `1px solid ${theme.borderGlass}` }}><img src={pendingImagePreview} alt="Image ready to send" style={{ maxWidth: 120, maxHeight: 80, borderRadius: 8, objectFit: 'contain' }} /><span style={{ flex: 1, color: theme.textMuted, fontSize: '.82rem' }}>Add a caption or send the photo</span><button type="button" onClick={() => { setPendingImageFile(null); URL.revokeObjectURL(pendingImagePreview); setPendingImagePreview(''); }} disabled={sending || uploading} aria-label="Remove selected image" title="Remove image" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, cursor: 'pointer' }}><X size={17} /></button></div>}<form onSubmit={sendMessage} style={{ display: 'flex', flexShrink: 0, gap: 8, padding: '12px 12px calc(12px + env(safe-area-inset-bottom))', borderTop: `1px solid ${theme.borderGlass}` }}><ImagePickerButton accept="image/*" onImageSelected={handleImageSelected} disabled={!connected || sending || uploading} style={{ alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '0 12px', color: theme.text, background: 'transparent', cursor: connected && !uploading ? 'pointer' : 'not-allowed', opacity: connected && !uploading ? 1 : .5 }} title="Send image" aria-label="Send image">{uploading ? <LoadingDots /> : <ImagePlus size={18} />}</ImagePickerButton><textarea value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="Write a message…" rows={2} disabled={!connected || sending || uploading} style={{ flex: 1, resize: 'none', border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: 10, background: theme.surfaceMuted, color: theme.text, font: 'inherit' }} /><button type="submit" disabled={!connected || sending || uploading || (!draft.trim() && !pendingImageFile)} style={{ alignSelf: 'stretch', display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '0 15px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 800 }}>{sending ? <LoadingDots /> : <><Send size={16} /> Send</>}</button></form>
       </div>
     </main>
-    {editingImageUrl && <ProfileImageCropModal preserveAspectRatio imageUrl={editingImageUrl} onCancel={() => { URL.revokeObjectURL(editingImageUrl); setEditingImageUrl(''); }} onDone={async (file) => { URL.revokeObjectURL(editingImageUrl); setEditingImageUrl(''); await sendImage(file); }} />}
+    {editingImageUrl && <ProfileImageCropModal preserveAspectRatio imageUrl={editingImageUrl} onCancel={() => { URL.revokeObjectURL(editingImageUrl); setEditingImageUrl(''); }} onDone={(file) => { URL.revokeObjectURL(editingImageUrl); setEditingImageUrl(''); if (pendingImagePreview) URL.revokeObjectURL(pendingImagePreview); setPendingImageFile(file); setPendingImagePreview(URL.createObjectURL(file)); }} />}
     {viewingImageUrl && <ImagePreviewModal imageUrl={viewingImageUrl} onClose={() => setViewingImageUrl('')} />}
   </div></HybridTheme>;
 };
