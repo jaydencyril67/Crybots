@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, Check, ShieldCheck, Fingerprint, KeyRound, Walle
 import { useAppTheme, type AppThemePreference } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { navigate } from '../utils/navigate';
-import { completeOnboardingStep } from '../utils/onboarding';
 
 type SetupStep = { id: string; title: string; description: string; detail: string; route: string; icon: LucideIcon };
 
@@ -48,6 +47,7 @@ const OnboardingWizard = () => {
     const returnedIndex = setupSteps.findIndex((step) => step.id === returnStep);
     if (returnedIndex >= 0) {
       const nextIndex = Math.min(returnedIndex + 1, setupSteps.length - 1);
+      if (returnedIndex === setupSteps.length - 1) setFinished(true);
       setStepIndex(nextIndex);
       setCompleted((previous) => previous.includes(returnStep) ? previous : [...previous, returnStep]);
       localStorage.setItem('crybots_onboarding_step_index', String(nextIndex));
