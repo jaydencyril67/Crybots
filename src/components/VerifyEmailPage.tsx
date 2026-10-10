@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
@@ -156,7 +156,7 @@ const VerifyEmailPage = () => {
           <p style={styles.text}>{message}</p>
           {status === 'loading' ? (
             <div style={{ marginTop: '18px', color: theme.textMuted }}>
-              <InlineLoadingDots />
+              <LoadingDots />
             </div>
           ) : null}
           {status === 'success' && uid ? <p style={styles.meta}>Your UID: {uid}</p> : null}
