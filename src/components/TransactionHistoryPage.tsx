@@ -332,9 +332,9 @@ const TransactionHistoryPage = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '100%' }}>
                     <p style={{ ...styles.cardText, textAlign: 'center' }}>Showing {transactionHistoryStartIndex + 1}-{Math.min(transactionHistoryStartIndex + transactionHistoryPageSize, filteredTransactions.length)} of {filteredTransactions.length} transactions</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', alignItems: 'center', width: '100%' }}>
-                      <button type="button" style={styles.button} disabled={transactionHistoryCurrentPage === 1} onClick={() => { setTransactionHistoryPage((current) => Math.max(1, current - 1)); setExpandedTransactionId(null); }}>Prev</button>
+                      <button type="button" style={{ ...styles.selectOption, width: 'auto', minWidth: '72px', textAlign: 'center' as const }} disabled={transactionHistoryCurrentPage === 1} onClick={() => { setTransactionHistoryPage((current) => Math.max(1, current - 1)); setExpandedTransactionId(null); }}>Prev</button>
                       <span style={styles.muted}>Page {transactionHistoryCurrentPage} / {transactionHistoryTotalPages}</span>
-                      <button type="button" style={styles.button} disabled={transactionHistoryCurrentPage === transactionHistoryTotalPages} onClick={() => { setTransactionHistoryPage((current) => Math.min(transactionHistoryTotalPages, current + 1)); setExpandedTransactionId(null); }}>Next</button>
+                      <button type="button" style={{ ...styles.selectOption, width: 'auto', minWidth: '72px', textAlign: 'center' as const }} disabled={transactionHistoryCurrentPage === transactionHistoryTotalPages} onClick={() => { setTransactionHistoryPage((current) => Math.min(transactionHistoryTotalPages, current + 1)); setExpandedTransactionId(null); }}>Next</button>
                     </div>
                   </div>
                 ) : null}
