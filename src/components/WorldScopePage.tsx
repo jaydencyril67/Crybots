@@ -117,7 +117,7 @@ const WorldScopePage = () => {
     notice: { border: `1px solid ${theme.borderGlass}`, borderRadius: 13, background: theme.surfaceMuted, color: theme.textMuted, padding: '12px 13px', fontSize: '.82rem', lineHeight: 1.5, marginTop: 12 },
     status: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const, color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
     tabRow: { display: 'flex', flexWrap: 'nowrap' as const, gap: 8, paddingBottom: 8, marginBottom: 12, width: '100%', overflowX: 'auto' as const, overflowY: 'hidden' as const, WebkitOverflowScrolling: 'touch' as const, scrollbarWidth: 'thin' as const },
-    tab: { flex: '0 0 auto', minWidth: 'max-content', minHeight: 42, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '11px 16px', background: theme.surfaceGlass, color: theme.textMuted, fontSize: '.88rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' as const, boxSizing: 'border-box' as const },
+    tab: { flex: '0 0 auto', minWidth: 'max-content', minHeight: 38, border: `1px solid ${theme.border}`, borderRadius: 9, padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, fontSize: '.88rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' as const, boxSizing: 'border-box' as const },
     rankingCard: { border: `1px solid ${theme.borderGlass}`, borderRadius: 15, padding: 14, background: theme.surfaceGlass, display: 'grid', gap: 10, marginBottom: 10, minWidth: 0, boxSizing: 'border-box' as const },
     rankingHead: { display: 'flex', alignItems: 'flex-start', gap: 11 },
     iconBox: { width: 38, height: 38, flex: '0 0 38px', display: 'grid', placeItems: 'center', borderRadius: 12, background: 'rgba(56,189,248,.12)', color: theme.primary },
@@ -224,7 +224,7 @@ const WorldScopePage = () => {
           <h2 style={styles.sectionTitle}>Your live rankings</h2>
           <div style={styles.status}>{loading ? <><span aria-label="Loading" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /></span> Fetching selected ranking…</> : data?.asOf ? <><Clock3 size={14} /> Snapshot {new Date(data.asOf).toLocaleString()} · UTC daily window</> : 'Waiting for ranking data'}</div>
           <div style={styles.tabRow} role="tablist" aria-label="WorldScope rankings">
-            {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { color: theme.textInverse, borderColor: theme.primary, background: theme.primary } : {}) }} onClick={() => { if (selectedSection.id === section.id) return; setActiveSection(section.id); void loadWorldScope(); }}>{section.title}</button>)}
+            {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { if (selectedSection.id === section.id) return; setActiveSection(section.id); void loadWorldScope(); }}>{section.title}</button>)}
           </div>
           <div style={styles.outerCard}>
           <section style={{ ...styles.rankingCard, background: theme.surfaceMuted }}>
