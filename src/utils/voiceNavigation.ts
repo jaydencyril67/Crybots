@@ -369,6 +369,7 @@ export const askVoiceAssistant = async (message: string) => {
       body: JSON.stringify({
         transcript: trimmed,
         currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
+        pageRoutes: PAGE_ROUTES,
         uiButtons: getVisibleVoiceButtons(),
         history: voiceConversationHistory.slice(-8),
         context: voiceBrainContext,
