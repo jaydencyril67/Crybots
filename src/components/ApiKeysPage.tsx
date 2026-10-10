@@ -3,7 +3,6 @@ import { ArrowLeft, KeyRound, Plus, ShieldCheck, Copy, Ban } from 'lucide-react'
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
-import InlineLoadingDots from './InlineLoadingDots';
 import ReusableDatePage from './ReusableDatePage';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
@@ -170,17 +169,17 @@ const ApiKeysPage = () => {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
                   <button type="button" onClick={() => setShowCreate(false)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
-                  <button disabled={saving || !permissionCategories.some((category) => permissions[category.key].read || permissions[category.key].write)} style={{ ...styles.button }}>{saving ? <InlineLoadingDots /> : 'Create key'}</button>
+                  <button disabled={saving || !permissionCategories.some((category) => permissions[category.key].read || permissions[category.key].write)} style={{ ...styles.button }}>{saving ? <LoadingDots /> : 'Create key'}</button>
                 </div>
               </form>
             )}
           </div>
 
-          {secret && <div style={styles.card}><div style={styles.row}><p style={styles.label}><KeyRound size={15} /> Secret</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button }}>{copyingSecret ? <InlineLoadingDots /> : <><Copy size={15} /> Copy</>}</button><button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton }}>Dismiss</button></div></div></div>}
+          {secret && <div style={styles.card}><div style={styles.row}><p style={styles.label}><KeyRound size={15} /> Secret</p><code style={{ display: 'block', overflowWrap: 'anywhere', padding: 12, borderRadius: 10, background: theme.surfaceGlass }}>{secret}</code><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={async () => { setCopyingSecret(true); try { await navigator.clipboard?.writeText(secret); } finally { setCopyingSecret(false); } }} disabled={copyingSecret} style={{ ...styles.button }}>{copyingSecret ? <LoadingDots /> : <><Copy size={15} /> Copy</>}</button><button type="button" onClick={() => setSecret('')} style={{ ...styles.button, ...styles.mutedButton }}>Dismiss</button></div></div></div>}
 
           <div style={styles.card}>
             <div style={styles.row}><p style={styles.value}>Your API keys</p><p style={styles.note}>Tap View to inspect permissions and manage each credential.</p></div>
-            {loading ? <div style={{ ...styles.row, marginTop: 10, textAlign: 'center' }}><InlineLoadingDots /></div> : !keys.length ? <div style={{ ...styles.row, marginTop: 10 }}><p style={styles.note}>No API keys yet. Create one when you are ready to connect an external application.</p></div> : <div style={{ display: 'grid', gap: 14, marginTop: 10 }}>{keys.map((key) => <article key={key.id} style={styles.row}>
+            {loading ? <div style={{ ...styles.row, marginTop: 10, textAlign: 'center' }}><LoadingDots /></div> : !keys.length ? <div style={{ ...styles.row, marginTop: 10 }}><p style={styles.note}>No API keys yet. Create one when you are ready to connect an external application.</p></div> : <div style={{ display: 'grid', gap: 14, marginTop: 10 }}>{keys.map((key) => <article key={key.id} style={styles.row}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                 <KeyRound size={20} color={key.revokedAt ? theme.textMuted : theme.primary} />
                 <div style={{ minWidth: 0, flex: 1 }}><p style={{ ...styles.value, fontSize: '0.95rem' }}>{key.name}</p><p style={{ ...styles.note, marginTop: 3 }}>{key.prefix}… · {key.revokedAt ? 'Revoked' : 'Active'}</p></div>
@@ -197,14 +196,14 @@ const ApiKeysPage = () => {
                   <p style={styles.label}>Access</p><p style={{ ...styles.note, marginTop: 5 }}>{key.permissions?.withdrawals ? 'API withdrawals enabled' : 'API withdrawals disabled'}</p>
                 </div>
 
-                {!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><p style={styles.note}>Revoke this API key? Applications using it will stop working.</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} disabled={revokingId === key.id} style={{ ...styles.button, background: theme.danger }}><Ban size={15} />{revokingId === key.id ? <InlineLoadingDots /> : 'Confirm revoke'}</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} disabled={revokingId !== null} style={{ ...styles.button, ...styles.mutedButton }}><Ban size={15} /> Revoke API key</button>)}
+                {!key.revokedAt && (revokeId === key.id ? <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}><p style={styles.note}>Revoke this API key? Applications using it will stop working.</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}><button type="button" onClick={() => setRevokeId(null)} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button><button type="button" onClick={() => { setRevokeId(null); void revokeKey(key.id); }} disabled={revokingId === key.id} style={{ ...styles.button, background: theme.danger }}><Ban size={15} />{revokingId === key.id ? <LoadingDots /> : 'Confirm revoke'}</button></div></div> : <button type="button" onClick={() => setRevokeId(key.id)} disabled={revokingId !== null} style={{ ...styles.button, ...styles.mutedButton }}><Ban size={15} /> Revoke API key</button>)}
                 {deleteId === key.id ? (
                   <div style={{ display: 'grid', gap: 10, marginTop: 8, padding: 12, borderRadius: 12, border: `1px solid ${theme.danger}`, background: theme.surfaceGlass }}>
                     <p style={styles.note}>Permanently delete this API key? This cannot be undone.</p>
                     <label style={{ display: 'grid', gap: 7, fontWeight: 700 }}>Security code<input type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit security code" style={{ ...styles.input, WebkitTextSecurity: 'disc' } as React.CSSProperties} /></label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
                       <button type="button" onClick={() => { setDeleteId(null); setSecurityCode(''); }} style={{ ...styles.button, ...styles.mutedButton }}>Cancel</button>
-                      <button type="button" onClick={() => void deleteKey(key.id)} disabled={deletingId === key.id || securityCode.length !== 6} style={{ ...styles.button, background: theme.danger }}>{deletingId === key.id ? <InlineLoadingDots /> : 'Delete API key'}</button>
+                      <button type="button" onClick={() => void deleteKey(key.id)} disabled={deletingId === key.id || securityCode.length !== 6} style={{ ...styles.button, background: theme.danger }}>{deletingId === key.id ? <LoadingDots /> : 'Delete API key'}</button>
                     </div>
                   </div>
                 ) : (
