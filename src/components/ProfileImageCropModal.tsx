@@ -225,7 +225,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone, preserveAspectRatio
         <div style={{ position: 'absolute', inset: 0, borderRadius: '24px', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.8)', pointerEvents: 'none' }} />
       </div>
 
-      <span style={{ fontSize: '0.78rem', opacity: 0.7 }}>Pinch to zoom • Drag to position</span>
+      <span style={{ fontSize: '0.78rem', opacity: 0.7 }}>{preserveAspectRatio ? 'Full image shown • Pinch to zoom • Drag to crop' : 'Pinch to zoom • Drag to position'}</span>
     </div>
   );
 };
