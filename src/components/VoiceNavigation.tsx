@@ -145,14 +145,19 @@ const VoiceNavigation = () => {
       logVoiceDebug('info', `CryBots API accepted ${action.operation} for ${action.target}: HTTP ${response.status}; checking authoritative bot records`);
 
       try {
-        const verification = await api.post('/api/voice/verify-operation', {
-          operation: action.operation,
-          botId: action.target,
-          amount: action.operation === 'bot_deactivate' ? undefined : Number(action.parameters?.amount),
-          startedAt: operationStartedAt,
-        });
-        const verificationStatus = verification.data?.status;
-        const verificationMessage = typeof verification.data?.message === 'string' ? verification.data.message.trim() : '';
+        let verification;
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          verification = await api.post('/api/voice/verify-operation', {
+            operation: action.operation,
+            botId: action.target,
+            amount: action.operation === 'bot_deactivate' ? undefined : Number(action.parameters?.amount),
+            startedAt: operationStartedAt,
+          });
+          if (verification.data?.status !== 'unverified' || attempt === 2) break;
+          await new Promise((resolve) => window.setTimeout(resolve, 700));
+        }
+        const verificationStatus = verification?.data?.status;
+        const verificationMessage = typeof verification?.data?.message === 'string' ? verification.data.message.trim() : '';
         if (verificationStatus === 'verified' && verificationMessage) {
           logVoiceDebug('info', `Brain verified ${action.operation} for ${action.target} against backend records`);
           speakVoiceResponse(verificationMessage);
