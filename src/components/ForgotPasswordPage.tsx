@@ -3,7 +3,7 @@ import { navigate } from '../utils/navigate';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -717,7 +717,7 @@ const ForgotPasswordPage = () => {
                     onClick={goNext}
                     disabled={loading}
                   >
-                    {loading ? <InlineLoadingDots /> : step === steps.length - 1 ? 'Reset password' : 'Continue'}
+                    {loading ? <LoadingDots /> : step === steps.length - 1 ? 'Reset password' : 'Continue'}
                   </button>
                 </div>
               </div>
