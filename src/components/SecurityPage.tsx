@@ -13,6 +13,7 @@ import NotificationBanner from './NotificationBanner';
 import { createPasskey, isWebAuthnAvailable } from '../utils/webauthn';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 import { logWebAuthnDebug } from '../utils/webauthnDebug';
+import { completeOnboardingStep } from '../utils/onboarding';
 
 type SecurityDevice = {
   id?: string;
@@ -601,6 +602,7 @@ const SecurityPage = () => {
       setSecurityCode('');
       setConfirmSecurityCode('');
       showStatus('success', 'Security code updated successfully.', 'securityCode');
+      completeOnboardingStep('security-code');
     } catch (error: any) {
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your security code. Please check your details and try again.'), 'securityCode');
     } finally {
@@ -659,6 +661,7 @@ const SecurityPage = () => {
       setTwoFactorCode('');
       setTwoFactorCodeError('');
       showStatus('success', twoFactorEnabled ? 'Two-factor authentication disabled.' : 'Two-factor authentication enabled.', 'twoFactor');
+      if (!twoFactorEnabled) completeOnboardingStep('two-factor');
     } catch (error: any) {
       showStatus('error', getFriendlyErrorMessage(error, 'Unable to update two-factor authentication. Please try again.'), 'twoFactor');
     } finally {
@@ -773,6 +776,7 @@ const SecurityPage = () => {
       setPasskeys(verifyResponse.data.credentials ?? []);
       setBiometricEnabled(true);
       showStatus('success', 'Biometric security enabled with a passkey.', 'biometric');
+      completeOnboardingStep('biometric');
     } catch (error: any) {
       const response = error?.response;
       logWebAuthnDebug('biometric-flow-error', 'error', 'Biometric registration flow failed', {
