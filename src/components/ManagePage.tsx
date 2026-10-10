@@ -4,7 +4,7 @@ import { ArrowLeft, WalletCards } from 'lucide-react';
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 import ReusableDatePage from './ReusableDatePage';
 import NowBar from './NowBar';
@@ -182,7 +182,7 @@ const ManagePage = () => {
               <label style={styles.label}><span>Description (optional)</span><input style={styles.input} value={description} onChange={(event) => setDescription(event.target.value.slice(0, 100))} placeholder="e.g. Main trading wallet" /></label>
               <label style={styles.label}><span>Security code</span><input style={{ ...styles.input, WebkitTextSecurity: 'disc' } as React.CSSProperties} type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" /><span style={styles.helper}>Required when binding or editing a wallet.</span></label>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || (!editingWalletId && wallets.length >= 10)}>{saving ? <InlineLoadingDots /> : editingWalletId ? 'Update wallet' : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
+                  <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleSave()} disabled={saving || !walletValid || (!editingWalletId && wallets.length >= 10)}>{saving ? <LoadingDots /> : editingWalletId ? 'Update wallet' : wallets.length >= 10 ? 'Wallet limit reached' : 'Save wallet'}</button>
                   {editingWalletId ? <button style={{ ...styles.button, background: theme.surfaceMuted, borderColor: theme.borderGlass, color: theme.text }} type="button" onClick={resetWalletForm}>Cancel edit</button> : null}
                 </div>
               </div>
@@ -197,7 +197,7 @@ const ManagePage = () => {
               <p style={styles.text}>Temporarily prevent withdrawals and transfers during a selected date and time range.</p>
               <button type="button" style={styles.button} onClick={() => setBlockPicker('startsAt')}>Start: {blockSettings.startsAt ? new Date(blockSettings.startsAt).toLocaleString() : 'Choose date and time'}</button>
               <button type="button" style={styles.button} onClick={() => setBlockPicker('endsAt')}>End: {blockSettings.endsAt ? new Date(blockSettings.endsAt).toLocaleString() : 'Choose date and time'}</button>
-              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} disabled={blockSaving || (!blockSettings.enabled && (!blockSettings.startsAt || !blockSettings.endsAt))} onClick={() => void saveBlockSettings(blockSettings.enabled ? { enabled: false, startsAt: null, endsAt: null, active: false } : { ...blockSettings, enabled: true })}>{blockSaving ? <InlineLoadingDots /> : blockSettings.enabled ? 'Disable block' : 'Enable block'}</button>
+              <button type="button" style={{ ...styles.button, ...styles.primaryButton }} disabled={blockSaving || (!blockSettings.enabled && (!blockSettings.startsAt || !blockSettings.endsAt))} onClick={() => void saveBlockSettings(blockSettings.enabled ? { enabled: false, startsAt: null, endsAt: null, active: false } : { ...blockSettings, enabled: true })}>{blockSaving ? <LoadingDots /> : blockSettings.enabled ? 'Disable block' : 'Enable block'}</button>
             </div>
           </section>
         </div>
