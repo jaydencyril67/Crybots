@@ -8,7 +8,6 @@ import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
-import InlineLoadingDots from './InlineLoadingDots';
 import ReusableConfirmationPage from './ReusableConfirmationPage';
 import NotificationBanner from './NotificationBanner';
 import { createPasskey, isWebAuthnAvailable } from '../utils/webauthn';
@@ -872,9 +871,9 @@ const SecurityPage = () => {
                 <p style={styles.note}>{uidChangeMessage}</p>
                 <div className="security-control" style={styles.control}>
                   <input style={styles.input} value={uid} onChange={(event) => setUid(event.target.value.replace(/\D/g, '').slice(0, 5))} placeholder="Edit UID" inputMode="numeric" maxLength={5} disabled={uidChangeLocked} />
-                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid || uidChangeLocked}>{requestingUidCode ? <InlineLoadingDots /> : 'Email code'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleUidCodeRequest()} disabled={requestingUidCode || savingUid || uidChangeLocked}>{requestingUidCode ? <LoadingDots /> : 'Email code'}</button>
                   {uidCodeRequested ? <input style={styles.input} value={uidCode} onChange={(event) => setUidCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit email confirmation code" inputMode="numeric" maxLength={4} /> : null}
-                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid || uidChangeLocked}>{savingUid ? <InlineLoadingDots /> : 'Change'}</button> : null}
+                  {uidCodeRequested ? <button type="button" style={styles.button} onClick={() => void handleUidSave()} disabled={savingUid || uidChangeLocked}>{savingUid ? <LoadingDots /> : 'Change'}</button> : null}
                 </div>
                 {renderStatus('uid')}
                 </div>
@@ -891,7 +890,7 @@ const SecurityPage = () => {
                     <input id="max-active-sessions" type="range" min="1" max="10" step="1" value={maxActiveSessions} onChange={(event) => setMaxActiveSessions(Number(event.target.value))} disabled={savingMaxSessions} aria-label="Maximum active sessions" style={{ width: '100%', accentColor: theme.primary, cursor: savingMaxSessions ? 'not-allowed' : 'grab', opacity: savingMaxSessions ? 0.65 : 1 }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}>{Array.from({ length: 10 }, (_, index) => <span key={index + 1}>{index + 1}</span>)}</div>
                   </div>
-                  <button type="button" style={styles.button} onClick={() => void handleMaxSessionsSave()} disabled={savingMaxSessions}>{savingMaxSessions ? <InlineLoadingDots /> : 'Save session limit'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleMaxSessionsSave()} disabled={savingMaxSessions}>{savingMaxSessions ? <LoadingDots /> : 'Save session limit'}</button>
                 </div>
                 {renderStatus('sessions')}
                 <p style={styles.note}>Choose how many devices can stay signed in at once. The default is 2, and you can allow from 1 up to 10.</p>
@@ -993,7 +992,7 @@ const SecurityPage = () => {
                   {passwordErrorMessage ? <p style={styles.inlineError}>{passwordErrorMessage}</p> : null}
                   <input style={confirmPasswordInputStyle} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
                   {confirmPasswordMismatch ? <p style={styles.inlineError}>Passwords do not match.</p> : null}
-                  <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <InlineLoadingDots /> : 'Change'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <LoadingDots /> : 'Change'}</button>
                 </div>
                 {renderStatus('password')}
                 </div>
@@ -1008,7 +1007,7 @@ const SecurityPage = () => {
                   <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
                   <input style={{ ...styles.input, WebkitTextSecurity: 'disc' } as React.CSSProperties} type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
                   <input style={{ ...styles.input, WebkitTextSecurity: 'disc' } as React.CSSProperties} type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
-                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode || securityCodeChangeLocked}>{savingSecurityCode ? <InlineLoadingDots /> : 'Save'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode || securityCodeChangeLocked}>{savingSecurityCode ? <LoadingDots /> : 'Save'}</button>
                 </div>
                 {renderStatus('securityCode')}
                 </div>
@@ -1020,7 +1019,7 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{twoFactorEnabled ? 'Two-factor authentication enabled' : twoFactorConfigured ? 'Authenticator configured but disabled' : 'Two-factor authentication not set up'}</p>
                 {!twoFactorConfigured ? (
                   <div style={styles.buttonRow}>
-                    <button type="button" style={styles.button} onClick={() => void handleSetup2fa()} disabled={saving2fa}>{saving2fa ? <InlineLoadingDots /> : 'Set up 2FA'}</button>
+                    <button type="button" style={styles.button} onClick={() => void handleSetup2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : 'Set up 2FA'}</button>
                   </div>
                 ) : twoFactorSetupOpen ? (
                   <div style={styles.control}>
@@ -1059,7 +1058,7 @@ const SecurityPage = () => {
                     <input style={twoFactorCodeError ? { ...styles.input, borderColor: theme.danger, background: theme.surface } : styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => { setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setTwoFactorCodeError(''); }} placeholder="6-digit authenticator code" autoComplete="one-time-code" aria-invalid={Boolean(twoFactorCodeError)} />
                     {twoFactorCodeError ? <p style={styles.inlineError}>{twoFactorCodeError}</p> : null}
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? <InlineLoadingDots /> : 'Enable 2FA'}</button>
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : 'Enable 2FA'}</button>
                     </div>
                   </div>
                 ) : (
@@ -1067,8 +1066,8 @@ const SecurityPage = () => {
                     <input style={twoFactorCodeError ? { ...styles.input, borderColor: theme.danger, background: theme.surfaceMuted } : styles.input} inputMode="numeric" maxLength={6} value={twoFactorCode} onChange={(event) => { setTwoFactorCode(event.target.value.replace(/\D/g, '').slice(0, 6)); setTwoFactorCodeError(''); }} placeholder="6-digit authenticator code" autoComplete="one-time-code" aria-invalid={Boolean(twoFactorCodeError)} />
                     {twoFactorCodeError ? <p style={styles.inlineError}>{twoFactorCodeError}</p> : null}
                     <div style={styles.buttonRow}>
-                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? <InlineLoadingDots /> : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
-                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa}>{saving2fa ? <InlineLoadingDots /> : <><Trash2 size={16} /> Delete 2FA</>}</button> : null}
+                      <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
+                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : <><Trash2 size={16} /> Delete 2FA</>}</button> : null}
                     </div>
                   </div>
                 )}
@@ -1081,7 +1080,7 @@ const SecurityPage = () => {
                 <p style={styles.rowLabel}><Fingerprint size={16} /> Biometric</p>
                 <p style={styles.rowValue}>{biometricEnabled ? 'Biometric security enabled' : 'Biometric security disabled'}</p>
                 <div style={styles.buttonRow}>
-                  <button type="button" style={styles.button} onClick={() => void handleToggleBiometric()} disabled={savingBiometric}>{savingBiometric ? <InlineLoadingDots /> : biometricEnabled ? 'Disable biometric' : 'Enable biometric'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleToggleBiometric()} disabled={savingBiometric}>{savingBiometric ? <LoadingDots /> : biometricEnabled ? 'Disable biometric' : 'Enable biometric'}</button>
                 </div>
                 {renderStatus('biometric')}
                 </div>
@@ -1092,7 +1091,7 @@ const SecurityPage = () => {
                 <p style={styles.rowLabel}><Laptop2 size={16} /> Hardware security</p>
                 <p style={styles.rowValue}>{hardwareKeyEnabled ? 'Hardware security enabled' : 'Hardware security disabled'}</p>
                 <div style={styles.buttonRow}>
-                  <button type="button" style={styles.button} onClick={() => void handleToggleHardware()} disabled={savingHardware}>{savingHardware ? <InlineLoadingDots /> : hardwareKeyEnabled ? 'Disable hardware security' : 'Enable hardware security'}</button>
+                  <button type="button" style={styles.button} onClick={() => void handleToggleHardware()} disabled={savingHardware}>{savingHardware ? <LoadingDots /> : hardwareKeyEnabled ? 'Disable hardware security' : 'Enable hardware security'}</button>
                 </div>
                 {renderStatus('hardware')}
                 </div>
