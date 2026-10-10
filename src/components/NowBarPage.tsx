@@ -191,13 +191,13 @@ const NowBarPage = () => {
             </div>
           </section>
           <section style={styles.card}>
-            <h2 style={styles.cardHeading}>🎙 Voice navigation</h2>
-            <p style={styles.cardText}>Use the visible NowBar page labels as voice commands. Microphone permission is required.</p>
+            <h2 style={styles.cardHeading}>🤖 AI Mode</h2>
+            <p style={styles.cardText}>Use AI-powered voice commands to interact with NowBar and navigate pages. Microphone permission is required.</p>
             <div style={styles.list}>
               <div style={styles.row}>
                 <div style={styles.rowContent}>
-                  <p style={styles.label}>Voice Mode</p>
-                  <p style={styles.description}>Listen for NowBar labels and navigate to the matching page.</p>
+                  <p style={styles.label}>AI Mode</p>
+                  <p style={styles.description}>Speak naturally to navigate to pages and use supported NowBar commands.</p>
                 </div>
                 <button type="button" style={{ ...styles.button, ...(voiceModeEnabled ? styles.active : {}) }} onClick={toggleVoiceMode} aria-pressed={voiceModeEnabled}>{voiceModeEnabled ? 'Enabled' : 'Enable'}</button>
               </div>
