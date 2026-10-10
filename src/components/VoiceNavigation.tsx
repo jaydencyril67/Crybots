@@ -122,6 +122,7 @@ const VoiceNavigation = () => {
     setExecutingApiAction(true);
     logVoiceDebug('info', `User approved Brain API action ${action.operation} for ${action.target}`);
     try {
+      const operationStartedAt = new Date().toISOString();
       let response;
       const botPath = `/api/bot-investments/${encodeURIComponent(action.target)}`;
       if (action.operation === 'bot_activate') {
@@ -141,8 +142,32 @@ const VoiceNavigation = () => {
 
       const resultMessage = response.data.message.trim();
       clearPendingApiAction();
-      logVoiceDebug('info', `CryBots API accepted ${action.operation} for ${action.target}: HTTP ${response.status}`);
-      speakVoiceResponse(resultMessage);
+      logVoiceDebug('info', `CryBots API accepted ${action.operation} for ${action.target}: HTTP ${response.status}; checking authoritative bot records`);
+
+      try {
+        const verification = await api.post('/api/brain/verify-operation', {
+          operation: action.operation,
+          botId: action.target,
+          amount: action.operation === 'bot_deactivate' ? undefined : Number(action.parameters?.amount),
+          startedAt: operationStartedAt,
+        });
+        const verificationStatus = verification.data?.status;
+        const verificationMessage = typeof verification.data?.message === 'string' ? verification.data.message.trim() : '';
+        if (verificationStatus === 'verified' && verificationMessage) {
+          logVoiceDebug('info', `Brain verified ${action.operation} for ${action.target} against backend records`);
+          speakVoiceResponse(verificationMessage);
+        } else if (verificationStatus === 'pending' && verificationMessage) {
+          logVoiceDebug('warn', `Brain operation remains pending verification: ${action.operation} for ${action.target}`);
+          speakVoiceResponse(verificationMessage + ' Original server response: ' + resultMessage);
+        } else {
+          logVoiceDebug('warn', `Brain could not verify final state for ${action.operation} on ${action.target}`);
+          speakVoiceResponse((verificationMessage || 'CryBots accepted the request, but I could not independently verify the updated backend record.') + ' Original server response: ' + resultMessage + ' Do not repeat the operation until you check My Bots and your transaction history.');
+        }
+      } catch (verificationError) {
+        const detail = verificationError as { response?: { status?: number }; message?: string };
+        logVoiceDebug('error', `Operation response received but backend verification failed: ${detail.message || 'verification request failed'}`);
+        speakVoiceResponse('CryBots returned a response, but I could not verify the updated backend records. Do not repeat the operation yet; check My Bots and your transaction history first.');
+      }
     } catch (error) {
       const failure = error as { response?: { status?: number; data?: { message?: string } }; message?: string };
       clearPendingApiAction();
