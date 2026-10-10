@@ -719,6 +719,14 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                 aria-label={action.label}
                 data-nowbar-control
                 onClick={() => {
+                  if (isExpanded && action.active) {
+                    // Selecting the already-active page collapses the expanded dock
+                    // back to its normal content-wrapped title mode.
+                    handleInteraction();
+                    setView('title');
+                    setMode('compact');
+                    return;
+                  }
                   if (!isExpanded) saveNowBarAction(action.label);
                   action.onClick();
                 }}
