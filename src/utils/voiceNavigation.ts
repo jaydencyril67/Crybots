@@ -120,9 +120,11 @@ export const requestVoiceMicrophoneAccess = async () => {
 };
 
 let voiceConversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+let voiceBrainContext: Record<string, unknown> = {};
 
 export const disableVoiceMode = () => {
   voiceConversationHistory = [];
+  voiceBrainContext = {};
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
   window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
@@ -345,6 +347,7 @@ type VoiceAssistantAction = {
 
 type VoiceAssistantResponse = {
   reply?: string;
+  context?: Record<string, unknown>;
   action?: VoiceAssistantAction;
   debug?: { requestId?: string; elapsedMs?: number; providerStatus?: number };
 };
@@ -368,6 +371,7 @@ export const askVoiceAssistant = async (message: string) => {
         currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
         uiButtons: getVisibleVoiceButtons(),
         history: voiceConversationHistory.slice(-8),
+        context: voiceBrainContext,
       }),
     });
 
@@ -377,6 +381,10 @@ export const askVoiceAssistant = async (message: string) => {
       if (body.reply) speakVoiceResponse(body.reply);
       else if (response.status === 503) speakVoiceResponse('The conversational assistant is not configured yet.');
       return false;
+    }
+
+    if (body.context && typeof body.context === 'object' && !Array.isArray(body.context)) {
+      voiceBrainContext = body.context;
     }
 
     const reply = typeof body.reply === 'string' ? body.reply.trim() : '';
