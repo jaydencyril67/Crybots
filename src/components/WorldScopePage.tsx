@@ -3,6 +3,7 @@ import { Activity, ArrowLeft, BarChart3, Bot, CheckCircle2, Clock3, Crown, LockK
 import api from '../api/axios';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -129,9 +130,7 @@ const WorldScopePage = () => {
     footer: { marginTop: 14, color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
   };
 
-  const loaderStyle = `@keyframes worldscopeDotPulse { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } } .worldscope-dot-loader { width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; animation: worldscopeDotPulse 1s infinite ease-in-out; } .worldscope-dot-loader:nth-child(2) { animation-delay: .15s; } .worldscope-dot-loader:nth-child(3) { animation-delay: .3s; }`;
   return <HybridTheme mode={themeMode}>
-    <style>{loaderStyle}</style>
     <div style={styles.page}>
       <main style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate(isRankingsPage ? '/worldscope' : '/store')}><ArrowLeft size={16} /> {isRankingsPage ? 'WorldScope' : 'Store'}</button>
@@ -140,7 +139,7 @@ const WorldScopePage = () => {
             <div style={styles.eyebrow}><Activity size={15} /> CryBots platform intelligence</div>
             <h1 style={styles.title}>{isRankingsPage ? 'WorldScope Rankings' : 'WorldScope'}</h1>
             <p style={styles.subtitle}>{isRankingsPage ? 'Explore platform rankings built from recorded bot settlements and currently available Commerce and Rentals listings.' : 'Understand what is happening across the platform. WorldScope brings together rankings from recorded bot settlements and currently available Commerce and Rentals listings, so you can compare real app activity instead of relying on guesswork.'}</p>
-            <div style={styles.status}>{loading ? <><span aria-label="Loading" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /></span> Checking your access…</> : accessActive ? <><CheckCircle2 size={14} color="#22c55e" /> Subscription active</> : <><LockKeyhole size={14} /> Paid subscription required</>} {data?.asOf && <>· Data snapshot {new Date(data.asOf).toLocaleString()}</>}</div>
+            <div style={styles.status}>{loading ? <><LoadingDots /> Checking your access…</> : accessActive ? <><CheckCircle2 size={14} color="#22c55e" /> Subscription active</> : <><LockKeyhole size={14} /> Paid subscription required</>} {data?.asOf && <>· Data snapshot {new Date(data.asOf).toLocaleString()}</>}</div>
           </section>
         </div>
 
@@ -160,7 +159,7 @@ const WorldScopePage = () => {
             <div style={styles.card}>
               <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 900 }}>Choose when you're ready</h2>
               <p style={styles.subtitle}>Preview the subscription plans first. You can choose Moderate Scope for core rankings or Advance Scope for all five categories.</p>
-              <button type="button" disabled={loading} style={{ ...styles.button, ...styles.primaryButton, opacity: loading ? 0.8 : 1 }} onClick={() => accessActive ? navigate('/worldscope-rankings') : setScreen('payments')}>{loading ? <span aria-label="Loading" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /></span> : accessActive ? <>View WorldScope Rankings <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></> : <>Preview payment plans <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></>}</button>
+              <button type="button" disabled={loading} style={{ ...styles.button, ...styles.primaryButton, opacity: loading ? 0.8 : 1 }} onClick={() => accessActive ? navigate('/worldscope-rankings') : setScreen('payments')}>{loading ? <LoadingDots /> : accessActive ? <>View WorldScope Rankings <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></> : <>Preview payment plans <ArrowLeft size={15} style={{ display: 'inline', transform: 'rotate(180deg)', verticalAlign: 'middle', marginLeft: 4 }} /></>}</button>
             </div>
           </div>
         </>}
@@ -222,14 +221,14 @@ const WorldScopePage = () => {
             </div>
           </div>
           <h2 style={styles.sectionTitle}>Your live rankings</h2>
-          <div style={styles.status}>{loading ? <><span aria-label="Loading" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /></span> Fetching selected ranking…</> : data?.asOf ? <><Clock3 size={14} /> Snapshot {new Date(data.asOf).toLocaleString()} · UTC daily window</> : 'Waiting for ranking data'}</div>
+          <div style={styles.status}>{loading ? <><LoadingDots /> Fetching selected ranking…</> : data?.asOf ? <><Clock3 size={14} /> Snapshot {new Date(data.asOf).toLocaleString()} · UTC daily window</> : 'Waiting for ranking data'}</div>
           <div style={styles.tabRow} role="tablist" aria-label="WorldScope rankings">
             {visibleSections.map(section => <button key={section.id} type="button" role="tab" aria-selected={selectedSection.id === section.id} style={{ ...styles.tab, ...(selectedSection.id === section.id ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { if (selectedSection.id === section.id) return; setActiveSection(section.id); void loadWorldScope(); }}>{section.title}</button>)}
           </div>
           <div style={styles.outerCard}>
           <section style={{ ...styles.rankingCard, background: theme.surfaceMuted }}>
             <div style={styles.rankingHead}><div style={styles.iconBox}><SectionIcon size={20} /></div><div style={{ flex: 1, minWidth: 0 }}><h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900 }}>{selectedSection.title}</h3><p style={{ ...styles.subtitle, fontSize: '.88rem', marginTop: 5 }}>{selectedSection.subtitle}</p></div>{selectedSection.tier === 'advanced' && <span style={{ fontSize: '.74rem', fontWeight: 900, color: '#a855f7' }}>ADVANCE</span>}</div>
-            {loading ? <div style={{ ...styles.message, display: 'flex', alignItems: 'center', gap: 8 }}><span aria-label="Loading" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /><span className="worldscope-dot-loader" /></span> Fetching fresh ranking data…</div> : activeRows.length === 0 ? <div style={styles.message}>No qualifying records are available for this ranking yet. No sample numbers are shown.</div> : <div style={styles.tableWrap}><table style={styles.table}><thead><tr><th style={styles.th}>Rank</th>{selectedSection.columns.map(column => <th key={column.key} style={styles.th}>{column.label}</th>)}</tr></thead><tbody>{activeRows.slice(0, 5).map((row, index) => <tr key={String(row.botId || row.symbol || row.creator || index)}><td style={{ ...styles.td, fontWeight: 900 }}>#{index + 1}</td>{selectedSection.columns.map(column => <td key={column.key} style={styles.td}>{formatCell(row[column.key], column.format)}</td>)}</tr>)}</tbody></table></div>}
+            {loading ? <div style={{ ...styles.message, display: 'flex', alignItems: 'center', gap: 8 }}><LoadingDots /> Fetching fresh ranking data…</div> : activeRows.length === 0 ? <div style={styles.message}>No qualifying records are available for this ranking yet. No sample numbers are shown.</div> : <div style={styles.tableWrap}><table style={styles.table}><thead><tr><th style={styles.th}>Rank</th>{selectedSection.columns.map(column => <th key={column.key} style={styles.th}>{column.label}</th>)}</tr></thead><tbody>{activeRows.slice(0, 5).map((row, index) => <tr key={String(row.botId || row.symbol || row.creator || index)}><td style={{ ...styles.td, fontWeight: 900 }}>#{index + 1}</td>{selectedSection.columns.map(column => <td key={column.key} style={styles.td}>{formatCell(row[column.key], column.format)}</td>)}</tr>)}</tbody></table></div>}
             <div style={styles.muted}>Window: {data?.windows?.[selectedSection.id === 'profitableBots' ? 'botProfitability' : selectedSection.id === 'dailySymbols' ? 'dailySymbols' : selectedSection.id === 'topCreators' ? 'creatorCreationCounts' : 'listings'] || 'server-recorded data'}.</div>
           </section>
           </div>
