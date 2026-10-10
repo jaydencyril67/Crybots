@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Camera, Check, ChevronDown, Image as ImageIcon, LoaderCircle } from 'lucide-react';
 import { isNativeGalleryAvailable, loadNativeGalleryImage, loadNativeGalleryPhotos, NativeGalleryPhoto } from '../utils/nativeImagePicker';
 import { useAppTheme } from './AppTheme';
@@ -18,7 +18,7 @@ const NativeGalleryModal = ({ onClose, onSelect }: NativeGalleryModalProps) => {
   const [opening, setOpening] = useState(false);
   const [error, setError] = useState('');
   const [showAlbums, setShowAlbums] = useState(false);
-  const [cameraFallback, setCameraFallback] = useState(false);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -65,7 +65,7 @@ const NativeGalleryModal = ({ onClose, onSelect }: NativeGalleryModalProps) => {
         <button type="button" onClick={() => setShowAlbums((value) => !value)} style={{ minWidth: 0, flex: 1, display: 'flex', alignItems: 'center', gap: 8, border: 0, background: 'transparent', color: text, fontSize: 17, fontWeight: 800, textAlign: 'left' }}>
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{album}</span><ChevronDown size={18} />
         </button>
-        <button type="button" aria-label="Take a photo" onClick={() => setCameraFallback(true)} style={buttonStyle}><Camera size={20} /></button>
+        <button type="button" aria-label="Take a photo" onClick={() => cameraInputRef.current?.click()} style={buttonStyle}><Camera size={20} /></button>
       </header>
 
       {showAlbums && <div style={{ position: 'absolute', top: 72, left: 70, right: 64, zIndex: 2, maxHeight: '55vh', overflowY: 'auto', border: '1px solid ' + border, borderRadius: 16, background: surface, boxShadow: '0 18px 50px rgba(0,0,0,.35)', padding: 6 }}>
@@ -74,15 +74,7 @@ const NativeGalleryModal = ({ onClose, onSelect }: NativeGalleryModalProps) => {
         </button>)}
       </div>}
 
-      {cameraFallback && <div style={{ position: 'absolute', inset: 0, zIndex: 4, background, display: 'grid', placeItems: 'center', padding: 24, textAlign: 'center' }}>
-        <div style={{ maxWidth: 340 }}>
-          <div style={{ margin: '0 auto 12px', width: 54, height: 54, display: 'grid', placeItems: 'center', borderRadius: 18, background: dark ? '#1f2937' : '#e9edf5' }}><Camera size={26} /></div>
-          <h3 style={{ margin: '0 0 8px' }}>Take a photo</h3>
-          <p style={{ color: muted, lineHeight: 1.5 }}>Use your phone camera, then return here to continue.</p>
-          <input type="file" accept="image/*" capture="environment" onChange={async (event) => { const file = event.target.files?.[0]; event.target.value = ''; if (file) { await onSelect(file); onClose(); } }} style={{ display: 'block', width: '100%', margin: '16px 0' }} />
-          <button type="button" onClick={() => setCameraFallback(false)} style={{ border: '1px solid ' + border, color: text, background: 'transparent', borderRadius: 12, padding: '11px 18px' }}>Back to gallery</button>
-        </div>
-      </div>}
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={async (event) => { const file = event.target.files?.[0]; event.target.value = ''; if (file) { try { await onSelect(file); onClose(); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Unable to use the camera photo.'); } } }} style={{ display: 'none' }} />
 
       <main style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 3 }}>
         {loading ? <div style={{ minHeight: '50vh', display: 'grid', placeItems: 'center', color: muted }}><div style={{ display: 'grid', justifyItems: 'center', gap: 10 }}><LoaderCircle size={28} className="native-gallery-spin" /><span>Loading your photos…</span></div></div>
