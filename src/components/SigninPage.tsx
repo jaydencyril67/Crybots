@@ -5,7 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NotificationBanner from './NotificationBanner';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
@@ -789,7 +789,7 @@ const SigninPage = () => {
                     <div style={styles.optionGrid}>
                       {signInMethods.filter((option) => option.value !== 'passkey' || passkeyAvailable).map((option) => (
                         <button key={option.value} type="button" style={{ ...hybridStyles.optionCard, ...(method === option.value ? hybridStyles.optionCardActive : {}) }} onClick={() => handleStartSignin(option.value)} disabled={isSubmitting}>
-                          {isSubmitting && method === option.value ? <InlineLoadingDots /> : <KeyRound size={20} />}
+                          {isSubmitting && method === option.value ? <LoadingDots /> : <KeyRound size={20} />}
                           <div>
                             <div style={{ fontWeight: 700, color: theme.text }}>{option.title}</div>
                             <div style={{ color: theme.textMuted, fontSize: '13px', lineHeight: 1.5 }}>{option.description}</div>
@@ -831,7 +831,7 @@ const SigninPage = () => {
                       {resendStatus ? <NotificationBanner tone="success" title="Update received" message={resendStatus} /> : null}
                       {showResendConfirmationLink ? (
                         <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={hybridStyles.linkButton}>
-                          {isResendingCode ? <InlineLoadingDots /> : 'Resend confirmation code'}
+                          {isResendingCode ? <LoadingDots /> : 'Resend confirmation code'}
                         </button>
                       ) : null}
                       {submitError.toLowerCase().includes('pending deletion') ? (
@@ -851,13 +851,13 @@ const SigninPage = () => {
                 <div style={styles.navRow}>
                   <button type="button" onClick={handleBack} style={{ ...styles.button, ...hybridStyles.buttonGhost }}>Back</button>
                   {step === 'email' ? (
-                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={isSubmitting}>{isSubmitting ? <InlineLoadingDots /> : 'Continue'}</button>
+                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={isSubmitting}>{isSubmitting ? <LoadingDots /> : 'Continue'}</button>
                   ) : step === 'password' ? (
-                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Sign in'}</button>
+                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <LoadingDots /> : 'Sign in'}</button>
                   ) : step === 'code' ? (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Verify code'}</button>
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <LoadingDots /> : 'Verify code'}</button>
                   ) : (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <InlineLoadingDots /> : 'Verify code'}</button>
+                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <LoadingDots /> : 'Verify code'}</button>
                   )}
                 </div>
                 <div style={styles.switchRow}>
