@@ -236,7 +236,7 @@ const getRuntimePageSnapshot = () => {
           // Only expose whether a field is filled; never send its value to Brain.
           hasValue: Boolean(field.value.trim()),
         }));
-      return { label: readAccessibleLabel(form) || (heading ? readAccessibleLabel(heading) : '') || `Form ${index + 1}`, fields };
+      return { label: (form.getAttribute('aria-label') || form.getAttribute('title') || (heading ? readAccessibleLabel(heading) : '') || `Form ${index + 1}`).replace(/\\s+/g, ' ').trim().slice(0, 100), fields };
     });
   return {
     title: (document.title || '').replace(/\\s+/g, ' ').trim().slice(0, 120),
@@ -459,12 +459,12 @@ export const askVoiceAssistant = async (message: string) => {
 
     if (body.action?.type === 'click') {
       logVoiceDebug('info', `Assistant action: click ${body.action.target || ''}`);
+      const clickedLabel = getVisibleVoiceButtons().find(button => button.id === body.action?.target)?.label || 'the selected control';
       const before = getVisibleInterfaceFingerprint();
       const executed = executeVoiceUiAction(body.action);
       if (!executed) {
         speakVoiceResponse('I could not safely activate that control, so no action was taken.');
       } else {
-        const clickedLabel = getVisibleVoiceButtons().find(button => button.id === body.action?.target)?.label || 'the selected control';
         window.setTimeout(() => {
           const after = getVisibleInterfaceFingerprint();
           if (after !== before) {
