@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { useAppTheme } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 
@@ -75,7 +75,7 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
           <div style={{ fontSize: '.96rem', fontWeight: 750 }}>Image preview</div>
           <div style={{ marginTop: 3, color: 'rgba(255,255,255,.62)', fontSize: '.75rem' }}>Pinch to zoom · Drag to move · {Math.round(zoom * 100)}%</div>
         </div>
-        <button type="button" onClick={onClose} aria-label="Close image preview" title="Close preview" style={{ display: 'inline-flex', flexShrink: 0, alignItems: 'center', justifyContent: 'center', width: 44, height: 44, borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, boxShadow: '0 6px 24px rgba(0,0,0,.24)', cursor: 'pointer' }}><X size={21} strokeWidth={2.3} /></button>
+        <button type="button" onClick={onClose} aria-label="Close image preview" title="Close preview" style={{ display: 'inline-flex', flexShrink: 0, alignItems: 'center', justifyContent: 'center', minWidth: 64, height: 44, padding: '0 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, boxShadow: '0 6px 24px rgba(0,0,0,.24)', cursor: 'pointer', font: 'inherit', fontSize: '.88rem', fontWeight: 650 }}>Close</button>
       </div>
       <div onClick={(event) => event.stopPropagation()} onTouchStart={touchStart} onTouchMove={touchMove} onTouchEnd={touchEnd} onWheel={wheel} style={{ position: 'relative', display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', touchAction: 'none', padding: 12 }}>
         <img src={imageUrl} alt="Full-size chat attachment" draggable={false} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} onMouseLeave={mouseUp} style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 10, userSelect: 'none', cursor: zoom > 1 ? 'grab' : 'zoom-in', transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`, transformOrigin: 'center center', transition: pinchStart.current ? 'none' : 'transform 80ms ease-out' }} />
