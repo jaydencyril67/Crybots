@@ -1,4 +1,5 @@
 import { navigate } from './navigate';
+import { GENERATED_PAGE_ROUTES } from './generatedPageRoutes';
 import { prepareMediaOutput, releaseMediaOutput } from './mediaAudio';
 import { API_BASE_URL, authHeaders } from '../api/axios';
 
@@ -37,70 +38,7 @@ export const logVoiceDebug = (level: VoiceDebugLog['level'], message: string) =>
 
 export type VoiceCommand = { label: string; route: string };
 
-export const PAGE_ROUTES: VoiceCommand[] = [
-  { label: 'SIGN UP', route: '/signup' },
-  { label: 'SIGN UP CONFIRMATION', route: '/signup-confirmation-sent' },
-  { label: 'VERIFY EMAIL', route: '/verify-email' },
-  { label: 'ACCOUNT CONFIRMED', route: '/account-confirmed' },
-  { label: 'SIGN IN', route: '/signin' },
-  { label: 'FORGOT PASSWORD', route: '/forgot-password' },
-  { label: 'HOME', route: '/home' },
-  { label: 'DETAILS', route: '/details' },
-  { label: 'MANAGE', route: '/manage' },
-  { label: 'THEME', route: '/theme' },
-  { label: 'EDGE LIGHTING', route: '/nowbar-color' },
-  { label: 'BUTTON COLOR', route: '/nowbar-button-color' },
-  { label: 'NOWBAR', route: '/nowbar' },
-  { label: 'NOWBAR COLOR', route: '/nowbar-color' },
-  { label: 'NOWBAR BUTTON COLOR', route: '/nowbar-button-color' },
-  { label: 'STATISTICS', route: '/statistics' },
-  { label: 'PROFILE', route: '/profile' },
-  { label: 'EXIT', route: '/exit' },
-  { label: 'AUTO EXIT', route: '/auto-exit' },
-  { label: 'MANUAL EXIT', route: '/manual-exit' },
-  { label: 'AGENT', route: '/agent' },
-  { label: 'STATS', route: '/stats' },
-  { label: 'TOOLS', route: '/tools' },
-  { label: 'MENU', route: '/menu' },
-  { label: 'TRADE', route: '/trade' },
-  { label: 'CHART', route: '/chart' },
-  { label: 'MARKET', route: '/market' },
-  { label: 'PORTFOLIO', route: '/portfolio' },
-  { label: 'CREATION', route: '/creation' },
-  { label: 'RENTALS', route: '/rentals' },
-  { label: 'COMMERCE', route: '/commerce' },
-  { label: 'MY BOTS', route: '/bots' },
-  { label: 'LOGS', route: '/logs' },
-  { label: 'HELP', route: '/help' },
-  { label: 'FAQ', route: '/faq' },
-  { label: 'OPTIONS', route: '/options' },
-  { label: 'STORE', route: '/store' },
-  { label: 'DOWNLOAD', route: '/download' },
-  { label: 'WORLDSCOPE', route: '/worldscope' },
-  { label: 'ABOUT', route: '/about' },
-  { label: 'INFORMATION', route: '/information' },
-  { label: 'PRIVACY POLICY', route: '/privacy-policy' },
-  { label: 'COMMUNITY STANDARDS', route: '/community-standards' },
-  { label: 'DEV', route: '/dev' },
-  { label: 'API KEYS', route: '/api-keys' },
-  { label: 'WEBHOOKS', route: '/webhooks' },
-  { label: 'CONFIGURE', route: '/configure' },
-  { label: 'ASSETS', route: '/asset' },
-  { label: 'DANGER', route: '/danger' },
-  { label: 'PENDING DELETION', route: '/pending-deletion' },
-  { label: 'ENABLE ACCOUNT', route: '/enable-account' },
-  { label: 'SECURITY', route: '/security' },
-  { label: 'WITHDRAWALS', route: '/withdrawals' },
-  { label: 'TRANSFER', route: '/transfer' },
-  { label: 'DEPOSIT', route: '/deposit' },
-  { label: 'TRANSACTIONS', route: '/transactions' },
-  { label: 'NOTIFICATIONS', route: '/notifications' },
-  { label: 'TICKETS', route: '/tickets' },
-  { label: 'ALERT', route: '/alert' },
-  { label: 'NOTIFICATION COLOR', route: '/notification-color' },
-  { label: 'APP USAGE', route: '/app-usage' },
-  { label: 'ADMIN CHAT', route: '/admin/chat' },
-];
+export const PAGE_ROUTES: VoiceCommand[] = GENERATED_PAGE_ROUTES;
 
 export const requestVoiceMicrophoneAccess = async () => {
   if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
