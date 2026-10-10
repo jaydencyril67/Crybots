@@ -7,6 +7,7 @@ export const VOICE_MODE_STORAGE_KEY = 'nowbar_voice_navigation_enabled';
 export const VOICE_MODE_CHANGED_EVENT = 'nowbar-voice-mode-changed';
 export const VOICE_STATUS_EVENT = 'nowbar-voice-status-changed';
 export const VOICE_OUTPUT_EVENT = 'nowbar-voice-output-changed';
+export const VOICE_API_CONFIRMATION_EVENT = 'crybots-brain-api-confirmation';
 
 export const VOICE_DEBUG_EVENT = 'nowbar-voice-debug';
 const VOICE_DEBUG_STORAGE_KEY = 'crybots_voice_debug_logs';
@@ -402,6 +403,9 @@ type VoiceAssistantAction = {
   direction?: string;
   amount?: number;
   position?: 'top' | 'bottom';
+  operation?: 'bot_activate' | 'bot_deactivate' | 'bot_withdraw';
+  parameters?: Record<string, string>;
+  requiresConfirmation?: boolean;
 } | null;
 
 type VoiceAssistantResponse = {
@@ -493,6 +497,17 @@ export const askVoiceAssistant = async (message: string) => {
             speakVoiceResponse('I clicked ' + clickedLabel + ', but I could not detect a visible change. I cannot confirm that the action completed.');
           }
         }, 1000);
+      }
+    }
+
+    if (body.action?.type === 'api') {
+      const supported = ['bot_activate', 'bot_deactivate', 'bot_withdraw'].includes(body.action.operation || '');
+      if (supported && body.action.target && body.action.requiresConfirmation === true) {
+        logVoiceDebug('info', `Prepared API-backed Brain command: ${body.action.operation} for ${body.action.target}; awaiting explicit approval`);
+        window.dispatchEvent(new CustomEvent(VOICE_API_CONFIRMATION_EVENT, { detail: body.action }));
+      } else {
+        logVoiceDebug('warn', 'Rejected malformed or unapproved Brain API command');
+        speakVoiceResponse('I could not validate that operation, so I did not send it.');
       }
     }
 
