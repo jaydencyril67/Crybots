@@ -5,7 +5,7 @@ import NowBar from './NowBar';
 import api, { forceLogout } from '../api/axios';
 import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 
 type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
@@ -225,7 +225,7 @@ const DangerPage = () => {
                 <input id="danger-disable-reason" style={styles.input} value={disable.reason} onChange={(event) => setDisable((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for disabling" />
               </div>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>{disable.loading === 'disable' ? <InlineLoadingDots /> : 'Disable Account'}</button>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('disable', disable, setDisable)} disabled={disable.loading !== null}>{disable.loading === 'disable' ? <LoadingDots /> : 'Disable Account'}</button>
               </div>
               {disable.status ? <NotificationBanner tone={disable.statusTone} title={disable.statusTone === 'success' ? 'Action completed' : 'Action required'} message={disable.status} /> : null}
                 </section>
@@ -252,7 +252,7 @@ const DangerPage = () => {
                 <input id="danger-self-exclude-reason" style={styles.input} value={selfExclude.reason} onChange={(event) => setSelfExclude((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for self exclusion" />
               </div>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null || !selfExclude.durationDays}>{selfExclude.loading === 'self-exclude' ? <InlineLoadingDots /> : 'Self Exclude Account'}</button>
+                <button type="button" style={styles.actionButton} onClick={() => submitAction('self-exclude', selfExclude, setSelfExclude)} disabled={selfExclude.loading !== null || !selfExclude.durationDays}>{selfExclude.loading === 'self-exclude' ? <LoadingDots /> : 'Self Exclude Account'}</button>
               </div>
               {selfExclude.status ? <NotificationBanner tone={selfExclude.statusTone} title={selfExclude.statusTone === 'success' ? 'Action completed' : 'Action required'} message={selfExclude.status} /> : null}
                   </section>
@@ -275,7 +275,7 @@ const DangerPage = () => {
                 <input id="danger-delete-reason" style={styles.input} value={remove.reason} onChange={(event) => setRemove((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for deleting" />
               </div>
               <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? <InlineLoadingDots /> : 'Delete Account'}</button>
+                <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? <LoadingDots /> : 'Delete Account'}</button>
               </div>
               {remove.status ? <NotificationBanner tone={remove.statusTone} title={remove.statusTone === 'success' ? 'Action completed' : 'Action required'} message={remove.status} /> : null}
                 </section>
