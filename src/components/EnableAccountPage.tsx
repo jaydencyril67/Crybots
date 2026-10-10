@@ -4,7 +4,7 @@ import api from '../api/axios';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NotificationBanner from './NotificationBanner';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import ReusableDatePage from './ReusableDatePage';
 import { navigate } from '../utils/navigate';
 
@@ -104,7 +104,7 @@ const EnableAccountPage = () => {
             <label style={{ color: theme.text }}>Date of birth<button type="button" style={{ ...fieldStyle, textAlign: 'left' as const, cursor: 'pointer' }} onClick={() => setShowDobPage(true)}>{dob || 'Select your date of birth'}</button></label>
             {codeSent ? <label style={{ color: theme.text }}>Email verification code<input style={fieldStyle} inputMode="numeric" maxLength={4} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" autoComplete="one-time-code" /></label> : null}
             {message ? <NotificationBanner tone={success ? 'success' : 'warning'} title={success ? 'Enablement request received' : 'Action required'} message={message} /> : null}
-            {!success ? <button type="button" onClick={codeSent ? enableAccount : requestCode} disabled={isLoading || (codeSent ? code.length !== 4 : !canRequestCode)} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>{isLoading ? <InlineLoadingDots /> : codeSent ? 'Enable account' : 'Email me a verification code'}</button> : <button type="button" onClick={() => navigate('/signin')} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>Return to sign in</button>}
+            {!success ? <button type="button" onClick={codeSent ? enableAccount : requestCode} disabled={isLoading || (codeSent ? code.length !== 4 : !canRequestCode)} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>{isLoading ? <LoadingDots /> : codeSent ? 'Enable account' : 'Email me a verification code'}</button> : <button type="button" onClick={() => navigate('/signin')} style={{ padding: '14px 18px', border: 0, borderRadius: 12, cursor: 'pointer', background: theme.primary, color: theme.textInverse, fontWeight: 800 }}>Return to sign in</button>}
             {!success && codeSent ? <button type="button" onClick={requestCode} disabled={isLoading || !canRequestCode} style={{ border: 0, background: 'transparent', color: theme.primary, cursor: 'pointer' }}>Request a new code</button> : null}
           </div>
         </section>
