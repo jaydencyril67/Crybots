@@ -55,9 +55,16 @@ const OnboardingWizard = () => {
     navigate('/home');
   };
   const skipStep = () => {
-    setSkipped((previous) => previous.includes(current.id) ? previous : [...previous, current.id]);
-    if (stepIndex >= setupSteps.length - 1) finish();
-    else setStepIndex((previous) => Math.min(previous + 1, setupSteps.length - 1));
+    const nextSkipped = skipped.includes(current.id) ? skipped : [...skipped, current.id];
+    setSkipped(nextSkipped);
+    setOpening(false);
+    if (stepIndex >= setupSteps.length - 1) {
+      localStorage.setItem('crybots_onboarding_completed', 'true');
+      localStorage.setItem('crybots_onboarding_skipped', JSON.stringify(nextSkipped));
+      navigate('/home');
+    } else {
+      setStepIndex((previous) => Math.min(previous + 1, setupSteps.length - 1));
+    }
   };
   const openStep = () => {
     setOpening(true);
@@ -96,7 +103,7 @@ const OnboardingWizard = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px', marginTop: '18px' }}>
                 <button type="button" style={styles.secondary} disabled={stepIndex === 0} onClick={() => { setOpening(false); setStepIndex((previous) => Math.max(0, previous - 1)); }}><ArrowLeft size={16} /> Back</button>
-                <button type="button" style={styles.secondary} onClick={() => stepIndex === setupSteps.length - 1 ? finish() : setStepIndex((previous) => previous + 1)}>{stepIndex === setupSteps.length - 1 ? 'Finish setup' : 'Next step'} <ArrowRight size={16} /></button>
+                <button type="button" style={styles.secondary} onClick={() => { setOpening(false); if (stepIndex === setupSteps.length - 1) finish(); else setStepIndex((previous) => previous + 1); }}>{stepIndex === setupSteps.length - 1 ? 'Finish setup' : 'Next step'} <ArrowRight size={16} /></button>
               </div>
             </>}
           </section>
