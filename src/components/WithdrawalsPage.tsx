@@ -4,7 +4,6 @@ import { ArrowLeft, CalendarClock, ChevronDown, Coins, ShieldCheck, TimerReset }
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
-import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import ReusableDatePage from './ReusableDatePage';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -307,7 +306,7 @@ const WithdrawPage = () => {
             </div>
             <div style={styles.buttonRow}>
               <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleWithdraw()} disabled={withdrawing || Number(amount) < 10 || !Number.isInteger(Number(amount)) || !availableDestination || (wallets.length > 0 && !selectedWalletId) || !securityCodeSet || !securityCode}>
-                {withdrawing ? <InlineLoadingDots /> : 'Submit withdrawal'}
+                {withdrawing ? <LoadingDots /> : 'Submit withdrawal'}
               </button>
             </div>
             <p style={styles.sectionText}>Crypto balance: {loading ? <LoadingDots /> : `${balances.usdtBalance.toFixed(2)} USDT`}</p>
