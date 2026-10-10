@@ -135,6 +135,10 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/faq"
   },
   {
+    "label": "AI MODE",
+    "route": "/ai-mode"
+  },
+  {
     "label": "OPTIONS",
     "route": "/options"
   },
