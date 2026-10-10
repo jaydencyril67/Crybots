@@ -69,18 +69,23 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone, preserveAspectRatio
 
   const handleImageLoad = () => {
     const image = imageRef.current;
-    if (preserveAspectRatio && image?.naturalWidth && image.naturalHeight) {
+    if (!image?.naturalWidth || !image.naturalHeight) return;
+    let nextSize = { width: CROP_SIZE, height: CROP_SIZE };
+    if (preserveAspectRatio) {
       const maxWidth = Math.min(window.innerWidth * 0.92, 680);
       const maxHeight = Math.min(window.innerHeight * 0.62, 620);
       const ratio = image.naturalWidth / image.naturalHeight;
       let width = maxWidth;
       let height = width / ratio;
       if (height > maxHeight) { height = maxHeight; width = height * ratio; }
-      setCropSize({ width, height });
+      nextSize = { width, height };
+      setCropSize(nextSize);
+    } else {
+      setCropSize(nextSize);
     }
-    const geometry = getGeometry();
-    if (!geometry) return;
-    const initialOffset = { x: (cropSize.width - geometry.width) / 2, y: (cropSize.height - geometry.height) / 2 };
+    const baseScale = Math.max(nextSize.width / image.naturalWidth, nextSize.height / image.naturalHeight);
+    const geometry = { width: image.naturalWidth * baseScale, height: image.naturalHeight * baseScale };
+    const initialOffset = { x: (nextSize.width - geometry.width) / 2, y: (nextSize.height - geometry.height) / 2 };
     offsetRef.current = initialOffset;
     setOffset(initialOffset);
     setReady(true);
