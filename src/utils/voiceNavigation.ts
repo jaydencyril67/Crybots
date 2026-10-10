@@ -291,6 +291,7 @@ const getVisibleInterfaceFingerprint = () => {
     title: snapshot?.title || '',
     headings: snapshot?.headings || [],
     states: snapshot?.states || [],
+    fields: snapshot?.fields || [],
     forms: snapshot?.forms || [],
     buttons,
   });
