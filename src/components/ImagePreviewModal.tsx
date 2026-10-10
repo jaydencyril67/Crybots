@@ -4,7 +4,7 @@ import { useAppTheme } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 
 type Props = { imageUrl: string; onClose: () => void };
-const touchDistance = (touches: TouchList) => {
+const touchDistance = (touches: React.TouchEvent<HTMLDivElement>['touches']) => {
   if (touches.length < 2) return 0;
   return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
 };
