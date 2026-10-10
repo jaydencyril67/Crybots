@@ -6,7 +6,6 @@ import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
-import InlineLoadingDots from './InlineLoadingDots';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 
@@ -310,7 +309,7 @@ const BotInvestmentsPage = () => {
                 onClick={() => void activate()}
                 style={styles.button}
               >
-                {busyBotId === selectedBot?.botId ? <InlineLoadingDots /> : <><TrendingUp size={16} /> Confirm investment</>}
+                {busyBotId === selectedBot?.botId ? <LoadingDots /> : <><TrendingUp size={16} /> Confirm investment</>}
               </button>
             </div>
           </div>
@@ -437,7 +436,7 @@ const BotInvestmentsPage = () => {
                                   setMessage('');
                                 }}
                               >
-                                {busyBotId === bot.botId ? <InlineLoadingDots /> : <><PlayCircle size={15} /> Activate Bot</>}
+                                {busyBotId === bot.botId ? <LoadingDots /> : <><PlayCircle size={15} /> Activate Bot</>}
                               </button>
                             ) : withdrawBot?.botId === bot.botId ? (
                               <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: '1px solid ' + theme.borderGlass, background: theme.surfaceGlass }}>
@@ -476,7 +475,7 @@ const BotInvestmentsPage = () => {
                                     onClick={() => void withdraw()}
                                     style={{ ...styles.button, borderRadius: 10, padding: '7px 10px', fontSize: '0.84rem' }}
                                   >
-                                    {busyBotId === bot.botId ? <InlineLoadingDots /> : 'Withdraw'}
+                                    {busyBotId === bot.botId ? <LoadingDots /> : 'Withdraw'}
                                   </button>
                                 </div>
                               </div>
@@ -501,7 +500,7 @@ const BotInvestmentsPage = () => {
                                     onClick={() => void deactivate(bot)}
                                     style={{ ...styles.button, background: theme.danger, borderRadius: 10 }}
                                   >
-                                    {busyBotId === bot.botId ? <InlineLoadingDots /> : 'Deactivate'}
+                                    {busyBotId === bot.botId ? <LoadingDots /> : 'Deactivate'}
                                   </button>
                                 </div>
                               </div>
@@ -513,7 +512,7 @@ const BotInvestmentsPage = () => {
                                   disabled={busyBotId === bot.botId || Boolean(confirmingBotId)}
                                   onClick={() => { setWithdrawBot(bot); setWithdrawAmount(''); setError(''); setMessage(''); }}
                                 >
-                                  {busyBotId === bot.botId ? <InlineLoadingDots /> : <><ArrowDownToLine size={15} /> Withdraw</>}
+                                  {busyBotId === bot.botId ? <LoadingDots /> : <><ArrowDownToLine size={15} /> Withdraw</>}
                                 </button>
                               <button
                                 type="button"
@@ -522,7 +521,7 @@ const BotInvestmentsPage = () => {
                                 onClick={() => setConfirmingBotId(bot.botId)}
                               >
 
-                                {busyBotId === bot.botId ? <InlineLoadingDots /> : <><PauseCircle size={15} /> Deactivate</>}
+                                {busyBotId === bot.botId ? <LoadingDots /> : <><PauseCircle size={15} /> Deactivate</>}
                                 </button>
                               </div>
                             )}
