@@ -34,7 +34,7 @@ for (const line of resolver.split('\n')) {
   if (!keyMatch) continue;
   const key = keyMatch[1];
   if (key === 'landing' || key.startsWith('admin-')) continue;
-  const pathMatches = [...line.matchAll(/(?:normalizedPath|path)\s*(?:===|startsWith)\s*'([^']+)'/g)];
+  const pathMatches = [...line.matchAll(/(?:normalizedPath|path)(?:\s*===\s*|\s*\.startsWith\()\s*'([^']+)'/g)];
   for (const match of pathMatches) {
     let route = match[1];
     if (route.startsWith('#')) continue;
