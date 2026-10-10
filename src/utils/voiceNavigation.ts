@@ -220,6 +220,22 @@ const getRuntimePageSnapshot = () => {
     .filter(Boolean)
     .filter((value, index, list) => list.indexOf(value) === index)
     .slice(0, 10);
+  const fields = Array.from(document.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input:not([type="hidden"]), select, textarea'))
+    .filter(field => isVisibleElement(field as HTMLElement) && !field.closest('form'))
+    .slice(0, 12)
+    .map(field => {
+      const section = field.closest<HTMLElement>('section, article, fieldset, [role="region"], [data-section]');
+      const sectionHeading = section?.querySelector<HTMLElement>('h1, h2, h3, h4, legend, [role="heading"]');
+      return {
+        label: readAccessibleLabel(field) || 'Unlabelled field',
+        type: field instanceof HTMLInputElement ? field.type || 'text' : field instanceof HTMLSelectElement ? 'select' : 'textarea',
+        required: field.required || field.getAttribute('aria-required') === 'true',
+        disabled: field.disabled || field.getAttribute('aria-disabled') === 'true',
+        // Only expose whether a field is filled; never send its value to Brain.
+        hasValue: Boolean(field.value.trim()),
+        section: sectionHeading ? readAccessibleLabel(sectionHeading) : undefined,
+      };
+    });
   const forms = Array.from(document.querySelectorAll<HTMLFormElement>('form'))
     .filter(form => isVisibleElement(form))
     .slice(0, 5)
@@ -242,6 +258,7 @@ const getRuntimePageSnapshot = () => {
     title: (document.title || '').replace(/\\s+/g, ' ').trim().slice(0, 120),
     headings,
     states,
+    fields,
     forms,
   };
 };
