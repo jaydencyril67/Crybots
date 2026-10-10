@@ -157,7 +157,37 @@ const isVisibleButton = (button: HTMLButtonElement) => {
     && rect.height > 0;
 };
 
-export const getVisibleVoiceButtons = (): VoiceUiButton[] => {
+export const getRuntimePageRoutes = (): VoiceCommand[] => {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return [];
+  const discovered = new Map<string, VoiceCommand>();
+  const elements = Array.from(document.querySelectorAll<HTMLElement>('a[href], [data-route]'));
+  for (const element of elements) {
+    const style = window.getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0 || rect.width <= 0 || rect.height <= 0) continue;
+    const rawHref = element.getAttribute('data-route') || element.getAttribute('href');
+    if (!rawHref) continue;
+    let route = rawHref.trim();
+    if (/^https?:\/\//i.test(route)) {
+      try {
+        const url = new URL(route, window.location.origin);
+        if (url.origin !== window.location.origin) continue;
+        route = url.pathname;
+      } catch { continue; }
+    } else if (route.startsWith('#/')) {
+      route = route.slice(1);
+    }
+    route = route.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
+    if (!/^\/[a-z0-9/_-]*$/i.test(route) || route.startsWith('/admin')) continue;
+    const label = (element.getAttribute('aria-label') || element.getAttribute('title') || element.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 100);
+    if (!label || discovered.has(route)) continue;
+    discovered.set(route, { label, route });
+    if (discovered.size >= 60) break;
+  }
+  return [...discovered.values()];
+};
+
+const getVisibleVoiceButtons = (): VoiceUiButton[] => {
   if (typeof document === 'undefined') return [];
   const counts = new Map<string, number>();
   return Array.from(document.querySelectorAll<HTMLButtonElement>('button'))
@@ -307,7 +337,7 @@ export const askVoiceAssistant = async (message: string) => {
       body: JSON.stringify({
         transcript: trimmed,
         currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
-        pageRoutes: PAGE_ROUTES,
+        pageRoutes: [...PAGE_ROUTES, ...getRuntimePageRoutes()],
         uiButtons: getVisibleVoiceButtons(),
         history: voiceConversationHistory.slice(-8),
         context: voiceBrainContext,
