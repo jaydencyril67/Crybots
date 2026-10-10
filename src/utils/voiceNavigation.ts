@@ -280,7 +280,7 @@ const getVisibleInterfaceFingerprint = () => {
 };
 
 const isSensitiveVoiceButton = (label: string) =>
-  /\b(withdraw|transfer|delete|remove|disable|revoke|reset|change password|security code|confirm deletion|close account)\b/i.test(label);
+  /\b(withdraw|transfer|deposit|send|delete|remove|disable|enable|revoke|reset|password|security code|confirm|close account|submit|purchase|buy|sell|rent|activate|deactivate|create|generate|add|edit|update|save|approve)\b/i.test(label);
 
 export const executeVoiceUiAction = (action: { type?: string; target?: string } | null | undefined) => {
   if (!action || action.type !== 'click' || !action.target || typeof document === 'undefined') return false;
