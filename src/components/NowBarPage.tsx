@@ -4,7 +4,6 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
-import { requestVoiceMicrophoneAccess, VOICE_MODE_CHANGED_EVENT, VOICE_MODE_STORAGE_KEY } from '../utils/voiceNavigation';
 
 type EdgeLightMode = 'stable-light' | 'stable' | 'blink-light' | 'blink' | 'pulse-light' | 'pulse' | 'color-light' | 'color';
 
@@ -50,8 +49,7 @@ const NowBarPage = () => {
   const [buttonColorEnabled, setButtonColorEnabled] = useState(false);
   const [swipeNavigationEnabled, setSwipeNavigationEnabled] = useState(true);
   const [expandModeEnabled, setExpandModeEnabled] = useState(true);
-  const [voiceModeEnabled, setVoiceModeEnabled] = useState(false);
-  const [mode, setMode] = useState<EdgeLightMode>('stable');
+    const [mode, setMode] = useState<EdgeLightMode>('stable');
 
   useEffect(() => {
     try {
@@ -59,12 +57,10 @@ const NowBarPage = () => {
       const savedButtonColorEnabled = window.localStorage.getItem(BUTTON_COLOR_ENABLED_STORAGE_KEY);
       const savedSwipeNavigation = window.localStorage.getItem(SWIPE_NAVIGATION_STORAGE_KEY);
       const savedExpandMode = window.localStorage.getItem(EXPAND_MODE_STORAGE_KEY);
-      const savedVoiceMode = window.localStorage.getItem(VOICE_MODE_STORAGE_KEY);
       setEnabled(Boolean(saved.enabled));
       if (savedButtonColorEnabled !== null) setButtonColorEnabled(savedButtonColorEnabled === 'true');
       if (savedSwipeNavigation !== null) setSwipeNavigationEnabled(savedSwipeNavigation === 'true');
       if (savedExpandMode !== null) setExpandModeEnabled(savedExpandMode === 'true');
-      if (savedVoiceMode !== null) setVoiceModeEnabled(savedVoiceMode === 'true');
       if (saved.mode && EDGE_LIGHT_MODES.some((option) => option.key === saved.mode)) setMode(saved.mode);
     } catch {
       // Keep defaults when saved settings are invalid.
@@ -106,22 +102,6 @@ const NowBarPage = () => {
     toggleFeature(EXPAND_MODE_STORAGE_KEY, !expandModeEnabled, setExpandModeEnabled);
   };
 
-  const toggleVoiceMode = () => {
-    const nextEnabled = !voiceModeEnabled;
-    if (!nextEnabled) {
-      setVoiceModeEnabled(false);
-      window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'false');
-      window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
-      return;
-    }
-
-    void requestVoiceMicrophoneAccess().then((granted) => {
-      if (!granted) return;
-      setVoiceModeEnabled(true);
-      window.localStorage.setItem(VOICE_MODE_STORAGE_KEY, 'true');
-      window.dispatchEvent(new Event(VOICE_MODE_CHANGED_EVENT));
-    });
-  };
 
   const toggle = () => {
     const nextEnabled = !enabled;
@@ -187,19 +167,6 @@ const NowBarPage = () => {
                   <p style={styles.description}>Allow holding the NowBar to expand its navigation buttons.</p>
                 </div>
                 <button type="button" style={{ ...styles.button, ...(expandModeEnabled ? styles.active : {}) }} onClick={toggleExpandMode} aria-pressed={expandModeEnabled}>{expandModeEnabled ? 'Enabled' : 'Enable'}</button>
-              </div>
-            </div>
-          </section>
-          <section style={styles.card}>
-            <h2 style={styles.cardHeading}>🤖 AI Mode</h2>
-            <p style={styles.cardText}>Use AI-powered voice commands to interact with NowBar and navigate pages. Microphone permission is required.</p>
-            <div style={styles.list}>
-              <div style={styles.row}>
-                <div style={styles.rowContent}>
-                  <p style={styles.label}>AI Mode</p>
-                  <p style={styles.description}>Speak naturally to navigate to pages and use supported NowBar commands.</p>
-                </div>
-                <button type="button" style={{ ...styles.button, ...(voiceModeEnabled ? styles.active : {}) }} onClick={toggleVoiceMode} aria-pressed={voiceModeEnabled}>{voiceModeEnabled ? 'Enabled' : 'Enable'}</button>
               </div>
             </div>
           </section>
