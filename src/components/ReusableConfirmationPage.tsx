@@ -1,7 +1,7 @@
 import React from 'react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 
 export type ConfirmationDetail = {
@@ -227,7 +227,7 @@ const ReusableConfirmationPage = ({
                   onClick={onPrimaryAction}
                   disabled={isProcessing || primaryActionDisabled}
                 >
-                  {isProcessing ? <InlineLoadingDots /> : primaryActionLabel}
+                  {isProcessing ? <LoadingDots /> : primaryActionLabel}
                 </button>
                 {secondaryActionLabel && onSecondaryAction ? (
                   <button type="button" style={styles.secondaryButton} onClick={onSecondaryAction} disabled={isProcessing}>
