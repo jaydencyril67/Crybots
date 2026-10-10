@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
-import InlineLoadingDots from './InlineLoadingDots';
+import LoadingDots from './LoadingDots';
 import ReusableDatePage from './ReusableDatePage';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
@@ -136,8 +136,8 @@ const AutoExitPage = () => {
                       <input type="range" min="5" max="30" step="5" value={idleMinutes} onChange={(event) => setIdleMinutes(Number(event.target.value))} disabled={idleSaving} aria-label="Idle exit timeout in minutes" style={{ width: '100%', accentColor: theme.primary, cursor: idleSaving ? 'not-allowed' : 'grab', opacity: idleSaving ? 0.65 : 1 }} />
                       <div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span></div>
                     </div>
-                    {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleExit(true)}>{idleSaving ? <InlineLoadingDots /> : 'Save timeout'}</button>}
-                    <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <InlineLoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
+                    {idleEnabled && <button type="button" style={styles.button} disabled={idleSaving} onClick={() => saveIdleExit(true)}>{idleSaving ? <LoadingDots /> : 'Save timeout'}</button>}
+                    <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <LoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
                   </div>
               </section>
             </div>
@@ -147,7 +147,7 @@ const AutoExitPage = () => {
                 <p style={styles.status}>{scheduledExit ? `Set for ${scheduledExit.replace('T', ' ')}` : 'No scheduled exit set.'}</p>
                   <div style={styles.buttonRow}>
                     <button type="button" style={styles.button} disabled={scheduleSaving} onClick={() => setShowDatePicker(true)}>{scheduledExit ? 'Change time' : 'Choose time'}</button>
-                    {scheduledExit && <button type="button" style={styles.button} disabled={scheduleSaving} onClick={cancelSchedule}>{scheduleSaving ? <InlineLoadingDots /> : 'Cancel scheduled exit'}</button>}
+                    {scheduledExit && <button type="button" style={styles.button} disabled={scheduleSaving} onClick={cancelSchedule}>{scheduleSaving ? <LoadingDots /> : 'Cancel scheduled exit'}</button>}
                   </div>
                 <p style={styles.status} aria-live="polite">{status}</p>
               </section>
