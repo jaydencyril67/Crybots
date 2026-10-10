@@ -4,6 +4,7 @@ import NowBar from './NowBar';
 
 const destinations: ParentPageCard[] = [
   { label: 'FAQ', description: 'Find answers to frequently asked questions.', route: '/faq' },
+  { label: 'AI Mode', description: 'Enable voice-powered AI assistance to navigate CryBots and interact with supported controls.', route: '/ai-mode' },
   { label: 'Live Chat', description: 'Chat live with the CryBots support team.', route: '/chat' },
   { label: 'Tickets', description: 'Create and manage your support requests.', route: '/tickets' },
 ];
