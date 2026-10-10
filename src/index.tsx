@@ -8,6 +8,7 @@ import SignupConfirmationSentPage from './components/SignupConfirmationSentPage'
 import AccountConfirmedPage from './components/AccountConfirmedPage';
 import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
+import OnboardingWizard from './components/OnboardingWizard';
 import AdminHomePage from './components/AdminHomePage';
 import AdminSettingsPage from './components/AdminSettingsPage';
 import AdminUsersPage from './components/AdminUsersPage';
@@ -128,6 +129,7 @@ const getRouteKey = () => {
   if (pathname === '/verify-email' || hash === '#/verify-email') return 'verify-email';
   if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'account-confirmed';
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
+  if (pathname === '/onboarding' || hash === '#/onboarding') return 'onboarding';
   if (pathname === '/admin-home' || hash === '#/admin-home') return 'admin-home';
   if (pathname === '/admin/settings' || hash === '#/admin/settings') return 'admin-settings';
   if (pathname === '/admin/users' || hash === '#/admin/users') return 'admin-users';
@@ -213,6 +215,7 @@ const routeToKey = (path: string) => {
   if (normalizedPath === '/verify-email' || normalizedPath === '#/verify-email') return 'verify-email';
   if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'account-confirmed';
   if (normalizedPath === '/signin' || normalizedPath === '#/signin') return 'signin';
+  if (normalizedPath === '/onboarding' || normalizedPath === '#/onboarding') return 'onboarding';
   if (normalizedPath === '/admin-home' || normalizedPath === '#/admin-home') return 'admin-home';
   if (normalizedPath === '/admin/settings' || normalizedPath === '#/admin/settings') return 'admin-settings';
   if (normalizedPath === '/admin/users' || normalizedPath === '#/admin/users') return 'admin-users';
@@ -526,6 +529,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'verify-email') return <VerifyEmailPage />;
     if (displayedRouteKey === 'account-confirmed') return <AccountConfirmedPage />;
     if (displayedRouteKey === 'signin') return <SigninPage />;
+    if (displayedRouteKey === 'onboarding') return <ProtectedRoute><OnboardingWizard /></ProtectedRoute>;
     if (displayedRouteKey === 'admin-home') return <AdminHomePage />;
     if (displayedRouteKey === 'admin-settings') return <AdminSettingsPage />;
     if (displayedRouteKey === 'admin-users') return <AdminUsersPage />;
