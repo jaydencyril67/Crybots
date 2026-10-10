@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserR
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
-import InlineLoadingDots from './InlineLoadingDots';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
@@ -284,7 +283,7 @@ const TransferPage = () => {
                 </div>
                 <div style={styles.buttonRow}>
                   <button style={{ ...styles.button, ...styles.primaryButton }} type="button" onClick={() => void handleTransfer()} disabled={transferring || !recipientValid || !amountIsValid || !securityCodeBound || !securityCode}>
-                    {transferring ? <InlineLoadingDots /> : 'Send USDT'}
+                    {transferring ? <LoadingDots /> : 'Send USDT'}
                   </button>
                 </div>
                 <p style={styles.cardText}>Available balance: {loading ? <LoadingDots /> : `${usdtBalance.toFixed(2)} USDT`}</p>
