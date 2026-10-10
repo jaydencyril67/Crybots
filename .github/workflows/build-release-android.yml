@@ -775,7 +775,7 @@ jobs:
                           MediaStore.Images.Media.DATE_ADDED,
                           MediaStore.Images.Media.BUCKET_DISPLAY_NAME
                       };
-                      String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC LIMIT 400";
+                      String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC LIMIT 200";
                       try (Cursor cursor = getContext().getContentResolver().query(
                               MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                               projection, null, null, sortOrder)) {
@@ -827,8 +827,11 @@ jobs:
                               int count;
                               while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
                               JSObject result = new JSObject();
-                              result.put("dataUrl", "data:image/jpeg;base64," + Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP));
-                              result.put("name", "photo-" + id + ".jpg");
+                              String mimeType = getContext().getContentResolver().getType(uri);
+                              if (mimeType == null || !mimeType.startsWith("image/")) mimeType = "image/jpeg";
+                              String extension = mimeType.equals("image/png") ? ".png" : mimeType.equals("image/webp") ? ".webp" : ".jpg";
+                              result.put("dataUrl", "data:" + mimeType + ";base64," + Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP));
+                              result.put("name", "photo-" + id + extension);
                               call.resolve(result);
                           }
                       } catch (Exception error) {
@@ -841,7 +844,7 @@ jobs:
                   Bitmap bitmap = null;
                   try {
                       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                          bitmap = getContext().getContentResolver().loadThumbnail(uri, new Size(240, 240), null);
+                          bitmap = getContext().getContentResolver().loadThumbnail(uri, new Size(160, 160), null);
                       } else {
                           long id = ContentUris.parseId(uri);
                           bitmap = MediaStore.Images.Thumbnails.getThumbnail(
@@ -851,7 +854,7 @@ jobs:
                       }
                       if (bitmap == null) return null;
                       ByteArrayOutputStream output = new ByteArrayOutputStream();
-                      bitmap.compress(Bitmap.CompressFormat.JPEG, 65, output);
+                      bitmap.compress(Bitmap.CompressFormat.JPEG, 55, output);
                       return Base64.encodeToString(output.toByteArray(), Base64.NO_WRAP);
                   } catch (Exception ignored) {
                       return null;
