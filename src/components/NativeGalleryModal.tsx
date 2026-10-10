@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Camera, Check, ChevronDown, Image as ImageIcon, LoaderCircle, X } from 'lucide-react';
+import { ArrowLeft, Camera, Check, ChevronDown, Image as ImageIcon, LoaderCircle } from 'lucide-react';
 import { isNativeGalleryAvailable, loadNativeGalleryImage, loadNativeGalleryPhotos, NativeGalleryPhoto } from '../utils/nativeImagePicker';
 import { useAppTheme } from './AppTheme';
 
