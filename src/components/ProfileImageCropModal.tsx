@@ -225,34 +225,7 @@ const ProfileImageCropModal = ({ imageUrl, onCancel, onDone, preserveAspectRatio
         <div style={{ position: 'absolute', inset: 0, borderRadius: '24px', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.8)', pointerEvents: 'none' }} />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
-        <button
-          type="button"
-          onClick={() => {
-            const nextZoom = clamp(zoomRef.current - 0.5, 1, 12);
-            const nextOffset = constrainOffset(offsetRef.current, nextZoom);
-            setCurrentZoom(nextZoom);
-            setCurrentOffset(nextOffset);
-          }}
-          disabled={!ready || zoom <= 1 || saving}
-          aria-label="Zoom out"
-          style={{ width: 44, height: 42, borderRadius: 13, border: '1px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 24, cursor: zoom <= 1 ? 'default' : 'pointer', opacity: zoom <= 1 ? 0.45 : 1 }}
-        >−</button>
-        <span aria-live="polite" style={{ minWidth: 62, textAlign: 'center', fontSize: '0.82rem', fontVariantNumeric: 'tabular-nums' }}>{Math.round(zoom * 100)}%</span>
-        <button
-          type="button"
-          onClick={() => {
-            const nextZoom = clamp(zoomRef.current + 0.5, 1, 12);
-            const nextOffset = constrainOffset(offsetRef.current, nextZoom);
-            setCurrentZoom(nextZoom);
-            setCurrentOffset(nextOffset);
-          }}
-          disabled={!ready || zoom >= 12 || saving}
-          aria-label="Zoom in"
-          style={{ width: 44, height: 42, borderRadius: 13, border: '1px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: 24, cursor: zoom >= 12 ? 'default' : 'pointer', opacity: zoom >= 12 ? 0.45 : 1 }}
-        >+</button>
-      </div>
-      <span style={{ fontSize: '0.78rem', opacity: 0.7, textAlign: 'center' }}>{preserveAspectRatio ? 'Pinch or use + / − to zoom • Drag to crop' : 'Pinch or use + / − to zoom • Drag to position'}</span>
+      <span style={{ fontSize: '0.78rem', opacity: 0.7, textAlign: 'center' }}>{preserveAspectRatio ? 'Pinch to zoom • Drag to crop' : 'Pinch to zoom • Drag to position'}</span>
     </div>
   );
 };
