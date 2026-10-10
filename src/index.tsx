@@ -30,6 +30,7 @@ import DetailsPage from './components/DetailsPage';
 import ManagePage from './components/ManagePage';
 import ThemePage from './components/ThemePage';
 import NowBarPage from './components/NowBarPage';
+import AiModePage from './components/AiModePage';
 import VoiceNavigation from './components/VoiceNavigation';
 import { disableVoiceMode } from './utils/voiceNavigation';
 import NowBarColorPage from './components/NowBarColorPage';
@@ -149,6 +150,7 @@ const getRouteKey = () => {
   if (pathname === '/manage' || hash === '#/manage') return 'manage';
   if (pathname === '/theme' || hash === '#/theme') return 'theme';
   if (pathname === '/nowbar' || hash === '#/nowbar') return 'nowbar';
+  if (pathname === '/ai-mode' || hash === '#/ai-mode') return 'ai-mode';
   if (pathname === '/nowbar-color' || hash === '#/nowbar-color') return 'nowbar-color';
   if (pathname === '/nowbar-button-color' || hash === '#/nowbar-button-color') return 'nowbar-button-color';
   if (pathname === '/notification-color' || hash === '#/notification-color') return 'notification-color';
@@ -546,6 +548,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'manage') return <ProtectedRoute><ManagePage /></ProtectedRoute>;
     if (displayedRouteKey === 'theme') return <ProtectedRoute><ThemePage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar') return <ProtectedRoute><NowBarPage /></ProtectedRoute>;
+    if (displayedRouteKey === 'ai-mode') return <ProtectedRoute><AiModePage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-color') return <ProtectedRoute><NowBarColorPage /></ProtectedRoute>;
     if (displayedRouteKey === 'nowbar-button-color') return <ProtectedRoute><NowBarButtonColorPage /></ProtectedRoute>;
     if (displayedRouteKey === 'notification-color') return <ProtectedRoute><NotificationColorPage /></ProtectedRoute>;
@@ -598,7 +601,7 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'alert') return <ProtectedRoute><AlertPage /></ProtectedRoute>;
     if (displayedRouteKey === 'app-usage') return <ProtectedRoute><AppUsagePage /></ProtectedRoute>;
 
-    if (!isAuthenticated && ['home', 'details', 'manage', 'theme', 'nowbar', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'worldscope-rankings', 'about', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'alert', 'app-usage'].includes(displayedRouteKey)) {
+    if (!isAuthenticated && ['home', 'details', 'manage', 'theme', 'nowbar', 'ai-mode', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'worldscope-rankings', 'about', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'alert', 'app-usage'].includes(displayedRouteKey)) {
       return <LandingPage />;
     }
 
@@ -606,7 +609,7 @@ const RouteTransition = () => {
   }, [displayedRouteKey, isAuthenticated]);
 
   const showNowBar = displayedRouteKey === 'admin-users' || displayedRouteKey === 'admin-chat' || displayedRouteKey === 'admin-deposits' || displayedRouteKey === 'admin-deposit-stats' || displayedRouteKey === 'admin-alert' || displayedRouteKey === 'admin-tickets' || displayedRouteKey === 'admin-ticket-stats' || displayedRouteKey === 'admin-alert-send' || displayedRouteKey === 'admin-funds' || displayedRouteKey === 'admin-funds-send' || displayedRouteKey === 'admin-user-stats' || displayedRouteKey === 'home' || displayedRouteKey === 'details' || displayedRouteKey === 'manage' || displayedRouteKey === 'theme' || displayedRouteKey === 'nowbar' || displayedRouteKey === 'nowbar-color' || displayedRouteKey === 'nowbar-button-color' || displayedRouteKey === 'notification-color' || displayedRouteKey === 'profile' || displayedRouteKey === 'exit' || displayedRouteKey === 'auto-exit' || displayedRouteKey === 'manual-exit' || displayedRouteKey === 'statistics' || displayedRouteKey === 'agent' || displayedRouteKey === 'tools' || displayedRouteKey === 'stats' || displayedRouteKey === 'menu' || displayedRouteKey === 'trade' || displayedRouteKey === 'chart' || displayedRouteKey === 'market' || displayedRouteKey === 'creation' || displayedRouteKey === 'rentals' || displayedRouteKey === 'bots' || displayedRouteKey === 'portfolio' || displayedRouteKey === 'trade-history' || displayedRouteKey === 'logs' || displayedRouteKey === 'help' || displayedRouteKey === 'faq' || displayedRouteKey === 'options' || displayedRouteKey === 'store' || displayedRouteKey === 'download' || displayedRouteKey === 'worldscope' || displayedRouteKey === 'worldscope-rankings' || displayedRouteKey === 'about' || displayedRouteKey === 'dev' || displayedRouteKey === 'api-keys' || displayedRouteKey === 'webhooks' || displayedRouteKey === 'configure' || displayedRouteKey === 'asset' || displayedRouteKey === 'withdrawals' || displayedRouteKey === 'transfer' || displayedRouteKey === 'deposit' || displayedRouteKey === 'transactions' || displayedRouteKey === 'notifications' || displayedRouteKey === 'tickets' || displayedRouteKey === 'notification' || displayedRouteKey === 'alert' || displayedRouteKey === 'app-usage';
-  const isProtectedPage = ['admin-users', 'admin-chat', 'admin-chat-user', 'admin-deposits', 'admin-deposit-stats', 'admin-alert', 'admin-tickets', 'admin-ticket-stats', 'admin-alert-send', 'admin-funds', 'admin-funds-send', 'admin-user-stats', 'home', 'details', 'manage', 'theme', 'nowbar', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'worldscope-rankings', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'notification', 'alert', 'app-usage'].includes(displayedRouteKey);
+  const isProtectedPage = ['admin-users', 'admin-chat', 'admin-chat-user', 'admin-deposits', 'admin-deposit-stats', 'admin-alert', 'admin-tickets', 'admin-ticket-stats', 'admin-alert-send', 'admin-funds', 'admin-funds-send', 'admin-user-stats', 'home', 'details', 'manage', 'theme', 'nowbar', 'ai-mode', 'nowbar-color', 'nowbar-button-color', 'notification-color', 'profile', 'exit', 'auto-exit', 'manual-exit', 'statistics', 'agent', 'tools', 'stats', 'menu', 'trade', 'chart', 'market', 'creation', 'rentals', 'commerce', 'bots', 'portfolio', 'trade-history', 'logs', 'help', 'faq', 'options', 'store', 'download', 'worldscope', 'worldscope-rankings', 'about', 'information', 'privacy-policy', 'community-standards', 'dev', 'api-keys', 'webhooks', 'configure', 'asset', 'danger', 'pending-deletion', 'security', 'withdrawals', 'transfer', 'deposit', 'transactions', 'notifications', 'tickets', 'chat', 'notification', 'alert', 'app-usage'].includes(displayedRouteKey);
   const usagePagePath = displayedRouteKey === 'exit' ? '/exit' : displayedRouteKey === 'statistics' ? '/statistics' : displayedRouteKey === 'tools' ? '/tools' : displayedRouteKey === 'stats' ? '/stats' : displayedRouteKey === 'menu' ? '/menu' : displayedRouteKey === 'nowbar' ? '/nowbar' : displayedRouteKey === 'nowbar-color' ? '/nowbar-color' : displayedRouteKey === 'nowbar-button-color' ? '/nowbar-button-color' : `/${displayedRouteKey}`;
 
   useEffect(() => {
