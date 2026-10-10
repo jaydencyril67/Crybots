@@ -431,6 +431,8 @@ export const askVoiceAssistant = async (message: string) => {
       })(),
       body: JSON.stringify({
         transcript: trimmed,
+        timeZone: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC',
+        locale: typeof navigator !== 'undefined' ? navigator.language : 'en-GB',
         currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
         pageRoutes: [...PAGE_ROUTES, ...getRuntimePageRoutes()],
         uiButtons: getVisibleVoiceButtons(),
