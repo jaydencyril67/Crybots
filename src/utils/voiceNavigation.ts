@@ -187,6 +187,65 @@ export const getRuntimePageRoutes = (): VoiceCommand[] => {
   return [...discovered.values()];
 };
 
+const isVisibleElement = (element: HTMLElement) => {
+  const style = window.getComputedStyle(element);
+  const rect = element.getBoundingClientRect();
+  return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0 && rect.width > 0 && rect.height > 0;
+};
+
+const readAccessibleLabel = (element: HTMLElement) => {
+  const explicit = element.getAttribute('aria-label') || element.getAttribute('title');
+  if (explicit?.trim()) return explicit.trim().replace(/\\s+/g, ' ').slice(0, 100);
+  if (element instanceof HTMLInputElement || element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement) {
+    const id = element.id;
+    const linked = id ? Array.from(document.querySelectorAll<HTMLLabelElement>('label[for]')).find(label => label.htmlFor === id) : undefined;
+    const wrapping = element.closest('label');
+    const label = linked?.innerText || wrapping?.innerText || element.getAttribute('placeholder') || element.getAttribute('name') || '';
+    return label.replace(/\\s+/g, ' ').trim().slice(0, 100);
+  }
+  return (element.innerText || element.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 100);
+};
+
+const getRuntimePageSnapshot = () => {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return undefined;
+  const headings = Array.from(document.querySelectorAll<HTMLElement>('main h1, main h2, main h3, [role="main"] h1, [role="main"] h2, [role="main"] h3, h1, h2'))
+    .filter(isVisibleElement)
+    .map(element => readAccessibleLabel(element))
+    .filter(Boolean)
+    .filter((value, index, list) => list.indexOf(value) === index)
+    .slice(0, 10);
+  const states = Array.from(document.querySelectorAll<HTMLElement>('[role="status"], [role="alert"], [aria-live="polite"], [aria-live="assertive"], [role="tab"][aria-selected="true"], [aria-current="page"]'))
+    .filter(isVisibleElement)
+    .map(element => readAccessibleLabel(element))
+    .filter(Boolean)
+    .filter((value, index, list) => list.indexOf(value) === index)
+    .slice(0, 10);
+  const forms = Array.from(document.querySelectorAll<HTMLFormElement>('form'))
+    .filter(form => isVisibleElement(form))
+    .slice(0, 5)
+    .map((form, index) => {
+      const heading = form.querySelector<HTMLElement>('h1, h2, h3, legend');
+      const fields = Array.from(form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input:not([type="hidden"]), select, textarea'))
+        .filter(field => isVisibleElement(field as HTMLElement))
+        .slice(0, 12)
+        .map(field => ({
+          label: readAccessibleLabel(field) || 'Unlabelled field',
+          type: field instanceof HTMLInputElement ? field.type || 'text' : field instanceof HTMLSelectElement ? 'select' : 'textarea',
+          required: field.required || field.getAttribute('aria-required') === 'true',
+          disabled: field.disabled || field.getAttribute('aria-disabled') === 'true',
+          // Only expose whether a field is filled; never send its value to Brain.
+          hasValue: Boolean(field.value.trim()),
+        }));
+      return { label: readAccessibleLabel(form) || (heading ? readAccessibleLabel(heading) : '') || `Form ${index + 1}`, fields };
+    });
+  return {
+    title: (document.title || '').replace(/\\s+/g, ' ').trim().slice(0, 120),
+    headings,
+    states,
+    forms,
+  };
+};
+
 const getVisibleVoiceButtons = (): VoiceUiButton[] => {
   if (typeof document === 'undefined') return [];
   const counts = new Map<string, number>();
@@ -339,6 +398,7 @@ export const askVoiceAssistant = async (message: string) => {
         currentPage: typeof window !== 'undefined' ? window.location.pathname : '/',
         pageRoutes: [...PAGE_ROUTES, ...getRuntimePageRoutes()],
         uiButtons: getVisibleVoiceButtons(),
+        pageSnapshot: getRuntimePageSnapshot(),
         history: voiceConversationHistory.slice(-8),
         context: voiceBrainContext,
       }),
