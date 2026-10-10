@@ -148,7 +148,7 @@ const AdminChatUserPage = () => {
     <main style={{ width: '100%', height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '0 12px 0' }}>
         <button type="button" onClick={() => navigate('/admin/chat')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, border: 0, borderBottom: `1px solid ${theme.borderGlass}`, borderRadius: 0, padding: '12px 4px', background: 'transparent', color: theme.text, cursor: 'pointer', margin: 0 }}><ArrowLeft size={16} /> Back to chats</button>
-        <div style={{ flexShrink: 0, alignSelf: 'center', transform: 'translateY(-3px)', color: connected ? theme.success : theme.textMuted, fontSize: '.78rem', textAlign: 'right', whiteSpace: 'nowrap' }}>{connected ? '● Live connection' : '○ Connecting…'}</div>
+        <div style={{ flexShrink: 0, color: connected ? theme.success : theme.textMuted, fontSize: '.78rem', textAlign: 'right', whiteSpace: 'nowrap' }}>{connected ? '● Live connection' : '○ Connecting…'}</div>
       </div>
       <div style={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div ref={chatListRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', padding: 16, boxSizing: 'border-box' }}>
