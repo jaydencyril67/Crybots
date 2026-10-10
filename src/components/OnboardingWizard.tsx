@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ArrowRight, Check, ShieldCheck, Fingerprint, KeyRound, Wallet, UserRound, Bell, Sparkles, SkipForward } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ShieldCheck, Fingerprint, KeyRound, Wallet, UserRound, Bell, Sparkles, SkipForward, type LucideIcon } from 'lucide-react';
 import { useAppTheme, type AppThemePreference } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { navigate } from '../utils/navigate';
 
-type SetupStep = { id: string; title: string; description: string; detail: string; route: string; icon: React.ComponentType<{ size?: number }> };
+type SetupStep = { id: string; title: string; description: string; detail: string; route: string; icon: LucideIcon };
 
 const setupSteps: SetupStep[] = [
   { id: 'profile', title: 'Add a profile photo', description: 'Make your account feel like yours.', detail: 'Choose a clear photo or avatar in your profile details.', route: '/details', icon: UserRound },
