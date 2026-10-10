@@ -870,7 +870,7 @@ jobs:
           # Branding image for Android 12+. Source is deliberately separate from the
           # full-screen splash so Android cannot substitute the old launcher artwork.
           cat > /tmp/crybots_branding.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320">
+          <svg xmlns="http://www.w3.org/2000/svg" width="800" height="640" viewBox="0 0 800 640">
             <rect width="800" height="320" fill="none"/>
             <text x="400" y="205"
                   text-anchor="middle"
@@ -905,7 +905,7 @@ jobs:
                   android:width="160dp"
                   android:height="64dp"
                   android:gravity="center|bottom"
-                  android:bottom="44dp"
+                  android:bottom="160dp"
                   android:drawable="@drawable/crybots_branding" />
           </layer-list>
           XML
