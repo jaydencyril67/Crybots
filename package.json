@@ -7,7 +7,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prestart": "node scripts/sync-brain-discovery.js",
+    "prebuild": "node scripts/sync-brain-discovery.js"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.1.2",
