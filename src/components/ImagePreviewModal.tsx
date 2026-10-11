@@ -14,24 +14,35 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const pinchStart = useRef<{ distance: number; zoom: number } | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const pinchStart = useRef<{ distance: number; zoom: number; imagePointX: number; imagePointY: number } | null>(null);
   const dragStart = useRef<{ x: number; y: number; offsetX: number; offsetY: number } | null>(null);
   const dragging = useRef(false);
 
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     const keyHandler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
-      if (event.key === '+' || event.key === '=') setZoom((z) => Math.min(5, z + 0.25));
+      if (event.key === '+' || event.key === '=') setZoom((z) => Math.min(10, z + 0.25));
       if (event.key === '-') setZoom((z) => Math.max(1, z - 0.25));
     };
     window.addEventListener('keydown', keyHandler);
-    return () => window.removeEventListener('keydown', keyHandler);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', keyHandler);
+    };
   }, [onClose]);
 
   const reset = () => { setZoom(1); setOffset({ x: 0, y: 0 }); };
   const touchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     if (event.touches.length === 2) {
-      pinchStart.current = { distance: touchDistance(event.touches), zoom };
+      const bounds = stageRef.current?.getBoundingClientRect();
+      const midX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+      const midY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+      const centerX = bounds ? bounds.left + bounds.width / 2 : midX;
+      const centerY = bounds ? bounds.top + bounds.height / 2 : midY;
+      pinchStart.current = { distance: Math.max(1, touchDistance(event.touches)), zoom, imagePointX: (midX - centerX - offset.x) / zoom, imagePointY: (midY - centerY - offset.y) / zoom };
       dragStart.current = null;
     } else if (event.touches.length === 1 && zoom > 1) {
       dragStart.current = { x: event.touches[0].clientX, y: event.touches[0].clientY, offsetX: offset.x, offsetY: offset.y };
@@ -41,7 +52,14 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
     if (event.touches.length === 2 && pinchStart.current) {
       event.preventDefault();
       const start = pinchStart.current;
-      setZoom(Math.max(1, Math.min(5, start.zoom * touchDistance(event.touches) / Math.max(1, start.distance))));
+      const nextZoom = Math.max(1, Math.min(10, start.zoom * touchDistance(event.touches) / Math.max(1, start.distance)));
+      const bounds = stageRef.current?.getBoundingClientRect();
+      const midX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+      const midY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+      const centerX = bounds ? bounds.left + bounds.width / 2 : midX;
+      const centerY = bounds ? bounds.top + bounds.height / 2 : midY;
+      setOffset({ x: midX - centerX - start.imagePointX * nextZoom, y: midY - centerY - start.imagePointY * nextZoom });
+      setZoom(nextZoom);
     } else if (event.touches.length === 1 && dragStart.current && zoom > 1) {
       event.preventDefault();
       const start = dragStart.current;
@@ -54,7 +72,7 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
   };
   const wheel = (event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
-    setZoom((z) => Math.max(1, Math.min(5, z + (event.deltaY < 0 ? 0.2 : -0.2))));
+    setZoom((z) => Math.max(1, Math.min(10, z + (event.deltaY < 0 ? 0.2 : -0.2))));
   };
   const mouseDown = (event: React.MouseEvent<HTMLImageElement>) => {
     if (zoom <= 1) return;
@@ -77,13 +95,13 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
         </div>
         <button type="button" onClick={onClose} aria-label="Close image preview" title="Close preview" style={{ display: 'inline-flex', flexShrink: 0, alignItems: 'center', justifyContent: 'center', minWidth: 64, height: 44, padding: '0 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, boxShadow: '0 6px 24px rgba(0,0,0,.24)', cursor: 'pointer', font: 'inherit', fontSize: '.88rem', fontWeight: 650 }}>Close</button>
       </div>
-      <div onClick={(event) => event.stopPropagation()} onTouchStart={touchStart} onTouchMove={touchMove} onTouchEnd={touchEnd} onWheel={wheel} style={{ position: 'relative', display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', touchAction: 'none', padding: 12 }}>
-        <img src={imageUrl} alt="Full-size chat attachment" draggable={false} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} onMouseLeave={mouseUp} style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 10, userSelect: 'none', cursor: zoom > 1 ? 'grab' : 'zoom-in', transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`, transformOrigin: 'center center', transition: pinchStart.current ? 'none' : 'transform 80ms ease-out' }} />
+      <div ref={stageRef} onClick={(event) => event.stopPropagation()} onTouchStart={touchStart} onTouchMove={touchMove} onTouchEnd={touchEnd} onWheel={wheel} style={{ position: 'relative', display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', touchAction: 'none', padding: 12 }}>
+        <img src={imageUrl} alt="Full-size chat attachment" draggable={false} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} onMouseLeave={mouseUp} style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 10, userSelect: 'none', cursor: zoom > 1 ? 'grab' : 'zoom-in', transform: `translate3d(${offset.x}px, ${offset.y}px, 0) scale(${zoom})`, transformOrigin: 'center center', willChange: 'transform', transition: 'none' }} />
       </div>
       <div onClick={(event) => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '12px 16px calc(16px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,.12)', background: 'rgba(255,255,255,.035)' }}>
         <button type="button" onClick={() => setZoom((z) => Math.max(1, z - 0.25))} aria-label="Zoom out" disabled={zoom <= 1} style={{ ...controlStyle, opacity: zoom <= 1 ? .4 : 1 }}><ZoomOut size={19} /></button>
         <button type="button" onClick={reset} aria-label="Reset zoom" style={{ ...controlStyle, width: 'auto', padding: '0 16px', gap: 8 }}><RotateCcw size={16} /><span style={{ fontSize: '.82rem', fontWeight: 650 }}>Reset</span></button>
-        <button type="button" onClick={() => setZoom((z) => Math.min(5, z + 0.25))} aria-label="Zoom in" disabled={zoom >= 5} style={{ ...controlStyle, opacity: zoom >= 5 ? .4 : 1 }}><ZoomIn size={19} /></button>
+        <button type="button" onClick={() => setZoom((z) => Math.min(5, z + 0.25))} aria-label="Zoom in" disabled={zoom >= 10} style={{ ...controlStyle, opacity: zoom >= 5 ? .4 : 1 }}><ZoomIn size={19} /></button>
       </div>
     </div>
   );
