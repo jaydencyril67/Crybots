@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { Check, X } from "lucide-react";
+import { HYBRID_THEME_TOKENS } from "./HybridTheme";
+import { useAppTheme } from "./AppTheme";
 
 type StoryImageCropModalProps = {
   imageUrl: string;
@@ -13,6 +15,8 @@ type StoryImageCropModalProps = {
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title = "Edit photo", aspectRatio, preserveAspectRatio = false }: StoryImageCropModalProps) {
+  const { themeMode } = useAppTheme();
+  const theme = HYBRID_THEME_TOKENS[themeMode];
   const imageRef = useRef<HTMLImageElement | null>(null);
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
   const gestureRef = useRef<{ distance: number; midpoint: { x: number; y: number }; zoom: number; offset: { x: number; y: number } } | null>(null);
@@ -216,28 +220,28 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
 
   return (
     <div role="dialog" aria-modal="true" aria-label={title} className="social-story-crop-overlay">
-      <style>{`.social-story-crop-overlay{position:fixed;inset:0;z-index:10020;display:flex;flex-direction:column;width:100vw;height:100vh;height:100dvh;min-height:0;overflow:hidden;box-sizing:border-box;background:linear-gradient(160deg,rgba(43,13,23,.99),rgba(21,7,12,.99));backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:#f8e9ec}
-.social-story-crop-header{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:12px;padding:max(14px,env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid rgba(255,210,219,.14);background:rgba(75,13,27,.35)}
+      <style>{`.social-story-crop-overlay{position:fixed;inset:0;z-index:10020;display:flex;flex-direction:column;width:100vw;height:100vh;height:100dvh;min-height:0;overflow:hidden;box-sizing:border-box;background:linear-gradient(160deg,${theme.background},${theme.surface});backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:${theme.text}}
+.social-story-crop-header{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:12px;padding:max(14px,env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid ${theme.border};background:${theme.surfaceGlass}}
 .social-story-crop-header>div{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;text-align:center}
-.social-story-crop-header strong{font-size:.96rem;font-weight:750;color:#fff0f3}
-.social-story-crop-header span{color:#c29da6;font-size:.72rem}
-.social-story-crop-header>button{display:inline-flex;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid rgba(255,210,219,.14);border-radius:13px;background:rgba(240,120,137,.09);color:#ffe9ed}
-.social-story-crop-header>button:last-child{background:linear-gradient(145deg,#e2536b,#a82039);border-color:transparent;color:#fff}
+.social-story-crop-header strong{font-size:.96rem;font-weight:750;color:${theme.text}}
+.social-story-crop-header span{color:${theme.textMuted};font-size:.72rem}
+.social-story-crop-header>button{display:inline-flex;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid ${theme.border};border-radius:13px;background:${theme.primarySoft};color:${theme.text}}
+.social-story-crop-header>button:last-child{background:linear-gradient(145deg,${theme.primary},${theme.primary});border-color:transparent;color:#fff}
 .social-story-crop-header>button:disabled{opacity:.45}
 .social-story-crop-stage{display:flex;flex:1 1 auto;min-height:0;align-items:center;justify-content:center;overflow:auto;overscroll-behavior:contain;padding:12px 12px}
-.social-story-crop-frame{position:relative;flex:0 0 auto;overflow:hidden;background:#17070d;touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;cursor:grab;isolation:isolate;box-shadow:0 0 0 1px rgba(255,210,219,.55),0 12px 48px rgba(0,0,0,.42)}
+.social-story-crop-frame{position:relative;flex:0 0 auto;overflow:hidden;background:${theme.surfaceMuted};touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;cursor:grab;isolation:isolate;box-shadow:0 0 0 1px ${theme.borderStrong},0 12px 48px rgba(0,0,0,.30)}
 .social-story-crop-frame:active{cursor:grabbing}
 .social-story-crop-frame>img{position:absolute;left:0;top:0;display:block;max-width:none;object-fit:fill;transform-origin:top left;will-change:transform;width:auto;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;pointer-events:none;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.social-story-crop-grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.15%,rgba(255,226,231,.48) 33.33%,transparent 33.5%,transparent 66.5%,rgba(255,226,231,.48) 66.67%,transparent 66.85%),linear-gradient(to bottom,transparent 33.15%,rgba(255,226,231,.48) 33.33%,transparent 33.5%,transparent 66.5%,rgba(255,226,231,.48) 66.67%,transparent 66.85%);box-shadow:inset 0 0 0 1px rgba(255,210,219,.65)}
-.social-story-crop-footer{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:12px;padding:12px 16px calc(16px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,210,219,.14);background:rgba(75,13,27,.3)}
-.social-story-crop-footer>button{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid rgba(255,210,219,.16);border-radius:13px;background:rgba(240,120,137,.1);color:#ffe9ed}
+.social-story-crop-grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.15%,${theme.borderStrong} 33.33%,transparent 33.5%,transparent 66.5%,${theme.borderStrong} 66.67%,transparent 66.85%),linear-gradient(to bottom,transparent 33.15%,${theme.borderStrong} 33.33%,transparent 33.5%,transparent 66.5%,${theme.borderStrong} 66.67%,transparent 66.85%);box-shadow:inset 0 0 0 1px ${theme.borderStrong}}
+.social-story-crop-footer{display:flex;flex:0 0 auto;align-items:center;justify-content:center;gap:12px;padding:12px 16px calc(16px + env(safe-area-inset-bottom));border-top:1px solid ${theme.border};background:${theme.surfaceGlass}}
+.social-story-crop-footer>button{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid ${theme.border};border-radius:13px;background:${theme.primarySoft};color:${theme.text}}
 .social-story-crop-footer>button:disabled{opacity:.4}
-.social-story-crop-footer input[type=range]{width:min(42vw,260px);accent-color:#f07889}
-.social-story-crop-footer>span{min-width:42px;color:#e5c3ca;font-size:.78rem;text-align:right}
-.social-story-crop-bottom{position:relative;display:flex;flex:0 0 auto;align-items:center;justify-content:center;min-height:54px;padding:8px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,210,219,.13);background:linear-gradient(180deg,rgba(75,13,27,.52),rgba(18,5,10,.98));box-shadow:0 -12px 34px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025)}
-.social-story-crop-bottom::before{content:"";position:absolute;top:0;left:50%;width:72px;height:2px;transform:translateX(-50%);border-radius:0 0 99px 99px;background:linear-gradient(90deg,rgba(240,120,137,.12),#f07889,rgba(240,120,137,.12));box-shadow:0 0 13px rgba(240,120,137,.22)}
-.social-story-crop-bottom span{display:block;width:34px;height:4px;border-radius:99px;background:rgba(255,210,219,.24)}
-.social-story-crop-error{position:absolute;left:16px;right:16px;bottom:calc(68px + env(safe-area-inset-bottom));z-index:2;padding:10px 12px;border:1px solid rgba(255,115,135,.38);border-radius:12px;background:rgba(54,9,19,.96);color:#ffdce2;font-size:.82rem;line-height:1.4;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.social-story-crop-footer input[type=range]{width:min(42vw,260px);accent-color:${theme.primary}}
+.social-story-crop-footer>span{min-width:42px;color:${theme.textMuted};font-size:.78rem;text-align:right}
+.social-story-crop-bottom{position:relative;display:flex;flex:0 0 auto;align-items:center;justify-content:center;min-height:54px;padding:8px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid ${theme.border};background:linear-gradient(180deg,${theme.surfaceMuted},rgba(18,5,10,.98));box-shadow:0 -12px 34px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025)}
+.social-story-crop-bottom::before{content:"";position:absolute;top:0;left:50%;width:72px;height:2px;transform:translateX(-50%);border-radius:0 0 99px 99px;background:linear-gradient(90deg,${theme.primarySoft},${theme.primary},${theme.primarySoft});box-shadow:0 0 13px rgba(240,120,137,.22)}
+.social-story-crop-bottom span{display:block;width:34px;height:4px;border-radius:99px;background:${theme.borderStrong}}
+.social-story-crop-error{position:absolute;left:16px;right:16px;bottom:calc(68px + env(safe-area-inset-bottom));z-index:2;padding:10px 12px;border:1px solid ${theme.danger};border-radius:12px;background:${theme.surfaceElevated};color:${theme.danger};font-size:.82rem;line-height:1.4;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.28)}
 @media(max-width:520px){.social-story-crop-stage{padding:10px 8px}.social-story-crop-header{gap:7px;padding-right:10px;padding-left:10px}.social-story-crop-header>button{flex-basis:38px;width:38px;height:38px}.social-story-crop-bottom{min-height:48px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}}`}</style>
       <header className="social-story-crop-header">
         <button type="button" onClick={onCancel} disabled={saving} aria-label="Cancel photo edit"><X size={23} /></button>
