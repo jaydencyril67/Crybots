@@ -354,7 +354,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const formatNameInput = (value: string) =>
-  value.toLocaleLowerCase().replace(/(^|\\s)(\\S)/g, (_match, space: string, character: string) => space + character.toLocaleUpperCase());
+  value.toLocaleLowerCase().replace(/(^|\s)(\S)/g, (_match, space: string, character: string) => space + character.toLocaleUpperCase());
 
 const SignupPage = () => {
   const [stepIndex, setStepIndex] = useState(0);
