@@ -353,6 +353,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
 });
 
+const formatNameInput = (value: string) =>
+  value.toLocaleLowerCase().replace(/(^|\\s)(\\S)/g, (_match, space: string, character: string) => space + character.toLocaleUpperCase());
+
 const SignupPage = () => {
   const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState<FormState>(initialState);
@@ -573,7 +576,7 @@ const SignupPage = () => {
               style={current.field === 'email' ? emailInputStyle : current.field === 'password' ? passwordInputStyle : styles.input}
               type={current.field === 'password' ? 'password' : current.field === 'email' ? 'email' : 'text'}
               value={form[current.field]}
-              onChange={(event) => updateField(current.field, event.target.value)}
+              onChange={(event) => updateField(current.field, current.field === 'firstName' || current.field === 'lastName' ? formatNameInput(event.target.value) : event.target.value)}
               placeholder={current.placeholder}
               autoComplete={current.field}
             />
