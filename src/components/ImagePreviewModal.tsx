@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useAppTheme } from './AppTheme';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 
@@ -24,8 +24,6 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
     document.body.style.overflow = 'hidden';
     const keyHandler = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
-      if (event.key === '+' || event.key === '=') setZoom((z) => Math.min(10, z + 0.25));
-      if (event.key === '-') setZoom((z) => Math.max(1, z - 0.25));
     };
     window.addEventListener('keydown', keyHandler);
     return () => {
@@ -34,7 +32,6 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
     };
   }, [onClose]);
 
-  const reset = () => { setZoom(1); setOffset({ x: 0, y: 0 }); };
   const touchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     if (event.touches.length === 2) {
       const bounds = stageRef.current?.getBoundingClientRect();
@@ -70,10 +67,6 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
     if (event.touches.length < 2) pinchStart.current = null;
     if (event.touches.length === 0) dragStart.current = null;
   };
-  const wheel = (event: React.WheelEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    setZoom((z) => Math.max(1, Math.min(10, z + (event.deltaY < 0 ? 0.2 : -0.2))));
-  };
   const mouseDown = (event: React.MouseEvent<HTMLImageElement>) => {
     if (zoom <= 1) return;
     dragging.current = true;
@@ -87,24 +80,13 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
   const mouseUp = () => { dragging.current = false; dragStart.current = null; };
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Image preview" onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', flexDirection: 'column', background: 'rgba(5,7,16,.96)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', color: '#fff' }}>
-      <div onClick={(event) => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: 'max(14px, env(safe-area-inset-top)) 16px 14px', borderBottom: '1px solid rgba(255,255,255,.12)', background: 'rgba(255,255,255,.035)' }}>
-        <div>
-          <div style={{ fontSize: '.96rem', fontWeight: 750 }}>Image preview</div>
-          <div style={{ marginTop: 3, color: 'rgba(255,255,255,.62)', fontSize: '.75rem' }}>Pinch to zoom · Drag to move · {Math.round(zoom * 100)}%</div>
-        </div>
-        <button type="button" onClick={onClose} aria-label="Close image preview" title="Close preview" style={{ display: 'inline-flex', flexShrink: 0, alignItems: 'center', justifyContent: 'center', minWidth: 64, height: 44, padding: '0 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, boxShadow: '0 6px 24px rgba(0,0,0,.24)', cursor: 'pointer', font: 'inherit', fontSize: '.88rem', fontWeight: 650 }}>Close</button>
-      </div>
-      <div ref={stageRef} onClick={(event) => event.stopPropagation()} onTouchStart={touchStart} onTouchMove={touchMove} onTouchEnd={touchEnd} onWheel={wheel} style={{ position: 'relative', display: 'flex', flex: 1, minHeight: 0, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', touchAction: 'none', padding: 12 }}>
-        <img src={imageUrl} alt="Full-size chat attachment" draggable={false} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} onMouseLeave={mouseUp} style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: 10, userSelect: 'none', cursor: zoom > 1 ? 'grab' : 'zoom-in', transform: `translate3d(${offset.x}px, ${offset.y}px, 0) scale(${zoom})`, transformOrigin: 'center center', willChange: 'transform', transition: 'none' }} />
-      </div>
-      <div onClick={(event) => event.stopPropagation()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '12px 16px calc(16px + env(safe-area-inset-bottom))', borderTop: '1px solid rgba(255,255,255,.12)', background: 'rgba(255,255,255,.035)' }}>
-        <button type="button" onClick={() => setZoom((z) => Math.max(1, z - 0.25))} aria-label="Zoom out" disabled={zoom <= 1} style={{ ...controlStyle, opacity: zoom <= 1 ? .4 : 1 }}><ZoomOut size={19} /></button>
-        <button type="button" onClick={reset} aria-label="Reset zoom" style={{ ...controlStyle, width: 'auto', padding: '0 16px', gap: 8 }}><RotateCcw size={16} /><span style={{ fontSize: '.82rem', fontWeight: 650 }}>Reset</span></button>
-        <button type="button" onClick={() => setZoom((z) => Math.min(5, z + 0.25))} aria-label="Zoom in" disabled={zoom >= 10} style={{ ...controlStyle, opacity: zoom >= 5 ? .4 : 1 }}><ZoomIn size={19} /></button>
+    <div role="dialog" aria-modal="true" aria-label="Image preview" onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 10000, overflow: 'hidden', background: 'rgba(5,7,16,.96)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', color: '#fff' }}>
+      <button type="button" onClick={(event) => { event.stopPropagation(); onClose(); }} aria-label="Close image preview" title="Close preview" style={{ position: 'absolute', zIndex: 2, top: 'max(12px, env(safe-area-inset-top))', right: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 42, height: 42, padding: 0, borderRadius: 999, border: `1px solid ${theme.borderGlass}`, background: 'rgba(12,16,30,.56)', color: '#fff', boxShadow: '0 6px 24px rgba(0,0,0,.24)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', cursor: 'pointer' }}><X size={21} /></button>
+      <div ref={stageRef} onClick={(event) => event.stopPropagation()} onTouchStart={touchStart} onTouchMove={touchMove} onTouchEnd={touchEnd} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', touchAction: 'none', padding: 0 }}>
+        <img src={imageUrl} alt="Full-size chat attachment" draggable={false} onMouseDown={mouseDown} onMouseMove={mouseMove} onMouseUp={mouseUp} onMouseLeave={mouseUp} style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', userSelect: 'none', cursor: zoom > 1 ? 'grab' : 'zoom-in', transform: `translate3d(${offset.x}px, ${offset.y}px, 0) scale(${zoom})`, transformOrigin: 'center center', willChange: 'transform', transition: 'none' }} />
       </div>
     </div>
   );
 };
-const controlStyle: React.CSSProperties = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 42, borderRadius: 13, border: '1px solid rgba(255,255,255,.16)', background: 'rgba(255,255,255,.09)', color: '#fff', cursor: 'pointer' };
+
 export default ImagePreviewModal;
