@@ -30,7 +30,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
   const paintFrameRef = useRef<number | null>(null);
   const cropPaintFrameRef = useRef<number | null>(null);
   const pendingCropRef = useRef<CropRect | null>(null);
-  const [frame, setFrame = useState({ width: 320, height: 320 });
+  const [frame, setFrame] = useState({ width: 320, height: 320 });
   const [frameAspectRatio, setFrameAspectRatio] = useState<number | undefined>(aspectRatio);
   const [crop, setCrop] = useState<CropRect>({ x: 16, y: 16, width: 288, height: 288 });
   const cropRef = useRef(crop);
