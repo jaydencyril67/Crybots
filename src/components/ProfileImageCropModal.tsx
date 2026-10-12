@@ -21,6 +21,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const imageRef = useRef<HTMLImageElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  const cropSelectionRef = useRef<HTMLDivElement | null>(null);
   const pointersRef = useRef(new Map<number, Point>());
   const gestureRef = useRef<{ distance: number; midpoint: Point; zoom: number; offset: Point } | null>(null);
   const imageDragRef = useRef<{ pointerId: number; point: Point; offset: Point } | null>(null);
@@ -48,7 +49,13 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
       cropPaintFrameRef.current = null;
       const pending = pendingCropRef.current;
       pendingCropRef.current = null;
-      if (pending) setCrop(pending);
+      const selection = cropSelectionRef.current;
+      if (!pending || !selection) return;
+      // Paint the moving box directly: avoid a React render on every touch frame.
+      selection.style.left = `${pending.x}px`;
+      selection.style.top = `${pending.y}px`;
+      selection.style.width = `${pending.width}px`;
+      selection.style.height = `${pending.height}px`;
     });
   };
 
@@ -241,6 +248,12 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
     if (cropDragRef.current?.pointerId !== event.pointerId) return;
     event.stopPropagation();
     cropDragRef.current = null;
+    if (cropPaintFrameRef.current !== null) {
+      cancelAnimationFrame(cropPaintFrameRef.current);
+      cropPaintFrameRef.current = null;
+    }
+    pendingCropRef.current = null;
+    setCrop(cropRef.current);
     try { event.currentTarget.releasePointerCapture(event.pointerId); } catch { /* Capture may already be released. */ }
   };
 
@@ -312,7 +325,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
           onPointerDown={handleStagePointerDown} onPointerMove={handleStagePointerMove} onPointerUp={handleStagePointerUp} onPointerCancel={handleStagePointerUp}>
           <img ref={imageRef} src={imageUrl} alt="Selected photo crop" onLoad={handleImageLoad} draggable={false}
             style={{ width: ready && imageRef.current?.naturalWidth ? imageRef.current.naturalWidth * baseScale() : '100%', height: ready && imageRef.current?.naturalHeight ? imageRef.current.naturalHeight * baseScale() : '100%', transform: `translate3d(${offsetRef.current.x}px, ${offsetRef.current.y}px, 0) scale(${zoomRef.current})` }} />
-          {ready && <div className="social-story-crop-selection" style={{ left: crop.x, top: crop.y, width: crop.width, height: crop.height }}
+          {ready && <div ref={cropSelectionRef} className="social-story-crop-selection" style={{ left: crop.x, top: crop.y, width: crop.width, height: crop.height }}
             onPointerDown={event => handleCropPointerDown(event, 'move')} onPointerMove={handleCropPointerMove} onPointerUp={handleCropPointerUp} onPointerCancel={handleCropPointerUp}>
             <div className="social-story-crop-grid" aria-hidden="true" />
             {handles.map(({ key, className }) => <span key={key} className={`social-story-crop-handle ${className}`}
