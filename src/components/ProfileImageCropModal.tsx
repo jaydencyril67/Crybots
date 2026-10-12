@@ -262,12 +262,11 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
   return (
     <div role="dialog" aria-modal="true" aria-label={title} className="social-story-crop-overlay">
       <style>{`.social-story-crop-overlay{position:fixed;inset:0;z-index:10020;display:flex;flex-direction:column;width:100vw;height:100vh;height:100dvh;min-height:0;overflow:hidden;box-sizing:border-box;background:linear-gradient(160deg,${theme.background},${theme.surface});backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:${theme.text}}
-.social-story-crop-header{display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:12px;padding:max(14px,env(safe-area-inset-top)) 16px 14px;border-bottom:1px solid ${theme.border};background:${theme.surfaceGlass}}
-.social-story-crop-header>div{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;text-align:center}
-.social-story-crop-header strong{font-size:.96rem;font-weight:750;color:${theme.text}}
-.social-story-crop-header span{color:${theme.textMuted};font-size:.72rem;line-height:1.35}
-.social-story-crop-header>button{display:inline-flex;flex:0 0 42px;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid ${theme.border};border-radius:13px;background:${theme.primarySoft};color:${theme.text}}
-.social-story-crop-header>button:last-child{background:linear-gradient(145deg,${theme.primary},${theme.primary});border-color:transparent;color:${theme.textInverse}}
+.social-story-crop-header{position:absolute;inset:0 0 auto;z-index:5;display:block;height:0;padding:0;border:0;background:transparent;pointer-events:none}
+.social-story-crop-header>div{display:none}
+.social-story-crop-header>button{position:absolute;top:max(12px,env(safe-area-inset-top));display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid ${theme.borderGlass};border-radius:999px;background:rgba(12,16,30,.58);color:${theme.text};box-shadow:0 6px 24px rgba(0,0,0,.24);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);pointer-events:auto}
+.social-story-crop-header>button:first-child{left:14px}
+.social-story-crop-header>button:last-child{right:14px;background:linear-gradient(145deg,${theme.primary},${theme.primary});border-color:transparent;color:${theme.textInverse}}
 .social-story-crop-header>button:disabled{opacity:.45}
 .social-story-crop-stage{display:flex;flex:1 1 auto;min-height:0;align-items:center;justify-content:center;overflow:auto;overscroll-behavior:contain;padding:12px}
 .social-story-crop-frame{position:relative;flex:0 0 auto;overflow:hidden;background:${theme.surfaceMuted};touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;isolation:isolate;box-shadow:0 0 0 1px ${theme.borderStrong},0 12px 48px rgba(0,0,0,.30)}
@@ -278,7 +277,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
 .social-story-crop-handle.nw{top:-8px;left:-8px;cursor:nwse-resize}.social-story-crop-handle.n{top:-8px;left:calc(50% - 8px);cursor:ns-resize}.social-story-crop-handle.ne{top:-8px;right:-8px;cursor:nesw-resize}
 .social-story-crop-handle.w{top:calc(50% - 8px);left:-8px;cursor:ew-resize}.social-story-crop-handle.e{top:calc(50% - 8px);right:-8px;cursor:ew-resize}
 .social-story-crop-handle.sw{bottom:-8px;left:-8px;cursor:nesw-resize}.social-story-crop-handle.s{bottom:-8px;left:calc(50% - 8px);cursor:ns-resize}.social-story-crop-handle.se{right:-8px;bottom:-8px;cursor:nwse-resize}
-.social-story-crop-bottom{position:relative;display:flex;flex:0 0 auto;align-items:center;justify-content:center;min-height:54px;padding:8px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid ${theme.border};background:linear-gradient(180deg,${theme.surfaceMuted},${theme.surface});box-shadow:0 -12px 34px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025)}
+.social-story-crop-bottom{display:none;position:relative;display:flex;flex:0 0 auto;align-items:center;justify-content:center;min-height:54px;padding:8px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid ${theme.border};background:linear-gradient(180deg,${theme.surfaceMuted},${theme.surface});box-shadow:0 -12px 34px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025)}
 .social-story-crop-bottom::before{content:"";position:absolute;top:0;left:50%;width:72px;height:2px;transform:translateX(-50%);border-radius:0 0 99px 99px;background:linear-gradient(90deg,${theme.primarySoft},${theme.primary},${theme.primarySoft})}
 .social-story-crop-bottom span{display:block;width:34px;height:4px;border-radius:99px;background:${theme.borderStrong}}
 .social-story-crop-error{position:absolute;left:16px;right:16px;bottom:calc(68px + env(safe-area-inset-bottom));z-index:4;padding:10px 12px;border:1px solid ${theme.danger};border-radius:12px;background:${theme.surfaceElevated};color:${theme.danger};font-size:.82rem;line-height:1.4;text-align:center;box-shadow:0 8px 28px rgba(0,0,0,.28)}
@@ -303,7 +302,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
         </div>
       </div>
       {errorMessage && <div className="social-story-crop-error" role="alert">{errorMessage}</div>}
-      <footer className="social-story-crop-bottom" aria-hidden="true"><span /></footer>
+      
     </div>
   );
 }
