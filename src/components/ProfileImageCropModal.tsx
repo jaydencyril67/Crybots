@@ -28,7 +28,9 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
   const zoomRef = useRef(1);
   const offsetRef = useRef<Point>({ x: 0, y: 0 });
   const paintFrameRef = useRef<number | null>(null);
-  const [frame, setFrame] = useState({ width: 320, height: 320 });
+  const cropPaintFrameRef = useRef<number | null>(null);
+  const pendingCropRef = useRef<CropRect | null>(null);
+  const [frame, setFrame = useState({ width: 320, height: 320 });
   const [frameAspectRatio, setFrameAspectRatio] = useState<number | undefined>(aspectRatio);
   const [crop, setCrop] = useState<CropRect>({ x: 16, y: 16, width: 288, height: 288 });
   const cropRef = useRef(crop);
@@ -36,7 +38,19 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const updateCrop = (next: CropRect) => { cropRef.current = next; setCrop(next); };
+  const updateCrop = (next: CropRect) => { cropRef.current = next; pendingCropRef.current = null; setCrop(next); };
+  // Batch crop-box rendering to one update per animation frame for smoother touch dragging.
+  const scheduleCropUpdate = (next: CropRect) => {
+    cropRef.current = next;
+    pendingCropRef.current = next;
+    if (cropPaintFrameRef.current !== null) return;
+    cropPaintFrameRef.current = requestAnimationFrame(() => {
+      cropPaintFrameRef.current = null;
+      const pending = pendingCropRef.current;
+      pendingCropRef.current = null;
+      if (pending) setCrop(pending);
+    });
+  };
 
   useEffect(() => {
     zoomRef.current = 1;
@@ -48,11 +62,17 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
     imageDragRef.current = null;
     cropDragRef.current = null;
     if (paintFrameRef.current !== null) cancelAnimationFrame(paintFrameRef.current);
+    if (cropPaintFrameRef.current !== null) cancelAnimationFrame(cropPaintFrameRef.current);
     paintFrameRef.current = null;
+    cropPaintFrameRef.current = null;
+    pendingCropRef.current = null;
     setErrorMessage('');
     return () => {
       if (paintFrameRef.current !== null) cancelAnimationFrame(paintFrameRef.current);
+      if (cropPaintFrameRef.current !== null) cancelAnimationFrame(cropPaintFrameRef.current);
       paintFrameRef.current = null;
+      cropPaintFrameRef.current = null;
+      pendingCropRef.current = null;
       pointersRef.current.clear();
       gestureRef.current = null;
       imageDragRef.current = null;
@@ -193,7 +213,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
     const dy = point.y - drag.start.y;
     const minSize = 56;
     if (drag.mode === 'move') {
-      updateCrop({ ...drag.crop, x: clamp(drag.crop.x + dx, 0, frame.width - drag.crop.width), y: clamp(drag.crop.y + dy, 0, frame.height - drag.crop.height) });
+      scheduleCropUpdate({ ...drag.crop, x: clamp(drag.crop.x + dx, 0, frame.width - drag.crop.width), y: clamp(drag.crop.y + dy, 0, frame.height - drag.crop.height) });
       return;
     }
     let left = drag.crop.x, top = drag.crop.y, right = drag.crop.x + drag.crop.width, bottom = drag.crop.y + drag.crop.height;
@@ -215,7 +235,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
         else right = clamp(left + nextWidth, left + minSize, frame.width);
       }
     }
-    updateCrop({ x: left, y: top, width: Math.max(minSize, right - left), height: Math.max(minSize, bottom - top) });
+    scheduleCropUpdate({ x: left, y: top, width: Math.max(minSize, right - left), height: Math.max(minSize, bottom - top) });
   };
   const handleCropPointerUp = (event: PointerEvent<HTMLElement>) => {
     if (cropDragRef.current?.pointerId !== event.pointerId) return;
