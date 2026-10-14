@@ -33,6 +33,7 @@ import ThemePage from './components/ThemePage';
 import NowBarPage from './components/NowBarPage';
 import AiModePage from './components/AiModePage';
 import VoiceNavigation from './components/VoiceNavigation';
+import NativePushHandler from './components/NativePushHandler';
 import { disableVoiceMode } from './utils/voiceNavigation';
 import NowBarColorPage from './components/NowBarColorPage';
 import NowBarButtonColorPage from './components/NowBarButtonColorPage';
@@ -660,6 +661,7 @@ root.render(
       <AppThemeProvider>
         <InitialSplashCleanup />
         <VoiceNavigation />
+        <NativePushHandler />
         <RouteTransition />
       </AppThemeProvider>
     </HelmetProvider>
