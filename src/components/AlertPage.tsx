@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 import { ArrowLeft, Bell, Mail, Smartphone } from 'lucide-react';
 import api from '../api/axios';
 import type { AlertPreferences, AlertPreferencesResponse } from '../types/alertPreferences';
@@ -89,7 +91,55 @@ const AlertPage = () => {
     void loadPreferences();
   }, []);
 
+  const isNativeAndroid = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
+
+  const registerNativePush = async () => {
+    let permission = await PushNotifications.checkPermissions();
+    if (permission.receive !== 'granted') permission = await PushNotifications.requestPermissions();
+    if (permission.receive !== 'granted') {
+      throw new Error('Allow notifications for CryBots in Android settings to enable push alerts.');
+    }
+
+    await PushNotifications.createChannel({ id: 'crybots_alerts', name: 'CryBots Alerts', importance: 5, sound: 'default' });
+    const fcmToken = await new Promise<string>(async (resolve, reject) => {
+      let settled = false;
+      let registrationListener: { remove: () => Promise<void> } | undefined;
+      let errorListener: { remove: () => Promise<void> } | undefined;
+      const finish = (callback: () => void) => {
+        if (settled) return;
+        settled = true;
+        void registrationListener?.remove();
+        void errorListener?.remove();
+        callback();
+      };
+      try {
+        registrationListener = await PushNotifications.addListener('registration', result => {
+          finish(() => resolve(result.value));
+        });
+        errorListener = await PushNotifications.addListener('registrationError', error => {
+          finish(() => reject(new Error(error.error || 'Android could not register this device for push notifications.')));
+        });
+        await PushNotifications.register();
+      } catch (error) {
+        finish(() => reject(error instanceof Error ? error : new Error('Android push registration failed.')));
+      }
+    });
+
+    await api.post('/api/notifications/native-push-token', { token: fcmToken });
+    window.localStorage.setItem('crybots_native_push_token', fcmToken);
+    setPushPermission('granted');
+  };
+
   const requestPushPermission = async () => {
+    if (isNativeAndroid) {
+      try {
+        await registerNativePush();
+        return true;
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Unable to enable Android push alerts.');
+        return false;
+      }
+    }
     if (!('Notification' in window)) {
       setPushPermission('unsupported');
       setError('Push notifications are not supported by this browser.');
@@ -111,7 +161,7 @@ const AlertPage = () => {
     const nextPreferences = { ...preferences, [key]: !preferences[key] };
     setSavingKey(key);
 
-    if (key === 'push' && nextPreferences.push && pushPermission !== 'granted') {
+    if (key === 'push' && nextPreferences.push && (isNativeAndroid || pushPermission !== 'granted')) {
       const granted = await requestPushPermission();
       if (!granted) {
         setSavingKey(null);
@@ -123,6 +173,13 @@ const AlertPage = () => {
       const response = await api.patch<AlertPreferencesResponse>('/api/settings/alerts', nextPreferences);
       setPreferences({ ...defaultPreferences, ...response.data.preferences });
       window.localStorage.setItem('kingshall_alert_preferences', JSON.stringify(response.data.preferences));
+      if (key === 'push' && !nextPreferences.push && isNativeAndroid) {
+        const nativeToken = window.localStorage.getItem('crybots_native_push_token');
+        if (nativeToken) {
+          await api.delete('/api/notifications/native-push-token', { data: { token: nativeToken } }).catch(() => undefined);
+          window.localStorage.removeItem('crybots_native_push_token');
+        }
+      }
       setSaved(true);
       completeOnboardingStep('notifications');
     } catch {
