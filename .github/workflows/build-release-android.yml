@@ -82,58 +82,45 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p android/app
-          if [ -n "${FIREBASE_GOOGLE_SERVICES_JSON:-}" ]; then
-            printf '%s' "$FIREBASE_GOOGLE_SERVICES_JSON" > android/app/google-services.json
-            echo "Using raw Firebase Android configuration secret."
-          elif [ -n "${FIREBASE_GOOGLE_SERVICES_JSON_BASE64:-}" ]; then
-            printf '%s' "$FIREBASE_GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
-            echo "Decoded Base64 Firebase Android configuration secret."
-          else
-            echo "::error::Set FIREBASE_GOOGLE_SERVICES_JSON (raw JSON) or FIREBASE_GOOGLE_SERVICES_JSON_BASE64 (Base64 JSON)."
-            exit 1
-          fi
           python3 - <<'PY'
+          import base64
           import json
+          import os
           from pathlib import Path
-          path = Path('android/app/google-services.json')
-          try:
-              data = json.loads(path.read_text())
-          except Exception as error:
-              raise SystemExit(f'Firebase Android configuration is not valid JSON: {error}')
-          packages = [item.get('client_info', {}).get('android_client_info', {}).get('package_name') for item in data.get('client', [])]
-          if 'com.kingshall.exchange' not in packages:
-              raise SystemExit('Firebase config does not contain Android package com.kingshall.exchange')
-          print('Firebase Android configuration validated for com.kingshall.exchange')
-          PY
-          python3 - <<'PY'
-          from pathlib import Path
-          root = Path('android/build.gradle')
-          text = root.read_text()
-          marker = 'dependencies {'
-          if marker not in text:
-              raise SystemExit('Could not find root Android buildscript dependencies block')
-          start = text.find(marker)
-          end = text.find('}', start)
-          block = text[start:end]
-          if 'com.google.gms:google-services' not in block:
-              text = text[:end] + "\n        classpath 'com.google.gms:google-services:4.4.2'" + text[end:]
-          root.write_text(text)
-          app = Path('android/app/build.gradle')
-          text = app.read_text()
-          if "apply plugin: 'com.google.gms.google-services'" not in text:
-              text += "\napply plugin: 'com.google.gms.google-services'\n"
-          dep = "implementation platform('com.google.firebase:firebase-bom:33.7.0')"
-          msg = "implementation 'com.google.firebase:firebase-messaging'"
-          if dep not in text or msg not in text:
-              marker = 'dependencies {'
-              start = text.find(marker)
-              if start < 0: raise SystemExit('Could not find app dependencies block')
-              end = text.find('}', start)
-              text = text[:end] + "\n    " + dep + "\n    " + msg + text[end:]
-          app.write_text(text)
-          print('Configured Google Services plugin and Firebase Messaging dependency')
-          PY
 
+          raw = os.environ.get("FIREBASE_GOOGLE_SERVICES_JSON", "").strip()
+          encoded_or_raw = os.environ.get("FIREBASE_GOOGLE_SERVICES_JSON_BASE64", "").strip()
+          if raw:
+              candidate = raw
+              source = "FIREBASE_GOOGLE_SERVICES_JSON"
+          elif encoded_or_raw:
+              # Accept correctly encoded Base64, but also recover if raw JSON was
+              # accidentally saved under the legacy BASE64 secret name.
+              try:
+                  decoded = base64.b64decode(encoded_or_raw, validate=True).decode("utf-8")
+                  json.loads(decoded)
+                  candidate = decoded
+                  source = "Base64 secret"
+              except Exception:
+                  candidate = encoded_or_raw
+                  source = "legacy secret (raw JSON detected)"
+          else:
+              raise SystemExit("Set FIREBASE_GOOGLE_SERVICES_JSON or FIREBASE_GOOGLE_SERVICES_JSON_BASE64 in repository Actions secrets.")
+
+          try:
+              data = json.loads(candidate)
+          except Exception as error:
+              raise SystemExit(f"Firebase Android configuration is not valid JSON ({source}): {error}")
+
+          packages = [
+              item.get("client_info", {}).get("android_client_info", {}).get("package_name")
+              for item in data.get("client", [])
+          ]
+          if "com.kingshall.exchange" not in packages:
+              raise SystemExit("Firebase config does not contain Android package com.kingshall.exchange; use CryBots' google-services.json, not HallsChat's.")
+          Path("android/app/google-services.json").write_text(json.dumps(data, indent=2) + "\n")
+          print(f"Firebase Android configuration validated for com.kingshall.exchange ({source}).")
+          PY
       - name: Set CryBots Android version
         env:
           APP_VERSION: ${{ inputs.app_version }}
