@@ -18,6 +18,20 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
   const pinchStart = useRef<{ distance: number; zoom: number; imagePointX: number; imagePointY: number } | null>(null);
   const dragStart = useRef<{ x: number; y: number; offsetX: number; offsetY: number } | null>(null);
   const dragging = useRef(false);
+  const pendingViewRef = useRef<{ zoom: number; offset: { x: number; y: number } } | null>(null);
+  const viewFrameRef = useRef<number | null>(null);
+  const scheduleViewUpdate = (nextZoom: number, nextOffset: { x: number; y: number }) => {
+    pendingViewRef.current = { zoom: nextZoom, offset: nextOffset };
+    if (viewFrameRef.current !== null) return;
+    viewFrameRef.current = requestAnimationFrame(() => {
+      viewFrameRef.current = null;
+      const pending = pendingViewRef.current;
+      pendingViewRef.current = null;
+      if (!pending) return;
+      setOffset(pending.offset);
+      setZoom(pending.zoom);
+    });
+  };
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -29,6 +43,9 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', keyHandler);
+      if (viewFrameRef.current !== null) cancelAnimationFrame(viewFrameRef.current);
+      viewFrameRef.current = null;
+      pendingViewRef.current = null;
     };
   }, [onClose]);
 
@@ -55,12 +72,11 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
       const midY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
       const centerX = bounds ? bounds.left + bounds.width / 2 : midX;
       const centerY = bounds ? bounds.top + bounds.height / 2 : midY;
-      setOffset({ x: midX - centerX - start.imagePointX * nextZoom, y: midY - centerY - start.imagePointY * nextZoom });
-      setZoom(nextZoom);
+      scheduleViewUpdate(nextZoom, { x: midX - centerX - start.imagePointX * nextZoom, y: midY - centerY - start.imagePointY * nextZoom });
     } else if (event.touches.length === 1 && dragStart.current && zoom > 1) {
       event.preventDefault();
       const start = dragStart.current;
-      setOffset({ x: start.offsetX + event.touches[0].clientX - start.x, y: start.offsetY + event.touches[0].clientY - start.y });
+      scheduleViewUpdate(zoom, { x: start.offsetX + event.touches[0].clientX - start.x, y: start.offsetY + event.touches[0].clientY - start.y });
     }
   };
   const touchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
@@ -75,7 +91,7 @@ const ImagePreviewModal = ({ imageUrl, onClose }: Props) => {
   };
   const mouseMove = (event: React.MouseEvent<HTMLImageElement>) => {
     if (!dragging.current || !dragStart.current || zoom <= 1) return;
-    setOffset({ x: dragStart.current.offsetX + event.clientX - dragStart.current.x, y: dragStart.current.offsetY + event.clientY - dragStart.current.y });
+    scheduleViewUpdate(zoom, { x: dragStart.current.offsetX + event.clientX - dragStart.current.x, y: dragStart.current.offsetY + event.clientY - dragStart.current.y });
   };
   const mouseUp = () => { dragging.current = false; dragStart.current = null; };
 
