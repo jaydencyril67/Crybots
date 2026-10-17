@@ -1057,7 +1057,13 @@ jobs:
 
           (async () => {
             const circle = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><circle cx="256" cy="256" r="117.5" fill="#000000" stroke="#000000" stroke-width="2"/></svg>');
-            const svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
+            let svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
+            const opaqueBackground = '<rect width="512" height="512" fill="#050817"/>';
+            const embeddedCircle = '<circle cx="256" cy="256" r="128" fill="#000000" stroke="#151515" stroke-width="1.5"/>';
+            if (!svg.includes(opaqueBackground) || !svg.includes(embeddedCircle)) {
+              throw new Error('CryBots icon source changed; cannot safely isolate the foreground mark.');
+            }
+            svg = svg.replace(opaqueBackground, '').replace(embeddedCircle, '');
             const mark = await sharp(Buffer.from(svg)).resize(208, 208, { fit: 'contain' }).png().toBuffer();
             const circleLayer = await sharp(circle).png().toBuffer();
 
@@ -1071,7 +1077,12 @@ jobs:
 
             const branding = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320"><rect width="800" height="320" fill="none"/><text x="400" y="174" text-anchor="middle" fill="#FFFFFF" font-family="STIX Two Text, serif" font-size="72" font-weight="700" letter-spacing="3">CryBots</text></svg>');
             await sharp(branding).png().toFile('android/app/src/main/res/drawable-nodpi/crybots_branding.png');
-            console.log('Created CryBots native splash using KingsHall 235px circle and 208px foreground geometry.');
+            const audit = await sharp('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png').ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+            const alphaAt = (x, y) => audit.data[(y * audit.info.width + x) * audit.info.channels + 3];
+            if (alphaAt(0, 0) !== 0 || alphaAt(64, 256) !== 0 || alphaAt(256, 256) === 0) {
+              throw new Error('CryBots splash image failed transparency/circle validation.');
+            }
+            console.log('Created and validated CryBots splash with KingsHall 235px circle and transparent 208px foreground.');
           })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
