@@ -11,10 +11,10 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/ke-icon.svg?v=4",
+      "src": "/icons/crybots-app-icon.svg?v=1",
       "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
