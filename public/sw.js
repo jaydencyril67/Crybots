@@ -36,8 +36,8 @@ self.addEventListener('push', (event) => {
   const title = payload.title || payload.notification?.title || 'CryBots alert';
   const options = {
     body: payload.message || payload.notification?.message || 'You have a new notification.',
-    icon: '/icons/ke-icon.svg?v=4',
-    badge: '/icons/ke-icon.svg?v=4',
+    icon: '/icons/crybots-app-icon.svg?v=1',
+    badge: '/icons/crybots-app-icon.svg?v=1',
     data: { url: '/notifications' },
   };
   event.waitUntil(self.registration.showNotification(title, options));
