@@ -1109,7 +1109,7 @@ jobs:
             if (!backgroundCircle.test(svg)) {
               throw new Error('CryBots master icon changed; cannot safely isolate its splash composition.');
             }
-            svg = svg.replace(backgroundCircle, '<circle cx="256" cy="256" r="190" fill="#000000"/>');
+            svg = svg.replace(backgroundCircle, '<circle cx="256" cy="256" r="125" fill="#000000"/>');
             await sharp(Buffer.from(svg))
               .png()
               .toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
