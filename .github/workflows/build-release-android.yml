@@ -1048,21 +1048,21 @@ jobs:
           set -euo pipefail
           mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values
 
-          # Use the same complete icon composition as the PWA master icon:
-          # navy outer canvas, centered black circle, and the reduced orbital mark.
-          # Remove only the navy square so Android's launch background remains visible
-          # around the circle, and preserve the SVG's exact 512px geometry.
+          # The current master SVG uses an oversized black circle (r=363) to
+          # fill the PWA canvas. For Android splash, reduce that backdrop to a
+          # true centered circle and leave the surrounding canvas transparent.
+          # Keep the orbital artwork, its transforms, and the 512px canvas intact.
           node - <<'NODE'
           const sharp = require('sharp');
           const fs = require('fs');
 
           (async () => {
             let svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
-            const opaqueBackground = '<rect width="512" height="512" fill="#050817"/>';
-            if (!svg.includes(opaqueBackground)) {
+            const backgroundCircle = /<circle\s+cx="256"\s+cy="256"\s+r="363"\s+fill="#000000"\s*\/>/;
+            if (!backgroundCircle.test(svg)) {
               throw new Error('CryBots master icon changed; cannot safely isolate its splash composition.');
             }
-            svg = svg.replace(opaqueBackground, '');
+            svg = svg.replace(backgroundCircle, '<circle cx="256" cy="256" r="190" fill="#000000"/>');
             await sharp(Buffer.from(svg))
               .png()
               .toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
@@ -1071,10 +1071,10 @@ jobs:
             await sharp(branding).png().toFile('android/app/src/main/res/drawable-nodpi/crybots_branding.png');
             const audit = await sharp('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png').ensureAlpha().raw().toBuffer({ resolveWithObject: true });
             const alphaAt = (x, y) => audit.data[(y * audit.info.width + x) * audit.info.channels + 3];
-            if (alphaAt(0, 0) !== 0 || alphaAt(64, 256) !== 0 || alphaAt(152, 152) !== 0 || alphaAt(256, 256) === 0) {
+            if (alphaAt(0, 0) !== 0 || alphaAt(64, 256) !== 0 || alphaAt(152, 152) === 0 || alphaAt(256, 256) === 0) {
               throw new Error('CryBots splash image failed transparency/circle validation.');
             }
-            console.log('Created and validated CryBots splash from the shared 512px master icon composition.');
+            console.log('Created and validated transparent CryBots splash with a centered circular black backdrop.');
           })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
