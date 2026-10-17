@@ -1,5 +1,5 @@
-const CACHE_NAME = 'crybots-pwa-v15-double-pwa-artwork';
-const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/crybots-app-icon.svg?v=6'];
+const CACHE_NAME = 'crybots-pwa-v16-pwa-artwork-1-10x';
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/crybots-app-icon.svg?v=7'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
 self.addEventListener('install', (event) => {
@@ -36,8 +36,8 @@ self.addEventListener('push', (event) => {
   const title = payload.title || payload.notification?.title || 'CryBots alert';
   const options = {
     body: payload.message || payload.notification?.message || 'You have a new notification.',
-    icon: '/icons/crybots-app-icon.svg?v=4',
-    badge: '/icons/crybots-app-icon.svg?v=4',
+    icon: '/icons/crybots-app-icon.svg?v=7',
+    badge: '/icons/crybots-app-icon.svg?v=7',
     data: { url: '/notifications' },
   };
   event.waitUntil(self.registration.showNotification(title, options));
