@@ -1048,15 +1048,15 @@ jobs:
           set -euo pipefail
           mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values android/app/src/main/res/values-v31
 
-          # Match KingsHall's native splash geometry: 235px visible circle on a
-          # 512px canvas, with the 208px foreground artwork centered in the image.
+          # Match KingsHall's native splash geometry: 235px filled circle plus a
+          # same-color stroke, producing an outer diameter of about 239px on 512px.
           # Preserve CryBots branding and its existing dark navy theme.
           node - <<'NODE'
           const sharp = require('sharp');
           const fs = require('fs');
 
           (async () => {
-            const circle = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><circle cx="256" cy="256" r="117.5" fill="#000000" stroke="#000000" stroke-width="2"/></svg>');
+            const circle = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><circle cx="256" cy="256" r="117.333333" fill="#000000" stroke="#000000" stroke-width="4.266667"/></svg>');
             let svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
             const opaqueBackground = '<rect width="512" height="512" fill="#050817"/>';
             const embeddedCircle = '<circle cx="256" cy="256" r="128" fill="#000000" stroke="#151515" stroke-width="1.5"/>';
@@ -1082,7 +1082,7 @@ jobs:
             if (alphaAt(0, 0) !== 0 || alphaAt(64, 256) !== 0 || alphaAt(152, 152) !== 0 || alphaAt(256, 256) === 0) {
               throw new Error('CryBots splash image failed transparency/circle validation.');
             }
-            console.log('Created and validated CryBots splash with KingsHall 235px circle and transparent 208px foreground.');
+            console.log('Created and validated CryBots splash with KingsHall-matched 239px outer circle and transparent foreground.');
           })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
