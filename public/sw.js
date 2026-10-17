@@ -1,5 +1,5 @@
-const CACHE_NAME = 'crybots-pwa-v10-aligned-logo';
-const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/ke-icon.svg?v=4'];
+const CACHE_NAME = 'crybots-pwa-v11-kingshall-splash';
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/crybots-app-icon.svg?v=1'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
 self.addEventListener('install', (event) => {
