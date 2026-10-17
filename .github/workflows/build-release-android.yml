@@ -1059,11 +1059,12 @@ jobs:
             const circle = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><circle cx="256" cy="256" r="117.333333" fill="#000000" stroke="#000000" stroke-width="4.266667"/></svg>');
             let svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
             const opaqueBackground = '<rect width="512" height="512" fill="#050817"/>';
-            const embeddedCircle = '<circle cx="256" cy="256" r="128" fill="#000000" stroke="#151515" stroke-width="1.5"/>';
-            if (!svg.includes(opaqueBackground) || !svg.includes(embeddedCircle)) {
+            if (!svg.includes(opaqueBackground)) {
               throw new Error('CryBots icon source changed; cannot safely isolate the foreground mark.');
             }
-            svg = svg.replace(opaqueBackground, '').replace(embeddedCircle, '');
+            // The master launcher SVG now has a full-canvas viewBox and no embedded circle.
+            // Remove only its square background so the native splash can compose its own circle.
+            svg = svg.replace(opaqueBackground, '');
             const mark = await sharp(Buffer.from(svg)).resize(208, 208, { fit: 'contain' }).png().toBuffer();
             const circleLayer = await sharp(circle).png().toBuffer();
 
