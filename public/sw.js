@@ -1,5 +1,5 @@
-const CACHE_NAME = 'crybots-pwa-v13-circle-splash-match';
-const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/crybots-app-icon.svg?v=4'];
+const CACHE_NAME = 'crybots-pwa-v14-fullbleed-pwa-icon';
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/crybots-app-icon.svg?v=5'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
 self.addEventListener('install', (event) => {
