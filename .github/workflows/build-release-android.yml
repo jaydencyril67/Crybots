@@ -1048,21 +1048,30 @@ jobs:
           set -euo pipefail
           mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values android/app/src/main/res/values-v31
 
-          # The source SVG now uses KingsHall's full-bleed dark canvas and a circle
-          # about 78% of the artwork width, with the CryBots mark scaled inside that circle.
-          # Rasterizing the complete SVG preserves the larger circle on Android 11 and 12+.
+          # Match KingsHall's native splash geometry: 235px visible circle on a
+          # 512px canvas, with the 208px foreground artwork centered in the image.
+          # Preserve CryBots branding and its existing dark navy theme.
           node - <<'NODE'
           const sharp = require('sharp');
+          const fs = require('fs');
 
           (async () => {
-            await sharp('public/icons/crybots-app-icon.svg')
-              .resize(512, 512, { fit: 'contain' })
+            const circle = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><circle cx="256" cy="256" r="117.5" fill="#000000" stroke="#000000" stroke-width="2"/></svg>');
+            const svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
+            const mark = await sharp(Buffer.from(svg)).resize(208, 208, { fit: 'contain' }).png().toBuffer();
+            const circleLayer = await sharp(circle).png().toBuffer();
+
+            await sharp({ create: { width: 512, height: 512, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+              .composite([
+                { input: circleLayer, left: 0, top: 0 },
+                { input: mark, left: 152, top: 152 }
+              ])
               .png()
               .toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
 
             const branding = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320"><rect width="800" height="320" fill="none"/><text x="400" y="174" text-anchor="middle" fill="#FFFFFF" font-family="STIX Two Text, serif" font-size="72" font-weight="700" letter-spacing="3">CryBots</text></svg>');
             await sharp(branding).png().toFile('android/app/src/main/res/drawable-nodpi/crybots_branding.png');
-            console.log('Created KingsHall-aligned CryBots circular splash icon and branding.');
+            console.log('Created CryBots native splash using KingsHall 235px circle and 208px foreground geometry.');
           })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
