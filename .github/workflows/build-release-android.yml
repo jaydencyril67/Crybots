@@ -189,7 +189,7 @@ jobs:
           from pathlib import Path
           path = Path("android/app/build.gradle")
           text = path.read_text()
-          deps = '''\n    implementation "androidx.webkit:webkit:1.14.0"\n    implementation "androidx.credentials:credentials:1.6.0"\n    implementation "androidx.credentials:credentials-play-services-auth:1.6.0"\n'''
+          deps = '''\n    implementation "androidx.core:core-splashscreen:1.0.1"\n    implementation "androidx.webkit:webkit:1.14.0"\n    implementation "androidx.credentials:credentials:1.6.0"\n    implementation "androidx.credentials:credentials-play-services-auth:1.6.0"\n'''
           marker = "dependencies {\n"
           if marker not in text:
               raise SystemExit("Could not find Android dependencies block")
