@@ -998,8 +998,8 @@ jobs:
       - name: Generate CryBots native assets
         run: |
           mkdir -p assets
-          cp public/icons/android-icon.svg assets/icon.svg
-          cp public/icons/android-splash.svg assets/splash.svg
+          cp public/icons/crybots-app-icon.svg assets/icon.svg
+          cp public/icons/crybots-app-icon.svg assets/splash.svg
           npx capacitor-assets generate --android
 
       - name: Sync Capacitor
@@ -1008,103 +1008,26 @@ jobs:
       - name: Configure unified CryBots native launch splash
         run: |
           set -euo pipefail
-          mkdir -p android/app/src/main/res/drawable android/app/src/main/res/values-v31
+          mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values android/app/src/main/res/values-v31
 
-          # Android 12+ requires a vector launch icon. Keep the same circular CryBots
-          # mark used by the full splash instead of falling back to the launcher icon.
-          cat > android/app/src/main/res/drawable/crybots_splash_icon.xml <<'XML'
-          <?xml version="1.0" encoding="utf-8"?>
-          <vector xmlns:android="http://schemas.android.com/apk/res/android"
-              android:width="432dp"
-              android:height="432dp"
-              android:viewportWidth="512"
-              android:viewportHeight="512">
-              <group
-                  android:pivotX="256"
-                  android:pivotY="256"
-                  android:scaleX="0.5"
-                  android:scaleY="0.5">
-                  <group
-                      android:translateX="0"
-                      android:translateY="0">
-                      <path
-                          android:fillColor="#000000"
-                          android:pathData="M32,256 A224,224 0,1 0,480,256 A224,224 0,1 0,32,256" />
-                      <path
-                          android:fillColor="#000000"
-                          android:fillAlpha="0"
-                          android:strokeColor="#151515"
-                          android:strokeWidth="1.5"
-                          android:pathData="M32.75,256 A223.25,223.25 0,1 0,479.25,256 A223.25,223.25 0,1 0,32.75,256" />
-                      <path
-                          android:fillColor="#000000"
-                          android:fillAlpha="0"
-                          android:strokeColor="#ffffff"
-                          android:strokeWidth="4.5"
-                          android:pathData="M229,79 A42,177 0,1 0,229,433 A42,177 0,1 0,229,79" />
-                      <path
-                          android:fillColor="#000000"
-                          android:fillAlpha="0"
-                          android:strokeColor="#ffffff"
-                          android:strokeWidth="5.5"
-                          android:pathData="M256,79 A42,177 0,1 0,256,433 A42,177 0,1 0,256,79" />
-                      <path
-                          android:fillColor="#000000"
-                          android:fillAlpha="0"
-                          android:strokeColor="#ffffff"
-                          android:strokeWidth="4.5"
-                          android:pathData="M283,79 A42,177 0,1 0,283,433 A42,177 0,1 0,283,79" />
-                      <path
-                          android:fillColor="#000000"
-                          android:fillAlpha="0"
-                          android:strokeColor="#ffffff"
-                          android:strokeWidth="5.5"
-                          android:pathData="M79,230 A177,43 0,1 0,433,230 A177,43 0,1 0,79,230" />
-                      <path
-                          android:fillColor="#000000"
-                          android:fillAlpha="0"
-                          android:strokeColor="#ffffff"
-                          android:strokeWidth="4.5"
-                          android:pathData="M79,256 A177,43 0,1 0,433,256 A177,43 0,1 0,79,256" />
-                      <path
-                          android:fillColor="#000000"
-                          android:fillAlpha="0"
-                          android:strokeColor="#ffffff"
-                          android:strokeWidth="4.5"
-                          android:pathData="M79,282 A177,43 0,1 0,433,282 A177,43 0,1 0,79,282" />
-                      <path
-                          android:fillColor="#ffffff"
-                          android:pathData="M280,256 A24,24 0,1 0,232,256 A24,24 0,1 0,280,256" />
-                  </group>
-              </group>
-          </vector>
-          XML
-
-          # Branding image for Android 12+. Source is deliberately separate from the
-          # full-screen splash so Android cannot substitute the old launcher artwork.
-          cat > /tmp/crybots_branding.svg <<'SVG'
-          <svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320">
-            <rect width="800" height="320" fill="none"/>
-            <text x="400" y="174"
-                  text-anchor="middle"
-                  fill="#ffffff"
-                  font-family="sans-serif"
-                  font-size="101"
-                  font-weight="700">CryBots</text>
-          </svg>
-          SVG
+          # Use the same 512px icon canvas as the PWA. The circular backdrop is
+          # 256px across and the CryBots mark is centered in a 208px artwork area,
+          # matching KingsHall's native launch splash proportions.
           node - <<'NODE'
           const sharp = require('sharp');
-          sharp('/tmp/crybots_branding.svg')
-            .png()
-            .toFile('android/app/src/main/res/drawable/crybots_branding.png')
-            .then(() => console.log('Created CryBots branding PNG'))
-            .catch((err) => { console.error(err); process.exit(1); });
+
+          (async () => {
+            await sharp('public/icons/crybots-app-icon.svg')
+              .resize(512, 512, { fit: 'contain' })
+              .png()
+              .toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
+
+            const branding = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320"><rect width="800" height="320" fill="none"/><text x="400" y="174" text-anchor="middle" fill="#FFFFFF" font-family="STIX Two Text, serif" font-size="72" font-weight="700" letter-spacing="3">CryBots</text></svg>');
+            await sharp(branding).png().toFile('android/app/src/main/res/drawable-nodpi/crybots_branding.png');
+            console.log('Created KingsHall-aligned CryBots circular splash icon and branding.');
+          })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
-          # Android 11 and below: draw the same background, logo and branding in the
-          # launch window. Android 12+: the compat/native SplashScreen API consumes
-          # the same icon/background plus the native branding image.
           cat > android/app/src/main/res/drawable/crybots_launch_background.xml <<'XML'
           <?xml version="1.0" encoding="utf-8"?>
           <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
@@ -1113,7 +1036,7 @@ jobs:
                   android:width="213dp"
                   android:height="213dp"
                   android:gravity="center"
-                  android:drawable="@drawable/crybots_splash_icon" />
+                  android:drawable="@drawable/crybots_splash_logo" />
               <item
                   android:width="160dp"
                   android:height="64dp"
@@ -1130,29 +1053,22 @@ jobs:
           </resources>
           XML
 
-          # Patch Capacitor's generated launch style instead of defining a duplicate
-          # style resource in the same values qualifier.
           python3 - <<'PY'
           from pathlib import Path
           import re
 
           path = Path("android/app/src/main/res/values/styles.xml")
           text = path.read_text()
-
-          pattern = re.compile(
-              r'(?s)<style\s+name="AppTheme\.NoActionBarLaunch"[^>]*>.*?</style>'
-          )
+          pattern = re.compile(r'(?s)<style\\s+name="AppTheme\\.NoActionBarLaunch"[^>]*>.*?</style>')
           replacement = """<style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
               <item name="android:windowBackground">@drawable/crybots_launch_background</item>
               <item name="windowSplashScreenBackground">@color/crybots_splash_background</item>
-              <item name="windowSplashScreenAnimatedIcon">@drawable/crybots_splash_icon</item>
+              <item name="windowSplashScreenAnimatedIcon">@drawable/crybots_splash_logo</item>
               <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
           </style>"""
-
           if not pattern.search(text):
               raise SystemExit("Could not find Capacitor AppTheme.NoActionBarLaunch")
-          text = pattern.sub(replacement, text, count=1)
-          path.write_text(text)
+          path.write_text(pattern.sub(lambda _: replacement, text, count=1))
           PY
 
           cat > android/app/src/main/res/values-v31/crybots_splash.xml <<'XML'
@@ -1160,13 +1076,12 @@ jobs:
           <resources>
               <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
                   <item name="android:windowSplashScreenBackground">@color/crybots_splash_background</item>
-                  <item name="android:windowSplashScreenAnimatedIcon">@drawable/crybots_splash_icon</item>
+                  <item name="android:windowSplashScreenAnimatedIcon">@drawable/crybots_splash_logo</item>
                   <item name="android:windowSplashScreenBrandingImage">@drawable/crybots_branding</item>
                   <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
               </style>
           </resources>
           XML
-
       - name: Prepare release signing
         env:
           GH_TOKEN: ${{ github.token }}
