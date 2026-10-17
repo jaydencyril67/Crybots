@@ -1161,7 +1161,7 @@ jobs:
               <item name="android:windowBackground">@drawable/crybots_launch_background</item>
               <item name="windowSplashScreenBackground">@color/crybots_splash_background</item>
               <item name="windowSplashScreenAnimatedIcon">@drawable/crybots_splash_logo</item>
-              <item name="windowSplashScreenBrandingImage">@drawable/crybots_branding</item>
+              <item name="android:windowSplashScreenBrandingImage">@drawable/crybots_branding</item>
               <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
           </style>"""
           if not pattern.search(text):
