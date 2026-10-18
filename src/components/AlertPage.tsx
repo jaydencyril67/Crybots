@@ -13,7 +13,7 @@ import NowBar from './NowBar';
 
 const preferenceTopics = [
   { key: 'account', label: 'Account activity', description: 'Profile changes, sign-ins and account updates.' },
-  { key: 'security', label: 'Security alerts', description: 'Password, two-factor authentication and session activity.' },
+  { key: 'security', label: 'Security alerts', description: 'Security-code, two-factor authentication and session activity.' },
   { key: 'transactions', label: 'Transactions', description: 'Deposits, withdrawals, transfers and payment updates.' },
   { key: 'market', label: 'Market updates', description: 'Market movements, bot activity and strategy updates.' },
 ] as const;
