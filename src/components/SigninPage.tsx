@@ -3,14 +3,15 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import api from '../api/axios';
 import { notifyAuthChanged } from '../utils/notificationEvents';
 import { Helmet } from 'react-helmet-async';
-import { ShieldCheck, LoaderCircle, KeyRound } from 'lucide-react';
+import { ShieldCheck, LoaderCircle, KeyRound, Fingerprint } from 'lucide-react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import { authenticateWithPasskey } from '../utils/webauthn';
 
 type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email?: string; username?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string };
-type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; message?: string };
+type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; message?: string; requiresExtraSecurity?: boolean; challengeToken?: string; methods?: Array<'2fa' | 'biometric'> };
 type NativeKingsHallAccountPlugin = { chooseAccount(): Promise<{ email?: string; cancelled?: boolean }> };
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
@@ -45,6 +46,10 @@ const SigninPage = () => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [challengeToken, setChallengeToken] = useState('');
+  const [extraMethods, setExtraMethods] = useState<Array<'2fa' | 'biometric'>>([]);
+  const [extraMethod, setExtraMethod] = useState<'2fa' | 'biometric' | ''>('');
+  const [extraCode, setExtraCode] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -131,6 +136,14 @@ const SigninPage = () => {
     setBusy(true); setError(''); setNotice('');
     try {
       const { data } = await api.post<SessionResponse>('/api/auth/kingshall/access-code', { identity, accessCode });
+      if (data.requiresExtraSecurity && data.challengeToken && data.methods?.length) {
+        setChallengeToken(data.challengeToken);
+        setExtraMethods(data.methods);
+        setExtraMethod(data.methods.length === 1 ? data.methods[0] : '');
+        setExtraCode('');
+        setNotice(data.methods.length > 1 ? 'Access Code verified. Choose one enabled extra-security method to finish signing in.' : 'Access Code verified. Complete the enabled extra-security check to finish signing in.');
+        return;
+      }
       saveSession(data, identity);
     } catch (e) {
       setError(messageFromError(e, 'KingsHall could not verify this Access Code.'));
@@ -140,8 +153,39 @@ const SigninPage = () => {
     }
   };
 
+  const verifyExtra2fa = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (busy || !challengeToken || extraCode.length !== 6) return;
+    setBusy(true); setError(''); setNotice('');
+    try {
+      const { data } = await api.post<SessionResponse>('/api/auth/kingshall/extra-security/verify-2fa', { challengeToken, code: extraCode });
+      saveSession(data, identity);
+    } catch (e) {
+      setError(messageFromError(e, 'The authenticator code could not be verified.'));
+    } finally {
+      setBusy(false);
+      setExtraCode('');
+    }
+  };
+
+  const verifyExtraBiometric = async () => {
+    if (busy || !challengeToken) return;
+    setBusy(true); setError(''); setNotice('');
+    try {
+      const { data: options } = await api.post('/api/webauthn/authenticate/options', { challengeToken });
+      const credential = await authenticateWithPasskey(options);
+      const { data } = await api.post<SessionResponse>('/api/webauthn/authenticate/verify', { challengeToken, ...credential });
+      saveSession(data, identity);
+    } catch (e) {
+      setError(messageFromError(e, 'Biometric verification failed. Please try again.'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const resetAccount = () => {
     setIdentity(''); setAccessCode(''); setAccountDetected(false); setError(''); setNotice('');
+    setChallengeToken(''); setExtraMethods([]); setExtraMethod(''); setExtraCode('');
   };
   const glass: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' };
   const button: React.CSSProperties = { minHeight: 46, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '12px 18px', fontWeight: 750, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%', cursor: busy ? 'wait' : 'pointer', background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box', boxShadow: theme.mode === 'dark' ? 'inset 0 1px rgba(255,255,255,.13), 0 4px 14px rgba(0,0,0,.22)' : 'inset 0 1px rgba(255,255,255,.48), 0 4px 14px rgba(30,30,30,.10)', backdropFilter: 'blur(12px) saturate(125%)', WebkitBackdropFilter: 'blur(12px) saturate(125%)' };
@@ -160,13 +204,34 @@ const SigninPage = () => {
           {!accountDetected && <button type="button" aria-label="Sign in with KingsHall" onClick={() => void startSignin()} disabled={busy} style={{ width: 88, height: 88, borderRadius: '50%', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, display: 'grid', placeItems: 'center', margin: '0 auto', cursor: busy ? 'wait' : 'pointer', backdropFilter: 'blur(12px) saturate(125%)', WebkitBackdropFilter: 'blur(12px) saturate(125%)', boxShadow: theme.mode === 'dark' ? 'inset 0 1px rgba(255,255,255,.13), 0 4px 14px rgba(0,0,0,.22)' : 'inset 0 1px rgba(255,255,255,.48), 0 4px 14px rgba(30,30,30,.10)' }}>{busy ? <LoadingDots /> : <KeyRound size={28} />}</button>}
           {!accountDetected && <p style={{ margin: '12px 0 0', color: theme.text, fontWeight: 700, fontSize: 14 }}>Sign in with KingsHall</p>}
 
-          {accountDetected && <form onSubmit={handleAccessCode} style={{ display: 'grid', gap: 14, textAlign: 'left' }}>
+          {accountDetected && !challengeToken && <form onSubmit={handleAccessCode} style={{ display: 'grid', gap: 14, textAlign: 'left' }}>
             <label htmlFor="signin-access-code" style={{ fontSize: 13, color: theme.textMuted, fontWeight: 650 }}>Bound six-digit Access Code</label>
             <input id="signin-access-code" style={{ ...input, textAlign: 'center', letterSpacing: '.35em', fontSize: 20 }} type="password" inputMode="numeric" autoComplete="off" value={accessCode} onChange={event => setAccessCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="••••••" minLength={6} maxLength={6} pattern="[0-9]{6}" required />
             <button type="submit" style={button} disabled={busy || accessCode.length !== 6}>{busy ? <LoadingDots /> : 'Verify and continue'}</button>
             <button type="button" onClick={resetAccount} style={{ border: 0, background: 'transparent', color: theme.primary, padding: 8, fontWeight: 700, cursor: 'pointer' }}>Cancel request</button>
           </form>}
 
+          {challengeToken && <section style={{ display: 'grid', gap: 14, textAlign: 'left' }}>
+            <div style={{ ...glass, borderRadius: 16, padding: 14 }}>
+              <p style={{ margin: 0, fontWeight: 800, fontSize: 14 }}>Extra security required</p>
+              <p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.5 }}>Your KingsHall Access Code was accepted, but CryBots will not finish sign-in until one enabled security check succeeds.</p>
+            </div>
+            {extraMethods.length > 1 && <div style={{ display: 'grid', gap: 8 }}>
+              <p style={{ margin: 0, fontSize: 13, color: theme.textMuted }}>Choose one method to continue</p>
+              {extraMethods.includes('2fa') && <button type="button" style={button} onClick={() => { setExtraMethod('2fa'); setError(''); }} disabled={busy}>Authenticator app (2FA)</button>}
+              {extraMethods.includes('biometric') && <button type="button" style={button} onClick={() => { setExtraMethod('biometric'); setError(''); }} disabled={busy}><Fingerprint size={17} /> Biometric / passkey</button>}
+            </div>}
+            {extraMethod === '2fa' && <form onSubmit={verifyExtra2fa} style={{ display: 'grid', gap: 12 }}>
+              <label htmlFor="signin-extra-2fa" style={{ fontSize: 13, color: theme.textMuted, fontWeight: 650 }}>Six-digit authenticator code</label>
+              <input id="signin-extra-2fa" style={{ ...input, textAlign: 'center', letterSpacing: '.3em', fontSize: 20 }} type="password" inputMode="numeric" autoComplete="one-time-code" value={extraCode} onChange={event => setExtraCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="••••••" minLength={6} maxLength={6} pattern="[0-9]{6}" required />
+              <button type="submit" style={button} disabled={busy || extraCode.length !== 6}>{busy ? <LoadingDots /> : 'Verify 2FA and continue'}</button>
+            </form>}
+            {extraMethod === 'biometric' && <div style={{ display: 'grid', gap: 10 }}>
+              <p style={{ margin: 0, color: theme.textMuted, fontSize: 13, lineHeight: 1.5 }}>Confirm with the passkey/biometric method bound to this CryBots account.</p>
+              <button type="button" style={button} onClick={() => void verifyExtraBiometric()} disabled={busy}>{busy ? <LoadingDots /> : <><Fingerprint size={17} /> Verify biometric and continue</>}</button>
+            </div>}
+            <button type="button" onClick={resetAccount} style={{ border: 0, background: 'transparent', color: theme.primary, padding: 8, fontWeight: 700, cursor: 'pointer' }}>Cancel request</button>
+          </section>}
           {notice && <p role="status" style={{ margin: '16px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{notice}</p>}
           {error && <p role="alert" style={{ margin: '16px 0 0', padding: '11px 13px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 13, lineHeight: 1.5 }}>{error}</p>}
           <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
