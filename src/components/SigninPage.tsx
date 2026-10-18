@@ -128,11 +128,11 @@ const SigninPage = () => {
     else navigate('/home');
   };
 
-  const glass = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' } as const;
-  const button = { minHeight: 46, border: 'none', borderRadius: 999, padding: '12px 18px', fontWeight: 750, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%', cursor: busy ? 'wait' : 'pointer', background: theme.primary, color: theme.textInverse, boxSizing: 'border-box' as const };
-  const secondaryButton = { ...button, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}` };
-  const input = { width: '100%', minHeight: 48, boxSizing: 'border-box' as const, borderRadius: 13, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '12px 14px', fontSize: 15, outline: 'none' };
-  const label = { display: 'block', fontSize: 13, color: theme.textMuted, marginBottom: 8, fontWeight: 650 as const };
+  const glass: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' } as const;
+  const button: React.CSSProperties = { minHeight: 46, border: 'none', borderRadius: 999, padding: '12px 18px', fontWeight: 750, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%', cursor: busy ? 'wait' : 'pointer', background: theme.primary, color: theme.textInverse, boxSizing: 'border-box' as const };
+  const secondaryButton: React.CSSProperties = { ...button, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}` };
+  const input: React.CSSProperties = { width: '100%', minHeight: 48, boxSizing: 'border-box' as const, borderRadius: 13, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '12px 14px', fontSize: 15, outline: 'none' };
+  const label: React.CSSProperties = { display: 'block', fontSize: 13, color: theme.textMuted, marginBottom: 8, fontWeight: 650 as const };
 
   return (
     <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, padding: 'clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
