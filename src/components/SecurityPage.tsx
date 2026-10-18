@@ -531,7 +531,7 @@ const SecurityPage = () => {
   };
 
   const handleSecurityCodeSave = async () => {
-    if (!securityCodeEmailCodeRequested || !/^\\d{4}$/.test(securityCodeEmailCode)) {
+    if (!securityCodeEmailCodeRequested || !/^\d{4}$/.test(securityCodeEmailCode)) {
       return showStatus('error', 'Request and enter the 4-digit email verification code first.', 'securityCode');
     }
     if (securityCode.length !== 6 || securityCode !== confirmSecurityCode) {
