@@ -106,12 +106,16 @@ const SigninPage = () => {
         }
         selectedEmail = (result.email || '').trim().toLowerCase();
         if (!selectedEmail) {
-          setNotice('No KingsHall account found on this device. Sign in to KingsHall, then return to CryBots.');
+          const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
+          if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
+          setShowNoAccountModal(true);
           return;
         }
       } else {
         selectedEmail = getBrowserAccountHint();
         if (!selectedEmail) {
+          const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
+          if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
           setShowNoAccountModal(true);
           return;
         }
