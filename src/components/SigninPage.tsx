@@ -12,7 +12,7 @@ import { navigate } from '../utils/navigate';
 type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email?: string; uid?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string };
 type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; message?: string };
 type NativeKingsHallAccount = { email: string; username?: string; displayName?: string };
-type NativeKingsHallAccountPlugin = { getAccounts(): Promise<{ accounts: NativeKingsHallAccount[] }> };
+type NativeKingsHallAccountPlugin = { chooseAccount(): Promise<{ email?: string; cancelled?: boolean }> };
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
 const ACCOUNT_HINT_KEY = 'kingshall_account_hint';
@@ -33,14 +33,14 @@ const SigninPage = () => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
-  const [accountOptions, setAccountOptions] = useState<NativeKingsHallAccount[]>([]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const returnedEmail = params.get('kingshall_account');
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const returnedEmail = params.get('kingshall_account') || hashParams.get('kingshall_account');
     if (returnedEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(returnedEmail)) {
       localStorage.setItem(ACCOUNT_HINT_KEY, returnedEmail.trim().toLowerCase());
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({}, '', window.location.pathname + window.location.search);
       setNotice('KingsHall account saved on this browser. Press the button to continue.');
     }
   }, []);
@@ -78,18 +78,16 @@ const SigninPage = () => {
       if (isNativeAndroid()) {
         const plugin = getNativePlugin();
         if (!plugin) throw new Error('This CryBots APK needs an update to use the KingsHall account manager.');
-        const result = await plugin.getAccounts();
-        const accounts = (result.accounts || []).filter(account => typeof account.email === 'string' && account.email.includes('@'));
-        setAccountOptions(accounts);
-        if (!accounts.length) {
+        const result = await plugin.chooseAccount();
+        if (result.cancelled) {
+          setNotice('Choose a KingsHall account to continue. If none appears, sign in to KingsHall first.');
+          return;
+        }
+        selectedEmail = (result.email || '').trim().toLowerCase();
+        if (!selectedEmail) {
           setNotice('No KingsHall account found on this device. Sign in to KingsHall, then return to CryBots.');
           return;
         }
-        if (accounts.length > 1) {
-          setNotice('Choose the KingsHall account you want to use.');
-          return;
-        }
-        selectedEmail = accounts[0].email;
       } else {
         selectedEmail = (localStorage.getItem(ACCOUNT_HINT_KEY) || '').trim().toLowerCase();
         if (!selectedEmail) {
@@ -109,12 +107,6 @@ const SigninPage = () => {
   };
 
   const chooseAccount = (email: string) => {
-    setIdentity(email);
-    setAccountDetected(true);
-    setAccountOptions([]);
-    setNotice('KingsHall account selected. Enter the bound Access Code to continue.');
-  };
-
   const handleAccessCode = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (busy || !identity || accessCode.length !== 6) return;
@@ -131,7 +123,7 @@ const SigninPage = () => {
   };
 
   const resetAccount = () => {
-    setIdentity(''); setAccessCode(''); setAccountDetected(false); setAccountOptions([]); setError(''); setNotice('');
+    setIdentity(''); setAccessCode(''); setAccountDetected(false); setError(''); setNotice('');
   };
   const handleReturn = () => {
     if (window.history.length > 1) window.history.back();
@@ -156,8 +148,6 @@ const SigninPage = () => {
           <p style={{ margin: '9px 0 22px', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{accountDetected ? identity : 'Continue with the KingsHall account saved on this device or browser.'}</p>
 
           {!accountDetected && <button type="button" aria-label="Sign in with KingsHall" onClick={() => void startSignin()} disabled={busy} style={{ width: 88, height: 88, borderRadius: '50%', border: `1px solid ${theme.borderGlass}`, background: theme.primary, color: theme.textInverse, display: 'grid', placeItems: 'center', margin: '0 auto', cursor: busy ? 'wait' : 'pointer', boxShadow: `0 8px 28px ${theme.primary}35, inset 0 1px 0 rgba(255,255,255,.25)` }}>{busy ? <LoadingDots /> : <KeyRound size={28} />}</button>}
-
-          {accountOptions.length > 1 && <div style={{ display: 'grid', gap: 10, marginTop: 20 }}>{accountOptions.map(account => <button key={account.email} type="button" onClick={() => chooseAccount(account.email)} style={{ ...glass, borderRadius: 14, padding: 14, color: theme.text, cursor: 'pointer' }}>{account.email}</button>)}</div>}
 
           {accountDetected && <form onSubmit={handleAccessCode} style={{ display: 'grid', gap: 14, textAlign: 'left' }}>
             <label htmlFor="signin-access-code" style={{ fontSize: 13, color: theme.textMuted, fontWeight: 650 }}>Bound six-digit Access Code</label>
