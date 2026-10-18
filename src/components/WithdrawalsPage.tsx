@@ -149,8 +149,6 @@ const WithdrawPage = () => {
 
   const [savingSecurityCode, setSavingSecurityCode] = useState(false);
   const [withdrawing, setWithdrawing] = useState(false);
-  const [password, setPassword] = useState('');
-  const [newSecurityCode, setNewSecurityCode] = useState('');
 
   const availableDestination = useMemo(() => currentWallet, [currentWallet]);
 
@@ -198,21 +196,6 @@ const WithdrawPage = () => {
       setShowSchedulePage(false);
     }
   }, [method]);
-
-  const handleSaveSecurityCode = async () => {
-    setSavingSecurityCode(true);
-    try {
-      await api.patch('/api/withdrawals/security-code', { currentPassword: password, securityCode: newSecurityCode });
-      setMessage({ kind: 'success', text: 'Security code updated successfully.' });
-      setPassword('');
-      setNewSecurityCode('');
-      setSecurityCodeSet(true);
-    } catch (error: any) {
-      setMessage({ kind: 'error', text: getFriendlyErrorMessage(error, 'Unable to update your security code. Please check your details and try again.') });
-    } finally {
-      setSavingSecurityCode(false);
-    }
-  };
 
   const handleWithdraw = async () => {
     setWithdrawing(true);
