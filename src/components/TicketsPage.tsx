@@ -145,44 +145,49 @@ const TicketsPage = () => {
           <h1 style={styles.heading}>Tickets</h1>
           <p style={styles.intro}>Send a message or report to the admin and track your support tickets here.</p>
           {error ? <p style={styles.error}>{error}</p> : null}
-          <section style={styles.panel}>
           {selectedTicket ? (
-            <section style={styles.detail}>
-              <div>
-                <h2 style={styles.detailHeading}>{selectedTicket.subject}</h2>
-                <p style={styles.meta}>Status: <strong>{selectedTicket.status}</strong></p>
-                <p style={styles.meta}>Created: {formatDate(selectedTicket.createdAt)}</p>
-                <p style={styles.meta}>Last updated: {formatDate(selectedTicket.updatedAt)}</p>
-              </div>
-              <p style={styles.body}>{selectedTicket.body}</p>
-              {selectedTicket.adminReply ? <div style={styles.reply}><strong>Admin reply</strong><p style={styles.body}>{selectedTicket.adminReply}</p></div> : null}
-              <div style={styles.detailActions}>
-                {selectedTicket.status !== 'closed' && showCloseConfirm ? <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => setShowCloseConfirm(false)}>Cancel</button><button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => void closeTicket()} disabled={closing}>{closing ? <LoadingDots /> : 'Confirm Close'}</button></> : <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>{selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => setShowCloseConfirm(true)} disabled={closing}>{closing ? <LoadingDots /> : <><Check size={16} /> Close Ticket</>}</button> : null}</>}
-              </div>
+            <section style={styles.panel}>
+              <section style={styles.detail}>
+                <div>
+                  <h2 style={styles.detailHeading}>{selectedTicket.subject}</h2>
+                  <p style={styles.meta}>Status: <strong>{selectedTicket.status}</strong></p>
+                  <p style={styles.meta}>Created: {formatDate(selectedTicket.createdAt)}</p>
+                  <p style={styles.meta}>Last updated: {formatDate(selectedTicket.updatedAt)}</p>
+                </div>
+                <p style={styles.body}>{selectedTicket.body}</p>
+                {selectedTicket.adminReply ? <div style={styles.reply}><strong>Admin reply</strong><p style={styles.body}>{selectedTicket.adminReply}</p></div> : null}
+                <div style={styles.detailActions}>
+                  {selectedTicket.status !== 'closed' && showCloseConfirm ? <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => setShowCloseConfirm(false)}>Cancel</button><button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => void closeTicket()} disabled={closing}>{closing ? <LoadingDots /> : 'Confirm Close'}</button></> : <><button type="button" style={{ ...styles.secondaryButton, ...styles.detailButton }} onClick={() => { setSelectedTicket(null); setError(''); }}><ChevronLeft size={16} /> Back to Tickets</button>{selectedTicket.status !== 'closed' ? <button type="button" style={{ ...styles.submitButton, ...styles.detailButton, ...(closing ? styles.disabled : {}) }} onClick={() => setShowCloseConfirm(true)} disabled={closing}>{closing ? <LoadingDots /> : <><Check size={16} /> Close Ticket</>}</button> : null}</>}
+                </div>
+              </section>
             </section>
           ) : (
             <>
-              {!showForm ? <button type="button" style={styles.createButton} onClick={() => { setShowForm(true); setError(''); }}><Plus size={18} /> Create New Ticket</button> : (
-                <form style={styles.form} onSubmit={(event) => void submitTicket(event)}>
-                  <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={60} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
-                  <label style={styles.label}>Body<textarea style={styles.textarea} value={body} maxLength={10000} onChange={(event) => setBody(event.target.value)} placeholder="Write your message or report here..." /></label>
-                  <div style={styles.formActions}>
-                    <button type="button" style={{ ...styles.secondaryButton, ...styles.formButton }} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
-                    <button type="submit" style={{ ...styles.submitButton, ...styles.formButton, ...(saving ? styles.disabled : {}) }} disabled={saving}>{saving ? <LoadingDots /> : <><Send size={16} /> Submit Ticket</>}</button>
-                  </div>
-                </form>
-              )}
-              <div style={styles.tableWrap}>
-                {loading ? <div style={styles.empty}><LoadingDots /></div> : tickets.length === 0 ? <div style={styles.empty}>No tickets yet.</div> : (
-                  <table style={styles.table}>
-                    <thead><tr><th style={styles.th}>Subject</th><th style={styles.th}>Status</th><th style={styles.th}>Action</th></tr></thead>
-                    <tbody>{tickets.map((ticket) => <tr key={ticket.id}><td style={styles.td}>{ticket.subject}</td><td style={styles.td}><span style={{ ...styles.status, ...statusStyle(ticket.status, theme) }}>{ticket.status}</span></td><td style={styles.td}><button type="button" style={styles.viewButton} onClick={() => void viewTicket(ticket)}><Eye size={15} /> View</button></td></tr>)}</tbody>
-                  </table>
-                )}
-              </div>
+              {showForm ? (
+                <section style={styles.panel}>
+                  <form style={styles.form} onSubmit={(event) => void submitTicket(event)}>
+                    <label style={styles.label}>Subject<input style={styles.input} value={subject} maxLength={60} onChange={(event) => setSubject(event.target.value)} placeholder="What can we help with?" /></label>
+                    <label style={styles.label}>Body<textarea style={styles.textarea} value={body} maxLength={10000} onChange={(event) => setBody(event.target.value)} placeholder="Write your message or report here..." /></label>
+                    <div style={styles.formActions}>
+                      <button type="button" style={{ ...styles.secondaryButton, ...styles.formButton }} onClick={() => { setShowForm(false); setError(''); }} disabled={saving}>Cancel</button>
+                      <button type="submit" style={{ ...styles.submitButton, ...styles.formButton, ...(saving ? styles.disabled : {}) }} disabled={saving}>{saving ? <LoadingDots /> : <><Send size={16} /> Submit Ticket</>}</button>
+                    </div>
+                  </form>
+                </section>
+              ) : null}
+              <section style={styles.panel}>
+                {!showForm ? <button type="button" style={styles.createButton} onClick={() => { setShowForm(true); setError(''); }}><Plus size={18} /> Create New Ticket</button> : null}
+                <div style={styles.tableWrap}>
+                  {loading ? <div style={styles.empty}><LoadingDots /></div> : tickets.length === 0 ? <div style={styles.empty}>No tickets yet.</div> : (
+                    <table style={styles.table}>
+                      <thead><tr><th style={styles.th}>Subject</th><th style={styles.th}>Status</th><th style={styles.th}>Action</th></tr></thead>
+                      <tbody>{tickets.map((ticket) => <tr key={ticket.id}><td style={styles.td}>{ticket.subject}</td><td style={styles.td}><span style={{ ...styles.status, ...statusStyle(ticket.status, theme) }}>{ticket.status}</span></td><td style={styles.td}><button type="button" style={styles.viewButton} onClick={() => void viewTicket(ticket)}><Eye size={15} /> View</button></td></tr>)}</tbody>
+                    </table>
+                  )}
+                </div>
+              </section>
             </>
           )}
-          </section>
         </div>
       </main>
       <NowBar />
