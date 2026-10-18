@@ -72,8 +72,8 @@ const Creation = () => {
 
   const [tradingViewResults, setTradingViewResults] = useState<TradingViewResult[]>([]);
   const [searchingSymbols, setSearchingSymbols] = useState(false);
-  const outerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass };
-  const innerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted };
+  const outerCardStyle: React.CSSProperties = { display: 'grid', gap: 14, width: '100%', boxSizing: 'border-box', padding: 16, borderRadius: 22, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' };
+  const innerCardStyle: React.CSSProperties = { display: 'grid', gap: 12, width: '100%', boxSizing: 'border-box', padding: 0, border: 'none', borderRadius: 0, background: 'transparent' };
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' };
   const labelStyle: React.CSSProperties = { display: 'grid', gap: 7, color: theme.text, fontWeight: 750, fontSize: '0.85rem' };
 
