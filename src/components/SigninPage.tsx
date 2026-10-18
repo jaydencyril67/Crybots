@@ -16,6 +16,25 @@ type NativeKingsHallAccountPlugin = { chooseAccount(): Promise<{ email?: string;
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
 const ACCOUNT_HINT_KEY = 'kingshall_account_hint';
+const EMAIL_PATTERN = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+const getSavedBrowserAccounts = () => {
+  let accounts: string[] = [];
+  const cookie = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith('kh_saved_accounts='));
+  if (cookie) {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(cookie.slice('kh_saved_accounts='.length)));
+      if (Array.isArray(parsed)) accounts = parsed.filter((item): item is string => typeof item === 'string' && EMAIL_PATTERN.test(item.trim().toLowerCase())).map(item => item.trim().toLowerCase());
+    } catch {}
+  }
+  const hint = getBrowserAccountHint();
+  if (hint) accounts.push(hint);
+  return [...new Set(accounts)].slice(0, 10);
+};
+const setSelectedBrowserAccount = (email: string) => {
+  const selected = email.trim().toLowerCase();
+  localStorage.setItem(ACCOUNT_HINT_KEY, selected);
+  document.cookie = 'kh_account_hint=' + encodeURIComponent(selected) + '; Domain=.kingshall.online; Path=/; Max-Age=31536000; Secure; SameSite=Lax';
+};
 const getBrowserAccountHint = () => {
   const cookie = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith('kh_account_hint='));
   if (cookie) {
@@ -47,6 +66,7 @@ const SigninPage = () => {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [showNoAccountModal, setShowNoAccountModal] = useState(false);
+  const [browserAccounts, setBrowserAccounts] = useState<string[]>([]);
   const [challengeToken, setChallengeToken] = useState('');
   const [extraMethods, setExtraMethods] = useState<Array<'2fa' | 'biometric'>>([]);
   const [extraMethod, setExtraMethod] = useState<'2fa' | 'biometric' | ''>('');
@@ -112,9 +132,17 @@ const SigninPage = () => {
           return;
         }
       } else {
-        selectedEmail = getBrowserAccountHint();
-        if (!selectedEmail) {
-          const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
+        const accounts = getSavedBrowserAccounts();
+        const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
+        if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
+        if (accounts.length) {
+          setBrowserAccounts(accounts);
+          return;
+        }
+        setShowNoAccountModal(true);
+        return;
+      }
+      const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
           if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
           setShowNoAccountModal(true);
           return;
@@ -205,6 +233,11 @@ const SigninPage = () => {
           <h1 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', lineHeight: 1.2 }}>{accountDetected ? 'Confirm your KingsHall account' : 'Sign in to CryBots'}</h1>
           <p style={{ margin: '9px 0 22px', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{accountDetected ? identity : 'Continue with the KingsHall account saved on this device or browser.'}</p>
 
+          {!accountDetected && browserAccounts.length > 0 && <div style={{ display: 'grid', gap: 9, margin: '0 0 16px', textAlign: 'left' }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 800 }}>Saved KingsHall accounts</p>
+            <p style={{ margin: 0, color: theme.textMuted, fontSize: 12, lineHeight: 1.5 }}>Choose which account to use for this sign-in request.</p>
+            {browserAccounts.map(email => <button key={email} type="button" style={{ ...button, justifyContent: 'flex-start', overflowWrap: 'anywhere', textAlign: 'left' }} onClick={() => { setSelectedBrowserAccount(email); setIdentity(email); setAccountDetected(true); setError(''); setNotice('KingsHall account selected. Enter its bound Access Code to continue.'); }}>{email} <KeyRound size={15} /></button>)}
+          </div>}
           {!accountDetected && <button type="button" aria-label="Sign in with KingsHall" onClick={() => void startSignin()} disabled={busy} style={{ width: 88, height: 88, borderRadius: '50%', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, display: 'grid', placeItems: 'center', margin: '0 auto', cursor: busy ? 'wait' : 'pointer', backdropFilter: 'blur(12px) saturate(125%)', WebkitBackdropFilter: 'blur(12px) saturate(125%)', boxShadow: theme.mode === 'dark' ? 'inset 0 1px rgba(255,255,255,.13), 0 4px 14px rgba(0,0,0,.22)' : 'inset 0 1px rgba(255,255,255,.48), 0 4px 14px rgba(30,30,30,.10)' }}>{busy ? <LoadingDots /> : <KeyRound size={28} />}</button>}
           {!accountDetected && <p style={{ margin: '12px 0 0', color: theme.text, fontWeight: 700, fontSize: 14 }}>Sign in with KingsHall</p>}
 
