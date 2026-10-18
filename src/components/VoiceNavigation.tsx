@@ -532,7 +532,7 @@ const VoiceNavigation = () => {
         justifyContent: 'center',
         padding: '18px',
         background: 'rgba(2, 6, 23, 0.78)',
-        backdropFilter: 'blur(10px)',
+        backdropFilter: 'blur(4px)',
       }}
     >
       <section
