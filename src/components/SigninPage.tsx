@@ -239,6 +239,7 @@ const SigninPage = () => {
           {notice && <p role="status" style={{ margin: '16px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{notice}</p>}
           {error && <p role="alert" style={{ margin: '16px 0 0', padding: '11px 13px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 13, lineHeight: 1.5 }}>{error}</p>}
           <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
+          <div style={{ marginTop: 14, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>Need an account? <a href={KINGSHALL_SIGNIN} style={{ color: theme.primary, fontWeight: 700, textDecoration: 'none' }}>Create or recover access in KingsHall</a></div>
         </section>
       </div>
       {showNoAccountModal && <div role="presentation" onClick={() => setShowNoAccountModal(false)} style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'grid', placeItems: 'center', padding: 20, background: 'rgba(0,0,0,.58)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
