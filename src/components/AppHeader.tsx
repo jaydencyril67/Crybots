@@ -340,10 +340,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   return (
     <>
       <AppUpdateMonitor />
-      <style>{`@keyframes ke-header-alert {
-        0%, 100% { opacity: 1; box-shadow: 0 0 0 1px color-mix(in srgb, var(--notification-color) 72%, transparent), 0 0 8px color-mix(in srgb, var(--notification-color) 38%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px color-mix(in srgb, var(--notification-color) 34%, transparent)); }
-        50% { opacity: 0.9; box-shadow: 0 0 0 2px color-mix(in srgb, var(--notification-color) 78%, transparent), 0 0 22px color-mix(in srgb, var(--notification-color) 62%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--notification-color) 48%, transparent)); }
-      }`}</style>
+      <style>{`@keyframes ke-header-alert { 0%, 100% { opacity: 1; } 50% { opacity: .94; } }</style>
       <header
         style={headerStyle}
         onClick={handleHeaderClick}
