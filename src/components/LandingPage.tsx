@@ -54,6 +54,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     maxWidth: '1160px',
     margin: '0 auto',
     padding: 'clamp(14px, 2.5vw, 24px) clamp(12px, 2vw, 20px) 32px',
+    display: 'grid',
+    gap: '16px',
   },
   glow: {
     position: 'absolute' as const,
@@ -133,7 +135,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gridTemplateColumns: 'minmax(0, 1fr)',
     gap: 'clamp(20px, 4vw, 44px)',
     alignItems: 'center',
-    padding: 'clamp(28px, 5vw, 56px) 0 clamp(28px, 4vw, 44px)',
+    padding: 'clamp(22px, 4vw, 36px)',
+    borderRadius: '22px',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
     position: 'relative' as const,
     zIndex: 1,
   },
@@ -301,7 +307,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '12px',
   },
   assetItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', borderRadius: 0, borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '12px 0', flexWrap: 'wrap' as const },
-  sectionGroup: { display: 'grid', gap: '10px', padding: '18px 0 0', borderRadius: 0, border: 'none', borderTop: `1px solid ${theme.borderGlass}`, background: 'transparent' },
+  sectionGroup: { display: 'grid', gap: '10px', padding: 'clamp(18px, 3vw, 26px)', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' },
   sectionGrid: {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
@@ -322,7 +328,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     lineHeight: 1.7,
     color: theme.textMuted,
   },
-  howSection: { borderRadius: 0, border: 'none', borderTop: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '18px 0 0', position: 'relative' as const, zIndex: 1, marginBottom: '0' },
+  howSection: { borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', padding: 'clamp(18px, 3vw, 26px)', position: 'relative' as const, zIndex: 1, marginBottom: '0' },
   howGrid: {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
@@ -421,7 +427,6 @@ const LandingPage = () => {
         <div style={styles.shell}>
           
 
-          <div style={styles.outerCard}>
           <div style={styles.heroGrid}>
             <div style={{ textAlign: 'center' }}>
               <h2 style={styles.heading}>
@@ -528,7 +533,6 @@ const LandingPage = () => {
               </div>
             </div>
           </section>
-          </div>
         </div>
       </section>
     </main>
