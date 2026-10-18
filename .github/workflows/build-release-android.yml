@@ -1095,40 +1095,51 @@ jobs:
           set -euo pipefail
           mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values android/app/src/main/res/values-v31
 
-          # The current master SVG uses an oversized black circle (r=363) to
-          # fill the PWA canvas. For Android splash, reduce that backdrop to a
-          # true centered circle and leave the surrounding canvas transparent.
-          # Keep the orbital artwork, its transforms, and the 512px canvas intact.
+          # Build the same 92px circle holder + 72px foreground image as the PWA
+          # for legacy Android. Android 12+ uses its 512px system-icon canvas:
+          # 92dp circle and 72dp foreground image mapped onto the 288dp splash canvas.
           node - <<'NODE'
           const sharp = require('sharp');
           const fs = require('fs');
 
           (async () => {
             let svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
-            const backgroundCircle = /<circle\s+cx="256"\s+cy="256"\s+r="363"\s+fill="#000000"\s*\/>/;
+            const backgroundCircle = /<circle\\s+cx="256"\\s+cy="256"\\s+r="363"\\s+fill="#000000"\\s*\\/>/;
             if (!backgroundCircle.test(svg)) {
-              throw new Error('CryBots master icon changed; cannot safely isolate its splash composition.');
+              throw new Error('CryBots master icon changed; cannot safely isolate its splash artwork.');
             }
-            svg = svg.replace(backgroundCircle, '<circle cx="256" cy="256" r="235" fill="#000000"/>');
-            // Match the custom refresh splash's 92px circle / 72px mark.
-            // Keep separate compositions for the 92dp legacy layer and Android 12+
-            // system icon canvas so the system splash does not enlarge the artwork.
-            const rendered = await sharp(Buffer.from(svg)).png().toBuffer();
-            await sharp(rendered).resize(545, 545).extract({ left: 16, top: 16, width: 512, height: 512 })
+            // Remove the app-icon backdrop: splash circle dimensions are composed separately.
+            svg = svg.replace(backgroundCircle, '');
+            const artwork = Buffer.from(svg);
+
+            // Android 11 and below: 92dp image holder, 92px black circle, 72px artwork image.
+            const legacyArtwork = await sharp(artwork).resize(72, 72).png().toBuffer();
+            await sharp({ create: { width: 92, height: 92, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+              .composite([
+                { input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="92" height="92"><circle cx="46" cy="46" r="46" fill="#000000"/></svg>'), left: 0, top: 0 },
+                { input: legacyArtwork, left: 10, top: 10 }
+              ])
               .png().toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
-            const small = await sharp(rendered).resize(178, 178).png().toBuffer();
+
+            // Android 12+: the system splash icon canvas is 288dp. Map the same
+            // 92dp circle and 72dp artwork image to 512px, centered with transparency.
+            const systemArtwork = await sharp(artwork).resize(128, 128).png().toBuffer();
             await sharp({ create: { width: 512, height: 512, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
-              .composite([{ input: small, left: 167, top: 167 }])
+              .composite([
+                { input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><circle cx="256" cy="256" r="81.78" fill="#000000"/></svg>'), left: 0, top: 0 },
+                { input: systemArtwork, left: 192, top: 192 }
+              ])
               .png().toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo_v31.png');
 
             const branding = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320"><rect width="800" height="320" fill="none"/><text x="400" y="174" text-anchor="middle" fill="#FFFFFF" font-family="STIX Two Text, serif" font-size="72" font-weight="700" letter-spacing="3">CryBots</text></svg>');
             await sharp(branding).png().toFile('android/app/src/main/res/drawable-nodpi/crybots_branding.png');
+
             const audit = await sharp('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png').ensureAlpha().raw().toBuffer({ resolveWithObject: true });
             const alphaAt = (x, y) => audit.data[(y * audit.info.width + x) * audit.info.channels + 3];
-            if (alphaAt(0, 0) !== 0 || alphaAt(256, 0) !== 0 || alphaAt(200, 200) === 0 || alphaAt(256, 256) === 0) {
-              throw new Error('CryBots splash image failed transparency/circle validation.');
+            if (audit.info.width !== 92 || audit.info.height !== 92 || alphaAt(0, 0) !== 0 || alphaAt(46, 2) === 0 || alphaAt(46, 46) === 0) {
+              throw new Error('CryBots 92px splash composition failed validation.');
             }
-            console.log('Created and validated transparent CryBots splash with a centered circular black backdrop.');
+            console.log('Created and validated CryBots splash: 92px circle holder + 72px artwork image on all Android versions.');
           })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
@@ -1137,8 +1148,8 @@ jobs:
           <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
               <item android:drawable="@color/crybots_splash_background" />
               <item
-                  android:width="94dp"
-                  android:height="94dp"
+                  android:width="92dp"
+                  android:height="92dp"
                   android:gravity="center"
                   android:drawable="@drawable/crybots_splash_logo" />
               <item
