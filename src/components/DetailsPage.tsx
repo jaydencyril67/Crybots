@@ -43,7 +43,7 @@ const baseStyles = {
 };
 
 type ProfileDetails = {
-  firstName?: string; lastName?: string; fullName?: string; name?: string; email?: string; uid?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string;
+  firstName?: string; lastName?: string; fullName?: string; name?: string; email?: string; username?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string;
   accountStatus?: 'active' | 'disabled' | 'self_excluded' | 'pending_delete';
   securityFunctions?: { emailConfirmed?: boolean; securityCode?: boolean; twoFactor?: boolean; passkey?: boolean };
 };
@@ -89,7 +89,7 @@ const DetailsPage = () => {
   const profileDetails = liveProfile; const avatarPicture = profileDetails?.profilePicture || '';
   const coverPicture = profileDetails?.coverPhoto || '';
   const fullName = profileDetails?.fullName || profileDetails?.name || [profileDetails?.firstName, profileDetails?.lastName].filter(Boolean).join(' ').trim();
-  const email = profileDetails?.email; const uid = profileDetails?.uid; const securityFunctions = profileDetails?.securityFunctions;
+  const email = profileDetails?.email; const username = profileDetails?.username; const securityFunctions = profileDetails?.securityFunctions;
   const allSecurityFunctionsEnabled = Boolean(securityFunctions?.emailConfirmed && securityFunctions.securityCode && securityFunctions.twoFactor && securityFunctions.passkey);
   const accountStatus = profileLoading ? null : profileDetails?.accountStatus === 'active' ? allSecurityFunctionsEnabled ? 'Protected' : 'Active' : profileDetails?.accountStatus ? accountStatusLabels[profileDetails.accountStatus] : 'Active';
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : null;
@@ -122,7 +122,7 @@ const DetailsPage = () => {
                 <div style={styles.row}><p style={styles.infoLabel}><UserRound size={16} /> Display name</p><div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : fullName}</div></div>
                 <div style={styles.row}><p style={styles.infoLabel}><Mail size={16} /> Email</p><div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : email}</div></div>
                 <div style={styles.row}><p style={styles.infoLabel}><ShieldCheck size={16} /> Account status</p><p style={styles.infoValue}>{profileLoading ? <LoadingDots /> : accountStatus}</p></div>
-                <div style={styles.row}><p style={styles.infoLabel}><ShieldCheck size={16} /> UID</p><div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : uid}</div></div>
+                <div style={styles.row}><p style={styles.infoLabel}><ShieldCheck size={16} /> KingsHall username</p><div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : username}</div></div>
                 <div style={styles.row}><p style={styles.infoLabel}><Coins size={16} /> USDT Balance</p><div style={styles.infoValue}>{balanceLoading ? <LoadingDots /> : typeof usdtBalance === 'number' ? `${usdtBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT` : null}</div></div>
               </div>
               {balanceError ? <div style={styles.helperText}>{balanceError}</div> : null}
