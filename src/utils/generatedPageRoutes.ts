@@ -7,10 +7,6 @@ export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
     "route": "/signin"
   },
   {
-    "label": "FORGOT PASSWORD",
-    "route": "/forgot-password"
-  },
-  {
     "label": "HOME",
     "route": "/home"
   },
