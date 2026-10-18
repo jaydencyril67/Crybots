@@ -1104,7 +1104,7 @@ jobs:
 
           (async () => {
             let svg = fs.readFileSync('public/icons/crybots-app-icon.svg', 'utf8');
-            const backgroundCircle = /<circle\\s+cx="256"\\s+cy="256"\\s+r="363"\\s+fill="#000000"\\s*\\/>/;
+            const backgroundCircle = /<circle\s+cx="256"\s+cy="256"\s+r="363"\s+fill="#000000"\s*\/>/;
             if (!backgroundCircle.test(svg)) {
               throw new Error('CryBots master icon changed; cannot safely isolate its splash artwork.');
             }
