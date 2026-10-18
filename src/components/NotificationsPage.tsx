@@ -27,15 +27,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
   section: { display: 'grid', gap: '10px' },
   outerCard: { display: 'grid', gap: 0, marginTop: 6, padding: '8px 16px', borderRadius: 22, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', minWidth: 0, boxSizing: 'border-box' as const },
-  list: { display: 'grid', gap: 0, minWidth: 0 },
-  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '14px 0', border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, borderRadius: 0, background: 'transparent', color: theme.text, boxSizing: 'border-box' as const, minWidth: 0 },
-  unread: { background: 'transparent', boxShadow: `inset 2px 0 0 ${theme.primary}`, paddingLeft: 10 },
+  list: { display: 'grid', gap: 10, minWidth: 0 },
+  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: 16, border: `1px solid ${theme.borderGlass}`, borderRadius: 20, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', color: theme.text, boxSizing: 'border-box' as const, minWidth: 0 },
+  unread: { borderColor: theme.primary, boxShadow: `inset 3px 0 0 ${theme.primary}, inset 0 1px 0 rgba(255,255,255,0.06)` },
   icon: { width: '20px', height: '20px', color: theme.primary, flexShrink: 0 },
   title: { margin: 0, fontSize: '0.95rem', fontWeight: 850, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.76rem' },
   view: { borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '7px 12px', fontSize: '0.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceGlass, backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', cursor: 'pointer', justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 },
   markAll: { borderRadius: 999, border: `1px solid ${theme.primary}`, padding: '8px 13px', fontSize: '0.82rem', fontWeight: 800, color: theme.primary, background: theme.primarySoft, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 },
-  empty: { padding: '24px 0', border: 'none', borderRadius: 0, color: theme.textMuted, textAlign: 'center' as const, background: 'transparent' },
+  empty: { padding: 24, border: `1px solid ${theme.borderGlass}`, borderRadius: 20, color: theme.textMuted, textAlign: 'center' as const, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' },
 });
 
 const iconForType = (type: NotificationItem['type']) => {
@@ -127,8 +127,7 @@ const NotificationsPage = () => {
           {notifications.some((notification) => !notification.readAt) ? <button type="button" style={styles.markAll} onClick={() => void markAllAsRead()} disabled={markingAllRead}>{markingAllRead ? <LoadingDots /> : <><CheckCheck size={15} /> Mark all as read</>}</button> : null}
           {refreshing ? <NotificationBanner tone="info" title="Updating notifications" message="Checking for new in-app alerts." /> : null}
           {error ? <NotificationBanner tone="error" title="Notifications unavailable" message={error} /> : null}
-          <div style={styles.outerCard}>
-            <div style={styles.list}>
+          <div style={styles.list}>
             {loading ? <div style={styles.empty}><LoadingDots /></div> : null}
             {!loading && hasLoadedNotifications && !error && !notifications.length ? <div style={styles.empty}>No notifications yet.</div> : null}
             {notifications.map((notification) => {
@@ -140,7 +139,6 @@ const NotificationsPage = () => {
                 </article>
               );
             })}
-            </div>
           </div>
         </div>
       </main>
