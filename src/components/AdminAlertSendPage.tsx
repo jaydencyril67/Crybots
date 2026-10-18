@@ -18,7 +18,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   section: { display: 'grid', gap: '10px' },
   title: { margin: 0, fontSize: '1.45rem', fontWeight: 900 },
   text: { margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7 },
-  card: { display: 'grid', gap: 14, padding: 16, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'blur(24px) saturate(1.15)' },
+  card: { display: 'grid', gap: 14, padding: 16, borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'none' },
   field: { display: 'grid', gap: 8, position: 'relative' as const },
   label: { fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
   input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: 12, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem', font: 'inherit' },
