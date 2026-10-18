@@ -1093,7 +1093,7 @@ jobs:
       - name: Configure unified CryBots native launch splash
         run: |
           set -euo pipefail
-          mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values
+          mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values android/app/src/main/res/values-v31
 
           # The current master SVG uses an oversized black circle (r=363) to
           # fill the PWA canvas. For Android splash, reduce that backdrop to a
@@ -1154,6 +1154,18 @@ jobs:
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
               <color name="crybots_splash_background">#050817</color>
+          </resources>
+          XML
+
+          cat > android/app/src/main/res/values-v31/crybots_splash.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+                  <item name="android:windowSplashScreenBackground">@color/crybots_splash_background</item>
+                  <item name="android:windowSplashScreenAnimatedIcon">@drawable/crybots_splash_logo_v31</item>
+                  <item name="android:windowSplashScreenBrandingImage">@drawable/crybots_branding</item>
+                  <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+              </style>
           </resources>
           XML
 
