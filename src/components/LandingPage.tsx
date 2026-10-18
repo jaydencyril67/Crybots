@@ -46,7 +46,6 @@ const steps = [
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    overflow: 'hidden',
     background: theme.background,
     color: theme.text,
   },
@@ -255,7 +254,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   signupPreviewWrap: {
     marginTop: '24px',
-    overflow: 'hidden',
     borderRadius: '24px',
     border: `1px solid ${theme.border}`,
   },
@@ -356,7 +354,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   featureCard: {
     borderRadius: '18px',
     border: `1px solid ${theme.border}`,
-    background: theme.surfaceMuted,
+    background: theme.surfaceGlass,
     padding: '24px',
     backdropFilter: 'none',
     WebkitBackdropFilter: 'none',
