@@ -113,30 +113,28 @@ const SigninPage = () => {
     const loadingStartedAt = Date.now();
     setBusy(true); setError(''); setNotice('');
     try {
-      // Keep account detection behind the same minimum five-second loading state.
-      await new Promise(resolve => window.setTimeout(resolve, 250));
       if (isNativeAndroid()) {
         if (!Capacitor.isPluginAvailable('KingsHallAccount')) throw new Error('This CryBots APK needs an update to use the KingsHall account manager.');
+        // Keep the APK spinner active for at least five seconds across every account-chooser outcome.
         const result = await DeviceAccount.chooseAccount();
+        const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
+        if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
         if (result.cancelled) {
           setNotice('Choose a KingsHall account to continue. If none appears, sign in to KingsHall first.');
           return;
         }
         const selectedEmail = (result.email || '').trim().toLowerCase();
         if (!EMAIL_PATTERN.test(selectedEmail)) {
-          const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
-          if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
           setShowNoAccountModal(true);
           return;
         }
-        const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
-        if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
         setIdentity(selectedEmail);
         setAccountDetected(true);
         setNotice('KingsHall account detected. Enter the bound Access Code to continue.');
         return;
       }
 
+      // Browser/PWA also waits a minimum of five seconds before showing the result.
       const accounts = getSavedBrowserAccounts();
       const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
       if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
@@ -146,13 +144,15 @@ const SigninPage = () => {
       }
       setShowNoAccountModal(true);
     } catch (e) {
+      const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
+      if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
       setError(messageFromError(e, 'Unable to detect a KingsHall account.'));
     } finally {
       setBusy(false);
     }
   };
 
-  const handleAccessCode = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleAccessCode = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (busy || !identity || accessCode.length !== 6) return;
     setBusy(true); setError(''); setNotice('');
