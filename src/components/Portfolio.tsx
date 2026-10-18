@@ -116,18 +116,22 @@ const Portfolio = () => {
     },
     card: {
       marginTop: '14px',
-      padding: '10px',
-      borderRadius: '16px',
+      padding: '16px',
+      borderRadius: '22px',
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+      display: 'grid',
+      gap: '14px',
+      boxSizing: 'border-box' as const,
     },
     row: {
       display: 'grid',
       gap: '8px',
-      padding: '13px 14px',
-      borderRadius: '15px',
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceMuted,
+      padding: '10px 0',
+      borderRadius: 0,
+      border: 'none',
+      background: 'transparent',
       minWidth: 0,
     },
     label: {
@@ -168,7 +172,7 @@ const Portfolio = () => {
 
             {error && <NotificationBanner tone="error" title="Portfolio unavailable" message={error} />}
 
-            <div style={{ display: 'grid', gap: 10 }}>
+            <div style={{ display: 'grid', gap: 14 }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
                 <div style={styles.row}>
                   <p style={styles.label}><Bot size={14} /> Total bots</p>
