@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CircleUserRound, Coins, Eye, Image as ImageIcon, Mail, ShieldCheck, Trash2, Upload, UserRound } from 'lucide-react';
+import { ArrowLeft, Coins, Eye, Image as ImageIcon, Mail, ShieldCheck, Trash2, Upload, UserRound } from 'lucide-react';
 import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
