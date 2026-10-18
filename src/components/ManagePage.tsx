@@ -10,7 +10,6 @@ import ReusableDatePage from './ReusableDatePage';
 import NowBar from './NowBar';
 import { getFriendlyErrorMessage } from '../utils/errorMessage';
 import { navigate } from '../utils/navigate';
-import { completeOnboardingStep } from '../utils/onboarding';
 
 type WalletNetwork = 'TRC-20' | 'BEP-20' | 'TRX';
 type Wallet = { id?: string; network: WalletNetwork; address: string; description?: string };
@@ -120,7 +119,6 @@ const ManagePage = () => {
       setWallets(data.wallets || []);
       resetWalletForm();
       setStatus({ kind: 'success', message: wasEditing ? 'Wallet updated successfully.' : 'Wallet saved successfully.' });
-      if (!wasEditing) completeOnboardingStep('wallet');
     } catch (error: any) {
       setStatus({ kind: 'error', message: getFriendlyErrorMessage(error, 'Unable to save your wallet address. Please try again.') });
     } finally {
