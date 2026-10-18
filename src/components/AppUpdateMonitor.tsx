@@ -120,7 +120,7 @@ const AppUpdateMonitor = () => {
         background: theme.surfaceElevated,
         color: theme.text,
         boxShadow: '0 14px 36px rgba(0,0,0,0.32)',
-        backdropFilter: 'blur(22px)',
+        backdropFilter: 'blur(8px)',
       }}
     >
       <style>{'@keyframes kh-update-spin { to { transform: rotate(360deg); } }'}</style>
