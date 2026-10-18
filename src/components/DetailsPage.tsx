@@ -18,7 +18,7 @@ const baseStyles = {
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { paddingTop: '8px', display: 'grid', gap: '14px', marginTop: '14px' },
   rowList: { display: 'grid', gap: '14px', width: '100%', minWidth: 0, padding: '16px', borderRadius: '22px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', boxSizing: 'border-box' as const },
-  profilePhotoCard: { width: 'fit-content', maxWidth: '100%', margin: '0 auto' },
+  profilePhotoCard: { width: '100%', maxWidth: '552px', margin: '0 auto' },
   row: { width: '100%', maxWidth: '100%', border: 'none', borderRadius: 0, padding: '10px 0', background: 'transparent', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
   grid: { display: 'grid', gap: '12px', gridTemplateColumns: 'minmax(0, 1fr)' },
   infoList: { display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginTop: '8px' },
