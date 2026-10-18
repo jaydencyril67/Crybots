@@ -98,15 +98,15 @@ const WorldScopePage = () => {
     page: { minHeight: '100vh', paddingBottom: 90, overflowX: 'hidden', overflowY: 'auto', background: theme.background, color: theme.text },
     shell: { width: '100%', maxWidth: 920, margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' },
     back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, borderRadius: 10, padding: '7px 10px', fontSize: '.84rem', fontWeight: 700, marginBottom: 12, cursor: 'pointer' },
-    mainCard: { padding: 16, borderRadius: 22, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', display: 'grid', gap: 16, minWidth: 0, boxSizing: 'border-box' as const },
-    hero: { border: 'none', background: 'transparent', borderRadius: 0, padding: 0, display: 'grid', gap: 13, marginBottom: 0 },
+    sectionCard: { padding: 16, borderRadius: 22, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', display: 'grid', gap: 12, minWidth: 0, boxSizing: 'border-box' as const },
+    hero: { padding: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', borderRadius: 22, display: 'grid', gap: 13, minWidth: 0, boxSizing: 'border-box' as const },
     eyebrow: { display: 'inline-flex', alignItems: 'center', gap: 7, color: theme.primary, fontSize: '.74rem', fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' as const },
     title: { margin: 0, fontSize: 'clamp(1.15rem, 3vw, 1.45rem)', lineHeight: 1.25, letterSpacing: '-.03em', fontWeight: 900 },
     subtitle: { margin: 0, color: theme.textMuted, fontSize: '.92rem', lineHeight: 1.7, maxWidth: '64ch' },
     sectionTitle: { margin: '14px 0 10px', fontSize: 'clamp(1.15rem, 3vw, 1.45rem)', fontWeight: 900, letterSpacing: '-.03em' },
     muted: { color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
     grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 12 },
-    outerCard: { display: 'contents' as const },
+    outerCard: { padding: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', borderRadius: 22, display: 'grid', gap: 12, minWidth: 0, boxSizing: 'border-box' as const },
     card: { border: 'none', background: 'transparent', borderRadius: 0, padding: 0, display: 'grid', alignContent: 'start', gap: 12, minWidth: 0, boxSizing: 'border-box' as const },
     button: { width: '100%', minWidth: 108, border: 'none', borderRadius: 999, padding: '11px 16px', color: theme.text, background: theme.surfaceMuted, fontWeight: 700, fontSize: '.88rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', boxSizing: 'border-box' as const },
     primaryButton: { background: theme.primary, color: theme.textInverse, borderColor: theme.primary },
@@ -116,7 +116,7 @@ const WorldScopePage = () => {
     cancelConfirm: { flex: 1, borderRadius: 999, border: `1px solid ${theme.borderGlass}`, padding: '8px 13px', fontSize: '.82rem', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer' },
     confirmPurchase: { flex: 1, borderRadius: 999, border: `1px solid ${theme.primary}`, padding: '8px 13px', fontSize: '.82rem', fontWeight: 800, color: theme.textInverse, background: theme.primary, cursor: 'pointer' },
     featureList: { display: 'grid', gap: 8, padding: 0, margin: 0, listStyle: 'none', color: theme.textMuted, fontSize: '.88rem', lineHeight: 1.5 },
-    notice: { border: 'none', borderRadius: 0, borderTop: `1px solid ${theme.borderGlass}`, background: 'transparent', color: theme.textMuted, padding: '12px 0 0', fontSize: '.82rem', lineHeight: 1.5, marginTop: 4 },
+    notice: { border: `1px solid ${theme.borderGlass}`, borderRadius: 16, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)', color: theme.textMuted, padding: 14, fontSize: '.82rem', lineHeight: 1.5, minWidth: 0, boxSizing: 'border-box' as const },
     status: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const, color: theme.textMuted, fontSize: '.82rem', lineHeight: 1.5 },
     tabRow: { display: 'flex', flexWrap: 'nowrap' as const, gap: 8, paddingBottom: 8, marginBottom: 12, width: '100%', overflowX: 'auto' as const, overflowY: 'hidden' as const, WebkitOverflowScrolling: 'touch' as const, scrollbarWidth: 'thin' as const },
     tab: { flex: '0 0 auto', minWidth: 'max-content', minHeight: 38, border: `1px solid ${theme.border}`, borderRadius: 9, padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, fontSize: '.88rem', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' as const, boxSizing: 'border-box' as const },
@@ -135,15 +135,12 @@ const WorldScopePage = () => {
     <div style={styles.page}>
       <main style={styles.shell}>
         <button type="button" style={styles.back} onClick={() => navigate(isRankingsPage ? '/worldscope' : '/store')}><ArrowLeft size={16} /> {isRankingsPage ? 'WorldScope' : 'Store'}</button>
-        <div style={styles.mainCard}>
-        <div style={{ ...styles.outerCard, marginBottom: 0 }}>
-          <section style={{ ...styles.hero, marginBottom: 0, background: theme.surfaceMuted }}>
+        <section style={styles.hero}>
             <div style={styles.eyebrow}><Activity size={15} /> CryBots platform intelligence</div>
             <h1 style={styles.title}>{isRankingsPage ? 'WorldScope Rankings' : 'WorldScope'}</h1>
             <p style={styles.subtitle}>{isRankingsPage ? 'Explore platform rankings built from recorded bot settlements and currently available Commerce and Rentals listings.' : 'Understand what is happening across the platform. WorldScope brings together rankings from recorded bot settlements and currently available Commerce and Rentals listings, so you can compare real app activity instead of relying on guesswork.'}</p>
             <div style={styles.status}>{loading ? <><LoadingDots /> Checking your access…</> : accessActive ? <><CheckCircle2 size={14} color="#22c55e" /> Subscription active</> : <><LockKeyhole size={14} /> Paid subscription required</>} {data?.asOf && <>· Data snapshot {new Date(data.asOf).toLocaleString()}</>}</div>
-          </section>
-        </div>
+        </section>
 
         {error && <div role="alert" style={{ ...styles.message, borderColor: '#ef4444' }}>{error}</div>}
         {message && <div role="status" style={styles.message}>{message}</div>}
@@ -236,7 +233,6 @@ const WorldScopePage = () => {
           </div>
           <div style={styles.footer}><Sparkles size={13} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: 5 }} /> Profit rankings use recorded settlement entries. Daily symbol ranking uses the current UTC date. Listing rankings only include currently available bots. Rankings describe recorded app activity and are not a promise of future returns.</div>
         </>}
-        </div>
       </main>
       <NowBar />
     </div>
