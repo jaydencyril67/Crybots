@@ -170,7 +170,7 @@ const TradeHistory = () => {
             <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
             <div style={styles.rowList}>
               <section style={{ ...styles.card, position: 'relative', zIndex: 2, overflow: 'visible' }}>
-                <button type="button" style={{ ...styles.select, border: 'none', padding: 0, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setFiltersOpen((open) => !open)}>
+                <button type="button" style={{ ...styles.selectTrigger, border: 'none', padding: 0, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setFiltersOpen((open) => !open)}>
                   <span style={styles.cardTitle}><Filter size={18} /> Filters</span><span style={{ ...styles.muted, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>{typeFilter === 'all' ? 'All bot activity' : typeFilter} <ChevronDown size={17} style={{ transform: filtersOpen ? 'rotate(180deg)' : 'none' }} /></span>
                 </button>
                 {filtersOpen ? <div className="trade-history-filters" style={styles.filters}>
@@ -184,7 +184,7 @@ const TradeHistory = () => {
               </section>
 
               <section style={{ ...styles.card, position: 'relative', zIndex: 1 }}>
-                <button type="button" style={{ ...styles.select, border: 'none', padding: 0, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setOverviewOpen((open) => !open)}>
+                <button type="button" style={{ ...styles.selectTrigger, border: 'none', padding: 0, background: 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setOverviewOpen((open) => !open)}>
                   <span style={styles.cardTitle}><ListFilter size={18} /> Overview</span><span style={{ ...styles.muted, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>{loading ? <LoadingDots /> : `${filteredEntries.length} of ${entries.length}`} <ChevronDown size={17} style={{ transform: overviewOpen ? 'rotate(180deg)' : 'none' }} /></span>
                 </button>
                 {overviewOpen ? <div style={styles.overviewList}>
