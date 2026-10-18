@@ -3,7 +3,7 @@ import { Capacitor, registerPlugin } from '@capacitor/core';
 import api from '../api/axios';
 import { notifyAuthChanged } from '../utils/notificationEvents';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, ShieldCheck, LoaderCircle, KeyRound } from 'lucide-react';
+import { ShieldCheck, LoaderCircle, KeyRound } from 'lucide-react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
@@ -124,29 +124,22 @@ const SigninPage = () => {
   const resetAccount = () => {
     setIdentity(''); setAccessCode(''); setAccountDetected(false); setError(''); setNotice('');
   };
-  const handleReturn = () => {
-    if (window.history.length > 1) window.history.back();
-    else navigate('/home');
-  };
-
   const glass: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' };
   const button: React.CSSProperties = { minHeight: 46, border: 'none', borderRadius: 999, padding: '12px 18px', fontWeight: 750, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%', cursor: busy ? 'wait' : 'pointer', background: theme.primary, color: theme.textInverse, boxSizing: 'border-box' };
   const input: React.CSSProperties = { width: '100%', minHeight: 48, boxSizing: 'border-box', borderRadius: 13, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '12px 14px', fontSize: 15, outline: 'none' };
 
   return (
     <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, padding: 'clamp(14px, 3vw, 28px)', boxSizing: 'border-box', display: 'grid', placeItems: 'center' }}>
+      <style>{'@keyframes kh-signin-spin { to { transform: rotate(360deg); } }'}</style>
       <Helmet><title>CryBots | Sign in with KingsHall</title><meta name="description" content="Sign in securely to CryBots through your KingsHall account." /></Helmet>
       <div style={{ width: '100%', maxWidth: 460 }}>
-        <header style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <button type="button" onClick={handleReturn} aria-label="Go back" style={{ ...glass, color: theme.text, borderRadius: 999, width: 44, height: 44, display: 'grid', placeItems: 'center', flexShrink: 0 }}><ArrowLeft size={18} /></button>
-          <div><p style={{ margin: 0, color: theme.primary, fontSize: 12, fontWeight: 800, letterSpacing: '.16em' }}>CRYBOTS · KINGSHALL ID</p><p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: 13 }}>One identity. Secure access.</p></div>
-        </header>
         <section style={{ ...glass, borderRadius: 24, padding: 'clamp(22px, 6vw, 34px)', textAlign: 'center' }}>
           <div style={{ width: 54, height: 54, margin: '0 auto 14px', display: 'grid', placeItems: 'center', borderRadius: '50%', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.primary }}><ShieldCheck size={25} /></div>
           <h1 style={{ margin: 0, fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', lineHeight: 1.2 }}>{accountDetected ? 'Confirm your KingsHall account' : 'Sign in to CryBots'}</h1>
           <p style={{ margin: '9px 0 22px', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{accountDetected ? identity : 'Continue with the KingsHall account saved on this device or browser.'}</p>
 
           {!accountDetected && <button type="button" aria-label="Sign in with KingsHall" onClick={() => void startSignin()} disabled={busy} style={{ width: 88, height: 88, borderRadius: '50%', border: `1px solid ${theme.borderGlass}`, background: theme.primary, color: theme.textInverse, display: 'grid', placeItems: 'center', margin: '0 auto', cursor: busy ? 'wait' : 'pointer', boxShadow: `0 8px 28px ${theme.primary}35, inset 0 1px 0 rgba(255,255,255,.25)` }}>{busy ? <LoadingDots /> : <KeyRound size={28} />}</button>}
+          {!accountDetected && <p style={{ margin: '12px 0 0', color: theme.text, fontWeight: 700, fontSize: 14 }}>Sign in with KingsHall</p>}
 
           {accountDetected && <form onSubmit={handleAccessCode} style={{ display: 'grid', gap: 14, textAlign: 'left' }}>
             <label htmlFor="signin-access-code" style={{ fontSize: 13, color: theme.textMuted, fontWeight: 650 }}>Bound six-digit Access Code</label>
@@ -160,7 +153,7 @@ const SigninPage = () => {
           <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
         </section>
       </div>
-      {busy && <div role="status" aria-live="polite" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'grid', placeItems: 'center', background: 'rgba(0,0,0,.52)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}><div style={{ ...glass, borderRadius: 22, padding: 24, minWidth: 120, display: 'grid', justifyItems: 'center', gap: 12, color: theme.text }}><LoaderCircle size={34} className="animate-spin" /><span style={{ fontSize: 13, fontWeight: 650 }}>Checking KingsHall…</span></div></div>}
+      {busy && <div role="status" aria-live="polite" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'grid', placeItems: 'center', background: 'rgba(0,0,0,.52)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}><div style={{ ...glass, borderRadius: 22, padding: 24, minWidth: 120, display: 'grid', justifyItems: 'center', gap: 12, color: theme.text }}><LoaderCircle size={34} style={{ animation: 'kh-signin-spin 1s linear infinite' }} /><span style={{ fontSize: 13, fontWeight: 650 }}>Checking KingsHall…</span></div></div>}
     </main>
   );
 };
