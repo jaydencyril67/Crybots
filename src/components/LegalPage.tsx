@@ -49,7 +49,7 @@ const LegalPage = ({ title, eyebrow, summary, updated, sections }: LegalPageProp
       <div style={styles.page}>
         <main style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/about')}><ArrowLeft size={16} aria-hidden="true" /> About</button>
-          <header style={{ ...styles.heroCard, ...styles.hero }}>
+          <header style={styles.heroCard}>
             <p style={styles.eyebrow}>{eyebrow}</p>
             <h1 style={styles.title}>{title}</h1>
             <p style={styles.summary}>{summary}</p>
