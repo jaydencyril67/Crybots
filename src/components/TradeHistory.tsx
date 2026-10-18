@@ -76,8 +76,8 @@ const TradeHistory = () => {
     shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
     content: { display: 'grid', gap: '14px', marginTop: '10px' },
     back: { alignSelf: 'start', justifySelf: 'start', width: 'fit-content', display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
-    rowList: { display: 'grid', gap: '10px', width: '100%', minWidth: 0, padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
-    card: { width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', display: 'grid', gap: '12px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const, overflow: 'hidden' as const },
+    rowList: { display: 'grid', gap: '14px', width: '100%', minWidth: 0, padding: 0, borderRadius: 0, border: 'none', background: 'transparent', boxSizing: 'border-box' as const },
+    card: { width: '100%', maxWidth: '100%', background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}`, borderRadius: '22px', padding: '16px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', display: 'grid', gap: '14px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const, overflow: 'hidden' as const },
     cardTitle: { margin: 0, fontSize: '1.05rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' as const },
     cardText: { margin: '4px 0 0', color: theme.textMuted, lineHeight: 1.5, fontSize: '0.86rem' },
     filters: { display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', marginTop: '14px' },
@@ -86,7 +86,7 @@ const TradeHistory = () => {
     input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem' },
     select: { border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const },
     overviewList: { display: 'grid', gap: '7px' },
-    overviewItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', borderRadius: '14px', border: `1px solid ${theme.border}`, background: theme.surfaceMuted, padding: '13px 14px' },
+    overviewItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '12px 0' },
     overviewLabel: { margin: 0, color: theme.text, fontSize: '0.9rem', fontWeight: 700 },
     overviewValue: { margin: 0, fontSize: '1rem', fontWeight: 900, textAlign: 'right' as const, flexShrink: 0 },
     pill: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '6px 10px', borderRadius: '999px', fontSize: '0.76rem', fontWeight: 800, whiteSpace: 'nowrap' as const },
@@ -196,7 +196,7 @@ const TradeHistory = () => {
                             <td style={styles.td}><span style={{ ...styles.pill, ...statusStyle, border: `1px solid ${statusStyle.borderColor}`, background: theme.primarySoft }}>{entry.status}</span></td>
                             <td style={styles.td}><button type="button" style={styles.button} onClick={() => setExpandedId(expanded ? null : entry.id)}>{expanded ? 'Hide' : 'View'}</button></td>
                           </tr>
-                          {expanded ? <tr><td colSpan={3} style={{ ...styles.td, background: theme.surfaceGlass }}>
+                          {expanded ? <tr><td colSpan={3} style={{ ...styles.td, background: 'transparent' }}>
                             <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
                               <div><span style={styles.label}>Amount</span><p style={{ ...styles.cardText, color: positive ? theme.success : theme.danger, fontWeight: 800 }}>{money(entry.amountValue, entry.currency)}</p></div>
                               <div><span style={styles.label}>Activity type</span><p style={styles.cardText}>{entry.kind === 'performance' ? (entry.amountValue >= 0 ? 'Bot profit' : 'Bot loss') : 'Bot financial activity'}</p></div>
