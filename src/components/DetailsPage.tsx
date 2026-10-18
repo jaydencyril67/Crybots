@@ -63,7 +63,7 @@ const DetailsPage = () => {
     card: createHybridCardStyles(theme).card,
     rowList: { ...baseStyles.rowList, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
     row: { ...baseStyles.row, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
-    infoRow: { ...baseStyles.infoRow, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'blur(18px) saturate(1.08)', WebkitBackdropFilter: 'blur(18px) saturate(1.08)' },
+    infoRow: { ...baseStyles.infoRow, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'none', WebkitBackdropFilter: 'none' },
   }), [theme]);
 
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(null); const [profileLoading, setProfileLoading] = useState(true);
