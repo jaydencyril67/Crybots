@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import AppThemeProvider, { useAppTheme } from './components/AppTheme';
 import LandingPage from './components/LandingPage';
-import SignupPage from './components/SignupPage';
-import SignupConfirmationSentPage from './components/SignupConfirmationSentPage';
 import AccountConfirmedPage from './components/AccountConfirmedPage';
 import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
@@ -124,8 +122,7 @@ const getRouteKey = () => {
   const pathname = getPathname().split(/[?#]/)[0].replace(/\/+$/, '') || '/';
   const hash = getHash().split(/[?#]/)[0].replace(/\/+$/, '') || '';
 
-  if (pathname === '/signup' || hash === '#/signup') return 'signup';
-  if (pathname === '/signup-confirmation-sent' || hash === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
+  if (pathname === '/signup' || hash === '#/signup') return 'signin';
   if (pathname === '/verify-email' || hash === '#/verify-email') return 'verify-email';
   if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'account-confirmed';
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
@@ -209,8 +206,7 @@ const getRouteKey = () => {
 
 const routeToKey = (path: string) => {
   const normalizedPath = path.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
-  if (normalizedPath === '/signup' || normalizedPath === '#/signup') return 'signup';
-  if (normalizedPath === '/signup-confirmation-sent' || normalizedPath === '#/signup-confirmation-sent') return 'signup-confirmation-sent';
+  if (normalizedPath === '/signup' || normalizedPath === '#/signup') return 'signin';
   if (normalizedPath === '/verify-email' || normalizedPath === '#/verify-email') return 'verify-email';
   if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'account-confirmed';
   if (normalizedPath === '/signin' || normalizedPath === '#/signin') return 'signin';
@@ -522,8 +518,6 @@ const RouteTransition = () => {
   }, []);
 
   const appContent = useMemo(() => {
-    if (displayedRouteKey === 'signup') return <SignupPage />;
-    if (displayedRouteKey === 'signup-confirmation-sent') return <SignupConfirmationSentPage />;
     if (displayedRouteKey === 'verify-email') return <VerifyEmailPage />;
     if (displayedRouteKey === 'account-confirmed') return <AccountConfirmedPage />;
     if (displayedRouteKey === 'signin') return <SigninPage />;
