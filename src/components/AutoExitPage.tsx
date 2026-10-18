@@ -129,7 +129,7 @@ const AutoExitPage = () => {
           <div style={styles.content}>
             <button type="button" style={styles.back} onClick={() => navigate('/exit')}><ArrowLeft size={17} /> Exit</button>
             <div style={styles.outerCard}>
-              <section style={{ ...styles.dangerRow, borderBottom: `1px solid ${theme.borderGlass}` }}>
+              <section style={styles.dangerRow}>
                 <h3 style={styles.title}>Exit when the app is idle</h3>
                 <p style={styles.status}>End your session after the selected period of inactivity. Scheduled exit remains independent.</p>
                   <div style={styles.buttonRow}>
@@ -143,6 +143,8 @@ const AutoExitPage = () => {
                     <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <LoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
                   </div>
               </section>
+            </div>
+            <div style={styles.outerCard}>
               <section style={styles.dangerRow}>
                 <h3 style={styles.title}>Scheduled exit</h3>
                 <p style={styles.status}>{scheduledExit ? `Set for ${scheduledExit.replace('T', ' ')}` : 'No scheduled exit set.'}</p>
