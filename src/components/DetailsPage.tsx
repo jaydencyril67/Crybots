@@ -6,7 +6,6 @@ import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../u
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
-import { completeOnboardingStep } from '../utils/onboarding';
 import NowBar from './NowBar';
 import LoadingDots from './LoadingDots';
 import ImagePickerButton from './ImagePickerButton';
@@ -115,7 +114,6 @@ const DetailsPage = () => {
       const uploadedFile = await uploadResponse.json() as { secure_url?: string }; if (!uploadedFile.secure_url) throw new Error('Image upload did not return a usable URL.');
       await api.patch('/api/settings/profile-picture', { profilePicture: uploadedFile.secure_url }); setAvatarPreview(uploadedFile.secure_url);
       setLiveProfile((current) => current ? { ...current, profilePicture: uploadedFile.secure_url } : current);
-      completeOnboardingStep('profile');
     } catch (error) { setAvatarError(error instanceof Error ? error.message : 'Unable to upload image.'); }
     finally { setAvatarUploading(false); }
   };
