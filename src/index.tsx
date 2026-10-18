@@ -20,7 +20,6 @@ import AdminTicketsPage from './components/AdminTicketsPage';
 import AdminChatPage from './components/AdminChatPage';
 import AdminChatUserPage from './components/AdminChatUserPage';
 import AdminTicketStatsPage from './components/AdminTicketStatsPage';
-import ForgotPasswordPage from './components/ForgotPasswordPage';
 import HomePage from './components/HomePage';
 import DetailsPage from './components/DetailsPage';
 import ManagePage from './components/ManagePage';
@@ -137,7 +136,6 @@ const getRouteKey = () => {
   if (pathname.startsWith('/admin/chat/') || hash.startsWith('#/admin/chat/')) return 'admin-chat-user';
   if (pathname === '/admin/chat' || hash === '#/admin/chat') return 'admin-chat';
   if (pathname.startsWith('/admin/ticket-stats/') || hash.startsWith('#/admin/ticket-stats/')) return 'admin-ticket-stats';
-  if (pathname === '/forgot-password' || hash === '#/forgot-password') return 'forgot-password';
   if (pathname === '/home' || hash === '#/home') return 'home';
   if (pathname === '/details' || hash === '#/details') return 'details';
   if (pathname === '/manage' || hash === '#/manage') return 'manage';
@@ -218,7 +216,6 @@ const routeToKey = (path: string) => {
   if (path.startsWith('/admin/chat/') || path.startsWith('#/admin/chat/')) return 'admin-chat-user';
   if (path === '/admin/chat' || path === '#/admin/chat') return 'admin-chat';
   if (path.startsWith('/admin/ticket-stats/') || path.startsWith('#/admin/ticket-stats/')) return 'admin-ticket-stats';
-  if (path === '/forgot-password' || path === '#/forgot-password') return 'forgot-password';
   if (path === '/home' || path === '#/home') return 'home';
   if (path === '/details' || path === '#/details') return 'details';
   if (path === '/manage' || path === '#/manage') return 'manage';
@@ -527,7 +524,6 @@ const RouteTransition = () => {
     if (displayedRouteKey === 'admin-chat') return <AdminChatPage />;
     if (displayedRouteKey === 'admin-chat-user') return <AdminChatUserPage />;
     if (displayedRouteKey === 'admin-ticket-stats') return <AdminTicketStatsPage />;
-    if (displayedRouteKey === 'forgot-password') return <ForgotPasswordPage />;
     if (displayedRouteKey === 'home') return <ProtectedRoute><HomePage /></ProtectedRoute>;
     if (displayedRouteKey === 'details') return <ProtectedRoute><DetailsPage /></ProtectedRoute>;
     if (displayedRouteKey === 'manage') return <ProtectedRoute><ManagePage /></ProtectedRoute>;
