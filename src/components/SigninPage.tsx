@@ -113,10 +113,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     alignItems: 'stretch',
     position: 'relative' as const,
     zIndex: 1,
-    padding: '10px',
-    borderRadius: '16px',
+    padding: 'clamp(16px, 3vw, 24px)',
+    borderRadius: '22px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
   },
   heroCard: {
     borderRadius: '24px',
@@ -329,13 +330,7 @@ const SigninPage = () => {
       background: theme.surfaceGlass,
       color: theme.text,
     },
-    heroCard: {
-      ...styles.heroCard,
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
-      color: theme.text,
-
-    },
+    heroCard: { ...styles.heroCard, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', color: theme.text, padding: '0 0 16px', borderRadius: 0 },
     titleAccent: {
       ...styles.titleAccent,
       background: 'none',
@@ -347,12 +342,7 @@ const SigninPage = () => {
       ...styles.lead,
       color: theme.textMuted,
     },
-    panel: {
-      ...styles.panel,
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceGlass,
-      color: theme.text,
-    },
+    panel: { ...styles.panel, border: 'none', background: 'transparent', color: theme.text, padding: '16px 0 0', borderRadius: 0 },
     progressBar: {
       ...styles.progressBar,
       background: theme.borderGlass,
