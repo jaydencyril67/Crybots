@@ -17,7 +17,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     padding: 'clamp(14px, 2.5vw, 24px) clamp(12px, 2vw, 18px) 32px',
     background: theme.background,
     position: 'relative' as const,
-    overflow: 'hidden',
   },
   backdrop: {
     position: 'absolute' as const,
