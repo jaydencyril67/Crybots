@@ -16,7 +16,7 @@ type NativeKingsHallAccountPlugin = { chooseAccount(): Promise<{ email?: string;
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
 const ACCOUNT_HINT_KEY = 'kingshall_account_hint';
-const EMAIL_PATTERN = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const getSavedBrowserAccounts = () => {
   let accounts: string[] = [];
   const cookie = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith('kh_saved_accounts='));
