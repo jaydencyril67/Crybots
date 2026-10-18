@@ -14,21 +14,24 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '14px', marginTop: '10px' },
   outerCard: {
-    padding: '10px',
-    borderRadius: '16px',
+    padding: '16px',
+    borderRadius: '22px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+    display: 'grid',
+    gap: 0,
     width: '100%',
     minWidth: 0,
     boxSizing: 'border-box' as const,
   },
-  dangerRow: { width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
+  dangerRow: { width: '100%', maxWidth: '100%', background: 'transparent', border: 'none', borderRadius: 0, padding: '12px 0', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
   title: { margin: 0, fontSize: '0.96rem', fontWeight: 800, color: theme.text },
   text: { margin: '5px 0 0', fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4, maxWidth: '64ch' },
   status: { margin: '5px 0 0', fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4 },
   buttonRow: { display: 'flex', flexWrap: 'wrap' as const, justifyContent: 'flex-start', gap: '10px', marginTop: '8px' },
-  button: { borderRadius: '999px', padding: '12px 16px', border: `1px solid ${theme.primary}`, cursor: 'pointer', fontWeight: 700, color: theme.textInverse, background: theme.primary, width: '100%', maxWidth: '100%' },
+  button: { borderRadius: '999px', padding: '12px 16px', border: `1px solid ${theme.borderGlass}`, cursor: 'pointer', fontWeight: 700, color: theme.text, background: theme.surfaceGlass, width: '100%', maxWidth: '100%', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' },
 });
 
 const toLocalDateTimeValue = (value: string) => {
@@ -126,7 +129,7 @@ const AutoExitPage = () => {
           <div style={styles.content}>
             <button type="button" style={styles.back} onClick={() => navigate('/exit')}><ArrowLeft size={17} /> Exit</button>
             <div style={styles.outerCard}>
-              <section style={styles.dangerRow}>
+              <section style={{ ...styles.dangerRow, borderBottom: `1px solid ${theme.borderGlass}` }}>
                 <h3 style={styles.title}>Exit when the app is idle</h3>
                 <p style={styles.status}>End your session after the selected period of inactivity. Scheduled exit remains independent.</p>
                   <div style={styles.buttonRow}>
@@ -140,8 +143,6 @@ const AutoExitPage = () => {
                     <button type="button" style={styles.button} aria-pressed={idleEnabled} disabled={idleSaving} onClick={() => saveIdleExit(!idleEnabled)}>{idleSaving ? <LoadingDots /> : idleEnabled ? 'Disable' : 'Enable'}</button>
                   </div>
               </section>
-            </div>
-            <div style={styles.outerCard}>
               <section style={styles.dangerRow}>
                 <h3 style={styles.title}>Scheduled exit</h3>
                 <p style={styles.status}>{scheduledExit ? `Set for ${scheduledExit.replace('T', ' ')}` : 'No scheduled exit set.'}</p>
