@@ -306,7 +306,7 @@ const TransferPage = () => {
               <div style={styles.panel}>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><Hash size={18} /> Security verification</h2>
-                <p style={styles.cardText}>Set a security code first if you have not set one yet. Transfers use your security code for verification and do not require your account password.</p>
+                <p style={styles.cardText}>Set a security code first if you have not set one yet. Transfers use your security code for verification.</p>
                 <p style={styles.cardText}>This keeps user-to-user sends aligned with the rest of the app’s account protection flow.</p>
               </section>
               </div>
