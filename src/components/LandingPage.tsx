@@ -199,29 +199,23 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     font: 'inherit',
     color: theme.text,
   },
+  outerCard: { display: 'grid', gap: '24px', padding: 'clamp(14px, 2.5vw, 24px)', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', minWidth: 0, boxSizing: 'border-box' as const },
   statsGroup: {
     marginTop: '26px',
     display: 'grid',
     gap: '10px',
-    padding: '10px',
-    borderRadius: '22px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
+    padding: '10px 0',
+    borderRadius: 0,
+    border: 'none',
+    borderTop: `1px solid ${theme.borderGlass}`,
+    background: 'transparent',
   },
   statsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
     gap: '10px',
   },
-  statCard: {
-    borderRadius: '15px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
-    padding: '14px',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
-    minWidth: 0,
-  },
+  statCard: { borderRadius: 0, border: 'none', borderRight: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '10px 14px', minWidth: 0 },
   statValue: {
     fontSize: 'clamp(22px, 3vw, 28px)',
     fontWeight: 700,
@@ -243,26 +237,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     background: `linear-gradient(135deg, ${theme.primarySoft}, ${theme.primarySoft}, transparent)`,
     filter: 'none',
   },
-  panel: {
-    position: 'relative' as const,
-    borderRadius: '26px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
-    padding: '18px',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
-  },
+  panel: { position: 'relative' as const, borderRadius: 0, border: 'none', background: 'transparent', padding: 0, minWidth: 0 },
   signupPreviewWrap: {
     marginTop: '24px',
     borderRadius: '24px',
     border: `1px solid ${theme.border}`,
   },
-  panelInner: {
-    borderRadius: '20px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
-    padding: '18px',
-  },
+  panelInner: { borderRadius: 0, border: 'none', background: 'transparent', padding: 0 },
   panelTop: {
     display: 'flex',
     alignItems: 'center',
@@ -296,13 +277,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '16px',
     marginTop: '24px',
   },
-  miniCard: {
-    borderRadius: '22px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
-    padding: '18px',
-    minWidth: 0,
-  },
+  miniCard: { borderRadius: 0, border: 'none', background: 'transparent', padding: '12px 0', minWidth: 0 },
   miniLabel: {
     margin: 0,
     fontSize: '12px',
@@ -325,41 +300,17 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     display: 'grid',
     gap: '12px',
   },
-  assetItem: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    borderRadius: '18px',
-    background: theme.surfaceGlass,
-    padding: '14px 16px',
-    flexWrap: 'wrap' as const,
-  },
-  sectionGroup: {
-    display: 'grid',
-    gap: '10px',
-    padding: '10px',
-    borderRadius: '28px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
-  },
+  assetItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', borderRadius: 0, borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '12px 0', flexWrap: 'wrap' as const },
+  sectionGroup: { display: 'grid', gap: '10px', padding: '18px 0 0', borderRadius: 0, border: 'none', borderTop: `1px solid ${theme.borderGlass}`, background: 'transparent' },
   sectionGrid: {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
-    gap: '10px',
+    gap: 0,
     position: 'relative' as const,
     zIndex: 1,
-    paddingBottom: '32px',
+    paddingBottom: '12px',
   },
-  featureCard: {
-    borderRadius: '18px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
-    padding: '24px',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
-    minWidth: 0,
-  },
+  featureCard: { borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '18px 4px', minWidth: 0 },
   featureTitle: {
     margin: '18px 0 0',
     fontSize: '18px',
@@ -371,25 +322,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     lineHeight: 1.7,
     color: theme.textMuted,
   },
-  howSection: {
-    borderRadius: '28px',
-    border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceGlass,
-    padding: '10px',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
-    position: 'relative' as const,
-    zIndex: 1,
-    marginBottom: '16px',
-  },
+  howSection: { borderRadius: 0, border: 'none', borderTop: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '18px 0 0', position: 'relative' as const, zIndex: 1, marginBottom: '0' },
   howGrid: {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
     gap: '32px',
-    borderRadius: '20px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceMuted,
-    padding: '24px',
+    borderRadius: 0,
+    border: 'none',
+    background: 'transparent',
+    padding: '12px 4px',
     alignItems: 'start',
   },
   howHeading: {
@@ -405,10 +346,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     display: 'flex',
     gap: '16px',
     alignItems: 'flex-start',
-    borderRadius: '22px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surfaceGlass,
-    padding: '18px',
+    borderRadius: 0,
+    border: 'none',
+    borderBottom: `1px solid ${theme.borderGlass}`,
+    background: 'transparent',
+    padding: '14px 0',
     minWidth: 0,
     flexWrap: 'wrap' as const,
   },
@@ -479,6 +421,7 @@ const LandingPage = () => {
         <div style={styles.shell}>
           
 
+          <div style={styles.outerCard}>
           <div style={styles.heroGrid}>
             <div style={{ textAlign: 'center' }}>
               <h2 style={styles.heading}>
@@ -585,6 +528,7 @@ const LandingPage = () => {
               </div>
             </div>
           </section>
+          </div>
         </div>
       </section>
     </main>
