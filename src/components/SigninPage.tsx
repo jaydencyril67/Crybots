@@ -107,8 +107,10 @@ const SigninPage = () => {
         }
       } catch (e) {
         const status = (e as { response?: { status?: number } })?.response?.status;
-        if (!stopped && (status === 410 || status === 404)) {
-          stopped = true; setError('This sign-in request has expired. Start again.'); setRequestId(''); setChallengeCode(''); setStep('identity');
+        if (!stopped && (status === 410 || status === 404 || status === 423)) {
+          stopped = true;
+          setError(status === 423 ? messageFromError(e, 'This CryBots account cannot sign in.') : 'This sign-in request has expired. Start again.');
+          setRequestId(''); setChallengeCode(''); setStep('identity');
         }
       } finally { inFlight = false; }
     };
