@@ -26,7 +26,7 @@ const faqSections: FAQSection[] = [
     title: 'Account security',
     items: [
       { question: 'How can I protect my account?', answer: 'Keep your email secure, enable two-factor authentication or a passkey from Security, and review notifications for unfamiliar activity.' },
-      { question: 'What are passkeys and two-factor authentication?', answer: 'A passkey lets a supported device authenticate you without typing a password. Two-factor authentication adds a second verification step, such as an authenticator code, when you sign in.' },
+      { question: 'What are passkeys and two-factor authentication?', answer: 'A passkey lets a supported device authenticate you using your device’s built-in unlock method. Two-factor authentication adds a second verification step, such as an authenticator code, when you sign in.' },
       { question: 'Why was my withdrawal or transfer blocked?', answer: 'Security controls can temporarily block fund movements after sensitive account changes or when additional verification is required. Review Security and contact support if the block remains.' },
       { question: 'What should I do if I see activity I do not recognise?', answer: 'Secure your email and account immediately, review Security and active sessions, and contact support with the relevant transaction or notification details.' },
     ],
