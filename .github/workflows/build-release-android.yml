@@ -1112,22 +1112,36 @@ jobs:
             svg = svg.replace(backgroundCircle, '');
             const artwork = Buffer.from(svg);
 
-            // Android 11 and below: 92dp image holder, 92px black circle, 72px artwork image.
-            const legacyArtwork = await sharp(artwork).resize(72, 72).png().toBuffer();
-            await sharp({ create: { width: 92, height: 92, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+            // Exact same displayed sizing for every Android version: 92dp circle + 72dp artwork.
+            const holderDp = 92;
+            const artworkDp = 72;
+            const legacyHolderPx = holderDp;
+            const legacyArtworkPx = artworkDp;
+            const systemCanvasPx = 512;
+            const systemCanvasDp = 288;
+            const systemHolderPx = Math.round(holderDp / systemCanvasDp * systemCanvasPx);
+            const systemArtworkPx = Math.round(artworkDp / systemCanvasDp * systemCanvasPx);
+            if (systemHolderPx !== 164 || systemArtworkPx !== 128) {
+              throw new Error('CryBots Android 12+ splash scale must match the same 92dp circle and 72dp artwork.');
+            }
+
+            // Android 11 and below: 92px circle holder with a centered 72px artwork image.
+            const legacyArtwork = await sharp(artwork).resize(legacyArtworkPx, legacyArtworkPx).png().toBuffer();
+            await sharp({ create: { width: legacyHolderPx, height: legacyHolderPx, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
               .composite([
                 { input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="92" height="92"><circle cx="46" cy="46" r="46" fill="#000000"/></svg>'), left: 0, top: 0 },
-                { input: legacyArtwork, left: 10, top: 10 }
+                { input: legacyArtwork, left: Math.round((legacyHolderPx - legacyArtworkPx) / 2), top: Math.round((legacyHolderPx - legacyArtworkPx) / 2) }
               ])
               .png().toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
 
-            // Android 12+: the system splash icon canvas is 288dp. Map the same
-            // 92dp circle and 72dp artwork image to 512px, centered with transparency.
-            const systemArtwork = await sharp(artwork).resize(128, 128).png().toBuffer();
-            await sharp({ create: { width: 512, height: 512, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+            // Android 12+: use the same dimensions converted to pixels for the 512px system canvas.
+            const systemArtwork = await sharp(artwork).resize(systemArtworkPx, systemArtworkPx).png().toBuffer();
+            const systemHolder = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="164" height="164"><circle cx="82" cy="82" r="82" fill="#000000"/></svg>');
+            const systemHolderLayer = await sharp(systemHolder).png().toBuffer();
+            await sharp({ create: { width: systemCanvasPx, height: systemCanvasPx, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
               .composite([
-                { input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><circle cx="256" cy="256" r="81.78" fill="#000000"/></svg>'), left: 0, top: 0 },
-                { input: systemArtwork, left: 192, top: 192 }
+                { input: systemHolderLayer, left: Math.round((systemCanvasPx - systemHolderPx) / 2), top: Math.round((systemCanvasPx - systemHolderPx) / 2) },
+                { input: systemArtwork, left: Math.round((systemCanvasPx - systemArtworkPx) / 2), top: Math.round((systemCanvasPx - systemArtworkPx) / 2) }
               ])
               .png().toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo_v31.png');
 
