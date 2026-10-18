@@ -19,13 +19,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     ...createHybridCardStyles(theme).card,
     width: '100%',
     maxWidth: '760px',
-    padding: '14px',
-  },
-  innerCard: {
-    ...createHybridCardStyles(theme).panel,
     padding: 'clamp(18px, 3.5vw, 26px)',
-    textAlign: 'center' as const,
   },
+  innerCard: { padding: 0, textAlign: 'center' as const, background: 'transparent', border: 'none', borderRadius: 0 },
   iconWrap: {
     width: '56px',
     height: '56px',
