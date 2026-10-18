@@ -80,9 +80,9 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     padding: '13px 14px',
     borderRadius: '15px',
     border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    background: theme.surfaceGlass,
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   cardTitle: {
     margin: 0,
