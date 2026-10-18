@@ -87,6 +87,8 @@ const SigninPage = () => {
     if (busy) return;
     setBusy(true); setError(''); setNotice('');
     try {
+      // Give the dimmed loading overlay a frame to render before account detection starts.
+      await new Promise(resolve => window.setTimeout(resolve, 250));
       let selectedEmail = '';
       if (isNativeAndroid()) {
         const plugin = getNativePlugin();
