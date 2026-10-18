@@ -1,890 +1,195 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { notifyAuthChanged } from '../utils/notificationEvents';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, KeyRound, ShieldCheck, Mail } from 'lucide-react';
+import { ArrowLeft, KeyRound, ShieldCheck, Smartphone } from 'lucide-react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
-import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+type Step = 'identity' | 'method' | 'access-code' | 'one-time';
+type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email?: string; uid?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string };
+type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; status?: string; accessCodeSet?: boolean; requestId?: string; challengeCode?: string; expiresAt?: string; message?: string };
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
-
 const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
-  if (isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail)) return '/admin-home';
-  return '/home';
+  return isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail) ? '/admin-home' : '/home';
 };
-
-const supportedEmailDomains = new Set([
-  'gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'kingshall.online',
-  'yahoo.com', 'yahoo.co.uk', 'icloud.com', 'me.com', 'mac.com', 'proton.me',
-  'protonmail.com', 'aol.com', 'zoho.com', 'gmx.com', 'gmx.net', 'yandex.com',
-  'mail.com', 'fastmail.com', 'tuta.com', 'tutanota.com',
-]);
-import { authenticateWithPasskey, isWebAuthnAvailable } from '../utils/webauthn';
-
-const signInMethods = [
-  { value: 'password', title: 'Password', description: 'Use your account password to sign in.' },
-  { value: 'code', title: 'Email sign-in code', description: 'Receive a 4-digit code by email.' },
-  { value: 'passkey', title: 'Biometric / passkey', description: 'Use your fingerprint, face, or security key.' },
-] as const;
-
-
-type SignInMethod = (typeof signInMethods)[number]['value'];
-
-type FormState = {
-  email: string;
-  password: string;
-  code: string;
-  twoFactorCode: string;
-  };
-
-const initialState: FormState = {
-  email: '',
-  password: '',
-  code: '',
-  twoFactorCode: '',
-};
-
-const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: {
-    minHeight: '100vh',
-  },
-  shell: {
-    position: 'relative' as const,
-    maxWidth: '1160px',
-    margin: '0 auto',
-    padding: 'clamp(14px, 2.4vw, 24px) clamp(12px, 2.2vw, 20px) 28px',
-  },
-  glow: {
-    position: 'absolute' as const,
-    inset: 0,
-    pointerEvents: 'none' as const,
-  },
-  topLine: {
-    position: 'absolute' as const,
-    insetInline: 0,
-    top: 0,
-    height: '1px',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    flexWrap: 'wrap' as const,
-    position: 'relative' as const,
-    zIndex: 1,
-    marginBottom: '18px',
-  },
-  brandBlock: {
-    minWidth: 0,
-    flex: '1 1 220px',
-  },
-  brandKicker: {
-    margin: 0,
-    fontSize: 'clamp(14px, 1.6vw, 16px)',
-    fontWeight: 800,
-    letterSpacing: '0.22em',
-    textTransform: 'uppercase' as const,
-  },
-  brandSub: {
-    margin: '6px 0 0',
-    fontSize: 'clamp(13px, 1.5vw, 15px)',
-  },
-  backButton: {
-    border: '1px solid transparent',
-    borderRadius: '999px',
-    width: '44px',
-    height: '44px',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'default',
-    flexShrink: 0,
-  },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1fr)',
-    gap: 'clamp(20px, 4vw, 32px)',
-    alignItems: 'stretch',
-    position: 'relative' as const,
-    zIndex: 1,
-    padding: 0,
-    borderRadius: 0,
-    border: 'none',
-    background: 'transparent',
-    boxShadow: 'none',
-  },
-  heroCard: {
-    borderRadius: '24px',
-    padding: '18px',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
-  },
-  title: {
-    margin: '12px 0 0',
-    fontSize: 'clamp(1.45rem, 2.4vw, 2rem)',
-    lineHeight: 1.08,
-    letterSpacing: '-0.03em',
-  },
-  titleAccent: {
-    display: 'block',
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: 'transparent',
-  },
-  lead: {
-    margin: '10px 0 0',
-    fontSize: '14px',
-    lineHeight: 1.6,
-  },
-  panel: {
-    borderRadius: '32px',
-    padding: 'clamp(18px, 3.2vw, 24px)',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
-  },
-  headerCopy: {
-    display: 'grid',
-    gap: '10px',
-  },
-  progressWrap: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '12px',
-    flexWrap: 'wrap' as const,
-    marginBottom: '18px',
-  },
-  progressBar: {
-    flex: '1 1 220px',
-    height: '10px',
-    borderRadius: '999px',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: '999px',
-  },
-  stepLabel: {
-    margin: 0,
-    fontSize: '12px',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.25em',
-    fontWeight: 800,
-  },
-  stepTitle: {
-    margin: '12px 0 0',
-    fontSize: 'clamp(1.5rem, 2.6vw, 2.05rem)',
-    lineHeight: 1.1,
-  },
-  stepDesc: {
-    margin: '10px 0 0',
-    lineHeight: 1.7,
-    fontSize: '15px',
-  },
-  form: {
-    marginTop: '18px',
-    display: 'grid',
-    gap: '16px',
-  },
-  field: {
-    display: 'grid',
-    gap: '8px',
-  },
-  label: {
-    fontSize: '14px',
-    fontWeight: 600,
-  },
-  input: {
-    width: '100%',
-    boxSizing: 'border-box' as const,
-    borderRadius: '12px',
-    border: `1px solid ${theme.border}`,
-    background: theme.surface,
-    color: theme.text,
-    padding: '10px 12px',
-    outline: 'none',
-    fontSize: '0.9rem',
-  },
-  optionGrid: {
-    display: 'grid',
-    gap: '12px',
-  },
-  optionCard: {
-    borderRadius: '18px',
-    border: '1px solid transparent',
-    padding: '14px 16px',
-    cursor: 'pointer',
-    display: 'flex',
-    gap: '12px',
-    alignItems: 'center',
-    textAlign: 'left' as const,
-  },
-  optionCardActive: {
-    border: '1px solid transparent',
-  },
-  navRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: '12px',
-    flexWrap: 'wrap' as const,
-    marginTop: '6px',
-  },
-  switchRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    flexWrap: 'wrap' as const,
-    marginTop: '18px',
-  },
-  switchText: {
-    fontSize: '14px',
-  },
-  switchLink: {
-    border: 'none',
-    background: 'transparent',
-    fontSize: '14px',
-    fontWeight: 700,
-    padding: 0,
-    cursor: 'pointer',
-  },
-  button: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    whiteSpace: 'nowrap' as const,
-    boxSizing: 'border-box' as const,
-    lineHeight: 1.2,
-    minHeight: '44px',
-    border: 'none',
-    borderRadius: '999px',
-    padding: '11px 16px',
-    fontWeight: 700,
-    cursor: 'pointer',
-    minWidth: '108px',
-  },
-  buttonGhost: {
-    border: '1px solid transparent',
-  },
-  buttonPrimary: {
-  },
-  footerNote: {
-    margin: '18px 0 0',
-    fontSize: '13px',
-    lineHeight: 1.6,
-  },
-  linkButton: {
-    marginTop: '10px',
-    padding: 0,
-    border: 'none',
-    background: 'transparent',
-    fontSize: '13px',
-    fontWeight: 700,
-    cursor: 'pointer',
-  },
-  icon: {
-    width: '20px',
-    height: '20px',
-    flexShrink: 0,
-  },
-  iconLarge: {
-    width: '24px',
-    height: '24px',
-    flexShrink: 0,
-  },
-});
 
 const SigninPage = () => {
   const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
-  const styles = getStyles(theme);
-  const hybridStyles = {
-    page: {
-      ...styles.page,
-      background: theme.background,
-      color: theme.text,
-    },
-    glow: {
-      ...styles.glow,
-      background: theme.background,
-    },
-    topLine: {
-      ...styles.topLine,
-      background: theme.border,
-    },
-    brandKicker: {
-      ...styles.brandKicker,
-      color: theme.text,
-    },
-    brandSub: {
-      ...styles.brandSub,
-      color: theme.textMuted,
-    },
-    backButton: {
-      ...styles.backButton,
-      borderColor: theme.borderGlass,
-      background: theme.surfaceGlass,
-      color: theme.text,
-    },
-    heroCard: { ...styles.heroCard, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, padding: 'clamp(18px, 3vw, 24px)', borderRadius: '22px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' },
-    titleAccent: {
-      ...styles.titleAccent,
-      background: 'none',
-      WebkitBackgroundClip: 'unset',
-      backgroundClip: 'unset',
-      color: theme.primary,
-    },
-    lead: {
-      ...styles.lead,
-      color: theme.textMuted,
-    },
-    panel: { ...styles.panel, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, padding: 'clamp(18px, 3vw, 24px)', borderRadius: '22px', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' },
-    progressBar: {
-      ...styles.progressBar,
-      background: theme.borderGlass,
-    },
-    progressFill: {
-      ...styles.progressFill,
-      background: theme.primary,
-    },
-    stepLabel: {
-      ...styles.stepLabel,
-      color: theme.primary,
-    },
-    stepDesc: {
-      ...styles.stepDesc,
-      color: theme.textMuted,
-    },
-    label: {
-      ...styles.label,
-      color: theme.textMuted,
-    },
-    input: {
-      ...styles.input,
-      border: `1px solid ${theme.border}`,
-      background: theme.surface,
-      color: theme.text,
-    },
-    optionCard: {
-      ...styles.optionCard,
-      borderColor: theme.borderGlass,
-      background: theme.surfaceGlass,
-      color: theme.text,
-    },
-    optionCardActive: {
-      ...styles.optionCardActive,
-      borderColor: theme.primarySoft,
-      background: theme.primarySoft,
-    },
-    switchText: {
-      ...styles.switchText,
-      color: theme.textMuted,
-    },
-    switchLink: {
-      ...styles.switchLink,
-      color: theme.primary,
-    },
-    buttonGhost: {
-      ...styles.buttonGhost,
-      borderColor: theme.borderGlass,
-      background: theme.surfaceGlass,
-      color: theme.text,
-    },
-    buttonPrimary: {
-      ...styles.buttonPrimary,
-      background: theme.primary,
-      color: theme.textInverse,
-    },
-    footerNote: {
-      ...styles.footerNote,
-      color: theme.textMuted,
-    },
-    linkButton: {
-      ...styles.linkButton,
-      color: theme.primary,
-    },
-    icon: {
-      ...styles.icon,
-      color: theme.primary,
-    },
-    iconLarge: {
-      ...styles.iconLarge,
-      color: theme.primary,
-    },
-  };
-  const [form, setForm] = useState<FormState>(initialState);
-  const [method, setMethod] = useState<SignInMethod | null>(null);
-  const [passkeyOptions, setPasskeyOptions] = useState<any | null>(null);
-  const [passkeyAvailable, setPasskeyAvailable] = useState(false);
-  const [step, setStep] = useState<'email' | 'method' | 'password' | 'code'>('email');
-  const [submitError, setSubmitError] = useState('');
-  
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [codeSent, setCodeSent] = useState(false);
-  const [isCodeLocked, setIsCodeLocked] = useState(false);
-  const [isResendingCode, setIsResendingCode] = useState(false);
-  const [attemptsLeft, setAttemptsLeft] = useState(5);
-  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
-  const [resendStatus, setResendStatus] = useState('');
-  const showResendConfirmationLink = submitError.toLowerCase().includes('confirm your email before signing in') || resendStatus.toLowerCase().includes('confirmation email has been sent');
+  const [identity, setIdentity] = useState('');
+  const [step, setStep] = useState<Step>('identity');
+  const [accessCodeAvailable, setAccessCodeAvailable] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
+  const [requestId, setRequestId] = useState('');
+  const [challengeCode, setChallengeCode] = useState('');
+  const [expiresAt, setExpiresAt] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
-  const progress = step === 'email' ? 20 : step === 'method' ? 40 : step === 'password' ? 60 : 80;
-
-  const handleReturn = () => {
-    if (window.history.length > 1) {
-      window.history.back();
-      return;
+  const saveSession = (data: SessionResponse, fallbackIdentity = identity) => {
+    if (!data.token || !data.user) throw new Error('KingsHall did not return a valid CryBots session.');
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    if (typeof data.user.firstName === 'string' && data.user.firstName.trim()) {
+      localStorage.setItem('firstName', data.user.firstName.trim());
+      localStorage.setItem('kingshall_first_name', data.user.firstName.trim());
     }
-
-    navigate('/home');
+    notifyAuthChanged();
+    navigate(getPostSigninRoute(data.user.email || fallbackIdentity, data.isAdmin === true));
   };
 
-  const canContinue = useMemo(() => form.email.trim().length > 0, [form.email]);
-
-  const updateField = (field: keyof FormState, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    setSubmitError('');
-    setResendStatus('');
+  const messageFromError = (e: unknown, fallback: string) => {
+    const response = (e as { response?: { data?: { message?: string; error?: string } } })?.response;
+    return response?.data?.message || response?.data?.error || (e as Error)?.message || fallback;
   };
 
-  const emailInputStyle = hybridStyles.input;
-
-  /* Email checks intentionally run only when Continue is clicked. */
-  const emailValidationMessage = (email: string) => {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail) return 'Enter your email address to continue.';
-    if (!emailPattern.test(normalizedEmail)) return 'Enter a valid email address.';
-    const domain = normalizedEmail.split('@')[1];
-    if (!supportedEmailDomains.has(domain)) return 'Use an email address from a supported provider.';
-    return '';
-  };
-
-  const signInDisabled = isSubmitting || !canContinue || (step === 'code' && (!form.code.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6))) || (step === 'password' && (!form.password.trim() || (twoFactorRequired && form.twoFactorCode.length !== 6)));
-
-  const handleNext = async () => {
-    const email = form.email.trim().toLowerCase();
-    const validationMessage = emailValidationMessage(email);
-    if (validationMessage) {
-      setSubmitError(validationMessage);
-      return;
-    }
-
-    setSubmitError('');
-    setIsSubmitting(true);
+  const handleLookup = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!identity.trim() || busy) return;
+    setBusy(true); setError(''); setNotice('');
     try {
-      await api.post('/api/auth/signin/check-email', { email });
-      const { data: options } = await api.post('/api/webauthn/authenticate/options', { email });
-      const hasPasskey = Array.isArray(options.allowCredentials) && options.allowCredentials.length > 0;
-      setPasskeyAvailable(hasPasskey);
-      setPasskeyOptions(hasPasskey ? options : null);
+      const { data } = await api.post<SessionResponse>('/api/auth/kingshall/lookup', { identity: identity.trim() });
+      if (!data.exists) throw new Error('No eligible KingsHall account was found.');
+      setAccessCodeAvailable(data.accessCodeSet === true);
       setStep('method');
-    } catch (error) {
-      const response = (error as { response?: { data?: { message?: string } } })?.response;
-      setPasskeyAvailable(false);
-      setPasskeyOptions(null);
-      setSubmitError(response?.data?.message || 'Unable to check this email right now. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch (e) { setError(messageFromError(e, 'Unable to check this identity with KingsHall.')); }
+    finally { setBusy(false); }
   };
 
-  const handleBack = () => {
-    if (step === 'method') {
-      setStep('email');
-      setMethod(null);
-      setSubmitError('');
-      return;
-    }
-
-    if (step === 'password' || step === 'code') {
-      setStep('method');
-      setSubmitError('');
-      return;
-    }
-
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      navigate('/home');
-    }
+  const handleAccessCode = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true); setError('');
+    try {
+      const { data } = await api.post<SessionResponse>('/api/auth/kingshall/access-code', { identity: identity.trim(), accessCode });
+      saveSession(data);
+    } catch (e) { setError(messageFromError(e, 'Unable to sign in with the Access Code.')); }
+    finally { setBusy(false); }
   };
 
-  const handleStartSignin = async (selectedMethod: SignInMethod) => {
-    setSubmitError('');
-    setMethod(selectedMethod);
-    setTwoFactorRequired(false);
+  const startOneTimeCode = async () => {
+    if (busy) return;
+    setBusy(true); setError(''); setNotice('');
+    try {
+      const { data } = await api.post<SessionResponse>('/api/auth/kingshall/request', { identity: identity.trim() });
+      if (!data.requestId || !data.challengeCode) throw new Error('KingsHall did not create a sign-in request.');
+      setRequestId(data.requestId);
+      setChallengeCode(data.challengeCode);
+      setExpiresAt(data.expiresAt || '');
+      setStep('one-time');
+      setNotice('Open your signed-in KingsHall app and enter this two-digit code in the approval window.');
+    } catch (e) { setError(messageFromError(e, 'Unable to request approval from KingsHall.')); }
+    finally { setBusy(false); }
+  };
 
-    if (selectedMethod === 'password') {
-      setStep('password');
-      return;
-    }
-
-    if (selectedMethod === 'passkey') {
-      if (!isWebAuthnAvailable()) {
-        setSubmitError('Passkeys are not supported by this browser.');
-        setMethod(null);
-        return;
-      }
-      setIsSubmitting(true);
+  useEffect(() => {
+    if (step !== 'one-time' || !requestId) return;
+    let stopped = false;
+    let inFlight = false;
+    const poll = async () => {
+      if (stopped || inFlight) return;
+      inFlight = true;
       try {
-        const options = passkeyOptions || (await api.post('/api/webauthn/authenticate/options', { email: form.email.trim().toLowerCase() })).data;
-        if (!Array.isArray(options.allowCredentials) || options.allowCredentials.length === 0) {
-          throw new Error('Biometric security is not enabled for this account.');
+        const { data } = await api.post<SessionResponse>('/api/auth/kingshall/status', { requestId });
+        if (stopped) return;
+        if (data.status === 'authenticated') {
+          stopped = true;
+          saveSession(data);
+        } else if (data.status === 'denied' || data.status === 'expired' || data.status === 'consumed') {
+          stopped = true;
+          setError(data.status === 'denied' ? 'The sign-in request was denied in KingsHall.' : 'This sign-in request has expired. Start again.');
+          setRequestId(''); setChallengeCode(''); setStep('identity');
         }
-        const assertion = await authenticateWithPasskey(options);
-        const response = await api.post('/api/webauthn/authenticate/verify', assertion);
-        if (response.data?.token) {
-          localStorage.setItem('token', response.data.token);
-          notifyAuthChanged();
+      } catch (e) {
+        const status = (e as { response?: { status?: number } })?.response?.status;
+        if (!stopped && (status === 410 || status === 404)) {
+          stopped = true; setError('This sign-in request has expired. Start again.'); setRequestId(''); setChallengeCode(''); setStep('identity');
         }
-        if (response.data?.user) localStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate(getPostSigninRoute(response.data?.user?.email || form.email, response.data?.isAdmin === true));
-      } catch (error) {
-        const response = (error as { response?: { data?: { message?: string } } })?.response;
-        setSubmitError(response?.data?.message || (error as Error)?.message || 'Unable to authenticate with your passkey.');
-        setMethod(null);
-      } finally {
-        setIsSubmitting(false);
-      }
-      return;
-    }
+      } finally { inFlight = false; }
+    };
+    void poll();
+    const timer = window.setInterval(() => { void poll(); }, 2500);
+    return () => { stopped = true; window.clearInterval(timer); };
+  }, [step, requestId]);
 
-    setIsSubmitting(true);
-
-    try {
-      const response = await api.post('/api/auth/signin/start', {
-        email: form.email,
-        method: selectedMethod,
-      });
-
-      setCodeSent(true);
-      setStep('code');
-      setIsCodeLocked(false);
-      setAttemptsLeft(5 - (response.data?.attemptsUsed || 0));
-      setResendStatus(response.data?.message || 'Confirmation code resent successfully.');
-    } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
-      const message = response?.data?.message || 'Unable to start sign in right now. Please try again.';
-      setResendStatus('');
-      setSubmitError(message);
-      if (response?.status === 423) {
-        setIsCodeLocked(true);
-      }
-      setMethod(null);
-    } finally {
-      setIsSubmitting(false);
-    }
+  const resetFlow = () => {
+    setStep('identity'); setAccessCode(''); setRequestId(''); setChallengeCode(''); setExpiresAt(''); setError(''); setNotice('');
+  };
+  const handleReturn = () => {
+    if (window.history.length > 1) window.history.back();
+    else navigate('/home');
   };
 
-  const handlePasswordSignin = async () => {
-    setSubmitError('');
-    setIsSubmitting(true);
+  const glass = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' } as const;
+  const button = { minHeight: 46, border: 'none', borderRadius: 999, padding: '12px 18px', fontWeight: 750, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%', cursor: busy ? 'wait' : 'pointer', background: theme.primary, color: theme.textInverse, boxSizing: 'border-box' as const };
+  const secondaryButton = { ...button, background: theme.surfaceGlass, color: theme.text, border: `1px solid ${theme.borderGlass}` };
+  const input = { width: '100%', minHeight: 48, boxSizing: 'border-box' as const, borderRadius: 13, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '12px 14px', fontSize: 15, outline: 'none' };
+  const label = { display: 'block', fontSize: 13, color: theme.textMuted, marginBottom: 8, fontWeight: 650 as const };
 
-    try {
-      const response = await api.post('/api/auth/signin', {
-        email: form.email,
-        password: form.password,
-        ...(twoFactorRequired ? { twoFactorCode: form.twoFactorCode } : {}),
-      });
-
-      
-
-      if (response.data?.token) {
-        localStorage.setItem('token', response.data.token);
-        notifyAuthChanged();
-      }
-
-      if (response.data?.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
-          localStorage.setItem('firstName', response.data.user.firstName.trim());
-          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
-        }
-      }
-
-      navigate(getPostSigninRoute(response.data?.user?.email || form.email, response.data?.isAdmin === true));
-    } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
-      const message = response?.data?.message || `Unable to sign you in right now. Please try again. (${response?.status || 'network error'})`;
-      if (response?.data?.twoFactorRequired) {
-        setTwoFactorRequired(true);
-        setSubmitError('Enter the 6-digit code from your authenticator app to continue.');
-      } else if (response?.status === 423 && message.toLowerCase().includes('pending deletion')) {
-        setSubmitError(message);
-        setMethod(null);
-      } else if (response?.status === 423 && response?.data?.accountStatus === 'self_excluded') {
-        setSubmitError(message);
-        setMethod(null);
-      } else if (response?.status === 423 && response?.data?.accountStatus === 'disabled') {
-        setSubmitError(message);
-        setMethod(null);
-      } else {
-        setSubmitError(message);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-      const handleCodeSignin = async () => {
-    setSubmitError('');
-    setIsSubmitting(true);
-
-    try {
-      const response = await api.post('/api/auth/signin/verify-code', {
-        email: form.email,
-        code: form.code,
-        ...(twoFactorRequired ? { twoFactorCode: form.twoFactorCode } : {}),
-      });
-
-      if (response.data?.token) {
-        localStorage.setItem('token', response.data.token);
-        notifyAuthChanged();
-      }
-
-      if (response.data?.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        if (typeof response.data.user.firstName === 'string' && response.data.user.firstName.trim()) {
-          localStorage.setItem('firstName', response.data.user.firstName.trim());
-          localStorage.setItem('kingshall_first_name', response.data.user.firstName.trim());
-        }
-      }
-
-      navigate(getPostSigninRoute(response.data?.user?.email || form.email, response.data?.isAdmin === true));
-    } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string; twoFactorRequired?: boolean; accountStatus?: string } } })?.response;
-      const message = response?.data?.message || 'Unable to verify code right now. Please try again.';
-      if (response?.data?.twoFactorRequired) {
-        setTwoFactorRequired(true);
-        setSubmitError('Enter the 6-digit code from your authenticator app to continue.');
-      } else {
-        setSubmitError(message);
-      }
-      if (response?.status === 423 && response?.data?.accountStatus === 'disabled') {
-        setIsCodeLocked(false);
-      } else if (response?.status === 423) {
-        setIsCodeLocked(true);
-      }
-      if (response?.status === 400 && message.toLowerCase().includes('attempt')) {
-        setAttemptsLeft((currentLeft) => Math.max(0, currentLeft - 1));
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (!form.email.trim() || isResendingCode) return;
-
-    setSubmitError('');
-    setResendStatus('');
-    setIsResendingCode(true);
-
-    try {
-      const response = await api.post('/api/auth/signin/start', {
-        email: form.email,
-        method: 'code',
-      });
-
-      setCodeSent(true);
-      setStep('code');
-      setIsCodeLocked(false);
-      setAttemptsLeft(5 - (response.data?.attemptsUsed || 0));
-      if (response.data?.confirmationEmailSent) {
-        setSubmitError('');
-        setResendStatus('A new confirmation email has been sent.');
-      }
-    } catch (error) {
-      const response = (error as { response?: { status?: number; data?: { message?: string } } })?.response;
-      const message = response?.data?.message || 'Unable to resend code right now. Please try again.';
-      setSubmitError(message);
-      if (response?.status === 423) {
-        setIsCodeLocked(true);
-      }
-    } finally {
-      setIsResendingCode(false);
-    }
-  };
-
-    return (
-    <>
+  return (
+    <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, padding: 'clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
       <Helmet>
-        <title>CryBots | Sign in</title>
-        <meta name="description" content="Sign in to your CryBots trading bot account using email and your preferred secure method." />
+        <title>CryBots | Sign in with KingsHall</title>
+        <meta name="description" content="Sign in to CryBots securely through your KingsHall identity." />
       </Helmet>
-
-      <main style={hybridStyles.page}>
-        <section style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={hybridStyles.glow} />
-          <div style={hybridStyles.topLine} />
-
-          <div style={styles.shell}>
-            
-
-            <div style={styles.grid}>
-              <article style={hybridStyles.heroCard}>
-                <h2 style={{ ...styles.title, color: theme.text }}>
-                  Welcome back.
-                  <span style={hybridStyles.titleAccent}>Sign in fast.</span>
-                </h2>
-                <p style={hybridStyles.lead}>Enter your email once, then choose password or email code to continue. Email-code sign in is protected with a 5-attempt lockout.</p>
-              </article>
-
-              <article style={hybridStyles.panel}>
-                <div style={styles.progressWrap}>
-                  <div style={hybridStyles.progressBar}>
-                    <div style={{ ...hybridStyles.progressFill, width: `${progress}%` }} />
-                  </div>
-                  <div style={{ color: theme.textMuted }}>{step === 'email' ? 'Step 1 of 3' : step === 'method' ? 'Step 2 of 3' : step === 'password' || step === 'code' ? 'Step 3 of 3' : 'Step 4 of 4'}</div>
-                </div>
-
-                <div style={styles.headerCopy}>
-                  {step === 'email' ? (
-                    <>
-                      <p style={hybridStyles.stepLabel}>Email</p>
-                      <h3 style={{ ...styles.stepTitle, color: theme.text }}>Start with your account email</h3>
-                      <p style={hybridStyles.stepDesc}>We’ll use this to show your sign-in choices and keep the flow secure.</p>
-                    </>
-                  ) : step === 'method' ? (
-                    <>
-                      <p style={hybridStyles.stepLabel}>Choose method</p>
-                      <h2 style={{ ...styles.stepTitle, color: theme.text }}>Pick how you want to sign in</h2>
-                      <p style={hybridStyles.stepDesc}>Password is instant if you remember it. Code sign-in sends a 4-digit email code through Resend.</p>
-                    </>
-                  ) : step === 'password' ? (
-                    <>
-                      <p style={hybridStyles.stepLabel}>Password</p>
-                      <h2 style={{ ...styles.stepTitle, color: theme.text }}>Enter your password</h2>
-                      <p style={hybridStyles.stepDesc}>This is your standard sign-in route.</p>
-                    </>
-                  ) : (
-                    <>
-                      <p style={hybridStyles.stepLabel}>Code</p>
-                      <h2 style={{ ...styles.stepTitle, color: theme.text }}>Enter your email code</h2>
-                      <p style={hybridStyles.stepDesc}>We sent a sign-in code to your email address.</p>
-                    </>
-                  )}
-                </div>
-
-                <div style={styles.form}>
-                  {step === 'email' ? (
-                    <div style={styles.field}>
-                      <label style={hybridStyles.label} htmlFor="signin-email">Email</label>
-                      <input id="signin-email" style={emailInputStyle} type="email" value={form.email} onChange={(event) => updateField('email', event.target.value)} placeholder="Enter your email" autoComplete="email" />
-                    </div>
-                  ) : null}
-
-                  {step === 'method' ? (
-                    <div style={styles.optionGrid}>
-                      {signInMethods.filter((option) => option.value !== 'passkey' || passkeyAvailable).map((option) => (
-                        <button key={option.value} type="button" style={{ ...hybridStyles.optionCard, ...(method === option.value ? hybridStyles.optionCardActive : {}) }} onClick={() => handleStartSignin(option.value)} disabled={isSubmitting}>
-                          {isSubmitting && method === option.value ? <LoadingDots /> : <KeyRound size={20} />}
-                          <div>
-                            <div style={{ fontWeight: 700, color: theme.text }}>{option.title}</div>
-                            <div style={{ color: theme.textMuted, fontSize: '13px', lineHeight: 1.5 }}>{option.description}</div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {step === 'password' ? (
-                    <div style={styles.field}>
-                      <label style={hybridStyles.label} htmlFor="signin-password">Password</label>
-                      <input id="signin-password" style={hybridStyles.input} type="password" value={form.password} onChange={(event) => updateField('password', event.target.value)} placeholder="Enter your password" autoComplete="current-password" />
-                      {twoFactorRequired ? (
-                        <>
-                          <label style={hybridStyles.label} htmlFor="signin-2fa-password">Authenticator code</label>
-                          <input id="signin-2fa-password" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
-                        </>
-                      ) : null}
-                    </div>
-                  ) : null}
-                  {step === 'code' ? (
-                    <div style={styles.field}>
-                      <label style={hybridStyles.label} htmlFor="signin-code">Sign-in code</label>
-                      <input id="signin-code" style={hybridStyles.input} inputMode="numeric" maxLength={4} value={form.code} onChange={(event) => updateField('code', event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" autoComplete="one-time-code" />
-                      {twoFactorRequired ? (
-                        <>
-                          <label style={hybridStyles.label} htmlFor="signin-2fa-code">Authenticator code</label>
-                          <input id="signin-2fa-code" style={hybridStyles.input} inputMode="numeric" maxLength={6} value={form.twoFactorCode} onChange={(event) => updateField('twoFactorCode', event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit authenticator code" autoComplete="one-time-code" />
-                        </>
-                      ) : null}
-                      <div style={hybridStyles.footerNote}>{isCodeLocked ? 'This account is locked for 2 hours.' : `Attempts left: ${attemptsLeft} • Code expires after 10 minutes.`}</div>
-                    </div>
-                  ) : null}
-
-                  {submitError || resendStatus ? (
-                    <div>
-                      {submitError ? <NotificationBanner tone="error" title="Action required" message={submitError} /> : null}
-                      {resendStatus ? <NotificationBanner tone="success" title="Update received" message={resendStatus} /> : null}
-                      {showResendConfirmationLink ? (
-                        <button type="button" onClick={handleResendCode} disabled={isResendingCode || isSubmitting} style={hybridStyles.linkButton}>
-                          {isResendingCode ? <LoadingDots /> : 'Resend confirmation code'}
-                        </button>
-                      ) : null}
-                      {submitError.toLowerCase().includes('pending deletion') ? (
-                        <button type="button" onClick={() => navigate(`/pending-deletion?email=${encodeURIComponent(form.email.trim())}`)} style={hybridStyles.linkButton}>
-                          Cancel deletion request
-                        </button>
-                      ) : null}
-                      {submitError.toLowerCase().includes('account disabled') ? (
-                        <button type="button" onClick={() => navigate(`/enable-account?email=${encodeURIComponent(form.email.trim())}`)} style={hybridStyles.linkButton}>
-                          Enable account
-                        </button>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </div>
-
-                <div style={styles.navRow}>
-                  <button type="button" onClick={handleBack} style={{ ...styles.button, ...hybridStyles.buttonGhost }}>Back</button>
-                  {step === 'email' ? (
-                    <button type="button" onClick={handleNext} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={isSubmitting}>{isSubmitting ? <LoadingDots /> : 'Continue'}</button>
-                  ) : step === 'password' ? (
-                    <button type="button" onClick={handlePasswordSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <LoadingDots /> : 'Sign in'}</button>
-                  ) : step === 'code' ? (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...hybridStyles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <LoadingDots /> : 'Verify code'}</button>
-                  ) : (
-                    <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <LoadingDots /> : 'Verify code'}</button>
-                  )}
-                </div>
-              </article>
-              <article style={hybridStyles.heroCard}>
-                <p style={hybridStyles.stepLabel}>Need help?</p>
-                <h2 style={{ ...styles.stepTitle, color: theme.text }}>Forgot your password?</h2>
-                <p style={hybridStyles.stepDesc}>Use your email code to verify your account and reset access securely.</p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/forgot-password')}
-                  style={{
-                    ...styles.button,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    minHeight: '42px',
-                    padding: '0 16px',
-                    borderRadius: '14px',
-                    border: `1px solid ${theme.primarySoft}`,
-                    background: theme.primarySoft,
-                    color: theme.primary,
-                    fontWeight: 700,
-
-                  }}
-                >
-                  Forgot password?
-                </button>
-              </article>
+      <div style={{ maxWidth: 560, margin: '0 auto' }}>
+        <header style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <button type="button" onClick={handleReturn} aria-label="Go back" style={{ ...glass, color: theme.text, borderRadius: 999, width: 44, height: 44, display: 'grid', placeItems: 'center', flexShrink: 0 }}><ArrowLeft size={18} /></button>
+          <div>
+            <p style={{ margin: 0, color: theme.primary, fontSize: 12, fontWeight: 800, letterSpacing: '.16em' }}>CRYBOTS · KINGSHALL ID</p>
+            <p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: 13 }}>One identity. Secure access.</p>
+          </div>
+        </header>
+        <section style={{ ...glass, borderRadius: 24, padding: 'clamp(20px, 5vw, 30px)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+            <div style={{ ...glass, width: 48, height: 48, borderRadius: 15, display: 'grid', placeItems: 'center', color: theme.primary, flexShrink: 0 }}>
+              {step === 'one-time' ? <Smartphone size={23} /> : step === 'access-code' ? <KeyRound size={23} /> : <ShieldCheck size={23} />}
+            </div>
+            <div>
+              <h1 style={{ margin: 0, fontSize: 'clamp(1.45rem, 4vw, 1.9rem)', lineHeight: 1.15 }}>{step === 'identity' ? 'Sign in to CryBots' : step === 'method' ? 'Choose your sign-in method' : step === 'access-code' ? 'Sign in with Access Code' : 'Approve in KingsHall'}</h1>
+              <p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.5 }}>{step === 'identity' ? 'Use the email or username linked to your KingsHall account.' : step === 'method' ? 'KingsHall controls your available authentication methods.' : step === 'access-code' ? 'Enter your six-digit KingsHall Access Code.' : 'Keep this page open while you approve the request in KingsHall.'}</p>
             </div>
           </div>
+
+          {step === 'identity' && <form onSubmit={handleLookup} style={{ display: 'grid', gap: 16 }}>
+            <div><label htmlFor="signin-identity" style={label}>Email or Username</label><input id="signin-identity" style={input} value={identity} onChange={event => setIdentity(event.target.value)} placeholder="Enter your email or username" autoComplete="username" autoCapitalize="none" required /></div>
+            <button type="submit" style={button} disabled={busy || !identity.trim()}>{busy ? <LoadingDots /> : 'Sign In'}</button>
+          </form>}
+
+          {step === 'method' && <div style={{ display: 'grid', gap: 12 }}>
+            <p style={{ margin: 0, color: theme.textMuted, fontSize: 13, overflowWrap: 'anywhere' }}>Account: <strong style={{ color: theme.text }}>{identity.trim()}</strong></p>
+            {accessCodeAvailable && <button type="button" style={secondaryButton} onClick={() => { setStep('access-code'); setError(''); }}><KeyRound size={18} /> Sign in with Access Code</button>}
+            <button type="button" style={secondaryButton} onClick={() => void startOneTimeCode()} disabled={busy}><Smartphone size={18} /> {busy ? <LoadingDots /> : 'Sign in with One-Time Code'}</button>
+            <button type="button" style={{ border: 0, background: 'transparent', color: theme.primary, padding: 10, fontWeight: 700 }} onClick={resetFlow}>Use a different account</button>
+          </div>}
+
+          {step === 'access-code' && <form onSubmit={handleAccessCode} style={{ display: 'grid', gap: 16 }}>
+            <div><label htmlFor="signin-access-code" style={label}>Six-digit Access Code</label><input id="signin-access-code" style={{ ...input, textAlign: 'center', letterSpacing: '.35em', fontSize: 20 }} type="password" inputMode="numeric" autoComplete="off" value={accessCode} onChange={event => setAccessCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="••••••" minLength={6} maxLength={6} pattern="[0-9]{6}" required /></div>
+            <button type="submit" style={button} disabled={busy || accessCode.length !== 6}>{busy ? <LoadingDots /> : 'Verify Access Code'}</button>
+            <button type="button" style={{ border: 0, background: 'transparent', color: theme.primary, padding: 8, fontWeight: 700 }} onClick={() => { setStep('method'); setAccessCode(''); setError(''); }}>Back to sign-in methods</button>
+          </form>}
+
+          {step === 'one-time' && <div style={{ display: 'grid', gap: 16 }}>
+            <div style={{ ...glass, borderRadius: 20, padding: 20, textAlign: 'center' }}>
+              <p style={{ margin: 0, color: theme.textMuted, fontSize: 12, fontWeight: 800, letterSpacing: '.15em' }}>YOUR TWO-DIGIT CHALLENGE</p>
+              <p aria-label={'Challenge code ' + challengeCode} style={{ margin: '10px 0', fontSize: 'clamp(3rem, 15vw, 4.5rem)', lineHeight: 1, letterSpacing: '.2em', fontWeight: 850, color: theme.primary }}>{challengeCode}</p>
+              <p style={{ margin: 0, color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>Open KingsHall on a device where you are signed in. Enter these two digits in the CryBots sign-in approval modal.</p>
+            </div>
+            <p role="status" style={{ margin: 0, color: theme.textMuted, fontSize: 13, textAlign: 'center' }}>Waiting for KingsHall approval… {expiresAt ? 'This request expires in about five minutes.' : ''}</p>
+            <button type="button" style={secondaryButton} onClick={resetFlow}>Cancel sign-in</button>
+          </div>}
+
+          {error && <p role="alert" style={{ margin: '16px 0 0', padding: '11px 13px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 13, lineHeight: 1.5 }}>{error}</p>}
+          {notice && step === 'one-time' && <p role="status" style={{ margin: '10px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.5 }}>{notice}</p>}
+          <p style={{ margin: '20px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>Authentication is handled by KingsHall. Never approve a sign-in request you did not initiate.</p>
         </section>
-      </main>
-    </>
+      </div>
+    </main>
   );
 };
 
