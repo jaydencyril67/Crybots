@@ -52,7 +52,6 @@ const initialState: FormState = {
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: {
     minHeight: '100vh',
-    overflow: 'hidden',
   },
   shell: {
     position: 'relative' as const,
@@ -164,7 +163,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     flex: '1 1 220px',
     height: '10px',
     borderRadius: '999px',
-    overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
@@ -334,7 +332,7 @@ const SigninPage = () => {
     heroCard: {
       ...styles.heroCard,
       border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceMuted,
+      background: theme.surfaceGlass,
       color: theme.text,
 
     },
@@ -352,7 +350,7 @@ const SigninPage = () => {
     panel: {
       ...styles.panel,
       border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceMuted,
+      background: theme.surfaceGlass,
       color: theme.text,
     },
     progressBar: {
