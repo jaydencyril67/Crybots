@@ -113,10 +113,8 @@ const SigninPage = () => {
     const loadingStartedAt = Date.now();
     setBusy(true); setError(''); setNotice('');
     try {
-      // Let the loading overlay render, then keep it visible for at least five seconds
-      // so account detection feels deliberate even when the hint is available instantly.
+      // Keep account detection behind the same minimum five-second loading state.
       await new Promise(resolve => window.setTimeout(resolve, 250));
-      let selectedEmail = '';
       if (isNativeAndroid()) {
         if (!Capacitor.isPluginAvailable('KingsHallAccount')) throw new Error('This CryBots APK needs an update to use the KingsHall account manager.');
         const result = await DeviceAccount.chooseAccount();
@@ -124,37 +122,29 @@ const SigninPage = () => {
           setNotice('Choose a KingsHall account to continue. If none appears, sign in to KingsHall first.');
           return;
         }
-        selectedEmail = (result.email || '').trim().toLowerCase();
-        if (!selectedEmail) {
+        const selectedEmail = (result.email || '').trim().toLowerCase();
+        if (!EMAIL_PATTERN.test(selectedEmail)) {
           const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
           if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
           setShowNoAccountModal(true);
           return;
         }
-      } else {
-        const accounts = getSavedBrowserAccounts();
         const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
         if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
-        if (accounts.length) {
-          setBrowserAccounts(accounts);
-          return;
-        }
-        setShowNoAccountModal(true);
+        setIdentity(selectedEmail);
+        setAccountDetected(true);
+        setNotice('KingsHall account detected. Enter the bound Access Code to continue.');
         return;
       }
+
+      const accounts = getSavedBrowserAccounts();
       const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
-          if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
-          setShowNoAccountModal(true);
-          return;
-        }
+      if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
+      if (accounts.length) {
+        setBrowserAccounts(accounts);
+        return;
       }
-      const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
-      if (remainingLoadingTime > 0) {
-        await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
-      }
-      setIdentity(selectedEmail);
-      setAccountDetected(true);
-      setNotice('KingsHall account detected. Enter the bound Access Code to continue.');
+      setShowNoAccountModal(true);
     } catch (e) {
       setError(messageFromError(e, 'Unable to detect a KingsHall account.'));
     } finally {
