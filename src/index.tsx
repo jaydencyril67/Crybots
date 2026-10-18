@@ -120,9 +120,6 @@ const getRouteKey = () => {
   const pathname = getPathname().split(/[?#]/)[0].replace(/\/+$/, '') || '/';
   const hash = getHash().split(/[?#]/)[0].replace(/\/+$/, '') || '';
 
-  if (pathname === '/signup' || hash === '#/signup') return 'signin';
-  if (pathname === '/verify-email' || hash === '#/verify-email') return 'signin';
-  if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'signin';
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
   if (pathname === '/admin-home' || hash === '#/admin-home') return 'admin-home';
   if (pathname === '/admin/settings' || hash === '#/admin/settings') return 'admin-settings';
@@ -204,9 +201,6 @@ const getRouteKey = () => {
 
 const routeToKey = (path: string) => {
   const normalizedPath = path.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
-  if (normalizedPath === '/signup' || normalizedPath === '#/signup') return 'signin';
-  if (normalizedPath === '/verify-email' || normalizedPath === '#/verify-email') return 'signin';
-  if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'signin';
   if (normalizedPath === '/signin' || normalizedPath === '#/signin') return 'signin';
   if (normalizedPath === '/admin-home' || normalizedPath === '#/admin-home') return 'admin-home';
   if (normalizedPath === '/admin/settings' || normalizedPath === '#/admin/settings') return 'admin-settings';
