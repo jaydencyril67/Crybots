@@ -20,8 +20,6 @@ const faqSections: FAQSection[] = [
     title: 'Getting started',
     items: [
       { question: 'What is CryBots?', answer: 'CryBots is a crypto trading bot platform where users can rent ready-made bots, build automated strategies and buy bots to trade crypto markets, while managing funds and reviewing performance.' },
-      { question: 'How do I create an account?', answer: 'Choose Sign up, enter your details, and confirm your email using the verification message we send you. After confirmation, sign in to access your account.' },
-      { question: 'Why do I need to verify my email?', answer: 'Email verification helps protect your account and makes sure important security, account, and transaction messages reach you.' },
       { question: 'I forgot my password. What should I do?', answer: 'Use Forgot password on the sign-in page and follow the email instructions to create a new password. Never share a password or verification code with anyone.' },
     ],
   },
