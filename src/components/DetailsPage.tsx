@@ -16,9 +16,9 @@ const baseStyles = {
   page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '90px' },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { paddingTop: '8px', display: 'grid', gap: '14px', marginTop: '14px' },
-  rowList: { display: 'grid', gap: '10px', width: '100%', minWidth: 0, padding: '4px', borderRadius: '16px', border: '1px solid transparent', boxSizing: 'border-box' as const },
+  rowList: { display: 'grid', gap: '14px', width: '100%', minWidth: 0, padding: '16px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', boxSizing: 'border-box' as const },
   profilePhotoCard: { width: 'fit-content', maxWidth: '100%', margin: '0 auto' },
-  row: { width: '100%', maxWidth: '100%', border: '1px solid transparent', borderRadius: '15px', padding: '13px 14px', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
+  row: { width: '100%', maxWidth: '100%', border: 'none', borderRadius: 0, padding: '10px 0', background: 'transparent', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
   grid: { display: 'grid', gap: '12px', gridTemplateColumns: 'minmax(0, 1fr)' },
   infoList: { display: 'grid', gap: '8px', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', marginTop: '8px' },
   infoRow: { width: '100%', padding: '13px 14px', borderRadius: '15px', boxSizing: 'border-box' as const, display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, gridColumn: '1 / -1' },
@@ -62,8 +62,8 @@ const DetailsPage = () => {
     profileAvatarFallback: { ...baseStyles.profileAvatarFallback, color: theme.text },
     card: createHybridCardStyles(theme).card,
     rowList: { ...baseStyles.rowList, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
-    row: { ...baseStyles.row, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
-    infoRow: { ...baseStyles.infoRow, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'none', WebkitBackdropFilter: 'none' },
+    row: { ...baseStyles.row, border: 'none', background: 'transparent' },
+    infoRow: { ...baseStyles.infoRow, border: 'none', background: 'transparent', backdropFilter: 'none', WebkitBackdropFilter: 'none' },
   }), [theme]);
 
   const [liveProfile, setLiveProfile] = useState<ProfileDetails | null>(null); const [profileLoading, setProfileLoading] = useState(true);
