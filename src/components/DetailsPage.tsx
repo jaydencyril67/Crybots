@@ -177,7 +177,7 @@ const DetailsPage = () => {
           <div style={styles.shell}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.content}>
-              <div style={{ ...styles.rowList, ...styles.profilePhotoCard }}>
+              <div className="cr-details-photo-card">
                 <div className="cr-details-photo-stack" ref={photoStackRef}>
                   <div className="cr-details-cover-frame" style={{ borderColor: theme.borderGlass, background: theme.surfaceGlass }}>
                     <button type="button" className="cr-details-cover-trigger" aria-label="Cover photo actions" aria-expanded={coverActionsOpen} onClick={() => { setCoverActionsOpen(open => !open); setPhotoActionsOpen(false); setDeletePhotoConfirm(null); }} disabled={coverUploading || avatarUploading}>
