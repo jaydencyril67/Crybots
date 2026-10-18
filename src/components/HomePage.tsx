@@ -225,12 +225,12 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   },
   panel: {
     borderRadius: '22px',
-    border: '1px solid rgba(221,226,233,0.22)',
-    background: theme.surfaceElevated,
-    boxShadow: '0 0 0 1px rgba(255,255,255,0.035), 0 16px 40px rgba(0,0,0,0.28), inset 0 1px rgba(255,255,255,0.075)',
+    border: `1px solid ${theme.borderGlass}`,
+    background: theme.surfaceGlass,
+    boxShadow: '0 12px 36px rgba(0,0,0,0.22), inset 0 1px rgba(255,255,255,0.09), inset 0 0 0 1px rgba(255,255,255,0.018)',
     padding: 'clamp(12px, 2.5vw, 16px)',
-    backdropFilter: 'none',
-    WebkitBackdropFilter: 'none',
+    backdropFilter: 'blur(18px) saturate(125%)',
+    WebkitBackdropFilter: 'blur(18px) saturate(125%)',
   },
   panelTitle: {
     margin: 0,
