@@ -86,6 +86,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     maxWidth: '1160px',
     margin: '0 auto',
     padding: 'clamp(12px, 2.5vw, 24px) clamp(10px, 2vw, 18px) 28px',
+    display: 'grid',
+    alignContent: 'start',
+    gap: '14px',
+    minWidth: 0,
   },
   header: {
     display: 'flex',
@@ -125,12 +129,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     color: theme.text,
     fontSize: '0.78rem',
     fontWeight: 600,
-  },
-  cardList: {
-    display: 'grid',
-    gap: '14px',
-    width: '100%',
-    minWidth: 0,
   },
   heroGrid: {
     display: 'grid',
@@ -544,7 +542,6 @@ const HomePage = () => {
       </Helmet>
       <main style={styles.page}>
         <div style={styles.shell}>
-          <div style={styles.cardList}>
             <section style={styles.heroCard}>
               <p style={styles.greeting}>{greeting}</p>
               <h2 style={styles.title}>
@@ -687,7 +684,6 @@ const HomePage = () => {
                 </div>
               </div>
             </section>
-          </div>
         </div>
         <NowBar />
       </main>
