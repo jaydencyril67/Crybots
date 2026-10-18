@@ -16,14 +16,14 @@ type TransferRecipientCheckResponse = {
     id?: string;
     firstName?: string;
     lastName?: string;
-    uid?: string;
+    username?: string;
     email?: string;
   };
 };
 
 type TransferDetailsResponse = {
   user?: {
-    uid?: string;
+    username?: string;
     email?: string;
     securityCodeSet?: boolean;
   };
@@ -122,7 +122,7 @@ const TransferPage = () => {
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState({ kind: 'idle' as 'idle' | 'success' | 'error', text: '' });
-  const [recipientMethod, setRecipientMethod] = useState<'uid' | 'email'>('uid');
+  const [recipientMethod, setRecipientMethod] = useState<'username' | 'email'>('username');
   const [recipientValue, setRecipientValue] = useState('');
   const [recipientValid, setRecipientValid] = useState(false);
   const [recipientDetails, setRecipientDetails] = useState<TransferRecipientCheckResponse['user'] | null>(null);
@@ -236,16 +236,16 @@ const TransferPage = () => {
               <section style={styles.card}>
                 {message.kind !== 'idle' ? <NotificationBanner tone={message.kind === 'success' ? 'success' : 'error'} title={message.kind === 'success' ? 'Transfer updated' : 'Please review your details'} message={message.text} /> : null}
                 <h2 style={styles.cardTitle}><ArrowRightLeft size={18} /> Send USDT to another user</h2>
-                <p style={styles.cardText}>Transfer USDT from your balance to another account using UID or email. The recipient is validated live as you type.</p>
+                <p style={styles.cardText}>Transfer USDT from your balance to another account using username or email. The recipient is validated live as you type.</p>
                 <div ref={recipientMenuRef} style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Recipient type</span>
                   <button type="button" style={styles.selectTrigger} onClick={() => setIsRecipientMenuOpen((current) => !current)}>
-                    <span>{recipientMethod === 'uid' ? 'UID' : 'Email'}</span>
+                    <span>{recipientMethod === 'username' ? 'Username' : 'Email'}</span>
                     <span style={{ transform: isRecipientMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}>▾</span>
                   </button>
                   {isRecipientMenuOpen ? (
                     <div style={styles.selectMenu}>
-                      {(['uid', 'email'] as const).map((option) => (
+                      {(['username', 'email'] as const).map((option) => (
                         <button
                           key={option}
                           type="button"
@@ -255,23 +255,23 @@ const TransferPage = () => {
                             setIsRecipientMenuOpen(false);
                           }}
                         >
-                          {option === 'uid' ? 'UID' : 'Email'}
+                          {option === 'username' ? 'Username' : 'Email'}
                         </button>
                       ))}
                     </div>
                   ) : null}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
-                  <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient UID'}</span>
+                  <span style={styles.label}>{recipientMethod === 'email' ? 'Recipient email' : 'Recipient username'}</span>
                   <input
                     style={styles.input}
                     value={recipientValue}
-                    onChange={(event) => setRecipientValue(recipientMethod === 'uid' ? event.target.value.replace(/\D/g, '').slice(0, 5) : event.target.value)}
-                    placeholder={recipientMethod === 'email' ? 'recipient@email.com' : '12345'}
+                    onChange={(event) => setRecipientValue(recipientMethod === 'username' ? event.target.value.replace(/[^a-z0-9]/gi, '').toLowerCase().slice(0, 24) : event.target.value)}
+                    placeholder={recipientMethod === 'email' ? 'recipient@email.com' : 'kingshallusername'}
                   />
                 </div>
                 <div style={styles.helper}>
-                  {recipientChecking ? 'Checking recipient...' : recipientValid ? `Recipient found: ${recipientDisplay}` : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a UID or email to validate.'}
+                  {recipientChecking ? 'Checking recipient...' : recipientValid ? `Recipient found: ${recipientDisplay}` : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a username or email to validate.'}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Amount</span>
@@ -299,7 +299,7 @@ const TransferPage = () => {
               <div style={styles.panel}>
               <section style={styles.card}>
                 <h2 style={styles.cardTitle}><UserRound size={18} /> Recipient validation</h2>
-                <p style={styles.cardText}>UID entries are restricted to 5 digits. Email validation checks the exact email that exists in the database.</p>
+                <p style={styles.cardText}>Username validation checks the exact KingsHall username; email validation checks the exact email registered in KingsHall.</p>
                 <p style={styles.cardText}>Validation runs live after a short pause so the interface stays responsive on mobile and desktop.</p>
               </section>
               </div>
