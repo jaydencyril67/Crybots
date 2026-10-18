@@ -7,7 +7,6 @@ import type { AlertPreferences, AlertPreferencesResponse } from '../types/alertP
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
-import { completeOnboardingStep } from '../utils/onboarding';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
@@ -181,7 +180,6 @@ const AlertPage = () => {
         }
       }
       setSaved(true);
-      completeOnboardingStep('notifications');
     } catch {
       setError('Unable to save preferences. Please try again.');
     } finally {
