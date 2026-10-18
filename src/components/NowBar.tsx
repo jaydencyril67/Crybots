@@ -738,15 +738,9 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                     borderColor: edgeLight.enabled ? edgeLightColor : (buttonColorEnabled ? buttonColor : 'rgba(238,242,249,0.72)'),
                     background: 'linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.055))',
                     color: '#ffffff',
-                    boxShadow: edgeLight.enabled
-                      ? (edgeLight.mode === 'stable-light'
-                        ? '0 0 0 1px rgba(255,255,255,0.10), 0 0 8px color-mix(in srgb, var(--edge-light) 28%, transparent), inset 0 0 8px color-mix(in srgb, var(--edge-light) 14%, transparent)'
-                        : edgeLight.mode === 'stable'
-                          ? '0 0 0 1px var(--edge-light), 0 0 16px color-mix(in srgb, var(--edge-light) 58%, transparent), inset 0 0 10px color-mix(in srgb, var(--edge-light) 22%, transparent)'
-                          : undefined)
-                      : buttonColorEnabled
-                        ? `0 0 0 1px color-mix(in srgb, ${buttonColor} 42%, transparent), 0 0 12px color-mix(in srgb, ${buttonColor} 34%, transparent), inset 0 0 8px color-mix(in srgb, ${buttonColor} 12%, transparent)`
-                        : '0 0 0 1px rgba(255,255,255,0.10), inset 0 1px rgba(255,255,255,0.10)',
+                    boxShadow: edgeLight.enabled && !['stable', 'stable-light'].includes(edgeLight.mode)
+                      ? undefined
+                      : 'inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 10px rgba(255,255,255,0.12)',
                     ...(edgeLight.enabled && !['stable', 'stable-light'].includes(edgeLight.mode) ? {
                       animation: `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' || edgeLight.mode === 'blink-light' ? '2.6s' : edgeLight.mode === 'pulse' || edgeLight.mode === 'pulse-light' ? '3.1s' : '6s'} ${edgeLight.mode === 'color' || edgeLight.mode === 'color-light' ? 'linear' : 'ease-in-out'} infinite`,
                       animationFillMode: 'both',
