@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ChevronDown, Copy, Filter, ListFilter, Search } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { navigate } from '../utils/navigate';
@@ -37,12 +37,25 @@ const TradeHistory = () => {
   const [overviewOpen, setOverviewOpen] = useState(false);
   const [typeFilter, setTypeFilter] = useState<HistoryType>('all');
   const [statusFilter, setStatusFilter] = useState<HistoryStatus>('all');
+  const [isTypeMenuOpen, setIsTypeMenuOpen] = useState(false);
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const typeMenuRef = useRef<HTMLDivElement | null>(null);
+  const statusMenuRef = useRef<HTMLDivElement | null>(null);
   const [query, setQuery] = useState('');
   const [amountMin, setAmountMin] = useState('');
   const [amountMax, setAmountMax] = useState('');
   const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [alert, setAlert] = useState<{ tone: NotificationTone; title: string; message: string } | null>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (typeMenuRef.current && !typeMenuRef.current.contains(event.target as Node)) setIsTypeMenuOpen(false);
+      if (statusMenuRef.current && !statusMenuRef.current.contains(event.target as Node)) setIsStatusMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,7 +97,9 @@ const TradeHistory = () => {
     field: { display: 'grid', gap: '8px' },
     label: { fontSize: '0.82rem', fontWeight: 700, color: theme.textMuted, textTransform: 'uppercase' as const, letterSpacing: '0.08em' },
     input: { width: '100%', boxSizing: 'border-box' as const, borderRadius: '12px', border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '10px 12px', outline: 'none', fontSize: '0.9rem' },
-    select: { border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const },
+    selectTrigger: { border: `1px solid ${theme.border}`, background: theme.surfaceMuted, color: theme.text, borderRadius: '14px', padding: '11px 12px', fontSize: '0.95rem', width: '100%', boxSizing: 'border-box' as const, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', cursor: 'pointer', textAlign: 'left' as const },
+    selectMenu: { position: 'absolute' as const, zIndex: 1000, top: 'calc(100% + 6px)', left: 0, right: 0, display: 'grid', gap: '6px', padding: '8px', borderRadius: '16px', background: theme.mode === 'dark' ? 'rgba(12,12,12,0.96)' : 'rgba(238,237,232,0.97)', border: `1px solid ${theme.borderStrong}`, boxShadow: theme.mode === 'dark' ? '0 18px 40px rgba(0,0,0,.62)' : '0 18px 40px rgba(30,30,30,.18)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', maxHeight: '260px', overflowY: 'auto' as const },
+    selectOption: { border: `1px solid ${theme.border}`, background: theme.mode === 'dark' ? 'rgba(42,42,42,0.94)' : 'rgba(220,219,213,0.96)', color: theme.text, borderRadius: '12px', padding: '10px 12px', width: '100%', textAlign: 'left' as const, cursor: 'pointer' },
     overviewList: { display: 'grid', gap: '7px' },
     overviewItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '12px 0' },
     overviewLabel: { margin: 0, color: theme.text, fontSize: '0.9rem', fontWeight: 700 },
@@ -160,8 +175,8 @@ const TradeHistory = () => {
                 </button>
                 {filtersOpen ? <div className="trade-history-filters" style={styles.filters}>
                   <label style={styles.field}><span style={styles.label}>Search</span><span style={{ position: 'relative' }}><Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: theme.textMuted }} /><input style={{ ...styles.input, paddingLeft: '36px' }} value={query} onChange={(event) => { setQuery(event.target.value); setPage(1); }} placeholder="Bot, symbol, reference" /></span></label>
-                  <label style={styles.field}><span style={styles.label}>Activity type</span><select style={styles.select} value={typeFilter} onChange={(event) => { setTypeFilter(event.target.value as HistoryType); setPage(1); }}><option value="all">All activity</option><option value="profit">Bot profits</option><option value="loss">Bot losses</option><option value="financial">Financial activity</option></select></label>
-                  <label style={styles.field}><span style={styles.label}>Status</span><select style={styles.select} value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value as HistoryStatus); setPage(1); }}><option value="all">All statuses</option><option value="completed">Completed</option><option value="pending">Pending</option><option value="failed">Failed</option></select></label>
+                  <div ref={typeMenuRef} style={{ ...styles.field, position: 'relative', zIndex: isTypeMenuOpen ? 30 : 1 }}><span style={styles.label}>Activity type</span><button type="button" style={styles.selectTrigger} aria-expanded={isTypeMenuOpen} onClick={() => { setIsTypeMenuOpen((open) => !open); setIsStatusMenuOpen(false); }}><span>{{ all: 'All activity', profit: 'Bot profits', loss: 'Bot losses', financial: 'Financial activity' }[typeFilter]}</span><ChevronDown size={17} style={{ transform: isTypeMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', flexShrink: 0 }} /></button>{isTypeMenuOpen ? <div style={styles.selectMenu}>{([{ value: 'all', label: 'All activity' }, { value: 'profit', label: 'Bot profits' }, { value: 'loss', label: 'Bot losses' }, { value: 'financial', label: 'Financial activity' }] as const).map((option) => <button key={option.value} type="button" style={{ ...styles.selectOption, ...(typeFilter === option.value ? { borderColor: theme.borderGlass, background: theme.surfaceGlass } : {}) }} onClick={() => { setTypeFilter(option.value); setPage(1); setIsTypeMenuOpen(false); }}>{option.label}</button>)}</div> : null}</div>
+                  <div ref={statusMenuRef} style={{ ...styles.field, position: 'relative', zIndex: isStatusMenuOpen ? 30 : 1 }}><span style={styles.label}>Status</span><button type="button" style={styles.selectTrigger} aria-expanded={isStatusMenuOpen} onClick={() => { setIsStatusMenuOpen((open) => !open); setIsTypeMenuOpen(false); }}><span>{{ all: 'All statuses', completed: 'Completed', pending: 'Pending', failed: 'Failed' }[statusFilter]}</span><ChevronDown size={17} style={{ transform: isStatusMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', flexShrink: 0 }} /></button>{isStatusMenuOpen ? <div style={styles.selectMenu}>{([{ value: 'all', label: 'All statuses' }, { value: 'completed', label: 'Completed' }, { value: 'pending', label: 'Pending' }, { value: 'failed', label: 'Failed' }] as const).map((option) => <button key={option.value} type="button" style={{ ...styles.selectOption, ...(statusFilter === option.value ? { borderColor: theme.borderGlass, background: theme.surfaceGlass } : {}) }} onClick={() => { setStatusFilter(option.value); setPage(1); setIsStatusMenuOpen(false); }}>{option.label}</button>)}</div> : null}</div>
                   <label style={styles.field}><span style={styles.label}>Min amount</span><input style={styles.input} inputMode="decimal" value={amountMin} onChange={(event) => { setAmountMin(event.target.value); setPage(1); }} placeholder="0.00" /></label>
                   <label style={styles.field}><span style={styles.label}>Max amount</span><input style={styles.input} inputMode="decimal" value={amountMax} onChange={(event) => { setAmountMax(event.target.value); setPage(1); }} placeholder="9999.99" /></label>
                   <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end' }}><button type="button" style={styles.button} onClick={clearFilters}>Clear filters</button></div>
