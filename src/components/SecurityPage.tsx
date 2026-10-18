@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, CheckCircle2, ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2, Copy } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, KeyRound, Smartphone, Fingerprint, Laptop2, LockKeyhole, LogOut, Trash2, Copy } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import api from '../api/axios';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -331,26 +331,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     fontSize: '0.82rem',
     lineHeight: 1.4,
   },
-  passwordChecklist: {
-    margin: '10px 0 0',
-    padding: 0,
-    listStyle: 'none',
-    display: 'grid',
-    gap: '6px',
-  },
-  passwordChecklistItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    fontSize: '11px',
-    lineHeight: 1.5,
-    color: theme.textMuted,
-  },
-  passwordChecklistIcon: {
-    width: '16px',
-    height: '16px',
-    flexShrink: 0,
-  },
 });
 
 const securityCodeChangeCooldownMs = 30 * 24 * 60 * 60 * 1000;
@@ -368,10 +348,9 @@ const SecurityPage = () => {
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [maxActiveSessions, setMaxActiveSessions] = useState(2);
   const [savingMaxSessions, setSavingMaxSessions] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [currentSecurityPassword, setCurrentSecurityPassword] = useState('');
+  const [securityCodeEmailCode, setSecurityCodeEmailCode] = useState('');
+  const [securityCodeEmailCodeRequested, setSecurityCodeEmailCodeRequested] = useState(false);
+  const [requestingSecurityCodeEmailCode, setRequestingSecurityCodeEmailCode] = useState(false);
   const [securityCode, setSecurityCode] = useState('');
   const [confirmSecurityCode, setConfirmSecurityCode] = useState('');
   const [status, setStatus] = useState<{ kind: SaveState; text: string; section: string }>({ kind: 'idle', text: '', section: 'security' });
@@ -393,7 +372,6 @@ const SecurityPage = () => {
   const [hardwareKeyEnabled, setHardwareKeyEnabled] = useState(false);
   const [savingUid, setSavingUid] = useState(false);
   const [requestingUidCode, setRequestingUidCode] = useState(false);
-  const [savingPassword, setSavingPassword] = useState(false);
   const [savingSecurityCode, setSavingSecurityCode] = useState(false);
   const [saving2fa, setSaving2fa] = useState(false);
   const [savingSecurityQuestion, setSavingSecurityQuestion] = useState(false);
@@ -532,79 +510,40 @@ const SecurityPage = () => {
     }
   };
 
-  const passwordHasMinLength = newPassword.length >= 8;
-  const passwordHasUppercase = /[A-Z]/.test(newPassword);
-  const passwordHasLowercase = /[a-z]/.test(newPassword);
-  const passwordHasNumber = /\d/.test(newPassword);
-  const passwordHasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
-  const passwordMeetsRequirement = passwordHasMinLength && passwordHasUppercase && passwordHasLowercase && passwordHasNumber && passwordHasSymbol;
-  const passwordNotice = 'Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol.';
-  const passwordChecklist = [
-    { label: 'At least 8 characters', met: passwordHasMinLength },
-    { label: 'One uppercase letter', met: passwordHasUppercase },
-    { label: 'One lowercase letter', met: passwordHasLowercase },
-    { label: 'One number', met: passwordHasNumber },
-    { label: 'One symbol', met: passwordHasSymbol },
-  ];
-  const passwordErrorMessage = newPassword && !passwordMeetsRequirement ? passwordNotice : '';
-  const passwordInputStyle = passwordErrorMessage ? { ...styles.input, borderColor: theme.danger, background: theme.surface } : styles.input;
-  const confirmPasswordMismatch = confirmPassword && newPassword !== confirmPassword;
-  const confirmPasswordInputStyle = confirmPasswordMismatch ? { ...styles.input, borderColor: theme.danger, background: theme.surface } : styles.input;
-
-  const handlePasswordSave = async () => {
-    if (!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()) {
-      return showStatus('error', 'Enter your current password, new password, and confirmation.', 'password');
-    }
-
-    if (!passwordMeetsRequirement) {
-      return showStatus('error', passwordNotice, 'password');
-    }
-
-    if (newPassword !== confirmPassword) {
-      return showStatus('error', 'New password and confirmation must match.', 'password');
-    }
-
-    setSavingPassword(true);
-    try {
-      await api.patch('/api/settings/password', {
-        currentPassword: currentPassword.trim(),
-        newPassword: newPassword.trim(),
-      });
-      showStatus('success', 'Password updated successfully.', 'password');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (error: any) {
-      showStatus('error', getFriendlyErrorMessage(error, 'Unable to update your password. Please check your details and try again.'), 'password');
-    } finally {
-      setSavingPassword(false);
-    }
-  };
-
   const securityCodeChangeLocked = Boolean(securityCodeChangeAvailableAt && new Date(securityCodeChangeAvailableAt).getTime() > Date.now());
   const securityCodeChangeDate = securityCodeChangeAvailableAt ? new Date(securityCodeChangeAvailableAt) : null;
   const securityCodeChangeMessage = securityCodeChangeLocked && securityCodeChangeDate && !Number.isNaN(securityCodeChangeDate.getTime())
     ? `You can change your security code again after ${securityCodeChangeDate.toLocaleDateString()}.`
     : 'For your protection, you can change your security code only once every 30 days.';
 
-  const handleSecurityCodeSave = async () => {
-    if (!currentSecurityPassword.trim()) {
-      return showStatus('error', 'Enter your current password to update the security code.', 'securityCode');
+  const handleSecurityCodeEmailCodeRequest = async () => {
+    setRequestingSecurityCodeEmailCode(true);
+    try {
+      await api.post('/api/withdrawals/security-code/email-code');
+      setSecurityCodeEmailCodeRequested(true);
+      setSecurityCodeEmailCode('');
+      showStatus('success', 'A verification code was sent to your account email. It expires in 10 minutes.', 'securityCode');
+    } catch (error: any) {
+      showStatus('error', getFriendlyErrorMessage(error, 'Unable to send the email verification code.'), 'securityCode');
+    } finally {
+      setRequestingSecurityCodeEmailCode(false);
     }
+  };
 
+  const handleSecurityCodeSave = async () => {
+    if (!securityCodeEmailCodeRequested || !/^\\d{4}$/.test(securityCodeEmailCode)) {
+      return showStatus('error', 'Request and enter the 4-digit email verification code first.', 'securityCode');
+    }
     if (securityCode.length !== 6 || securityCode !== confirmSecurityCode) {
       return showStatus('error', 'Security code must be 6 digits and match confirmation.', 'securityCode');
     }
-
     setSavingSecurityCode(true);
     try {
-      await api.patch('/api/withdrawals/security-code', {
-        currentPassword: currentSecurityPassword.trim(),
-        securityCode,
-      });
+      await api.patch('/api/withdrawals/security-code', { emailCode: securityCodeEmailCode, securityCode });
       setSecurityCodeSet(true);
       setSecurityCodeChangeAvailableAt(new Date(Date.now() + securityCodeChangeCooldownMs).toISOString());
-      setCurrentSecurityPassword('');
+      setSecurityCodeEmailCode('');
+      setSecurityCodeEmailCodeRequested(false);
       setSecurityCode('');
       setConfirmSecurityCode('');
       showStatus('success', 'Security code updated successfully.', 'securityCode');
@@ -983,35 +922,16 @@ const SecurityPage = () => {
 
               <div style={styles.card}>
                 <div style={styles.row}>
-                <p style={styles.rowLabel}><KeyRound size={16} /> Password</p>
-                <p style={styles.rowValue}>Change your account password</p>
-                <div className="security-control" style={styles.control}>
-                  <input style={styles.input} type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" />
-                  <input style={passwordInputStyle} type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" />
-                  <ul style={styles.passwordChecklist}>
-                    {passwordChecklist.map((item) => (
-                      <li key={item.label} style={styles.passwordChecklistItem}>
-                        <CheckCircle2 style={{ ...styles.passwordChecklistIcon, color: item.met ? theme.success : theme.textMuted }} />
-                        <span style={{ color: item.met ? theme.success : theme.textMuted }}>{item.label}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  {passwordErrorMessage ? <p style={styles.inlineError}>{passwordErrorMessage}</p> : null}
-                  <input style={confirmPasswordInputStyle} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" />
-                  {confirmPasswordMismatch ? <p style={styles.inlineError}>Passwords do not match.</p> : null}
-                  <button type="button" style={styles.button} onClick={() => void handlePasswordSave()} disabled={savingPassword}>{savingPassword ? <LoadingDots /> : 'Change'}</button>
-                </div>
-                {renderStatus('password')}
-                </div>
-              </div>
-
-              <div style={styles.card}>
-                <div style={styles.row}>
                 <p style={styles.rowLabel}><LockKeyhole size={16} /> Security code</p>
                 <p style={styles.rowValue}>{securityCodeSet ? 'Security code is active' : 'Security code not set yet'}</p>
                 <p style={styles.note}>{securityCodeChangeMessage}</p>
                 <div className="security-control" style={styles.control}>
-                  <input style={styles.input} type="password" value={currentSecurityPassword} onChange={(event) => setCurrentSecurityPassword(event.target.value)} placeholder="Current password" />
+                  <div style={styles.buttonRow}>
+                    <button type="button" style={styles.button} onClick={() => void handleSecurityCodeEmailCodeRequest()} disabled={requestingSecurityCodeEmailCode || securityCodeChangeLocked}>
+                      {requestingSecurityCodeEmailCode ? <LoadingDots /> : securityCodeEmailCodeRequested ? 'Resend email code' : 'Send email code'}
+                    </button>
+                  </div>
+                  {securityCodeEmailCodeRequested ? <input style={styles.input} type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={4} value={securityCodeEmailCode} onChange={(event) => setSecurityCodeEmailCode(event.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="4-digit email verification code" /> : null}
                   <input style={{ ...styles.input, WebkitTextSecurity: 'disc' } as React.CSSProperties} type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={securityCode} onChange={(event) => setSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="6-digit security code" />
                   <input style={{ ...styles.input, WebkitTextSecurity: 'disc' } as React.CSSProperties} type="text" inputMode="numeric" autoComplete="off" maxLength={6} value={confirmSecurityCode} onChange={(event) => setConfirmSecurityCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Confirm security code" />
                   <button type="button" style={styles.button} onClick={() => void handleSecurityCodeSave()} disabled={savingSecurityCode || securityCodeChangeLocked}>{savingSecurityCode ? <LoadingDots /> : 'Save'}</button>
