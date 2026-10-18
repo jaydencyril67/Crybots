@@ -31,7 +31,6 @@ const styles = {
     boxSizing: 'border-box' as const,
     zIndex: 50,
     transition: 'width 180ms ease, box-shadow 180ms ease, border-color 180ms ease, filter 180ms ease',
-    willChange: 'box-shadow, border-color, filter',
   },
   artworkContainer: {
     position: 'relative' as const,
@@ -315,10 +314,10 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
       ...styles.header,
       borderColor: `${notificationColor}b8`,
       boxShadow: isAlertActive
-        ? `0 0 0 1px color-mix(in srgb, ${notificationColor} 72%, transparent), 0 0 16px color-mix(in srgb, ${notificationColor} 48%, transparent), 0 14px 30px rgba(0,0,0,0.24)`
-        : `0 0 0 1px color-mix(in srgb, ${notificationColor} 42%, transparent), 0 0 10px color-mix(in srgb, ${notificationColor} 24%, transparent), 0 14px 30px rgba(0,0,0,0.24)`,
+        ? `0 0 0 1px color-mix(in srgb, ${notificationColor} 72%, transparent), 0 0 8px color-mix(in srgb, ${notificationColor} 38%, transparent), 0 14px 30px rgba(0,0,0,0.24)`
+        : `0 0 0 1px color-mix(in srgb, ${notificationColor} 42%, transparent), 0 0 6px color-mix(in srgb, ${notificationColor} 20%, transparent), 0 14px 30px rgba(0,0,0,0.24)`,
       animation: voiceModeEnabled || isAlertActive ? 'ke-header-alert 1.2s ease-in-out infinite' : 'none',
-      filter: voiceModeEnabled || isAlertActive ? `drop-shadow(0 0 7px ${notificationColor}57)` : 'none',
+      filter: 'none',
       ['--notification-color' as string]: notificationColor,
     }
     : styles.header;
@@ -342,7 +341,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
     <>
       <AppUpdateMonitor />
       <style>{`@keyframes ke-header-alert {
-        0%, 100% { opacity: 1; box-shadow: 0 0 0 1px color-mix(in srgb, var(--notification-color) 72%, transparent), 0 0 16px color-mix(in srgb, var(--notification-color) 48%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px color-mix(in srgb, var(--notification-color) 34%, transparent)); }
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 1px color-mix(in srgb, var(--notification-color) 72%, transparent), 0 0 8px color-mix(in srgb, var(--notification-color) 38%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 7px color-mix(in srgb, var(--notification-color) 34%, transparent)); }
         50% { opacity: 0.9; box-shadow: 0 0 0 2px color-mix(in srgb, var(--notification-color) 78%, transparent), 0 0 22px color-mix(in srgb, var(--notification-color) 62%, transparent), 0 14px 30px rgba(0,0,0,0.24); filter: drop-shadow(0 0 10px color-mix(in srgb, var(--notification-color) 48%, transparent)); }
       }`}</style>
       <header
