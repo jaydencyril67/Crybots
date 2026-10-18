@@ -831,6 +831,7 @@ const SecurityPage = () => {
                 <div style={styles.row}>
                 <p style={styles.rowLabel}><ShieldCheck size={16} /> 2FA</p>
                 <p style={styles.rowValue}>{twoFactorEnabled ? 'Two-factor authentication enabled' : twoFactorConfigured ? 'Authenticator configured but disabled' : 'Two-factor authentication not set up'}</p>
+                <p style={styles.note}>A configured authenticator is not required during sign-in unless 2FA is enabled.</p>
                 {!twoFactorConfigured ? (
                   <div style={styles.buttonRow}>
                     <button type="button" style={styles.button} onClick={() => void handleSetup2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : 'Set up 2FA'}</button>
