@@ -881,7 +881,7 @@ const SecurityPage = () => {
                     {twoFactorCodeError ? <p style={styles.inlineError}>{twoFactorCodeError}</p> : null}
                     <div style={styles.buttonRow}>
                       <button type="button" style={styles.button} onClick={() => void handleToggle2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA'}</button>
-                      {twoFactorEnabled ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : <><Trash2 size={16} /> Delete 2FA</>}</button> : null}
+                      {twoFactorConfigured ? <button type="button" style={{ ...styles.button, ...styles.dangerButton }} onClick={() => void handleDelete2fa()} disabled={saving2fa}>{saving2fa ? <LoadingDots /> : <><Trash2 size={16} /> Unbind 2FA</>}</button> : null}
                     </div>
                   </div>
                 )}
