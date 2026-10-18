@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import api from '../api/axios';
 import { notifyAuthChanged } from '../utils/notificationEvents';
 import { Helmet } from 'react-helmet-async';
@@ -19,15 +20,9 @@ const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
   return isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail) ? '/admin-home' : '/home';
 };
-const getNativePlugin = (): NativeKingsHallAccountPlugin | null => {
-  const capacitor = (window as Window & { Capacitor?: { isNativePlatform?: () => boolean; Plugins?: Record<string, unknown> } }).Capacitor;
-  const plugin = capacitor?.Plugins?.KingsHallAccount as NativeKingsHallAccountPlugin | undefined;
-  return plugin && typeof plugin.getAccounts === 'function' ? plugin : null;
-};
-const isNativeAndroid = () => {
-  const capacitor = (window as Window & { Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string } }).Capacitor;
-  return Boolean(capacitor?.isNativePlatform?.() && capacitor.getPlatform?.() === 'android');
-};
+const DeviceAccount = registerPlugin<NativeKingsHallAccountPlugin>('KingsHallAccount');
+const getNativePlugin = (): NativeKingsHallAccountPlugin => DeviceAccount;
+const isNativeAndroid = () => Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
 
 const SigninPage = () => {
   const { themeMode } = useAppTheme();
