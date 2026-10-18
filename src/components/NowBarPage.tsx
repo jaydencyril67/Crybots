@@ -29,15 +29,15 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   card: { marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   cardHeading: { margin: 0, fontSize: '1.05rem', fontWeight: 850 },
   cardText: { margin: '6px 0 16px', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
-  list: { display: 'grid', gap: '10px' },
-  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  list: { display: 'grid', gap: 0 },
+  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '14px 2px', borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent' },
   rowContent: { minWidth: 0 },
   label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
   description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
   button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', flexShrink: 0 },
   active: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
   modes: { display: 'grid', gap: '10px', marginTop: '10px' },
-  modeRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '11px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  modeRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '12px 2px', borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent' },
   modeLabel: { margin: 0, fontWeight: 750, fontSize: '0.88rem' },
 });
 
