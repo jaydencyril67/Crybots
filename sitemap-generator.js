@@ -14,8 +14,6 @@ const links = [
   { url: '/l', changefreq: 'monthly', priority: 0.3 }, // Login (optional)
   { url: '/r', changefreq: 'monthly', priority: 0.3 }, // Register (optional)
   { url: '/ve', changefreq: 'monthly', priority: 0.2 }, // Verify Email
-  { url: '/fp', changefreq: 'monthly', priority: 0.2 }, // Forgot Password
-  { url: '/rp', changefreq: 'monthly', priority: 0.2 }, // Reset Password
   { url: '/al', changefreq: 'monthly', priority: 0.2 }, // Admin Login (optional)
   { url: '/as', changefreq: 'monthly', priority: 0.2 }  // Admin Signup (optional)
 ];
