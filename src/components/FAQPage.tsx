@@ -20,16 +20,15 @@ const faqSections: FAQSection[] = [
     title: 'Getting started',
     items: [
       { question: 'What is CryBots?', answer: 'CryBots is a crypto trading bot platform where users can rent ready-made bots, build automated strategies and buy bots to trade crypto markets, while managing funds and reviewing performance.' },
-      { question: 'I forgot my password. What should I do?', answer: 'Use Forgot password on the sign-in page and follow the email instructions to create a new password. Never share a password or verification code with anyone.' },
     ],
   },
   {
     title: 'Account security',
     items: [
-      { question: 'How can I protect my account?', answer: 'Use a unique password, keep your email secure, enable two-factor authentication or a passkey from Security, and review notifications for unfamiliar activity.' },
+      { question: 'How can I protect my account?', answer: 'Keep your email secure, enable two-factor authentication or a passkey from Security, and review notifications for unfamiliar activity.' },
       { question: 'What are passkeys and two-factor authentication?', answer: 'A passkey lets a supported device authenticate you without typing a password. Two-factor authentication adds a second verification step, such as an authenticator code, when you sign in.' },
       { question: 'Why was my withdrawal or transfer blocked?', answer: 'Security controls can temporarily block fund movements after sensitive account changes or when additional verification is required. Review Security and contact support if the block remains.' },
-      { question: 'What should I do if I see activity I do not recognise?', answer: 'Secure your email and account immediately, change your password, review Security and active sessions, and contact support with the relevant transaction or notification details.' },
+      { question: 'What should I do if I see activity I do not recognise?', answer: 'Secure your email and account immediately, review Security and active sessions, and contact support with the relevant transaction or notification details.' },
     ],
   },
   {
@@ -56,10 +55,10 @@ const faqSections: FAQSection[] = [
   {
     title: 'Account controls and support',
     items: [
-      { question: 'How do I update my profile or preferences?', answer: 'Use Profile for personal details and Manage or Options for account preferences. Some sensitive changes may require your password or additional verification.' },
+      { question: 'How do I update my profile or preferences?', answer: 'Use Profile for personal details and Manage or Options for account preferences. Some sensitive changes may require your security code or an email verification code.' },
       { question: 'How do I disable or self-exclude my account?', answer: 'Open Danger from your account area. Disable temporarily restricts access, while self-exclusion is a stronger account-safety action. Read the warnings carefully because these actions can affect access to your account.' },
       { question: 'Can I delete my account?', answer: 'Yes, the account deletion option is available under Danger. Deletion is a serious action; confirm that you understand the consequences and keep any records you may need before proceeding.' },
-      { question: 'How do I contact support?', answer: 'Open Help to find the available support options. Include your account email, transaction ID or blockchain hash, and a clear description of the issue. Never include your password, private key, or one-time security code.' },
+      { question: 'How do I contact support?', answer: 'Open Help to find the available support options. Include your account email, transaction ID or blockchain hash, and a clear description of the issue. Never include your private key or one-time security code.' },
       { question: 'How do notifications and alerts work?', answer: 'Notifications keep you informed about account and transaction events. Alert Settings lets you control supported alerts so you can respond quickly to important activity.' },
     ],
   },
