@@ -15,6 +15,20 @@ type NativeKingsHallAccountPlugin = { chooseAccount(): Promise<{ email?: string;
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
 const ACCOUNT_HINT_KEY = 'kingshall_account_hint';
+const getBrowserAccountHint = () => {
+  const saved = (localStorage.getItem(ACCOUNT_HINT_KEY) || '').trim().toLowerCase();
+  if (saved) return saved;
+  const cookie = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith('kh_account_hint='));
+  if (!cookie) return '';
+  try {
+    const email = decodeURIComponent(cookie.slice('kh_account_hint='.length)).trim().toLowerCase();
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      localStorage.setItem(ACCOUNT_HINT_KEY, email);
+      return email;
+    }
+  } catch {}
+  return '';
+};
 const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
   return isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail) ? '/admin-home' : '/home';
@@ -88,7 +102,7 @@ const SigninPage = () => {
           return;
         }
       } else {
-        selectedEmail = (localStorage.getItem(ACCOUNT_HINT_KEY) || '').trim().toLowerCase();
+        selectedEmail = getBrowserAccountHint();
         if (!selectedEmail) {
           window.alert('No Account found pls signup or login on KingsHall to continue');
           redirectToKingsHall();
