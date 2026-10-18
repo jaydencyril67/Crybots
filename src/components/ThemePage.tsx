@@ -17,8 +17,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   rowContent: { minWidth: 0 },
   label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
   description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
-  enableButton: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', flexShrink: 0 },
-  enabledButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
+  enableButton: { borderRadius: '10px', border: `1px solid ${theme.borderGlass}`, padding: '9px 12px', fontWeight: 700, fontSize: '11px', color: theme.text, background: 'rgba(255,255,255,.035)', cursor: 'pointer', flexShrink: 0 },
+  enabledButton: { background: theme.surfaceMuted, color: theme.text, border: `1px solid ${theme.primary}` },
   preview: { width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0 },
   rowContentWithPreview: { display: 'flex', alignItems: 'center', gap: '11px', minWidth: 0 },
 });
