@@ -23,8 +23,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     background: theme.surfaceGlass,
     padding: 'clamp(18px, 3.5vw, 26px)',
     textAlign: 'center' as const,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   iconWrap: {
     width: '56px',
