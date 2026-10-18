@@ -31,10 +31,10 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
     mode: 'light',
     name: 'Light',
     background: 'radial-gradient(ellipse at 75% 10%, rgba(151,160,174,0.09), transparent 36%), #e9e7e2',
-    surface: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.72), transparent 62%), linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.52))',
-    surfaceElevated: 'linear-gradient(145deg, rgba(255,255,255,0.94), rgba(255,255,255,0.74))',
+    surface: 'linear-gradient(145deg, rgba(255,255,255,0.76), rgba(255,255,255,0.52))',
+    surfaceElevated: 'linear-gradient(145deg, rgba(255,255,255,0.90), rgba(255,255,255,0.72))',
     surfaceMuted: 'rgba(255,255,255,0.52)',
-    surfaceGlass: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.68), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.62), rgba(255,255,255,0.42))',
+    surfaceGlass: 'linear-gradient(145deg, rgba(255,255,255,0.60), rgba(255,255,255,0.40))',
     surfaceShine: 'rgba(255,255,255,0.62)',
     border: 'rgba(80,84,92,0.16)',
     borderStrong: 'rgba(80,84,92,0.28)',
@@ -53,11 +53,11 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
   dark: {
     mode: 'dark',
     name: 'Dark',
-    background: 'radial-gradient(ellipse at 75% 10%, rgba(151,160,174,0.09), transparent 36%), #030304',
-    surface: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.065), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
-    surfaceElevated: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.085), transparent 58%), linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025))',
+    background: '#030304',
+    surface: 'linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
+    surfaceElevated: 'linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025))',
     surfaceMuted: 'rgba(255,255,255,0.023)',
-    surfaceGlass: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.065), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
+    surfaceGlass: 'linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
     surfaceShine: 'rgba(255,255,255,0.075)',
     border: 'rgba(221,226,233,0.105)',
     borderStrong: 'rgba(221,226,233,0.22)',
@@ -88,8 +88,8 @@ export const createHybridCardStyles = (theme: HybridThemeToken) => ({
     padding: '18px',
     boxSizing: 'border-box' as const,
     boxShadow: 'inset 0 1px rgba(255,255,255,0.035)',
-    backdropFilter: 'blur(22px) saturate(1.25)',
-    WebkitBackdropFilter: 'blur(22px) saturate(1.25)',
+    backdropFilter: 'blur(8px) saturate(1.08)',
+    WebkitBackdropFilter: 'blur(8px) saturate(1.08)',
   },
   cardMobile: {
     padding: '16px',
@@ -101,8 +101,8 @@ export const createHybridCardStyles = (theme: HybridThemeToken) => ({
     background: theme.surfaceGlass,
     padding: '16px 18px',
     boxSizing: 'border-box' as const,
-    backdropFilter: 'blur(24px) saturate(1.15)',
-    WebkitBackdropFilter: 'blur(24px) saturate(1.15)',
+    backdropFilter: 'blur(8px) saturate(1.05)',
+    WebkitBackdropFilter: 'blur(8px) saturate(1.05)',
   },
 });
 
@@ -126,7 +126,6 @@ const HybridTheme = ({ mode = 'dark', children }: HybridThemeProps) => {
         ...styles.root,
         background: theme.background,
         color: theme.text,
-        backgroundAttachment: 'fixed',
       }}
     >
       <style>{`html, body, #root, *, *::before, *::after { font-family: "STIX Two Text" !important; font-synthesis: none !important; }`}</style>
