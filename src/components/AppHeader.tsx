@@ -342,7 +342,7 @@ const AppHeader = ({ isPublicPage = false }: AppHeaderProps) => {
   return (
     <>
       <AppUpdateMonitor />
-      <style>{`@keyframes ke-header-alert { 0%, 100% { opacity: 1; } 50% { opacity: .94; } }</style>
+      <style>{`@keyframes ke-header-alert { 0%, 100% { opacity: 1; } 50% { opacity: .94; } }`}</style>
       <header
         style={headerStyle}
         onClick={handleHeaderClick}
