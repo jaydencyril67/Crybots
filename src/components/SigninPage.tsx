@@ -46,6 +46,7 @@ const SigninPage = () => {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [showNoAccountModal, setShowNoAccountModal] = useState(false);
   const [challengeToken, setChallengeToken] = useState('');
   const [extraMethods, setExtraMethods] = useState<Array<'2fa' | 'biometric'>>([]);
   const [extraMethod, setExtraMethod] = useState<'2fa' | 'biometric' | ''>('');
@@ -111,8 +112,7 @@ const SigninPage = () => {
       } else {
         selectedEmail = getBrowserAccountHint();
         if (!selectedEmail) {
-          window.alert('No Account found pls signup or login on KingsHall to continue');
-          redirectToKingsHall();
+          setShowNoAccountModal(true);
           return;
         }
       }
@@ -237,6 +237,17 @@ const SigninPage = () => {
           <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
         </section>
       </div>
+      {showNoAccountModal && <div role="presentation" onClick={() => setShowNoAccountModal(false)} style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'grid', placeItems: 'center', padding: 20, background: 'rgba(0,0,0,.58)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
+        <section role="alertdialog" aria-modal="true" aria-labelledby="no-kingshall-account-title" aria-describedby="no-kingshall-account-description" onClick={event => event.stopPropagation()} style={{ ...glass, width: '100%', maxWidth: 360, boxSizing: 'border-box', borderRadius: 22, padding: 24, textAlign: 'center', boxShadow: '0 18px 60px rgba(0,0,0,.28)' }}>
+          <div style={{ width: 52, height: 52, margin: '0 auto 14px', display: 'grid', placeItems: 'center', borderRadius: '50%', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.primary }}><KeyRound size={23} /></div>
+          <h2 id="no-kingshall-account-title" style={{ margin: 0, fontSize: 19 }}>No KingsHall account found</h2>
+          <p id="no-kingshall-account-description" style={{ margin: '10px 0 20px', color: theme.textMuted, fontSize: 14, lineHeight: 1.6 }}>Please sign in to KingsHall first, then return to CryBots to continue.</p>
+          <div style={{ display: 'grid', gap: 9 }}>
+            <button type="button" style={button} onClick={redirectToKingsHall}>Sign in to KingsHall</button>
+            <button type="button" style={{ ...button, background: 'transparent' }} onClick={() => setShowNoAccountModal(false)}>Cancel</button>
+          </div>
+        </section>
+      </div>}
       {busy && <div role="status" aria-live="polite" style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'grid', placeItems: 'center', background: 'rgba(0,0,0,.52)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}><div style={{ ...glass, borderRadius: 22, padding: 24, minWidth: 120, display: 'grid', justifyItems: 'center', gap: 12, color: theme.text }}><LoaderCircle size={34} style={{ animation: 'kh-signin-spin 1s linear infinite' }} /><span style={{ fontSize: 13, fontWeight: 650 }}>Checking KingsHall…</span></div></div>}
     </main>
   );
