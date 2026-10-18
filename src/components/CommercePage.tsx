@@ -54,8 +54,8 @@ const CommercePage = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const outerCardStyle: React.CSSProperties = { display: 'grid', gap: 10, width: '100%', boxSizing: 'border-box', padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass };
-  const cardStyle: React.CSSProperties = { padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted };
+  const outerCardStyle: React.CSSProperties = { display: 'grid', gap: 12, width: '100%', boxSizing: 'border-box', padding: 0, border: 'none', borderRadius: 0, background: 'transparent' };
+  const cardStyle: React.CSSProperties = { padding: 0, border: 'none', borderRadius: 0, background: 'transparent' };
   const inputStyle: React.CSSProperties = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 10, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, font: 'inherit' };
   const buttonStyle: React.CSSProperties = { border: 0, borderRadius: 999, padding: '9px 13px', background: theme.primary, color: theme.textInverse, fontWeight: 800, cursor: 'pointer', font: 'inherit' };
 
@@ -167,7 +167,7 @@ const CommercePage = () => {
     const botId = bot.botId || bot._id || bot.name;
     const expanded = expandedBotId === botId;
     return <article key={botId} style={outerCardStyle}>
-      <section style={{ ...cardStyle, display: 'grid', gap: 10 }}>
+      <section style={{ ...cardStyle, display: 'grid', gap: 10, paddingBottom: 12, borderBottom: `1px solid ${theme.borderGlass}` }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850, overflowWrap: 'anywhere' }}>{bot.name}</h3>
@@ -202,8 +202,8 @@ const CommercePage = () => {
     <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' }}>
       <div style={{ width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' }}>
         <button type="button" onClick={() => navigate('/market')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' }}><ArrowLeft size={17} /> Market</button>
-        <section style={{ marginTop: '22px' }}>
-          <div style={{ display: 'flex', gap: 8, margin: '0 0 14px', padding: 4, borderRadius: 12, background: theme.surfaceGlass, border: `1px solid ${theme.borderGlass}` }}>
+        <section style={{ marginTop: '22px', padding: 16, borderRadius: 22, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', display: 'grid', gap: 14, boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', gap: 8, margin: 0, padding: 4, borderRadius: 12, background: 'transparent', border: 'none' }}>
             {(['browse', 'sell'] as const).map((view) => <button key={view} type="button" onClick={() => setActiveView(view)} style={{ flex: 1, border: `1px solid ${theme.border}`, borderRadius: '9px', padding: '8px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', ...(activeView === view ? { borderColor: theme.primary, color: theme.primary } : {}) }}>{view === 'browse' ? 'Browse' : 'Sell'}</button>)}
           </div>
           {error && <NotificationBanner tone="error" title="Commerce unavailable" message={error} />}{message && <NotificationBanner tone="success" title="Commerce updated" message={message} />}
