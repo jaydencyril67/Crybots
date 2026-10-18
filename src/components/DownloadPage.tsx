@@ -3,7 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { NativeAppUpdate, type NativeAppUpdateEvent } from '../utils/nativeAppUpdate';
 import { ArrowLeft } from 'lucide-react';
 import InstallAppButton from './InstallAppButton';
-import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
+import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
@@ -81,21 +81,26 @@ const DownloadPage = () => {
     },
     content: { display: 'grid', gap: '14px', marginTop: '10px' },
     outerCard: {
-      padding: '10px',
-      borderRadius: '16px',
+      padding: '16px',
+      borderRadius: '22px',
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+      display: 'grid',
+      gap: '16px',
+      boxSizing: 'border-box' as const,
+      minWidth: 0,
     },
     downloadCard: {
-      ...createHybridCardStyles(theme).card,
       display: 'grid',
       gap: '8px',
       width: '100%',
       maxWidth: '100%',
-      padding: '14px',
-      borderRadius: '15px',
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceMuted,
+      padding: '0 0 16px',
+      borderRadius: 0,
+      border: 'none',
+      borderBottom: `1px solid ${theme.borderGlass}`,
+      background: 'transparent',
       minWidth: 0,
       boxSizing: 'border-box' as const,
     },
@@ -156,9 +161,9 @@ const DownloadPage = () => {
             <button type="button" style={styles.backButton} onClick={() => navigate('/store')}>
               <ArrowLeft size={17} /> Store
             </button>
+            <div style={styles.outerCard}>
             {downloadOptions.map((option) => (
-              <div style={styles.outerCard} key={option.title}>
-                <section style={styles.downloadCard}>
+                <section style={styles.downloadCard} key={option.title}>
                   <h3 style={styles.title}>{option.title}</h3>
                   <p style={styles.description}>{option.description}</p>
                   <a
@@ -185,10 +190,8 @@ const DownloadPage = () => {
                   ) : null}
 
                 </section>
-              </div>
             ))}
-            <div style={styles.outerCard}>
-              <section style={styles.downloadCard}>
+              <section style={{ ...styles.downloadCard, borderBottom: 'none', paddingBottom: 0 }}>
                 <h3 style={styles.title}>PWA (Web App)</h3>
                 <p style={styles.description}>
                   Install CryBots directly from your browser as an app, without downloading an APK.
