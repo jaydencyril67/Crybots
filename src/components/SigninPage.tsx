@@ -84,9 +84,11 @@ const SigninPage = () => {
 
   const startSignin = async () => {
     if (busy) return;
+    const loadingStartedAt = Date.now();
     setBusy(true); setError(''); setNotice('');
     try {
-      // Give the dimmed loading overlay a frame to render before account detection starts.
+      // Let the loading overlay render, then keep it visible for at least five seconds
+      // so account detection feels deliberate even when the hint is available instantly.
       await new Promise(resolve => window.setTimeout(resolve, 250));
       let selectedEmail = '';
       if (isNativeAndroid()) {
@@ -108,6 +110,10 @@ const SigninPage = () => {
           redirectToKingsHall();
           return;
         }
+      }
+      const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
+      if (remainingLoadingTime > 0) {
+        await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
       }
       setIdentity(selectedEmail);
       setAccountDetected(true);
