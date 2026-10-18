@@ -54,7 +54,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   enableButton: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', flexShrink: 0 },
   enabledButton: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
   disabledButton: { opacity: 0.6, cursor: 'not-allowed' },
-
+  toggle: { position: 'relative' as const, display: 'block', flex: '0 0 42px', width: '42px', height: '25px', padding: '3px', border: `1px solid ${theme.borderGlass}`, borderRadius: '999px', background: 'rgba(255,255,255,.045)', cursor: 'pointer', flexShrink: 0 },
+  toggleOn: { borderColor: theme.primary, background: 'rgba(185,199,223,.22)', boxShadow: '0 0 12px rgba(185,199,223,.08)' },
+  toggleKnob: { display: 'block', width: '17px', height: '17px', borderRadius: '50%', background: '#a4a8b0', transition: 'transform .16s, background .16s' },
+  toggleKnobOn: { transform: 'translateX(16px)', background: '#eef2f8' },
 
 });
 
@@ -226,9 +229,7 @@ const AlertPage = () => {
                       <p style={styles.description}>{description}</p>
                     </div>
                   </div>
-                  <button type="button" disabled={loading || savingKey !== null || key === 'security'} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label}`} aria-pressed={preferences[key]} style={{ ...styles.enableButton, ...(preferences[key] ? styles.enabledButton : {}), ...(loading || savingKey !== null || key === 'security' ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>
-                    {savingKey === key ? <LoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
-                  </button>
+                  <button type="button" role="switch" disabled={loading || savingKey !== null || key === 'security'} aria-label={`${label}`} aria-checked={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}), ...(loading || savingKey !== null || key === 'security' ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>{savingKey === key ? <LoadingDots /> : <span style={{ ...styles.toggleKnob, ...(preferences[key] ? styles.toggleKnobOn : {}) }} />}</button>
                 </div>
               ))}
             </div>
@@ -247,9 +248,7 @@ const AlertPage = () => {
                       <p style={styles.description}>{description}</p>
                     </div>
                   </div>
-                  <button type="button" disabled={loading || savingKey !== null} aria-label={`${preferences[key] ? 'Disable' : 'Enable'} ${label} notifications`} aria-pressed={preferences[key]} style={{ ...styles.enableButton, ...(preferences[key] ? styles.enabledButton : {}), ...(loading || savingKey !== null ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>
-                    {savingKey === key ? <LoadingDots /> : preferences[key] ? 'Enabled' : 'Enable'}
-                  </button>
+                  <button type="button" role="switch" disabled={loading || savingKey !== null} aria-label={`${label} notifications`} aria-checked={preferences[key]} style={{ ...styles.toggle, ...(preferences[key] ? styles.toggleOn : {}), ...(loading || savingKey !== null ? styles.disabledButton : {}) }} onClick={() => void savePreference(key)}>{savingKey === key ? <LoadingDots /> : <span style={{ ...styles.toggleKnob, ...(preferences[key] ? styles.toggleKnobOn : {}) }} />}</button>
                 </div>
               ))}
             </div>
