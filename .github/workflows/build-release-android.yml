@@ -199,6 +199,43 @@ jobs:
           PY
 
           mkdir -p android/app/src/main/java/com/kingshall/exchange
+          cat > android/app/src/main/java/com/kingshall/exchange/KingsHallAccountPlugin.java <<'JAVA'
+          package com.kingshall.exchange;
+
+          import android.accounts.Account;
+          import android.accounts.AccountManager;
+          import com.getcapacitor.JSArray;
+          import com.getcapacitor.JSObject;
+          import com.getcapacitor.Plugin;
+          import com.getcapacitor.PluginCall;
+          import com.getcapacitor.PluginMethod;
+          import com.getcapacitor.annotation.CapacitorPlugin;
+
+          @CapacitorPlugin(name = "KingsHallAccount")
+          public class KingsHallAccountPlugin extends Plugin {
+              private static final String ACCOUNT_TYPE = "online.kingshall.account";
+
+              @PluginMethod
+              public void getAccounts(PluginCall call) {
+                  JSArray accounts = new JSArray();
+                  try {
+                      Account[] registered = AccountManager.get(getContext()).getAccountsByType(ACCOUNT_TYPE);
+                      for (Account account : registered) {
+                          if (account.name == null || !account.name.contains("@")) continue;
+                          JSObject item = new JSObject();
+                          item.put("email", account.name);
+                          accounts.put(item);
+                      }
+                      JSObject result = new JSObject();
+                      result.put("accounts", accounts);
+                      call.resolve(result);
+                  } catch (SecurityException error) {
+                      call.reject("Android did not allow CryBots to read KingsHall account names.", error);
+                  }
+              }
+          }
+          JAVA
+
           cat > android/app/src/main/java/com/kingshall/exchange/NativeWebAuthnPlugin.java <<'JAVA'
           package com.kingshall.exchange;
 
@@ -968,6 +1005,7 @@ jobs:
               @Override
               public void onCreate(Bundle savedInstanceState) {
                   registerPlugin(MediaAudioPlugin.class);
+                  registerPlugin(KingsHallAccountPlugin.class);
                   registerPlugin(WebAuthnDiagnosticsPlugin.class);
                   registerPlugin(NativeWebAuthnPlugin.class);
                   registerPlugin(NativeAppUpdatePlugin.class);
