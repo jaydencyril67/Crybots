@@ -128,10 +128,6 @@ const NowBarPage = () => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
-          <header style={styles.pageHeading}>
-            <h1 style={styles.heading}>NowBar</h1>
-            <p style={styles.intro}>Customize NowBar lighting, navigation gestures, and button appearance.</p>
-          </header>
           <section style={styles.card}>
             <div style={styles.cardHeading}><span style={styles.cardIcon}><Zap size={19} /></span><div><h2 style={styles.cardTitle}>Edge lighting</h2><p style={styles.cardText}>Control the animated edge effect around the NowBar.</p></div></div>
             <div style={styles.list}>
