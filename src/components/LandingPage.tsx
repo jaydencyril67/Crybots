@@ -77,7 +77,11 @@ const LandingPage = () => {
 
         <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, overflow: 'hidden' }}>
           <style>{`
-            .cb-prism-shell { width: min(1160px, 100%); margin: 0 auto; padding: 18px clamp(12px, 2.5vw, 24px) 38px; display: grid; gap: 16px; }
+            .cb-prism-shell, .cb-prism-shell * { box-sizing: border-box; }
+            .cb-prism-shell { width: 100%; max-width: 1208px; margin: 0 auto; padding: 18px clamp(12px, 2.5vw, 24px) 38px; display: grid; gap: 16px; min-width: 0; }
+            .cb-prism-shell section, .cb-prism-shell article, .cb-prism-shell aside, .cb-prism-shell footer { min-width: 0; }
+            .cb-prism-shell button { max-width: 100%; white-space: normal; line-height: 1.35; }
+            .cb-prism-shell p, .cb-prism-shell h1, .cb-prism-shell h2, .cb-prism-shell h3, .cb-prism-shell strong, .cb-prism-shell span { overflow-wrap: anywhere; }
             .cb-prism-intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); gap: clamp(18px, 3vw, 32px); align-items: stretch; }
             .cb-prism-copy { padding: clamp(20px, 3vw, 34px); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; position: relative; overflow: hidden; }
             .cb-prism-copy:after { content: ''; position: absolute; width: 190px; height: 190px; right: -88px; top: -90px; border: 1px solid ${theme.borderStrong}; transform: rotate(35deg); border-radius: 36px; pointer-events: none; }
@@ -118,8 +122,57 @@ const LandingPage = () => {
             .cb-prism-step:last-child { border-bottom: 0; padding-bottom: 0; }
             .cb-prism-step-number { width: 38px; height: 38px; border: 1px solid ${theme.borderGlass}; background: ${theme.surface}; border-radius: 12px; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
             .cb-prism-step p { color: ${theme.textMuted}; font-size: 13px; line-height: 1.65; margin: 7px 0 0; }
-            @media (max-width: 820px) { .cb-prism-intro { grid-template-columns: minmax(0, 1fr); } .cb-prism-preview { gap: 22px; } .cb-prism-features { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cb-prism-how { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
-            @media (max-width: 480px) { .cb-prism-shell { padding-top: 12px; gap: 12px; } .cb-prism-copy { padding: 20px 17px; } .cb-prism-title { font-size: 29px; } .cb-prism-actions { display: grid; grid-template-columns: minmax(0, 1fr); } .cb-prism-actions button { width: 100%; } .cb-prism-preview-top { align-items: center; } .cb-prism-orbit { width: 82px; height: 82px; border-radius: 26px; } .cb-prism-orbit:before { inset: 8px; border-radius: 19px; } .cb-prism-orbit:after { inset: 18px; border-radius: 14px; } .cb-prism-stats { grid-template-columns: minmax(0, 1fr); } .cb-prism-stat { padding: 14px 16px; } .cb-prism-features { grid-template-columns: minmax(0, 1fr); } .cb-prism-feature { padding: 17px; } }
+            @media (max-width: 960px) {
+              .cb-prism-intro { grid-template-columns: minmax(0, 1fr); }
+              .cb-prism-preview { gap: 22px; }
+              .cb-prism-features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+              .cb-prism-how { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+            }
+            @media (max-width: 640px) {
+              .cb-prism-shell { padding: 12px 12px 26px; gap: 12px; }
+              .cb-prism-copy { padding: 21px 17px; }
+              .cb-prism-title { font-size: clamp(27px, 7.2vw, 36px); letter-spacing: -.025em; }
+              .cb-prism-lead { font-size: 14px; line-height: 1.65; }
+              .cb-prism-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px; }
+              .cb-prism-actions button { width: 100%; min-width: 0; }
+              .cb-prism-preview { padding: 16px; }
+              .cb-prism-preview-top { align-items: center; gap: 10px; }
+              .cb-prism-orbit { width: 78px; height: 78px; border-radius: 24px; }
+              .cb-prism-orbit:before { inset: 7px; border-radius: 17px; }
+              .cb-prism-orbit:after { inset: 16px; border-radius: 12px; }
+              .cb-prism-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+              .cb-prism-stat:last-child { grid-column: 1 / -1; }
+              .cb-prism-stat { padding: 14px; }
+              .cb-prism-features { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+              .cb-prism-feature { padding: 15px; }
+              .cb-prism-how { padding: 19px 16px; }
+              .cb-prism-section-head { align-items: flex-start; }
+            }
+            @media (max-width: 420px) {
+              .cb-prism-shell { padding-inline: 9px; }
+              .cb-prism-copy { padding: 19px 14px; }
+              .cb-prism-eyebrow { font-size: 10px; letter-spacing: .045em; max-width: 100%; }
+              .cb-prism-preview-top { align-items: flex-start; }
+              .cb-prism-orbit { width: 60px; height: 60px; border-radius: 19px; }
+              .cb-prism-orbit:before { inset: 6px; border-radius: 13px; }
+              .cb-prism-orbit:after { inset: 13px; border-radius: 9px; }
+              .cb-prism-orbit svg { width: 21px; height: 21px; }
+              .cb-prism-value { font-size: clamp(22px, 7vw, 28px); }
+              .cb-prism-market { gap: 8px; font-size: 12px; }
+              .cb-prism-market-name { gap: 7px; }
+              .cb-prism-market-sub { font-size: 10px; }
+              .cb-prism-coin { width: 27px; height: 27px; }
+              .cb-prism-stats, .cb-prism-features { grid-template-columns: minmax(0, 1fr); }
+              .cb-prism-stat:last-child { grid-column: auto; }
+              .cb-prism-stat { padding: 14px 15px; }
+              .cb-prism-feature { padding: 16px; }
+              .cb-prism-step { grid-template-columns: 34px minmax(0, 1fr); gap: 10px; }
+              .cb-prism-step-number { width: 32px; height: 32px; }
+              .cb-prism-section-title { font-size: 22px; }
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .cb-prism-shell *, .cb-prism-shell *::before, .cb-prism-shell *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+            }
           `}</style>
 
           <div className="cb-prism-shell">
