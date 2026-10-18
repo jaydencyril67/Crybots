@@ -11,7 +11,7 @@ import NotificationBanner from './NotificationBanner';
 type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
 
 type DangerActionState = {
-  password: string;
+  securityCode: string;
   confirmation: string;
   reason: string;
   durationDays: string;
@@ -143,9 +143,9 @@ const DangerPage = () => {
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
 
-  const [disable, setDisable] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
-  const [selfExclude, setSelfExclude] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
-  const [remove, setRemove] = useState<DangerActionState>({ password: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
+  const [disable, setDisable] = useState<DangerActionState>({ securityCode: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
+  const [selfExclude, setSelfExclude] = useState<DangerActionState>({ securityCode: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
+  const [remove, setRemove] = useState<DangerActionState>({ securityCode: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
 
   const submitAction = async (
     action: DangerActionKey,
@@ -156,7 +156,7 @@ const DangerPage = () => {
 
     try {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
-      const payload = { password: state.password, confirmation: state.confirmation, reason: state.reason, ...(action === 'self-exclude' ? { durationDays: Number(state.durationDays) } : {}) };
+      const payload = { securityCode: state.securityCode, confirmation: state.confirmation, reason: state.reason, ...(action === 'self-exclude' ? { durationDays: Number(state.durationDays) } : {}) };
 
       if (action === 'disable') {
         await api.patch('/api/settings/danger/disable', payload, { headers });
@@ -185,7 +185,7 @@ const DangerPage = () => {
       const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
       await api.delete('/api/settings/danger/delete', {
         headers,
-        data: { password: remove.password, confirmation: remove.confirmation, reason: remove.reason },
+        data: { securityCode: remove.securityCode, confirmation: remove.confirmation, reason: remove.reason },
       });
       window.localStorage.removeItem('token');
       window.localStorage.removeItem('user');
@@ -214,8 +214,8 @@ const DangerPage = () => {
               <h3 style={styles.actionTitle}>Disable Account</h3>
               <p style={styles.actionText}>This will suspend access to your account until it is restored by support or your next allowed login flow.</p>
               <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-disable-password">Password</label>
-                <input id="danger-disable-password" style={styles.input} type="password" value={disable.password} onChange={(event) => setDisable((current) => ({ ...current, password: event.target.value }))} />
+                <label style={styles.label} htmlFor="danger-disable-security-code">Security Code</label>
+                <input id="danger-disable-security-code" style={styles.input} type="password" inputMode="numeric" maxLength={6} value={disable.securityCode} onChange={(event) => setDisable((current) => ({ ...current, securityCode: event.target.value.replace(/\D/g, '').slice(0, 6) }))} />
               </div>
               <div style={styles.field}>
                 <label style={styles.label} htmlFor="danger-disable-confirmation">Confirmation</label>
@@ -237,8 +237,8 @@ const DangerPage = () => {
               <h3 style={styles.actionTitle}>Self Exclude</h3>
               <p style={styles.actionText}>This places your account into a self-exclusion state to prevent further use according to your request.</p>
               <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-self-exclude-password">Password</label>
-                <input id="danger-self-exclude-password" style={styles.input} type="password" value={selfExclude.password} onChange={(event) => setSelfExclude((current) => ({ ...current, password: event.target.value }))} />
+                <label style={styles.label} htmlFor="danger-self-exclude-security-code">Security Code</label>
+                <input id="danger-self-exclude-security-code" style={styles.input} type="password" inputMode="numeric" maxLength={6} value={selfExclude.securityCode} onChange={(event) => setSelfExclude((current) => ({ ...current, securityCode: event.target.value.replace(/\D/g, '').slice(0, 6) }))} />
               </div>
               <div style={styles.field}>
                 <label style={styles.label} htmlFor="danger-self-exclude-confirmation">Confirmation</label>
@@ -264,8 +264,8 @@ const DangerPage = () => {
               <h3 style={styles.actionTitle}>Delete Account</h3>
               <p style={styles.actionText}>This starts a 30-day deletion countdown. Sign-in will be blocked while your account is pending deletion.</p>
               <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-delete-password">Password</label>
-                <input id="danger-delete-password" style={styles.input} type="password" value={remove.password} onChange={(event) => setRemove((current) => ({ ...current, password: event.target.value }))} />
+                <label style={styles.label} htmlFor="danger-delete-security-code">Security Code</label>
+                <input id="danger-delete-security-code" style={styles.input} type="password" inputMode="numeric" maxLength={6} value={remove.securityCode} onChange={(event) => setRemove((current) => ({ ...current, securityCode: event.target.value.replace(/\D/g, '').slice(0, 6) }))} />
               </div>
               <div style={styles.field}>
                 <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
