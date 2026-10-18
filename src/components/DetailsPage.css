@@ -1,0 +1,28 @@
+/* CryBots Details profile photography — mirrors the KingsHall centered cover/avatar stack. */
+.cr-details-photo-stack{position:relative;display:flex;align-items:center;flex-direction:column;gap:0;margin:0 auto;width:100%;max-width:520px;padding-bottom:36px;box-sizing:border-box}
+.cr-details-cover-frame{position:relative;width:100%;height:171px;margin-top:-16px;border:1px solid rgba(220,226,234,.17);border-radius:16px;overflow:visible;background:linear-gradient(135deg,rgba(120,132,154,.12),rgba(255,255,255,.025));box-shadow:inset 0 1px rgba(255,255,255,.05)}
+.cr-details-cover-trigger{position:relative;display:grid;place-items:center;width:100%;height:100%;padding:0;overflow:hidden;border:0;border-radius:15px;background:transparent;color:#dce2ea;cursor:pointer}
+.cr-details-cover-trigger>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cr-details-cover-empty{display:flex;align-items:center;flex-direction:column;gap:7px;color:#929aa8}
+.cr-details-cover-empty svg{width:28px;height:28px;stroke:currentColor;stroke-width:1.5}
+.cr-details-cover-empty small{font-size:10px;letter-spacing:.04em}
+.cr-details-cover-hint{position:absolute;right:9px;bottom:9px;padding:6px 8px;border:1px solid rgba(230,236,246,.22);border-radius:9px;background:rgba(9,11,15,.68);color:#f0f2f6;font-size:9px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.cr-details-avatar-wrap{position:absolute;left:50%;bottom:-32px;z-index:3;transform:translateX(-50%);width:138px;height:138px}
+.cr-details-avatar-trigger{position:relative;display:grid;place-items:center;width:138px;height:138px;min-width:138px;min-height:138px;padding:0;overflow:hidden;border:4px solid #0b0d11;border-radius:50%;background:linear-gradient(145deg,#222831,#050608);color:#e9edf3;box-shadow:0 10px 28px rgba(0,0,0,.48),0 0 0 1px rgba(220,226,234,.24);font-size:43px;cursor:pointer}
+.cr-details-avatar-trigger>img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.cr-details-photo-popout{position:absolute;z-index:20;display:flex;align-items:center;gap:5px;padding:7px;border:1px solid rgba(220,226,234,.22);border-radius:13px;background:linear-gradient(155deg,rgba(31,35,43,.98),rgba(9,11,15,.98));box-shadow:0 16px 42px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.06);backdrop-filter:blur(20px) saturate(135%);-webkit-backdrop-filter:blur(20px) saturate(135%)}
+.cr-details-photo-popout-cover{right:9px;bottom:calc(100% + 8px)}
+.cr-details-photo-popout-avatar{left:50%;top:auto;bottom:calc(100% + 8px);transform:translateX(-50%)}
+.cr-details-photo-popout button{display:flex;align-items:center;justify-content:center;gap:5px;min-width:66px;min-height:35px;padding:6px 9px;border:1px solid rgba(255,255,255,.06);border-radius:9px;background:rgba(255,255,255,.045);color:#e9edf3;font:inherit;font-size:10px;white-space:nowrap;cursor:pointer}
+.cr-details-photo-popout button svg{width:15px;height:15px;flex:0 0 15px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cr-details-photo-popout button:hover:not(:disabled){background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14)}
+.cr-details-photo-popout button:disabled{opacity:.35;cursor:not-allowed}
+.cr-details-photo-popout button.cr-details-danger{color:#f0a5a5;background:rgba(150,50,50,.14);border-color:rgba(230,110,110,.13)}
+.cr-details-photo-confirm{position:absolute;right:8px;bottom:calc(100% + 8px);z-index:24;width:190px;padding:12px;border:1px solid rgba(230,120,120,.25);border-radius:13px;background:linear-gradient(155deg,rgba(36,25,28,.99),rgba(13,10,12,.99));box-shadow:0 18px 42px rgba(0,0,0,.5);color:#f1e9ea}
+.cr-details-photo-confirm strong{display:block;font-size:11px;font-weight:650}
+.cr-details-photo-confirm>div{display:flex;gap:7px;margin-top:10px}
+.cr-details-photo-confirm button{flex:1;min-height:30px;padding:5px 7px;border:1px solid rgba(220,226,234,.14);border-radius:8px;background:rgba(255,255,255,.055);color:#e5e8ee;font:inherit;font-size:10px}
+.cr-details-photo-confirm button.cr-details-danger{color:#f0a5a5;background:rgba(150,50,50,.14);border-color:rgba(230,110,110,.13)}
+.cr-details-photo-confirm-avatar{left:50%;right:auto;transform:translateX(-50%)}
+.cr-details-avatar-uploading{position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.48);z-index:2;pointer-events:none}
+@media(max-width:480px){.cr-details-cover-frame{height:144px;margin-top:-14px}.cr-details-photo-stack{max-width:100%}.cr-details-avatar-wrap{bottom:-27px;width:126px;height:126px}.cr-details-avatar-trigger{width:126px;height:126px;min-width:126px;min-height:126px}.cr-details-photo-popout button{min-width:58px;padding:6px 7px}}
