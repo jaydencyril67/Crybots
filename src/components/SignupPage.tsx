@@ -114,8 +114,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceMuted,
     padding: '18px',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   title: {
     margin: '12px 0 0',
@@ -198,8 +198,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceMuted,
     padding: 'clamp(18px, 3.2vw, 24px)',
-    backdropFilter: 'blur(22px)',
-    WebkitBackdropFilter: 'blur(22px)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   progressWrap: {
     display: 'flex',
