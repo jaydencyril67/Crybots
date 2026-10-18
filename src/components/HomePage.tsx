@@ -79,7 +79,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     minHeight: '100vh',
     background: theme.background,
     color: theme.text,
-    overflow: 'hidden',
     paddingBottom: '118px',
   },
   shell: {
@@ -165,10 +164,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   heroCard: {
     borderRadius: '15px',
     border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
+    background: theme.surfaceGlass,
     padding: 'clamp(12px, 2.5vw, 16px)',
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   greeting: {
     margin: 0,
@@ -223,10 +222,10 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   panel: {
     borderRadius: '15px',
     border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
+    background: theme.surfaceGlass,
     padding: 'clamp(12px, 2.5vw, 16px)',
-    backdropFilter: 'blur(22px)',
-    WebkitBackdropFilter: 'blur(22px)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   panelTitle: {
     margin: 0,
