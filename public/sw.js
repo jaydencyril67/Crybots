@@ -1,5 +1,5 @@
-const CACHE_NAME = 'crybots-pwa-v16-pwa-artwork-1-10x';
-const APP_SHELL = ['/', '/index.html', '/manifest.json', '/icons/crybots-app-icon.svg?v=7'];
+const CACHE_NAME = 'crybots-pwa-v17-circular-launch-icon';
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/pwa-launch-icon.svg?v=4', '/icons/crybots-app-icon.svg?v=7'];
 const CACHEABLE_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico', '.woff', '.woff2'];
 
 self.addEventListener('install', (event) => {
@@ -18,7 +18,6 @@ self.addEventListener('activate', (event) => {
         if (cacheName !== CACHE_NAME) {
           return caches.delete(cacheName);
         }
-
         return Promise.resolve();
       }),
     )).then(() => self.clients.claim()),
