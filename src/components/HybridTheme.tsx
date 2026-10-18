@@ -53,11 +53,11 @@ export const HYBRID_THEME_TOKENS: Record<HybridThemeMode, HybridThemeToken> = {
   dark: {
     mode: 'dark',
     name: 'Dark',
-    background: '#030304',
-    surface: 'linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
-    surfaceElevated: 'linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025))',
+    background: 'radial-gradient(ellipse at 75% 10%, rgba(151,160,174,0.09), transparent 36%), #050505',
+    surface: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.065), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
+    surfaceElevated: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.075), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.065), rgba(255,255,255,0.025))',
     surfaceMuted: 'rgba(255,255,255,0.023)',
-    surfaceGlass: 'linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
+    surfaceGlass: 'radial-gradient(ellipse at 0 0, rgba(255,255,255,0.065), transparent 55%), linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015))',
     surfaceShine: 'rgba(255,255,255,0.075)',
     border: 'rgba(221,226,233,0.105)',
     borderStrong: 'rgba(221,226,233,0.22)',
@@ -82,7 +82,7 @@ type HybridThemeProps = {
 
 export const createHybridCardStyles = (theme: HybridThemeToken) => ({
   card: {
-    borderRadius: '22px',
+    borderRadius: '24px',
     border: `1px solid ${theme.borderGlass}`,
     background: theme.surfaceGlass,
     padding: '18px',
