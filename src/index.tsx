@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import AppThemeProvider, { useAppTheme } from './components/AppTheme';
 import LandingPage from './components/LandingPage';
-import AccountConfirmedPage from './components/AccountConfirmedPage';
-import VerifyEmailPage from './components/VerifyEmailPage';
 import SigninPage from './components/SigninPage';
 import AdminHomePage from './components/AdminHomePage';
 import AdminSettingsPage from './components/AdminSettingsPage';
@@ -123,8 +121,8 @@ const getRouteKey = () => {
   const hash = getHash().split(/[?#]/)[0].replace(/\/+$/, '') || '';
 
   if (pathname === '/signup' || hash === '#/signup') return 'signin';
-  if (pathname === '/verify-email' || hash === '#/verify-email') return 'verify-email';
-  if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'account-confirmed';
+  if (pathname === '/verify-email' || hash === '#/verify-email') return 'signin';
+  if (pathname === '/account-confirmed' || hash === '#/account-confirmed') return 'signin';
   if (pathname === '/signin' || hash === '#/signin') return 'signin';
   if (pathname === '/admin-home' || hash === '#/admin-home') return 'admin-home';
   if (pathname === '/admin/settings' || hash === '#/admin/settings') return 'admin-settings';
@@ -207,8 +205,8 @@ const getRouteKey = () => {
 const routeToKey = (path: string) => {
   const normalizedPath = path.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
   if (normalizedPath === '/signup' || normalizedPath === '#/signup') return 'signin';
-  if (normalizedPath === '/verify-email' || normalizedPath === '#/verify-email') return 'verify-email';
-  if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'account-confirmed';
+  if (normalizedPath === '/verify-email' || normalizedPath === '#/verify-email') return 'signin';
+  if (normalizedPath === '/account-confirmed' || normalizedPath === '#/account-confirmed') return 'signin';
   if (normalizedPath === '/signin' || normalizedPath === '#/signin') return 'signin';
   if (normalizedPath === '/admin-home' || normalizedPath === '#/admin-home') return 'admin-home';
   if (normalizedPath === '/admin/settings' || normalizedPath === '#/admin/settings') return 'admin-settings';
@@ -518,8 +516,6 @@ const RouteTransition = () => {
   }, []);
 
   const appContent = useMemo(() => {
-    if (displayedRouteKey === 'verify-email') return <VerifyEmailPage />;
-    if (displayedRouteKey === 'account-confirmed') return <AccountConfirmedPage />;
     if (displayedRouteKey === 'signin') return <SigninPage />;
     if (displayedRouteKey === 'admin-home') return <AdminHomePage />;
     if (displayedRouteKey === 'admin-settings') return <AdminSettingsPage />;
