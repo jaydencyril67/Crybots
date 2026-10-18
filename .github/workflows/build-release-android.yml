@@ -1164,9 +1164,9 @@ jobs:
           set -euo pipefail
           mkdir -p android/app/src/main/res/drawable-nodpi android/app/src/main/res/values android/app/src/main/res/values-v31
 
-          # Build the same 92px circle holder + 72px foreground image as the PWA
-          # for legacy Android. Android 12+ uses its 512px system-icon canvas:
-          # 92dp circle and 72dp foreground image mapped onto the 288dp splash canvas.
+          # Keep the 92px circle holder, but enlarge the foreground orbital artwork to 1.3x:
+          # 72px -> 94px on legacy Android; Android 12+ scales the same artwork to 166px.
+          # The background circle remains unchanged.
           node - <<'NODE'
           const sharp = require('sharp');
           const fs = require('fs');
@@ -1183,18 +1183,18 @@ jobs:
 
             // Exact same displayed sizing for every Android version: 92dp circle + 72dp artwork.
             const holderDp = 92;
-            const artworkDp = 72;
+            const artworkDp = 94;
             const legacyHolderPx = holderDp;
             const legacyArtworkPx = artworkDp;
             const systemCanvasPx = 512;
             const systemCanvasDp = 288;
             const systemHolderPx = Math.round(holderDp / systemCanvasDp * systemCanvasPx);
             const systemArtworkPx = Math.round(artworkDp / systemCanvasDp * systemCanvasPx);
-            if (systemHolderPx !== 164 || systemArtworkPx !== 128) {
-              throw new Error('CryBots Android 12+ splash scale must match the same 92dp circle and 72dp artwork.');
+            if (systemHolderPx !== 164 || systemArtworkPx !== 167) {
+              throw new Error('CryBots Android 12+ splash scale must preserve the 92dp circle and 1.3x artwork.');
             }
 
-            // Android 11 and below: 92px circle holder with a centered 72px artwork image.
+            // Android 11 and below: keep the 92px circle and center the 1.3x artwork image.
             const legacyArtwork = await sharp(artwork).resize(legacyArtworkPx, legacyArtworkPx).png().toBuffer();
             await sharp({ create: { width: legacyHolderPx, height: legacyHolderPx, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
               .composite([
@@ -1222,7 +1222,7 @@ jobs:
             if (audit.info.width !== 92 || audit.info.height !== 92 || alphaAt(0, 0) !== 0 || alphaAt(46, 2) === 0 || alphaAt(46, 46) === 0) {
               throw new Error('CryBots 92px splash composition failed validation.');
             }
-            console.log('Created and validated CryBots splash: 92px circle holder + 72px artwork image on all Android versions.');
+            console.log('Created and validated CryBots splash: unchanged 92px circle holder + 1.3x orbital artwork on all Android versions.');
           })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
