@@ -142,13 +142,18 @@ const DownloadPage = () => {
       boxSizing: 'border-box' as const,
       borderRadius: '999px',
       padding: '12px 16px',
-      border: `1px solid ${theme.primary}`,
+      border: `1px solid ${theme.borderGlass}`,
       cursor: 'pointer',
       fontWeight: 800,
       fontSize: '0.9rem',
       textDecoration: 'none',
-      color: theme.textInverse,
-      background: theme.primary,
+      color: theme.text,
+      background: theme.surfaceGlass,
+      boxShadow: theme.mode === 'dark'
+        ? 'inset 0 1px rgba(255,255,255,.13), inset 0 -1px rgba(0,0,0,.18), 0 4px 14px rgba(0,0,0,.22)'
+        : 'inset 0 1px rgba(255,255,255,.48), inset 0 -1px rgba(70,70,70,.08), 0 4px 14px rgba(30,30,30,.10)',
+      backdropFilter: 'blur(12px) saturate(125%)',
+      WebkitBackdropFilter: 'blur(12px) saturate(125%)',
       marginTop: '5px',
     },
   };
@@ -180,7 +185,7 @@ const DownloadPage = () => {
                     }}
                     style={{
                       ...styles.downloadButton,
-                      ...(option.url ? {} : { opacity: 0.65, cursor: 'not-allowed' }),
+                      ...(option.url ? {} : { opacity: 0.55, cursor: 'not-allowed' }),
                     }}
                   >
                     {option.title === 'Android APK' ? 'Download / Update' : 'Coming soon'}
