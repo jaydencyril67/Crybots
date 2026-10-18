@@ -88,8 +88,8 @@ export const createHybridCardStyles = (theme: HybridThemeToken) => ({
     padding: '18px',
     boxSizing: 'border-box' as const,
     boxShadow: 'inset 0 1px rgba(255,255,255,0.035)',
-    backdropFilter: 'blur(8px) saturate(1.08)',
-    WebkitBackdropFilter: 'blur(8px) saturate(1.08)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   cardMobile: {
     padding: '16px',
@@ -101,8 +101,8 @@ export const createHybridCardStyles = (theme: HybridThemeToken) => ({
     background: theme.surfaceGlass,
     padding: '16px 18px',
     boxSizing: 'border-box' as const,
-    backdropFilter: 'blur(8px) saturate(1.05)',
-    WebkitBackdropFilter: 'blur(8px) saturate(1.05)',
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
 });
 
