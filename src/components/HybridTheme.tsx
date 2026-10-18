@@ -137,9 +137,9 @@ const HybridTheme = ({ mode = 'dark', children }: HybridThemeProps) => {
 [data-theme="light"] input::placeholder, [data-theme="light"] textarea::placeholder { color: #70747d !important; opacity: 1; }
 [data-theme="dark"] input:-webkit-autofill, [data-theme="dark"] textarea:-webkit-autofill, [data-theme="dark"] select:-webkit-autofill { -webkit-text-fill-color: #f3f4f6 !important; -webkit-box-shadow: 0 0 0 1000px #090a0c inset !important; box-shadow: 0 0 0 1000px #090a0c inset !important; }
 [data-theme="light"] input:-webkit-autofill, [data-theme="light"] textarea:-webkit-autofill, [data-theme="light"] select:-webkit-autofill { -webkit-text-fill-color: #f3f4f6 !important; -webkit-box-shadow: 0 0 0 1000px #090a0c inset !important; box-shadow: 0 0 0 1000px #090a0c inset !important; }
-[data-theme="dark"] select { background-color: #151515 !important; color: #fff !important; border-color: rgba(221,226,233,.28) !important; color-scheme: dark; }
+[data-theme="dark"] select { background: #090a0c !important; background-image: none !important; color: #f3f4f6 !important; border-color: rgba(210,216,225,.15) !important; color-scheme: dark; }
 [data-theme="light"] select { background: #090a0c !important; background-image: none !important; color: #f3f4f6 !important; border-color: rgba(210,216,225,.15) !important; color-scheme: dark; }
-[data-theme="dark"] select option { background: #151515 !important; color: #fff !important; }
+[data-theme="dark"] select option { background: #090a0c !important; color: #f3f4f6 !important; }
 [data-theme="light"] select option { background: #090a0c !important; color: #f3f4f6 !important; }
 [data-theme="dark"] [role="listbox"] { background: #090909 !important; background-image: none !important; opacity: 1 !important; border-color: rgba(221,226,233,.32) !important; box-shadow: 0 16px 36px rgba(0,0,0,.72) !important; }
 [data-theme="light"] [role="listbox"] { background: #f1f0ec !important; background-image: none !important; opacity: 1 !important; border-color: rgba(80,84,92,.30) !important; box-shadow: 0 16px 36px rgba(30,30,30,.20) !important; }
