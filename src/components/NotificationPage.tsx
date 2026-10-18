@@ -24,7 +24,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
   section: { display: 'grid', gap: 10, marginTop: 18 },
   title: { margin: 0, fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
-  card: { display: 'grid', gap: 16, padding: '18px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'blur(24px) saturate(1.15)' },
+  card: { display: 'grid', gap: 16, padding: '18px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'none' },
   icon: { width: 24, height: 24, color: theme.primary },
   message: { margin: 0, color: theme.text, lineHeight: 1.7, whiteSpace: 'pre-wrap' as const },
   date: { margin: 0, color: theme.textMuted, fontSize: '0.82rem' },
