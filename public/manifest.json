@@ -11,7 +11,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/pwa-launch-icon.svg?v=1",
+      "src": "/icons/crybots-app-icon.svg?v=7",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
