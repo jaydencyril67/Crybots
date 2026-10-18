@@ -205,7 +205,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     font: 'inherit',
     color: theme.text,
   },
-  outerCard: { display: 'grid', gap: '24px', padding: 'clamp(14px, 2.5vw, 24px)', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', minWidth: 0, boxSizing: 'border-box' as const },
   statsGroup: {
     marginTop: '26px',
     display: 'grid',
@@ -307,16 +306,16 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     gap: '12px',
   },
   assetItem: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', borderRadius: 0, borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '12px 0', flexWrap: 'wrap' as const },
-  sectionGroup: { display: 'grid', gap: '10px', padding: 'clamp(18px, 3vw, 26px)', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' },
+  sectionGroup: { display: 'grid', gap: '10px', background: 'transparent', minWidth: 0 },
   sectionGrid: {
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr)',
-    gap: 0,
+    gap: '10px',
     position: 'relative' as const,
     zIndex: 1,
-    paddingBottom: '12px',
+    paddingBottom: 0,
   },
-  featureCard: { borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', padding: '18px 4px', minWidth: 0 },
+  featureCard: { borderRadius: '20px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', padding: 'clamp(16px, 2.5vw, 22px)', minWidth: 0 },
   featureTitle: {
     margin: '18px 0 0',
     fontSize: '18px',
