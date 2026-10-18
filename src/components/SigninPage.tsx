@@ -854,12 +854,6 @@ const SigninPage = () => {
                     <button type="button" onClick={handleCodeSignin} style={{ ...styles.button, ...styles.buttonPrimary }} disabled={signInDisabled}>{isSubmitting ? <LoadingDots /> : 'Verify code'}</button>
                   )}
                 </div>
-                <div style={styles.switchRow}>
-                  <span style={hybridStyles.switchText}>New to CryBots?</span>
-                  <button type="button" onClick={() => { navigate('/signup'); }} style={hybridStyles.switchLink}>
-                    Signup here
-                  </button>
-                </div>
               </article>
               <article style={hybridStyles.heroCard}>
                 <p style={hybridStyles.stepLabel}>Need help?</p>
