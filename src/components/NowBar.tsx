@@ -716,6 +716,7 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
               <button
                 type="button"
                 aria-label={action.label}
+                aria-current={action.active ? 'page' : undefined}
                 data-nowbar-control
                 onClick={() => {
                   if (isExpanded && action.active) {
@@ -732,6 +733,11 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                 style={{
                   ...styles.button,
                   ...(buttonColorEnabled ? { borderColor: buttonColor } : {}),
+                  ...(action.active ? {
+                    borderColor: 'rgba(238,242,249,0.58)',
+                    background: 'linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.045))',
+                    color: '#ffffff',
+                  } : {}),
                   ...(isExpanded ? styles.buttonExpanded : {}),
                 }}
               >
