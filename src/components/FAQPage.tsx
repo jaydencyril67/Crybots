@@ -71,8 +71,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '90px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '14px', marginTop: '10px' },
-  rowList: { display: 'grid', gap: '10px', width: '100%', minWidth: 0, padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
-  faqRow: { width: '100%', maxWidth: '100%', display: 'grid', gap: '6px', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', boxSizing: 'border-box' as const },
+  rowList: { display: 'grid', gap: '18px', width: '100%', minWidth: 0, padding: 'clamp(16px, 3vw, 24px)', borderRadius: '19px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.055)', boxSizing: 'border-box' as const },
+  faqRow: { width: '100%', maxWidth: '100%', display: 'grid', gap: '6px', background: 'transparent', border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, borderRadius: 0, padding: '13px 0', boxSizing: 'border-box' as const },
   summary: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', cursor: 'pointer', listStyle: 'none' as const },
   question: { margin: 0, fontSize: '0.94rem', fontWeight: 800, color: theme.text },
   answer: { margin: '10px 0 0', fontSize: '0.84rem', color: theme.textMuted, lineHeight: 1.55 },
@@ -101,7 +101,7 @@ const FAQPage = () => {
                   <section key={section.title}>
                     <h3 style={styles.sectionTitle}>{section.title}</h3>
                     <p style={styles.sectionText}>Quick guidance for common {section.title.toLowerCase()} questions.</p>
-                    <div style={{ display: 'grid', gap: '8px', marginTop: '10px' }}>
+                    <div style={{ display: 'grid', gap: 0, marginTop: '10px' }}>
                       {section.items.map((item, index) => (
                         <details key={item.question} style={styles.faqRow} open={index === 0 && section.title === 'Getting started'}>
                           <summary style={styles.summary}><span style={styles.question}>{item.question}</span><ChevronDown size={17} /></summary>
