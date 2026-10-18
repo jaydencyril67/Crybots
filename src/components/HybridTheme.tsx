@@ -129,6 +129,17 @@ const HybridTheme = ({ mode = 'dark', children }: HybridThemeProps) => {
       }}
     >
       <style>{`html, body, #root, *, *::before, *::after { font-family: "STIX Two Text" !important; font-synthesis: none !important; }
+[data-theme="dark"] select { background-color: #151515 !important; color: #fff !important; border-color: rgba(221,226,233,.28) !important; color-scheme: dark; }
+[data-theme="light"] select { background-color: #f5f4f1 !important; color: #151515 !important; border-color: rgba(80,84,92,.28) !important; color-scheme: light; }
+[data-theme="dark"] select option { background: #151515 !important; color: #fff !important; }
+[data-theme="light"] select option { background: #f5f4f1 !important; color: #151515 !important; }
+[data-theme="dark"] [role="listbox"] { background: #111 !important; border-color: rgba(221,226,233,.28) !important; box-shadow: 0 16px 36px rgba(0,0,0,.55) !important; }
+[data-theme="light"] [role="listbox"] { background: #f5f4f1 !important; border-color: rgba(80,84,92,.28) !important; box-shadow: 0 16px 36px rgba(30,30,30,.14) !important; }
+[data-theme="dark"] button[role="option"] { background: transparent !important; color: #fff !important; }
+[data-theme="light"] button[role="option"] { background: transparent !important; color: #151515 !important; }
+[data-theme="dark"] button[role="option"][aria-selected="true"] { background: rgba(255,255,255,.16) !important; color: #fff !important; border: 1px solid rgba(255,255,255,.28) !important; }
+[data-theme="light"] button[role="option"][aria-selected="true"] { background: rgba(21,21,21,.10) !important; color: #151515 !important; border: 1px solid rgba(80,84,92,.25) !important; }
+
 [data-theme="dark"] button { background: radial-gradient(ellipse at 0 0, rgba(255,255,255,.075), transparent 68%), linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025)) !important; border-color: rgba(221,226,233,.22) !important; color: #fff !important; box-shadow: inset 0 1px rgba(255,255,255,.07), 0 4px 14px rgba(0,0,0,.14); }
 [data-theme="light"] button { background: linear-gradient(145deg, rgba(255,255,255,.62), rgba(255,255,255,.34)) !important; border-color: rgba(80,84,92,.22) !important; color: #151515 !important; box-shadow: inset 0 1px rgba(255,255,255,.62), 0 4px 14px rgba(30,30,30,.06); }
 [data-theme] button:disabled { opacity: .55; }
