@@ -50,6 +50,48 @@
         font-synthesis: none !important;
       }
 
+      /* App-wide black form fields, matching the Withdrawal and Transfer inputs. */
+      input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]),
+      textarea,
+      select {
+        background: #090a0c !important;
+        background-color: #090a0c !important;
+        background-image: none !important;
+        color: #f3f4f6 !important;
+        -webkit-text-fill-color: #f3f4f6;
+        border-color: rgba(210, 216, 225, 0.15) !important;
+        color-scheme: dark;
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #70747d !important;
+        opacity: 1;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        background: #090a0c !important;
+        background-image: none !important;
+        border-color: rgba(220, 226, 234, 0.55) !important;
+        box-shadow: 0 0 0 3px rgba(220, 226, 234, 0.07) !important;
+        outline: none;
+      }
+
+      input:-webkit-autofill,
+      textarea:-webkit-autofill,
+      select:-webkit-autofill {
+        -webkit-text-fill-color: #f3f4f6 !important;
+        -webkit-box-shadow: 0 0 0 1000px #090a0c inset !important;
+        box-shadow: 0 0 0 1000px #090a0c inset !important;
+      }
+
+      select option {
+        background: #090a0c !important;
+        color: #f3f4f6 !important;
+      }
+
       /* Keep the same font family even when Android WebView creates native-looking form controls. */
       input,
       textarea,
