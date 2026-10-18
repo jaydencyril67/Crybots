@@ -64,9 +64,9 @@ const baseStyles = {
     padding: '13px 14px',
     borderRadius: '15px',
     border: `1px solid ${HYBRID_THEME_TOKENS.dark.borderGlass}`,
-    background: HYBRID_THEME_TOKENS.dark.surfaceMuted,
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
+    background: HYBRID_THEME_TOKENS.dark.surfaceGlass,
+    backdropFilter: 'none',
+    WebkitBackdropFilter: 'none',
   },
   sectionTitle: {
     margin: 0,
