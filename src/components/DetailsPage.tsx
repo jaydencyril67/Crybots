@@ -95,9 +95,12 @@ const DetailsPage = () => {
   const accountStatus = profileLoading ? null : profileDetails?.accountStatus === 'active' ? allSecurityFunctionsEnabled ? 'Protected' : 'Active' : profileDetails?.accountStatus ? accountStatusLabels[profileDetails.accountStatus] : 'Active';
   const usdtBalance = typeof balance?.usdtBalance === 'number' ? balance.usdtBalance : typeof profileDetails?.usdtBalance === 'number' ? profileDetails.usdtBalance : null;
 
+  return (
     <HybridTheme mode={themeMode}>
       <>
-        <Helmet><title>CryBots | Details</title></Helmet>          <div style={styles.shell}>
+        <Helmet><title>CryBots | Details</title></Helmet>
+        <main style={styles.page}>
+          <div style={styles.shell}>
             <button type="button" style={styles.portfolioBack} onClick={() => navigate('/profile')}><ArrowLeft size={17} /> Profile</button>
             <div style={styles.content}>
               <div className="cr-details-photo-card">
