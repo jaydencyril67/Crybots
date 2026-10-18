@@ -27,7 +27,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
   section: { display: 'grid', gap: '10px' },
   list: { display: 'grid', gap: 10, marginTop: 6 },
-  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box' as const, backdropFilter: 'blur(24px) saturate(1.15)' },
+  item: { display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center', gap: 14, padding: '12px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box' as const, backdropFilter: 'none' },
   unread: { border: `1px solid ${theme.primary}`, background: theme.primarySoft },
   icon: { width: '20px', height: '20px', color: theme.primary, flexShrink: 0 },
   title: { margin: 0, fontSize: '0.95rem', fontWeight: 850, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
