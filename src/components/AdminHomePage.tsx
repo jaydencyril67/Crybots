@@ -52,13 +52,13 @@ const AdminHomePage = () => {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}><h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900 }}>Admin Dashboard</h2></div>
             <p style={{ margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7 }}>Platform-wide totals and administrator tools.</p>
           </section>
-          <section style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'blur(24px) saturate(1.15)' }}>
+          <section style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'none' }}>
             <ShieldCheck size={22} color={theme.primary} />
             <div><strong style={{ fontSize: '0.95rem' }}>Administrator access active</strong><p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.84rem' }}>Use the admin navigation below to manage the platform.</p></div>
           </section>
           <section style={{ display: 'grid', gap: 10 }}>
             {error ? <NotificationBanner tone="error" title="Dashboard unavailable" message={error} /> : !totals ? <NotificationBanner title="Loading dashboard totals" message="Calculating platform-wide statistics…" /> : <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 10 }}>
-              {metrics.map(({ label, value, detail, icon: Icon, color }) => <article key={label} style={{ display: 'grid', gap: 9, padding: '15px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'blur(24px) saturate(1.15)' }}>
+              {metrics.map(({ label, value, detail, icon: Icon, color }) => <article key={label} style={{ display: 'grid', gap: 9, padding: '15px 14px', borderRadius: 14, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, backdropFilter: 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}><span style={{ color: theme.textMuted, fontSize: '0.78rem', fontWeight: 800 }}>{label}</span><Icon size={18} color={color} /></div>
                 <strong style={{ fontSize: '1.3rem', overflowWrap: 'anywhere' }}>{value}</strong>
                 <span style={{ color: theme.textMuted, fontSize: '0.76rem' }}>{detail}</span>
