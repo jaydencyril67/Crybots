@@ -141,7 +141,7 @@ const TransferPage = () => {
     if (!recipientDetails) return '';
     return recipientMethod === 'email'
       ? `${recipientDetails.firstName ?? ''} ${recipientDetails.lastName ?? ''}`.trim() || recipientDetails.email || ''
-      : `${recipientDetails.firstName ?? ''} ${recipientDetails.lastName ?? ''}`.trim() || recipientDetails.uid || '';
+      : `${recipientDetails.firstName ?? ''} ${recipientDetails.lastName ?? ''}`.trim() || recipientDetails.username || '';
   }, [recipientDetails, recipientMethod]);
 
   useEffect(() => {
