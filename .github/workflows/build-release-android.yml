@@ -1110,9 +1110,16 @@ jobs:
               throw new Error('CryBots master icon changed; cannot safely isolate its splash composition.');
             }
             svg = svg.replace(backgroundCircle, '<circle cx="256" cy="256" r="235" fill="#000000"/>');
-            await sharp(Buffer.from(svg))
-              .png()
-              .toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
+            // Match the custom refresh splash's 92px circle / 72px mark.
+            // Keep separate compositions for the 92dp legacy layer and Android 12+
+            // system icon canvas so the system splash does not enlarge the artwork.
+            const rendered = await sharp(Buffer.from(svg)).png().toBuffer();
+            await sharp(rendered).resize(545, 545).extract({ left: 16, top: 16, width: 512, height: 512 })
+              .png().toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
+            const small = await sharp(rendered).resize(178, 178).png().toBuffer();
+            await sharp({ create: { width: 512, height: 512, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+              .composite([{ input: small, left: 167, top: 167 }])
+              .png().toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo_v31.png');
 
             const branding = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="320" viewBox="0 0 800 320"><rect width="800" height="320" fill="none"/><text x="400" y="174" text-anchor="middle" fill="#FFFFFF" font-family="STIX Two Text, serif" font-size="72" font-weight="700" letter-spacing="3">CryBots</text></svg>');
             await sharp(branding).png().toFile('android/app/src/main/res/drawable-nodpi/crybots_branding.png');
@@ -1130,8 +1137,8 @@ jobs:
           <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
               <item android:drawable="@color/crybots_splash_background" />
               <item
-                  android:width="213dp"
-                  android:height="213dp"
+                  android:width="92dp"
+                  android:height="92dp"
                   android:gravity="center"
                   android:drawable="@drawable/crybots_splash_logo" />
               <item
