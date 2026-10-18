@@ -99,8 +99,9 @@ const ApiKeysPage = () => {
     shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
     content: { display: 'grid', gap: '14px', marginTop: '14px' },
     back: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '0 12px', height: 30, background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-    card: { padding: 10, borderRadius: 16, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
-    row: { display: 'grid', gap: 10, width: '100%', padding: '13px 14px', borderRadius: 15, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted, boxSizing: 'border-box' as const, minWidth: 0 },
+    outerCard: { padding: 16, borderRadius: 22, border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', display: 'grid', gap: 16, boxSizing: 'border-box' as const, minWidth: 0 },
+    card: { padding: 0, borderRadius: 0, border: 'none', background: 'transparent', minWidth: 0 },
+    row: { display: 'grid', gap: 10, width: '100%', padding: '12px 0', borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent', boxSizing: 'border-box' as const, minWidth: 0 },
     label: { margin: 0, color: theme.textMuted, fontSize: '0.74rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', display: 'inline-flex', alignItems: 'center', gap: 7 },
     value: { margin: 0, color: theme.text, fontSize: '0.94rem', fontWeight: 800, lineHeight: 1.5, wordBreak: 'break-word' as const, overflowWrap: 'anywhere' as const },
     note: { margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.4 },
@@ -122,6 +123,7 @@ const ApiKeysPage = () => {
           {error && <NotificationBanner tone="error" title="API key action unavailable" message={error} />}
           {secret && <NotificationBanner tone="success" title="New API key created" message="Copy the secret now. It will not be shown again." />}
 
+          <div style={styles.outerCard}>
           <div style={styles.card}>
             <div style={styles.row}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -211,6 +213,7 @@ const ApiKeysPage = () => {
                 )}
               </div>}
             </article>)}</div>}
+          </div>
           </div>
         </div>
         <NowBar />
