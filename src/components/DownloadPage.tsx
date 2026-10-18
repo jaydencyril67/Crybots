@@ -93,14 +93,14 @@ const DownloadPage = () => {
     },
     downloadCard: {
       display: 'grid',
-      gap: '8px',
+      gap: '12px',
       width: '100%',
       maxWidth: '100%',
-      padding: '0 0 16px',
-      borderRadius: 0,
-      border: 'none',
-      borderBottom: `1px solid ${theme.borderGlass}`,
-      background: 'transparent',
+      padding: '16px',
+      borderRadius: '22px',
+      border: `1px solid ${theme.borderGlass}`,
+      background: theme.surfaceGlass,
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
       minWidth: 0,
       boxSizing: 'border-box' as const,
     },
@@ -166,7 +166,6 @@ const DownloadPage = () => {
             <button type="button" style={styles.backButton} onClick={() => navigate('/store')}>
               <ArrowLeft size={17} /> Store
             </button>
-            <div style={styles.outerCard}>
             {downloadOptions.map((option) => (
                 <section style={styles.downloadCard} key={option.title}>
                   <h3 style={styles.title}>{option.title}</h3>
@@ -196,7 +195,7 @@ const DownloadPage = () => {
 
                 </section>
             ))}
-              <section style={{ ...styles.downloadCard, borderBottom: 'none', paddingBottom: 0 }}>
+              <section style={styles.downloadCard}>
                 <h3 style={styles.title}>PWA (Web App)</h3>
                 <p style={styles.description}>
                   Install CryBots directly from your browser as an app, without downloading an APK.
@@ -206,7 +205,6 @@ const DownloadPage = () => {
                   <InstallAppButton />
                 </div>
               </section>
-            </div>
           </div>
         </div>
         <NowBar />
