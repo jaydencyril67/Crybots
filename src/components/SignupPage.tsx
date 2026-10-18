@@ -36,7 +36,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     minHeight: '100vh',
     background: theme.background,
     color: theme.text,
-    overflow: 'hidden',
   },
   shell: {
     position: 'relative' as const,
@@ -112,7 +111,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   heroCard: {
     borderRadius: '24px',
     border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
+    background: theme.surfaceGlass,
     padding: '18px',
     backdropFilter: 'none',
     WebkitBackdropFilter: 'none',
@@ -196,7 +195,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   panel: {
     borderRadius: '16px',
     border: `1px solid ${theme.borderGlass}`,
-    background: theme.surfaceMuted,
+    background: theme.surfaceGlass,
     padding: 'clamp(18px, 3.2vw, 24px)',
     backdropFilter: 'none',
     WebkitBackdropFilter: 'none',
@@ -214,7 +213,6 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     height: '10px',
     borderRadius: '999px',
     background: theme.surfaceMuted,
-    overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
