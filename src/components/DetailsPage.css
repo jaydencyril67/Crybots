@@ -26,3 +26,6 @@
 .cr-details-photo-confirm-avatar{left:50%;right:auto;transform:translateX(-50%)}
 .cr-details-avatar-uploading{position:absolute;inset:0;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.48);z-index:2;pointer-events:none}
 @media(max-width:480px){.cr-details-cover-frame{height:144px;margin-top:-14px}.cr-details-photo-stack{max-width:100%}.cr-details-avatar-wrap{bottom:-27px;width:126px;height:126px}.cr-details-avatar-trigger{width:126px;height:126px;min-width:126px;min-height:126px}.cr-details-photo-popout button{min-width:58px;padding:6px 7px}}
+
+/* Keep the cover/avatar stack directly on the page, without its own glass card. */
+.cr-details-photo-card{width:100%;max-width:552px;margin:0 auto;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;box-sizing:border-box}
