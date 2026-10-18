@@ -10,7 +10,7 @@ import { navigate } from '../utils/navigate';
 
 type Step = 'identity' | 'method' | 'access-code' | 'one-time';
 type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email?: string; uid?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string };
-type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; status?: string; accessCodeSet?: boolean; requestId?: string; challengeCode?: string; expiresAt?: string; message?: string };
+type SessionResponse = { exists?: boolean; token?: string; user?: KingsHallUser; isAdmin?: boolean; status?: string; accessCodeSet?: boolean; requestId?: string; challengeCode?: string; expiresAt?: string; message?: string };
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
