@@ -3,14 +3,6 @@
 export type DiscoveredPageRoute = { label: string; route: string };
 export const GENERATED_PAGE_ROUTES: DiscoveredPageRoute[] = [
   {
-    "label": "VERIFY EMAIL",
-    "route": "/verify-email"
-  },
-  {
-    "label": "ACCOUNT CONFIRMED",
-    "route": "/account-confirmed"
-  },
-  {
     "label": "SIGN IN",
     "route": "/signin"
   },
