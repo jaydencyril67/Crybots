@@ -119,7 +119,6 @@ const SigninPage = () => {
     }
   };
 
-  const chooseAccount = (email: string) => {
   const handleAccessCode = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (busy || !identity || accessCode.length !== 6) return;
