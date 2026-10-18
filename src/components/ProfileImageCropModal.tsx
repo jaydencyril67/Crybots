@@ -294,10 +294,10 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
 
   return (
     <div role="dialog" aria-modal="true" aria-label={title} className="social-story-crop-overlay">
-      <style>{`.social-story-crop-overlay{position:fixed;inset:0;z-index:10020;display:flex;flex-direction:column;width:100vw;height:100vh;height:100dvh;min-height:0;overflow:hidden;box-sizing:border-box;background:linear-gradient(160deg,${theme.background},${theme.surface});backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);color:${theme.text}}
+      <style>{`.social-story-crop-overlay{position:fixed;inset:0;z-index:10020;display:flex;flex-direction:column;width:100vw;height:100vh;height:100dvh;min-height:0;overflow:hidden;box-sizing:border-box;background:linear-gradient(160deg,${theme.background},${theme.surface});backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);color:${theme.text}}
 .social-story-crop-header{position:absolute;inset:0 0 auto;z-index:5;display:block;height:0;padding:0;border:0;background:transparent;pointer-events:none}
 .social-story-crop-header>div{display:none}
-.social-story-crop-header>button{position:absolute;top:max(12px,env(safe-area-inset-top));display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid ${theme.borderGlass};border-radius:999px;background:rgba(12,16,30,.58);color:${theme.text};box-shadow:0 6px 24px rgba(0,0,0,.24);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);pointer-events:auto}
+.social-story-crop-header>button{position:absolute;top:max(12px,env(safe-area-inset-top));display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;padding:0;border:1px solid ${theme.borderGlass};border-radius:999px;background:rgba(12,16,30,.58);color:${theme.text};box-shadow:0 6px 24px rgba(0,0,0,.24);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);pointer-events:auto}
 .social-story-crop-header>button:first-child{left:14px}
 .social-story-crop-header>button:last-child{right:14px;background:linear-gradient(145deg,${theme.primary},${theme.primary});border-color:transparent;color:${theme.textInverse}}
 .social-story-crop-header>button:disabled{opacity:.45}
