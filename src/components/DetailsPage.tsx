@@ -69,7 +69,7 @@ const DetailsPage = () => {
   const [balance, setBalance] = useState<{ usdtBalance: number | null } | null>(() => ({ usdtBalance: null }));
 
   useEffect(() => {
-    let isMounted = true; let intervalId = 0;
+    let isMounted = true;
     const unsubscribe = subscribeBalance((balance) => { if (isMounted) setBalance(balance); });
     const loadProfile = async () => {
       try {
@@ -82,9 +82,8 @@ const DetailsPage = () => {
         setBalance({ usdtBalance: null }); setLiveProfile(null); setProfileLoading(false); setBalanceLoading(false); setBalanceError(null);
       }
     };
-    void loadProfile(); intervalId = window.setInterval(() => { void loadProfile(); }, 12000);
-    const handleFocus = () => { void loadProfile(); }; window.addEventListener('focus', handleFocus);
-    return () => { isMounted = false; window.clearInterval(intervalId); window.removeEventListener('focus', handleFocus); unsubscribe(); };
+    void loadProfile();
+    return () => { isMounted = false; unsubscribe(); };
   }, []);
 
   const profileDetails = liveProfile; const avatarPicture = profileDetails?.profilePicture || '';
