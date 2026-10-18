@@ -10,13 +10,13 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', overflowX: 'hidden' as const, overflowY: 'auto' as const, paddingBottom: '90px', background: theme.background, color: theme.text },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px) 28px', boxSizing: 'border-box' as const },
   content: { display: 'grid', gap: '14px', marginTop: '10px' },
-  rowList: { display: 'grid', gap: '10px', width: '100%', minWidth: 0, padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxSizing: 'border-box' as const },
-  dangerRow: { width: '100%', maxWidth: '100%', background: theme.surfaceMuted, border: `1px solid ${theme.borderGlass}`, borderRadius: '15px', padding: '13px 14px', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
+  rowList: { display: 'grid', gap: '0', width: '100%', minWidth: 0, padding: '16px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', boxSizing: 'border-box' as const },
+  dangerRow: { width: '100%', maxWidth: '100%', background: 'transparent', border: 'none', borderRadius: 0, padding: '8px 0 12px', display: 'grid', gap: '6px', textAlign: 'left' as const, minWidth: 0, boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', alignSelf: 'start', justifySelf: 'start', width: 'fit-content', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '12px' },
   title: { margin: 0, fontSize: '0.96rem', fontWeight: 800, color: theme.text },
   text: { margin: '5px 0 0', fontSize: '0.82rem', color: theme.textMuted, lineHeight: 1.4, maxWidth: '64ch' },
   actions: { display: 'flex', flexWrap: 'wrap' as const, gap: '10px', marginTop: '8px' },
-  button: { borderRadius: '999px', padding: '12px 16px', border: `1px solid ${theme.borderGlass}`, cursor: 'pointer', fontWeight: 700, color: theme.text, background: theme.surfaceMuted, width: '100%', maxWidth: '100%' },
+  button: { borderRadius: '999px', padding: '12px 16px', border: `1px solid ${theme.borderGlass}`, cursor: 'pointer', fontWeight: 700, color: theme.text, background: theme.surfaceGlass, width: '100%', maxWidth: '100%', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' },
   danger: { background: theme.primary, borderColor: theme.primary, color: theme.textInverse },
 });
 
