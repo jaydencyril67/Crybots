@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Zap, Navigation, Palette } from 'lucide-react';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
@@ -23,22 +23,31 @@ const EDGE_LIGHT_MODES: Array<{ key: EdgeLightMode; label: string }> = [
 ];
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
-  page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' },
-  shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
-  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  card: { marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
-  cardHeading: { margin: 0, fontSize: '1.05rem', fontWeight: 850 },
-  cardText: { margin: '6px 0 16px', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
+  page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '105px' },
+  shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: '10px clamp(14px, 3vw, 28px) 105px', boxSizing: 'border-box' as const },
+  back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem', marginBottom: '24px' },
+  pageHeading: { margin: '0 0 25px' },
+  heading: { margin: '15px 0 8px', fontSize: 'clamp(30px, 5vw, 43px)', fontWeight: 600, lineHeight: 1.08, letterSpacing: '-.035em' },
+  intro: { maxWidth: '580px', margin: 0, color: theme.textMuted, fontSize: '13px', lineHeight: 1.75 },
+  card: { margin: '0 0 15px', padding: 'clamp(16px, 3vw, 23px)', border: `1px solid ${theme.borderGlass}`, borderRadius: '19px', background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.055)' },
+  cardHeading: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '17px' },
+  cardIcon: { display: 'grid', placeItems: 'center', flex: '0 0 39px', width: '39px', height: '39px', border: `1px solid ${theme.borderGlass}`, borderRadius: '12px', color: theme.text, background: 'rgba(255,255,255,.035)' },
+  cardTitle: { margin: 0, fontSize: '16px', fontWeight: 600, letterSpacing: '-.01em' },
+  cardText: { margin: '5px 0 0', color: theme.textMuted, fontSize: '11px', lineHeight: 1.65 },
   list: { display: 'grid', gap: 0 },
-  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '14px 2px', borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent' },
-  rowContent: { minWidth: 0 },
-  label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
-  description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
-  button: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.text, background: theme.surfaceMuted, cursor: 'pointer', flexShrink: 0 },
-  active: { background: theme.primary, color: theme.textInverse, border: `1px solid ${theme.primary}` },
-  modes: { display: 'grid', gap: '10px', marginTop: '10px' },
-  modeRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '12px 2px', borderRadius: 0, border: 'none', borderBottom: `1px solid ${theme.borderGlass}`, background: 'transparent' },
-  modeLabel: { margin: 0, fontWeight: 750, fontSize: '0.88rem' },
+  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', minHeight: '63px', padding: '12px 0', borderTop: '1px solid rgba(221,226,233,.075)' },
+  rowContent: { display: 'flex', flex: '1 1 auto', flexDirection: 'column' as const, gap: '5px', minWidth: 0 },
+  label: { margin: 0, fontWeight: 600, fontSize: '12px', color: theme.text },
+  description: { margin: 0, maxWidth: '560px', color: theme.textMuted, fontSize: '10.5px', lineHeight: 1.6 },
+  button: { borderRadius: '10px', border: `1px solid ${theme.borderGlass}`, padding: '9px 12px', fontWeight: 700, fontSize: '11px', color: theme.text, background: 'rgba(255,255,255,.035)', cursor: 'pointer', flexShrink: 0 },
+  active: { background: theme.surfaceMuted, color: theme.text, border: `1px solid ${theme.primary}` },
+  toggle: { position: 'relative' as const, display: 'block', flex: '0 0 42px', width: '42px', height: '25px', padding: '3px', border: `1px solid ${theme.borderGlass}`, borderRadius: '999px', background: 'rgba(255,255,255,.045)', cursor: 'pointer' },
+  toggleOn: { borderColor: theme.primary, background: 'rgba(185,199,223,.22)', boxShadow: '0 0 12px rgba(185,199,223,.08)' },
+  toggleKnob: { display: 'block', width: '17px', height: '17px', borderRadius: '50%', background: '#a4a8b0', transition: 'transform .16s, background .16s' },
+  toggleKnobOn: { transform: 'translateX(16px)', background: '#eef2f8' },
+  modes: { display: 'grid', gap: 0, marginTop: '3px' },
+  modeRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', minHeight: '43px', padding: '9px 1px', borderTop: '1px solid rgba(221,226,233,.075)' },
+  modeLabel: { margin: 0, fontWeight: 500, fontSize: '11px' },
 });
 
 const NowBarPage = () => {
@@ -119,16 +128,19 @@ const NowBarPage = () => {
       <main style={styles.page}>
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/options')}><ArrowLeft size={17} /> Options</button>
+          <header style={styles.pageHeading}>
+            <h1 style={styles.heading}>NowBar</h1>
+            <p style={styles.intro}>Customize NowBar lighting, navigation gestures, and button appearance.</p>
+          </header>
           <section style={styles.card}>
-            <h2 style={styles.cardHeading}>⚡ Edge lighting</h2>
-            <p style={styles.cardText}>Control the animated edge effect and choose how it behaves around the NowBar.</p>
+            <div style={styles.cardHeading}><span style={styles.cardIcon}><Zap size={19} /></span><div><h2 style={styles.cardTitle}>Edge lighting</h2><p style={styles.cardText}>Control the animated edge effect around the NowBar.</p></div></div>
             <div style={styles.list}>
               <div style={styles.row}>
                 <div style={styles.rowContent}>
                   <p style={styles.label}>Edge lighting</p>
                   <p style={styles.description}>Show the selected lighting effect around the NowBar.</p>
                 </div>
-                <button type="button" style={{ ...styles.button, ...(enabled ? styles.active : {}) }} onClick={toggle} aria-pressed={enabled}>{enabled ? 'Enabled' : 'Enable'}</button>
+                <button type="button" role="switch" aria-checked={enabled} aria-label="Enable edge lighting" style={{ ...styles.toggle, ...(enabled ? styles.toggleOn : {}) }} onClick={toggle}><span style={{ ...styles.toggleKnob, ...(enabled ? styles.toggleKnobOn : {}) }} /></button>
               </div>
               <div style={styles.row}>
                 <div style={styles.rowContent}>
@@ -137,7 +149,7 @@ const NowBarPage = () => {
                 </div>
                 <button type="button" style={styles.button} onClick={() => navigate('/nowbar-color')}>Choose color</button>
               </div>
-              <div>
+              <div style={{ marginTop: '12px' }}>
                 <p style={{ ...styles.label, margin: '4px 0 10px' }}>Lighting behavior</p>
                 <div style={styles.modes}>
                   {EDGE_LIGHT_MODES.map((option) => (
@@ -151,28 +163,26 @@ const NowBarPage = () => {
             </div>
           </section>
           <section style={styles.card}>
-            <h2 style={styles.cardHeading}>🧭 Navigation behavior</h2>
-            <p style={styles.cardText}>Choose which touch interactions are available on the NowBar. Both features are enabled by default.</p>
+            <div style={styles.cardHeading}><span style={styles.cardIcon}><Navigation size={19} /></span><div><h2 style={styles.cardTitle}>Navigation behavior</h2><p style={styles.cardText}>Choose which touch interactions are available on the NowBar.</p></div></div>
             <div style={styles.list}>
               <div style={styles.row}>
                 <div style={styles.rowContent}>
                   <p style={styles.label}>Swipe navigation</p>
                   <p style={styles.description}>Navigate between related pages by swiping left or right on the NowBar.</p>
                 </div>
-                <button type="button" style={{ ...styles.button, ...(swipeNavigationEnabled ? styles.active : {}) }} onClick={toggleSwipeNavigation} aria-pressed={swipeNavigationEnabled}>{swipeNavigationEnabled ? 'Enabled' : 'Enable'}</button>
+                <button type="button" role="switch" aria-checked={swipeNavigationEnabled} aria-label="Enable swipe navigation" style={{ ...styles.toggle, ...(swipeNavigationEnabled ? styles.toggleOn : {}) }} onClick={toggleSwipeNavigation}><span style={{ ...styles.toggleKnob, ...(swipeNavigationEnabled ? styles.toggleKnobOn : {}) }} /></button>
               </div>
               <div style={styles.row}>
                 <div style={styles.rowContent}>
                   <p style={styles.label}>Expand mode</p>
                   <p style={styles.description}>Allow holding the NowBar to expand its navigation buttons.</p>
                 </div>
-                <button type="button" style={{ ...styles.button, ...(expandModeEnabled ? styles.active : {}) }} onClick={toggleExpandMode} aria-pressed={expandModeEnabled}>{expandModeEnabled ? 'Enabled' : 'Enable'}</button>
+                <button type="button" role="switch" aria-checked={expandModeEnabled} aria-label="Enable expand mode" style={{ ...styles.toggle, ...(expandModeEnabled ? styles.toggleOn : {}) }} onClick={toggleExpandMode}><span style={{ ...styles.toggleKnob, ...(expandModeEnabled ? styles.toggleKnobOn : {}) }} /></button>
               </div>
             </div>
           </section>
           <section style={styles.card}>
-            <h2 style={styles.cardHeading}>🎨 Button color</h2>
-            <p style={styles.cardText}>Replace the bold white button borders with a color that matches your NowBar style.</p>
+            <div style={styles.cardHeading}><span style={styles.cardIcon}><Palette size={19} /></span><div><h2 style={styles.cardTitle}>Button color</h2><p style={styles.cardText}>Customize the borders of your NowBar navigation buttons.</p></div></div>
             <div style={styles.list}>
               <div style={styles.row}>
                 <div style={styles.rowContent}>
