@@ -26,7 +26,8 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   heading: { margin: '20px 0 8px', fontSize: 'clamp(1.45rem, 4vw, 2rem)', fontWeight: 900 },
   intro: { margin: '8px 0 22px', color: theme.textMuted, lineHeight: 1.6 },
   createButton: { width: '100%', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 8, border: `1px solid ${theme.primary}`, borderRadius: 12, padding: '13px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 900, fontSize: '0.95rem' },
-  form: { display: 'grid', gap: 12, padding: 10, border: `1px solid ${theme.borderGlass}`, borderRadius: 16, background: theme.surfaceGlass },
+  panel: { display: 'grid', gap: 18, marginTop: 18, padding: 'clamp(14px, 3vw, 22px)', border: `1px solid ${theme.borderGlass}`, borderRadius: 19, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.055)' },
+  form: { display: 'grid', gap: 12, padding: 0, border: 'none', borderRadius: 0, background: 'transparent' },
   label: { display: 'grid', gap: 6, color: theme.text, fontSize: '0.86rem', fontWeight: 800 },
   input: { width: '100%', boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
   textarea: { width: '100%', minHeight: 170, resize: 'vertical' as const, boxSizing: 'border-box' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 10, padding: '11px 12px', background: theme.surfaceMuted, color: theme.text, fontSize: '0.92rem', outline: 'none' },
@@ -37,14 +38,14 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   detailButton: { width: '100%' },
   submitButton: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, border: `1px solid ${theme.primary}`, borderRadius: 10, padding: '10px 16px', background: theme.primary, color: theme.textInverse, cursor: 'pointer', fontWeight: 900 },
   disabled: { opacity: 0.6, cursor: 'not-allowed' },
-  tableWrap: { marginTop: 20, overflowX: 'auto' as const, border: `1px solid ${theme.borderGlass}`, borderRadius: 16, padding: 10, background: theme.surfaceGlass },
+  tableWrap: { marginTop: 0, overflowX: 'auto' as const, border: 'none', borderRadius: 0, padding: 0, background: 'transparent' },
   table: { width: '100%', minWidth: 520, borderCollapse: 'collapse' as const },
   th: { padding: '13px 14px', textAlign: 'left' as const, color: theme.textMuted, fontSize: '0.78rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em', borderBottom: `1px solid ${theme.borderGlass}` },
   td: { padding: '14px', borderBottom: `1px solid ${theme.borderGlass}`, fontSize: '0.9rem', verticalAlign: 'middle' as const },
   status: { display: 'inline-flex', borderRadius: 999, padding: '5px 10px', fontSize: '0.76rem', fontWeight: 900, textTransform: 'capitalize' as const },
   viewButton: { display: 'inline-flex', alignItems: 'center', gap: 6, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 11px', background: theme.surfaceMuted, color: theme.text, cursor: 'pointer', fontWeight: 800 },
   empty: { padding: '30px 16px', textAlign: 'center' as const, color: theme.textMuted },
-  detail: { display: 'grid', gap: 16, maxHeight: 'calc(100vh - 220px)', overflowY: 'auto' as const, padding: 10, border: `1px solid ${theme.borderGlass}`, borderRadius: 16, background: theme.surfaceGlass },
+  detail: { display: 'grid', gap: 16, maxHeight: 'calc(100vh - 220px)', overflowY: 'auto' as const, padding: 0, border: 'none', borderRadius: 0, background: 'transparent' },
   detailHeading: { margin: 0, fontSize: 'clamp(1.2rem, 3vw, 1.65rem)', fontWeight: 900, overflowWrap: 'anywhere' as const },
   meta: { margin: 0, color: theme.textMuted, fontSize: '0.82rem' },
   body: { margin: 0, whiteSpace: 'pre-wrap' as const, lineHeight: 1.7, overflowWrap: 'anywhere' as const },
@@ -144,6 +145,7 @@ const TicketsPage = () => {
           <h1 style={styles.heading}>Tickets</h1>
           <p style={styles.intro}>Send a message or report to the admin and track your support tickets here.</p>
           {error ? <p style={styles.error}>{error}</p> : null}
+          <section style={styles.panel}>
           {selectedTicket ? (
             <section style={styles.detail}>
               <div>
@@ -180,6 +182,7 @@ const TicketsPage = () => {
               </div>
             </>
           )}
+          </section>
         </div>
       </main>
       <NowBar />
