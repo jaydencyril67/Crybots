@@ -21,7 +21,7 @@ const features = [
 ];
 
 const steps = [
-  'Create your CryBots profile and set up your workspace.',
+  'Sign in to open your CryBots workspace.',
   'Fund your account using a supported payment method.',
   'Choose a strategy and follow its activity from your dashboard.',
 ];
@@ -35,7 +35,7 @@ const LandingPage = () => {
     navigate(isAdminToken(token) ? '/admin-home' : token && isTokenValid(token) ? '/home' : '/signin');
   };
 
-  const handleGetStartedClick = () => navigate('/signup');
+  const handleGetStartedClick = () => navigate('/signin');
 
   const card = {
     border: `1px solid ${theme.borderGlass}`,
@@ -182,7 +182,7 @@ const LandingPage = () => {
                 <h1 className="cb-prism-title">Your strategy.<br />A sharper way to move.</h1>
                 <p className="cb-prism-lead">Build your approach to crypto with automated bot strategies, useful account tools, and a single place to follow what matters.</p>
                 <div className="cb-prism-actions">
-                  <button type="button" onClick={handleGetStartedClick} style={primaryButton}>Get started <ArrowUpRight size={17} /></button>
+                  <button type="button" onClick={handleGetStartedClick} style={primaryButton}>Sign in <ArrowUpRight size={17} /></button>
                   <button type="button" onClick={handleDashboardClick} style={secondaryButton}>Open dashboard <ArrowDownRight size={16} /></button>
                 </div>
               </div>
