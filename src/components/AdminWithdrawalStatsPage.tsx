@@ -8,7 +8,7 @@ import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
-type Withdrawal = { id: string; amount: number; currency: string; assetType?: string; destinationLabel?: string; destinationValue?: string; method?: string; status: string; scheduledFor?: string; createdAt?: string; user?: { email?: string; firstName?: string; lastName?: string; uid?: string } };
+type Withdrawal = { id: string; amount: number; currency: string; assetType?: string; destinationLabel?: string; destinationValue?: string; method?: string; status: string; scheduledFor?: string; createdAt?: string; user?: { email?: string; firstName?: string; lastName?: string; username?: string } };
 const AdminWithdrawalStatsPage = () => {
   const { themeMode } = useAppTheme(); const theme = HYBRID_THEME_TOKENS[themeMode]; const routePath = window.location.pathname.startsWith('/admin/withdrawal-stats/') ? window.location.pathname : window.location.hash.replace(/^#/, ''); const id = routePath.split('/').filter(Boolean).pop();
   const [withdrawal, setWithdrawal] = useState<Withdrawal | null>(null); const [error, setError] = useState(''); const [saving, setSaving] = useState(false);
