@@ -118,6 +118,7 @@ const SigninPage = () => {
   }, [step, requestId]);
 
   const resetFlow = () => {
+    if (step === 'one-time' && requestId) api.post('/api/auth/kingshall/cancel', { requestId }).catch(() => {});
     setStep('identity'); setAccessCode(''); setRequestId(''); setChallengeCode(''); setExpiresAt(''); setError(''); setNotice('');
   };
   const handleReturn = () => {
