@@ -34,7 +34,6 @@ const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
   return isAdmin || (Boolean(configuredAdminEmail) && normalizedEmail === configuredAdminEmail) ? '/admin-home' : '/home';
 };
 const DeviceAccount = registerPlugin<NativeKingsHallAccountPlugin>('KingsHallAccount');
-const getNativePlugin = (): NativeKingsHallAccountPlugin => DeviceAccount;
 const isNativeAndroid = () => Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
 
 const SigninPage = () => {
@@ -91,9 +90,8 @@ const SigninPage = () => {
       await new Promise(resolve => window.setTimeout(resolve, 250));
       let selectedEmail = '';
       if (isNativeAndroid()) {
-        const plugin = getNativePlugin();
-        if (!plugin) throw new Error('This CryBots APK needs an update to use the KingsHall account manager.');
-        const result = await plugin.chooseAccount();
+        if (!Capacitor.isPluginAvailable('KingsHallAccount')) throw new Error('This CryBots APK needs an update to use the KingsHall account manager.');
+        const result = await DeviceAccount.chooseAccount();
         if (result.cancelled) {
           setNotice('Choose a KingsHall account to continue. If none appears, sign in to KingsHall first.');
           return;
