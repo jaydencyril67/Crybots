@@ -84,20 +84,21 @@ const DepositPage = () => {
     outerCard: {
       width: '100%',
       boxSizing: 'border-box' as const,
-      padding: '10px',
-      borderRadius: '16px',
+      padding: '16px',
+      borderRadius: '22px',
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
+      boxShadow: 'inset 0 1px rgba(255,255,255,0.035)',
       display: 'grid',
-      gap: '10px',
+      gap: '14px',
     },
     mutedCard: {
       width: '100%',
       boxSizing: 'border-box' as const,
-      padding: '13px 14px',
-      borderRadius: '15px',
-      border: `1px solid ${theme.borderGlass}`,
-      background: theme.surfaceMuted,
+      padding: 0,
+      borderRadius: 0,
+      border: 'none',
+      background: 'transparent',
       marginTop: 0,
       display: 'grid',
       gap: '12px',
@@ -376,12 +377,9 @@ const DepositPage = () => {
               <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'fixed' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('fixed'); setPayment(null); setCopied(false); }}>Deposit address</button>
               <button type="button" style={{ ...styles.secondaryButton, flex: 1, ...(depositMethod === 'now' ? { borderColor: theme.primary, color: theme.primary } : {}) }} onClick={() => { setDepositMethod('now'); setCopied(false); }}>One-time payment</button>
             </div>
+            {cryptoContent}
           </div>
           <div style={styles.outerCard}>
-          {cryptoContent}
-          </div>
-          <div style={styles.outerCard}>
-          <div style={styles.mutedCard}>
             <strong>Recent deposits</strong>
             {recentLoading ? (
               <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0' }}>
@@ -423,7 +421,6 @@ const DepositPage = () => {
                 })}
               </div>
             )}
-          </div>
           </div>
         </div>
         <NowBar />
