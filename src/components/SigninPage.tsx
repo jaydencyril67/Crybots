@@ -16,18 +16,18 @@ const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.A
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
 const ACCOUNT_HINT_KEY = 'kingshall_account_hint';
 const getBrowserAccountHint = () => {
-  const saved = (localStorage.getItem(ACCOUNT_HINT_KEY) || '').trim().toLowerCase();
-  if (saved) return saved;
   const cookie = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith('kh_account_hint='));
-  if (!cookie) return '';
-  try {
-    const email = decodeURIComponent(cookie.slice('kh_account_hint='.length)).trim().toLowerCase();
-    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      localStorage.setItem(ACCOUNT_HINT_KEY, email);
-      return email;
-    }
-  } catch {}
-  return '';
+  if (cookie) {
+    try {
+      const email = decodeURIComponent(cookie.slice('kh_account_hint='.length)).trim().toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        localStorage.setItem(ACCOUNT_HINT_KEY, email);
+        return email;
+      }
+    } catch {}
+  }
+  const saved = (localStorage.getItem(ACCOUNT_HINT_KEY) || '').trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(saved) ? saved : '';
 };
 const getPostSigninRoute = (email: unknown, isAdmin: boolean) => {
   const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
