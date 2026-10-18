@@ -242,7 +242,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
     inset: '-24px',
     borderRadius: '32px',
     background: `linear-gradient(135deg, ${theme.primarySoft}, ${theme.primarySoft}, transparent)`,
-    filter: 'blur(24px)',
+    filter: 'none',
   },
   panel: {
     position: 'relative' as const,
