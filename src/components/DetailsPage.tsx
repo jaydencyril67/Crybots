@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
-import { getCachedBalance, subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
+import { subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
