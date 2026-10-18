@@ -13,7 +13,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   card: { marginTop: '22px', padding: '16px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
   heading: { margin: 0, fontSize: '1.08rem', fontWeight: 850 },
   description: { margin: '8px 0 16px', color: theme.textMuted, fontSize: '0.88rem', lineHeight: 1.55 },
-  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '14px 0', borderRadius: 0, border: 'none', borderTop: `1px solid ${theme.borderGlass}`, background: 'transparent' },
   button: { width: '100%', borderRadius: '12px', border: `1px solid ${theme.primary}`, padding: '12px 16px', fontWeight: 850, color: theme.textInverse, background: theme.primary, cursor: 'pointer', marginTop: '14px' },
   muted: { color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.5, margin: '12px 0 0' },
 });
