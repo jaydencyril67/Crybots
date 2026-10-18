@@ -128,7 +128,12 @@ const HybridTheme = ({ mode = 'dark', children }: HybridThemeProps) => {
         color: theme.text,
       }}
     >
-      <style>{`html, body, #root, *, *::before, *::after { font-family: "STIX Two Text" !important; font-synthesis: none !important; }`}</style>
+      <style>{`html, body, #root, *, *::before, *::after { font-family: "STIX Two Text" !important; font-synthesis: none !important; }
+[data-theme="dark"] button { background: radial-gradient(ellipse at 0 0, rgba(255,255,255,.075), transparent 68%), linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025)) !important; border-color: rgba(221,226,233,.22) !important; color: #fff !important; box-shadow: inset 0 1px rgba(255,255,255,.07), 0 4px 14px rgba(0,0,0,.14); }
+[data-theme="light"] button { background: linear-gradient(145deg, rgba(255,255,255,.62), rgba(255,255,255,.34)) !important; border-color: rgba(80,84,92,.22) !important; color: #151515 !important; box-shadow: inset 0 1px rgba(255,255,255,.62), 0 4px 14px rgba(30,30,30,.06); }
+[data-theme] button:disabled { opacity: .55; }
+[data-theme] button:active { box-shadow: inset 0 1px rgba(255,255,255,.04); }
+`}</style>
       {children}
     </div>
   );
