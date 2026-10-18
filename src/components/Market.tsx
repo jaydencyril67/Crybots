@@ -10,11 +10,11 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
   page: { minHeight: '100vh', background: theme.background, color: theme.text, paddingBottom: '90px' },
   shell: { width: '100%', maxWidth: '920px', margin: '0 auto', padding: 'clamp(18px, 4vw, 36px) clamp(14px, 3vw, 28px)', boxSizing: 'border-box' as const },
   back: { display: 'inline-flex', alignItems: 'center', gap: '6px', border: `1px solid ${theme.borderGlass}`, borderRadius: '10px', padding: '7px 10px', background: theme.surfaceGlass, color: theme.text, cursor: 'pointer', fontSize: '0.84rem' },
-  card: { marginTop: '22px', padding: '10px', borderRadius: '16px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass },
+  card: { marginTop: '22px', padding: '16px', borderRadius: '22px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column' as const, gap: '14px', boxSizing: 'border-box' as const },
   cardHeading: { margin: 0, fontSize: '1.05rem', fontWeight: 850 },
-  cardText: { margin: '6px 0 16px', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
-  list: { display: 'grid', gap: '10px' },
-  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '13px 14px', borderRadius: '15px', border: `1px solid ${theme.borderGlass}`, background: theme.surfaceMuted },
+  cardText: { margin: '6px 0 0', color: theme.textMuted, fontSize: '0.86rem', lineHeight: 1.5 },
+  list: { display: 'grid', gap: '12px' },
+  row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', padding: '10px 0', border: 'none', background: 'transparent' },
   label: { margin: 0, fontWeight: 800, fontSize: '0.92rem' },
   description: { margin: '3px 0 0', color: theme.textMuted, fontSize: '0.78rem', lineHeight: 1.35 },
   action: { borderRadius: '999px', border: `1px solid ${theme.borderGlass}`, padding: '9px 13px', fontWeight: 800, color: theme.textInverse, background: theme.primary, cursor: 'pointer', flexShrink: 0 },
@@ -40,8 +40,10 @@ const Market = () => {
         <div style={styles.shell}>
           <button type="button" style={styles.back} onClick={() => navigate('/trade')}><ArrowLeft size={17} /> Trade</button>
           <section style={styles.card}>
-            <h2 style={styles.cardHeading}>Explore the market</h2>
-            <p style={styles.cardText}>Select one of the options below to get started.</p>
+            <div>
+              <h2 style={styles.cardHeading}>Explore the market</h2>
+              <p style={styles.cardText}>Select one of the options below to get started.</p>
+            </div>
             <div style={styles.list}>
               {categories.map(({ name, description }) => {
                 const isSelected = selectedCategory === name;
