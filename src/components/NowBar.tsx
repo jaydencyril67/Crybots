@@ -735,17 +735,12 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                   ...styles.button,
                   ...(buttonColorEnabled ? { borderColor: buttonColor } : {}),
                   ...(action.active ? {
-                    borderColor: edgeLight.enabled ? edgeLightColor : (buttonColorEnabled ? buttonColor : 'rgba(238,242,249,0.72)'),
+                    // Match HallsChat: a steady glass highlight on the active button.
+                    // Edge-light animation belongs to the NowBar shell, not each button.
+                    borderColor: buttonColorEnabled ? buttonColor : 'rgba(238,242,249,0.72)',
                     background: 'linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.055))',
                     color: '#ffffff',
-                    boxShadow: edgeLight.enabled && !['stable', 'stable-light'].includes(edgeLight.mode)
-                      ? undefined
-                      : 'inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 10px rgba(255,255,255,0.12)',
-                    ...(edgeLight.enabled && !['stable', 'stable-light'].includes(edgeLight.mode) ? {
-                      animation: `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' || edgeLight.mode === 'blink-light' ? '2.6s' : edgeLight.mode === 'pulse' || edgeLight.mode === 'pulse-light' ? '3.1s' : '6s'} ${edgeLight.mode === 'color' || edgeLight.mode === 'color-light' ? 'linear' : 'ease-in-out'} infinite`,
-                      animationFillMode: 'both',
-                      willChange: 'border-color, box-shadow, filter',
-                    } : {}),
+                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 10px rgba(255,255,255,0.12)',
                   } : {}),
                   ...(isExpanded ? styles.buttonExpanded : {}),
                 }}
