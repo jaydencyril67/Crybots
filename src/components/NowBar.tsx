@@ -734,15 +734,6 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                 style={{
                   ...styles.button,
                   ...(buttonColorEnabled ? { borderColor: buttonColor } : {}),
-                  ...(action.active ? {
-                    // Keep the glass highlight, while making the active button's own edge light visible.
-                    // Match HallsChat: the configured button color controls every button border,
-                    // independently of the NowBar shell's edge-light setting.
-                    borderColor: buttonColorEnabled ? buttonColor : 'rgba(238,242,249,0.72)',
-                    background: 'linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.055))',
-                    color: '#ffffff',
-                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 10px rgba(255,255,255,0.12)',
-                  } : {}),
                   ...(isExpanded ? styles.buttonExpanded : {}),
                 }}
               >
