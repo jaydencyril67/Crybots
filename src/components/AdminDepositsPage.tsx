@@ -7,8 +7,9 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
+import VerificationBadge from './VerificationBadge';
 
-type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string };
+type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string; verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected' };
 
 const AdminDepositsPage = () => {
   const { themeMode } = useAppTheme();
@@ -40,7 +41,7 @@ const AdminDepositsPage = () => {
     <section style={{ display: 'grid', gap: 10 }}><h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900 }}>Admin Deposits</h2><p style={{ margin: 0, fontSize: '0.92rem', color: theme.textMuted, lineHeight: 1.7 }}>Select a user to view all deposit details.</p></section>
     <section style={{ display: 'grid', gap: 10 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass }}><Search size={18} color={theme.textMuted} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search users by email" aria-label="Search users by email" style={{ width: '100%', border: 0, outline: 0, background: 'transparent', color: theme.text, fontSize: '0.92rem' }} /></div>
-      {error ? <NotificationBanner tone="error" title="Unable to load users" message={error} /> : loading ? <NotificationBanner title="Loading users" message="Loading registered user accounts…" /> : users.length === 0 ? <NotificationBanner title="No users found" message="No registered users match your search." /> : <div style={{ display: 'grid', gap: 10 }}>{users.map((user) => <article key={user._id} style={card}><div><h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 850 }}>{user.email}</h3><p style={{ margin: 0, color: theme.textMuted, fontSize: '0.84rem' }}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/deposit-stats/${user._id}`)} style={button}><Eye size={15} /> View</button></article>)}</div>}
+      {error ? <NotificationBanner tone="error" title="Unable to load users" message={error} /> : loading ? <NotificationBanner title="Loading users" message="Loading registered user accounts…" /> : users.length === 0 ? <NotificationBanner title="No users found" message="No registered users match your search." /> : <div style={{ display: 'grid', gap: 10 }}>{users.map((user) => <article key={user._id} style={card}><div><h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 850 }}>{user.email}</h3><p style={{ margin: 0, color: theme.textMuted, fontSize: '0.84rem' }}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} {user.verificationStatus === 'verified' && <VerificationBadge size={16} />} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/deposit-stats/${user._id}`)} style={button}><Eye size={15} /> View</button></article>)}</div>}
     </section>
   </div></div><NowBar admin /></div></HybridTheme>;
 };
