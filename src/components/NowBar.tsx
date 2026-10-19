@@ -736,17 +736,12 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                   ...(buttonColorEnabled ? { borderColor: buttonColor } : {}),
                   ...(action.active ? {
                     // Keep the glass highlight, while making the active button's own edge light visible.
-                    borderColor: edgeLight.enabled ? edgeLightColor : (buttonColorEnabled ? buttonColor : 'rgba(238,242,249,0.72)'),
+                    // Match HallsChat: the configured button color controls every button border,
+                    // independently of the NowBar shell's edge-light setting.
+                    borderColor: buttonColorEnabled ? buttonColor : 'rgba(238,242,249,0.72)',
                     background: 'linear-gradient(145deg, rgba(255,255,255,0.17), rgba(255,255,255,0.055))',
                     color: '#ffffff',
-                    boxShadow: edgeLight.enabled
-                      ? `inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 0 1px ${edgeLightColor}, 0 0 10px ${edgeLightColor}, 0 0 18px color-mix(in srgb, ${edgeLightColor} 45%, transparent)`
-                      : 'inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 10px rgba(255,255,255,0.12)',
-                    ...(edgeLight.enabled && !['stable', 'stable-light'].includes(edgeLight.mode) ? {
-                      animation: `nowbar-edge-${edgeLight.mode} ${edgeLight.mode === 'blink' || edgeLight.mode === 'blink-light' ? '2.6s' : edgeLight.mode === 'pulse' || edgeLight.mode === 'pulse-light' ? '3.1s' : '6s'} ${edgeLight.mode === 'color' || edgeLight.mode === 'color-light' ? 'linear' : 'ease-in-out'} infinite`,
-                      animationFillMode: 'both',
-                      willChange: 'border-color, box-shadow, filter',
-                    } : {}),
+                    boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 10px rgba(255,255,255,0.12)',
                   } : {}),
                   ...(isExpanded ? styles.buttonExpanded : {}),
                 }}
