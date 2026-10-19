@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRightLeft, AtSign, BadgeCheck, Hash, ShieldCheck, UserRound } from 'lucide-react';
 import api from '../api/axios';
 import NotificationBanner from './NotificationBanner';
+import VerificationBadge from './VerificationBadge';
 import LoadingDots from './LoadingDots';
 import NowBar from './NowBar';
 import { navigate } from '../utils/navigate';
@@ -18,6 +19,7 @@ type TransferRecipientCheckResponse = {
     lastName?: string;
     username?: string;
     email?: string;
+    verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected';
   };
 };
 
@@ -271,7 +273,7 @@ const TransferPage = () => {
                   />
                 </div>
                 <div style={styles.helper}>
-                  {recipientChecking ? 'Checking recipient...' : recipientValid ? `Recipient found: ${recipientDisplay}` : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a username or email to validate.'}
+                  {recipientChecking ? 'Checking recipient...' : recipientValid ? <>Recipient found: {recipientDisplay} {recipientDetails?.verificationStatus === 'verified' && <VerificationBadge size={16} />}</> : recipientValue.trim() ? 'No matching user found yet.' : 'Enter a username or email to validate.'}
                 </div>
                 <div style={styles.field as React.CSSProperties}>
                   <span style={styles.label}>Amount</span>
