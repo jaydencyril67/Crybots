@@ -7,8 +7,9 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
+import VerificationBadge from './VerificationBadge';
 
-type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string };
+type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string; verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected' };
 type UserResponse = { users: UserSummary[]; pagination: { page: number; pages: number; total: number } };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -59,7 +60,7 @@ const AdminUsersPage = () => {
           </section>
           <section style={styles.section}>
             <div style={styles.search}><Search size={18} color={theme.textMuted} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search users by email" aria-label="Search users by email" style={styles.input} /></div>
-            {error ? <NotificationBanner tone="error" title="Unable to load users" message={error} /> : loading ? <NotificationBanner title="Loading users" message="Loading registered user accounts…" /> : users.length === 0 ? <NotificationBanner title="No users found" message="No registered users match your search." /> : <div style={styles.cardGrid}>{users.map((user) => <article key={user._id} style={styles.card}><div><h3 style={styles.title}>{user.email}</h3><p style={styles.subtext}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/user-stats/${user._id}`)} style={styles.button}><Eye size={15} /> View</button></article>)}</div>}
+            {error ? <NotificationBanner tone="error" title="Unable to load users" message={error} /> : loading ? <NotificationBanner title="Loading users" message="Loading registered user accounts…" /> : users.length === 0 ? <NotificationBanner title="No users found" message="No registered users match your search." /> : <div style={styles.cardGrid}>{users.map((user) => <article key={user._id} style={styles.card}><div><h3 style={styles.title}>{user.email}</h3><p style={styles.subtext}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} {user.verificationStatus === 'verified' && <VerificationBadge size={16} />} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/user-stats/${user._id}`)} style={styles.button}><Eye size={15} /> View</button></article>)}</div>}
           </section>
         </div>
       </div>
