@@ -72,6 +72,18 @@ const LandingPage = () => {
       <>
         <Helmet>
           <title>CryBots | Crypto Trading Bots</title>
+          <meta
+            name="description"
+            content="Explore CryBots tools for automated trading strategies, bot discovery, portfolio tracking, and crypto market activity."
+          />
+          <link rel="canonical" href="https://crybots.kingshall.online/" />
+          <meta property="og:title" content="CryBots | Crypto Trading Bots" />
+          <meta
+            property="og:description"
+            content="Explore CryBots tools for automated trading strategies, bot discovery, portfolio tracking, and crypto market activity."
+          />
+          <meta property="og:url" content="https://crybots.kingshall.online/" />
+          <meta property="og:type" content="website" />
         </Helmet>
 
         <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, overflow: 'hidden' }}>
