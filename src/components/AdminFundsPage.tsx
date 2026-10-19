@@ -7,8 +7,9 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
+import VerificationBadge from './VerificationBadge';
 
-type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string };
+type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string; verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected' };
 type UserResponse = { users: UserSummary[]; pagination: { page: number; pages: number; total: number } };
 
 const AdminFundsPage = () => {
@@ -41,7 +42,7 @@ const AdminFundsPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', border: `1px solid ${theme.borderGlass}`, borderRadius: 14, background: theme.surfaceGlass }}><Search size={18} color={theme.textMuted} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search users by email" aria-label="Search users by email" style={{ width: '100%', border: 0, outline: 0, background: 'transparent', color: theme.text, fontSize: '0.92rem' }} /></div>
         {error ? <NotificationBanner tone="error" title="Unable to load users" message={error} /> : loading ? <NotificationBanner title="Loading users" message="Loading registered user accounts…" /> : <div style={{ display: 'grid', gap: 10 }}>
           <article style={cardStyle}><div><h3 style={{ margin: 0, fontSize: '0.95rem' }}>Everyone</h3><p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.84rem' }}>Send funds to every user</p></div><button type="button" onClick={() => navigate('/admin/funds/send/all')} style={buttonStyle}><Send size={15} /> Send</button></article>
-          {users.map((user) => <article key={user._id} style={cardStyle}><div><h3 style={{ margin: 0, fontSize: '0.95rem' }}>{user.email}</h3><p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.84rem' }}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/funds/send/${user._id}`)} style={buttonStyle}><Send size={15} /> Send</button></article>)}
+          {users.map((user) => <article key={user._id} style={cardStyle}><div><h3 style={{ margin: 0, fontSize: '0.95rem' }}>{user.email}</h3><p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.84rem' }}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} {user.verificationStatus === 'verified' && <VerificationBadge size={16} />} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/funds/send/${user._id}`)} style={buttonStyle}><Send size={15} /> Send</button></article>)}
         </div>}
       </div>
     </div><NowBar admin /></div>
