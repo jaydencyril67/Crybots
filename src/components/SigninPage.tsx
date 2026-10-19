@@ -345,7 +345,12 @@ const SigninPage = () => {
             </div>}
             <button type="button" onClick={resetAccount} style={{ border: 0, background: 'transparent', color: theme.primary, padding: 8, fontWeight: 700, cursor: 'pointer' }}>Cancel request</button>
           </section>}
-          <div style={{ ...glass, borderRadius: 16, padding: 14, marginTop: 16, display: 'grid', gap: 10, textAlign: 'left' }}>
+          {notice && <p role="status" style={{ margin: '16px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{notice}</p>}
+          {error && <p role="alert" style={{ margin: '16px 0 0', padding: '11px 13px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 13, lineHeight: 1.5 }}>{error}</p>}
+          <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
+          <div style={{ marginTop: 14, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>Need an account? <a href={KINGSHALL_SIGNIN} style={{ color: theme.primary, fontWeight: 700, textDecoration: 'none' }}>Create or recover access in KingsHall</a></div>
+        </section>
+                  <div style={{ ...glass, borderRadius: 16, padding: 14, marginTop: 16, display: 'grid', gap: 10, textAlign: 'left' }}>
             <div>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 800 }}>Signing in on a device without KingsHall?</p>
               <p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>Approve this device from your signed-in KingsHall account. No saved KingsHall account or Access Code is needed on this device.</p>
@@ -364,11 +369,7 @@ const SigninPage = () => {
               <p role="status" style={{ margin: 0, color: theme.textMuted, fontSize: 12 }}>Waiting for approval from KingsHall…</p>
               <button type="button" style={{ ...button, background: 'transparent' }} disabled={externalLoginBusy} onClick={() => void cancelExternalLogin()}>Cancel external login</button>
             </>}
-          </div>          {notice && <p role="status" style={{ margin: '16px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{notice}</p>}
-          {error && <p role="alert" style={{ margin: '16px 0 0', padding: '11px 13px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 13, lineHeight: 1.5 }}>{error}</p>}
-          <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
-          <div style={{ marginTop: 14, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>Need an account? <a href={KINGSHALL_SIGNIN} style={{ color: theme.primary, fontWeight: 700, textDecoration: 'none' }}>Create or recover access in KingsHall</a></div>
-        </section>
+          </div>
       </div>
       {showNoAccountModal && <div role="presentation" onClick={() => setShowNoAccountModal(false)} style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'grid', placeItems: 'center', padding: 20, background: 'rgba(0,0,0,.58)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
         <section role="alertdialog" aria-modal="true" aria-labelledby="no-kingshall-account-title" aria-describedby="no-kingshall-account-description" onClick={event => event.stopPropagation()} style={{ ...glass, width: '100%', maxWidth: 360, boxSizing: 'border-box', borderRadius: 22, padding: 24, textAlign: 'center', boxShadow: '0 18px 60px rgba(0,0,0,.28)' }}>
