@@ -3,7 +3,7 @@ import { ArrowLeft, LogOut } from 'lucide-react';
 import { navigate } from '../utils/navigate';
 import { isAdminToken } from '../utils/adminAuth';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
-import { useAppTheme, type AppThemePreference } from './AppTheme';
+import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 
 const EDGE_LIGHT_STORAGE_KEY = 'nowbar_edge_light';
@@ -31,7 +31,7 @@ const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
 });
 
 const AdminSettingsPage = () => {
-  const { themeMode, themePreference, setThemePreference } = useAppTheme();
+  const { themeMode } = useAppTheme();
   const theme = HYBRID_THEME_TOKENS[themeMode];
   const styles = getStyles(theme);
   const [edgeLightEnabled, setEdgeLightEnabled] = useState(false);
@@ -81,12 +81,6 @@ const AdminSettingsPage = () => {
     navigate('/signin');
   };
 
-  const themes: Array<{ key: AppThemePreference; label: string; description: string }> = [
-    { key: 'dark', label: 'Dark', description: 'A focused dark workspace.' },
-    { key: 'light', label: 'Light', description: 'A bright workspace for daytime use.' },
-    { key: 'system', label: 'System', description: 'Follow the administrator device theme.' },
-    { key: 'shift', label: 'Shift', description: 'Light during the day and dark overnight.' },
-  ];
   const toggleRows = [
     { label: 'Edge lighting', description: 'Show the selected lighting effect around the NowBar.', enabled: edgeLightEnabled, onClick: toggleEdgeLight },
     { label: 'Button color', description: 'Use the selected NowBar color on navigation buttons.', enabled: buttonColorEnabled, onClick: () => toggleNowBarSetting(BUTTON_COLOR_ENABLED_STORAGE_KEY, !buttonColorEnabled, setButtonColorEnabled, 'nowbar-button-color-changed') },
@@ -98,7 +92,7 @@ const AdminSettingsPage = () => {
     <button type="button" style={styles.back} onClick={() => navigate('/admin-home')}><ArrowLeft size={17} /> Admin dashboard</button>
     <h1 style={styles.title}>Admin settings</h1>
     <p style={styles.text}>Manage the administrator appearance, NowBar controls, and session.</p>
-    <section style={styles.card}><h2 style={styles.heading}>Appearance theme</h2><p style={styles.cardText}>The selected theme is applied immediately on this device.</p><div style={styles.list}>{themes.map((option) => <div key={option.key} style={styles.row}><div style={styles.content}><p style={styles.label}>{option.label}</p><p style={styles.description}>{option.description}</p></div><button type="button" style={{ ...styles.button, ...(themePreference === option.key ? styles.active : {}) }} onClick={() => setThemePreference(option.key)} aria-pressed={themePreference === option.key}>{themePreference === option.key ? 'Enabled' : 'Enable'}</button></div>)}</div></section>
+    <section style={styles.card}><h2 style={styles.heading}>Appearance</h2><p style={styles.cardText}>CryBots always uses its dark glass theme.</p></section>
     <section style={styles.card}><h2 style={styles.heading}>NowBar controls</h2><p style={styles.cardText}>Customize the administrator NowBar just like the user controls.</p><div style={styles.list}>{toggleRows.map((row) => <div key={row.label} style={styles.row}><div style={styles.content}><p style={styles.label}>{row.label}</p><p style={styles.description}>{row.description}</p></div><button type="button" style={{ ...styles.button, ...(row.enabled ? styles.active : {}) }} onClick={row.onClick} aria-pressed={row.enabled}>{row.enabled ? 'Enabled' : 'Enable'}</button></div>)}</div></section>
     <section style={styles.card}><h2 style={styles.heading}>Session</h2><p style={styles.cardText}>Sign out of the administrator account on this device.</p><button type="button" style={{ ...styles.button, ...styles.danger }} onClick={logout}><LogOut size={15} /> Log out</button></section>
   </div><NowBar admin /></main></HybridTheme>;
