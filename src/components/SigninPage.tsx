@@ -22,6 +22,14 @@ const ACCOUNT_HINT_KEY = 'kingshall_account_hint';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const getSavedBrowserAccounts = () => {
   let accounts: string[] = [];
+  let removed: string[] = [];
+  const removedCookie = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith('kh_removed_accounts='));
+  if (removedCookie) {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(removedCookie.slice('kh_removed_accounts='.length)));
+      if (Array.isArray(parsed)) removed = parsed.filter((item): item is string => typeof item === 'string').map(item => item.trim().toLowerCase());
+    } catch {}
+  }
   const cookie = document.cookie.split(';').map(part => part.trim()).find(part => part.startsWith('kh_saved_accounts='));
   if (cookie) {
     try {
@@ -31,7 +39,7 @@ const getSavedBrowserAccounts = () => {
   }
   const hint = getBrowserAccountHint();
   if (hint) accounts.push(hint);
-  return [...new Set(accounts)].slice(0, 10);
+  return [...new Set(accounts)].filter(email => !removed.includes(email)).slice(0, 10);
 };
 const setSelectedBrowserAccount = (email: string) => {
   const selected = email.trim().toLowerCase();
