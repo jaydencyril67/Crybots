@@ -132,6 +132,53 @@ const AlertPage = () => {
     setPushPermission('granted');
   };
 
+  const decodeVapidKey = (value: string): Uint8Array => {
+    const padded = value + '='.repeat((4 - value.length % 4) % 4);
+    const raw = window.atob(padded.replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from(raw, char => char.charCodeAt(0));
+  };
+
+  const registerWebPush = async () => {
+    if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      setPushPermission('unsupported');
+      throw new Error('Browser push is not supported here. Try a supported browser or the installed CryBots PWA.');
+    }
+    let permission = Notification.permission;
+    if (permission !== 'granted') permission = await Notification.requestPermission();
+    setPushPermission(permission);
+    if (permission !== 'granted') throw new Error('Allow browser notifications to enable CryBots push alerts.');
+
+    const keyResponse = await api.get<{ publicKey?: string | null; configured?: boolean }>('/api/notifications/web-push-key');
+    const publicKey = keyResponse.data.publicKey;
+    if (!publicKey || keyResponse.data.configured !== true) {
+      throw new Error('CryBots browser push needs the VAPID public and private keys configured on the API first.');
+    }
+
+    const registration = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    let subscription = await registration.pushManager.getSubscription();
+    if (!subscription) {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: decodeVapidKey(publicKey),
+      });
+    }
+    await api.post('/api/notifications/web-push-subscription', { subscription: subscription.toJSON() });
+    window.localStorage.setItem('crybots_web_push_endpoint', subscription.endpoint);
+  };
+
+  const unregisterWebPush = async () => {
+    const registration = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration('/') : undefined;
+    const subscription = await registration?.pushManager.getSubscription();
+    const endpoint = subscription?.endpoint || window.localStorage.getItem('crybots_web_push_endpoint');
+    try {
+      if (endpoint) await api.delete('/api/notifications/web-push-subscription', { data: { endpoint } });
+    } finally {
+      if (subscription) await subscription.unsubscribe().catch(() => false);
+      window.localStorage.removeItem('crybots_web_push_endpoint');
+    }
+  };
+
   const requestPushPermission = async () => {
     if (isNativeAndroid) {
       try {
@@ -142,17 +189,13 @@ const AlertPage = () => {
         return false;
       }
     }
-    if (!('Notification' in window)) {
-      setPushPermission('unsupported');
-      setError('Push notifications are not supported by this browser.');
+    try {
+      await registerWebPush();
+      return true;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Unable to enable browser push alerts.');
       return false;
     }
-    const permission = await Notification.requestPermission();
-    setPushPermission(permission);
-    if (permission !== 'granted') {
-      setError('Allow browser notifications to receive push alerts on this device.');
-    }
-    return permission === 'granted';
   };
 
   const savePreference = async (key: keyof Preferences) => {
@@ -163,7 +206,7 @@ const AlertPage = () => {
     const nextPreferences = { ...preferences, [key]: !preferences[key] };
     setSavingKey(key);
 
-    if (key === 'push' && nextPreferences.push && (isNativeAndroid || pushPermission !== 'granted')) {
+    if (key === 'push' && nextPreferences.push) {
       const granted = await requestPushPermission();
       if (!granted) {
         setSavingKey(null);
@@ -175,11 +218,15 @@ const AlertPage = () => {
       const response = await api.patch<AlertPreferencesResponse>('/api/settings/alerts', nextPreferences);
       setPreferences({ ...defaultPreferences, ...response.data.preferences });
       window.localStorage.setItem('kingshall_alert_preferences', JSON.stringify(response.data.preferences));
-      if (key === 'push' && !nextPreferences.push && isNativeAndroid) {
-        const nativeToken = window.localStorage.getItem('crybots_native_push_token');
-        if (nativeToken) {
-          await api.delete('/api/notifications/native-push-token', { data: { token: nativeToken } }).catch(() => undefined);
-          window.localStorage.removeItem('crybots_native_push_token');
+      if (key === 'push' && !nextPreferences.push) {
+        if (isNativeAndroid) {
+          const nativeToken = window.localStorage.getItem('crybots_native_push_token');
+          if (nativeToken) {
+            await api.delete('/api/notifications/native-push-token', { data: { token: nativeToken } }).catch(() => undefined);
+            window.localStorage.removeItem('crybots_native_push_token');
+          }
+        } else {
+          await unregisterWebPush().catch(() => undefined);
         }
       }
       setSaved(true);
