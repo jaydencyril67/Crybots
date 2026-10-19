@@ -57,7 +57,6 @@ const faqSections: FAQSection[] = [
     items: [
       { question: 'How do I update my profile or preferences?', answer: 'Use Profile for personal details and Manage or Options for account preferences. Some sensitive changes may require your security code or an email verification code.' },
       { question: 'How do I disable or self-exclude my account?', answer: 'Open Danger from your account area. Disable temporarily restricts access, while self-exclusion is a stronger account-safety action. Read the warnings carefully because these actions can affect access to your account.' },
-      { question: 'Can I delete my account?', answer: 'Yes, the account deletion option is available under Danger. Deletion is a serious action; confirm that you understand the consequences and keep any records you may need before proceeding.' },
       { question: 'How do I contact support?', answer: 'Open Help to find the available support options. Include your account email, transaction ID or blockchain hash, and a clear description of the issue. Never include your private key or one-time security code.' },
       { question: 'How do notifications and alerts work?', answer: 'Notifications keep you informed about account and transaction events. Alert Settings lets you control supported alerts so you can respond quickly to important activity.' },
     ],
