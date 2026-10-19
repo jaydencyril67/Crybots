@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { notifyAuthChanged } from '../utils/notificationEvents';
 import { Helmet } from 'react-helmet-async';
 import { ShieldCheck, LoaderCircle, KeyRound, Fingerprint } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
@@ -12,6 +13,8 @@ import { authenticateWithPasskey } from '../utils/webauthn';
 
 type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email?: string; username?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string };
 type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; message?: string; requiresExtraSecurity?: boolean; challengeToken?: string; methods?: Array<'2fa' | 'biometric'> };
+type ExternalLoginStart = { requestId: string; loginCode: string; qrToken: string; expiresAt: string; appName: 'CryBots' | 'HallsChat'; deviceLabel: string };
+type ExternalLoginStatus = SessionResponse & { status?: string };
 type NativeKingsHallAccountPlugin = { chooseAccount(): Promise<{ email?: string; cancelled?: boolean }> };
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
@@ -71,6 +74,8 @@ const SigninPage = () => {
   const [extraMethods, setExtraMethods] = useState<Array<'2fa' | 'biometric'>>([]);
   const [extraMethod, setExtraMethod] = useState<'2fa' | 'biometric' | ''>('');
   const [extraCode, setExtraCode] = useState('');
+  const [externalLogin, setExternalLogin] = useState<ExternalLoginStart | null>(null);
+  const [externalLoginBusy, setExternalLoginBusy] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -209,6 +214,84 @@ const SigninPage = () => {
     setIdentity(''); setAccessCode(''); setAccountDetected(false); setError(''); setNotice('');
     setChallengeToken(''); setExtraMethods([]); setExtraMethod(''); setExtraCode('');
   };
+
+  const startExternalLogin = async () => {
+    if (busy || externalLoginBusy) return;
+    setExternalLoginBusy(true); setError(''); setNotice('');
+    try {
+      const agent = navigator.userAgent;
+      const deviceLabel = /Windows/i.test(agent) ? 'Windows browser' : /Macintosh|Mac OS/i.test(agent) ? 'Mac browser' : /Android/i.test(agent) ? 'Android browser' : /iPhone|iPad/i.test(agent) ? 'Apple mobile browser' : 'External browser';
+      const { data } = await api.post<ExternalLoginStart>('/api/auth/kingshall/external/request', { deviceLabel });
+      setExternalLogin(data);
+      setNotice('');
+    } catch (e) {
+      setError(messageFromError(e, 'Unable to start external-device login.'));
+    } finally {
+      setExternalLoginBusy(false);
+    }
+  };
+
+  const cancelExternalLogin = async () => {
+    const request = externalLogin;
+    if (!request) return;
+    setExternalLogin(null);
+    setExternalLoginBusy(true);
+    setError('');
+    try {
+      await api.post('/api/auth/kingshall/external/cancel', { requestId: request.requestId });
+      setNotice('External-device login cancelled.');
+    } catch (e) {
+      setError(messageFromError(e, 'The external login request could not be cancelled.'));
+    } finally {
+      setExternalLoginBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!externalLogin?.requestId) return;
+    let stopped = false;
+    let timer: number | undefined;
+    const requestId = externalLogin.requestId;
+    const poll = async () => {
+      try {
+        const { data } = await api.post<ExternalLoginStatus>('/api/auth/kingshall/external/status', { requestId });
+        if (stopped) return;
+        if (data.status === 'authenticated') {
+          setExternalLogin(null);
+          if (data.requiresExtraSecurity && data.challengeToken && data.methods?.length) {
+            setIdentity(data.user?.email || '');
+            setAccountDetected(true);
+            setChallengeToken(data.challengeToken);
+            setExtraMethods(data.methods);
+            setExtraMethod(data.methods.length === 1 ? data.methods[0] : '');
+            setExtraCode('');
+            setNotice(data.methods.length > 1 ? 'Device approved. Complete one enabled CryBots security check to finish signing in.' : 'Device approved. Complete the enabled CryBots security check to finish signing in.');
+            return;
+          }
+          try { saveSession(data, data.user?.email || ''); }
+          catch (e) { setError((e as Error).message || 'The approved session could not be completed.'); }
+          return;
+        }
+        if (['denied', 'expired', 'consumed'].includes(String(data.status || ''))) {
+          setExternalLogin(null);
+          setError(data.status === 'denied' ? 'The external sign-in request was denied.' : 'The external sign-in request expired. Start again on this device.');
+          return;
+        }
+      } catch (e) {
+        if (stopped) return;
+        const status = (e as { response?: { status?: number } })?.response?.status;
+        if ([400, 401, 404, 409, 410, 423].includes(Number(status))) {
+          setExternalLogin(null);
+          setError(messageFromError(e, 'This external sign-in request is no longer valid.'));
+          return;
+        }
+      }
+      if (!stopped) timer = window.setTimeout(() => { void poll(); }, 1800);
+    };
+    timer = window.setTimeout(() => { void poll(); }, 1500);
+    return () => { stopped = true; if (timer !== undefined) window.clearTimeout(timer); };
+  }, [externalLogin?.requestId]);
+
   const glass: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' };
   const button: React.CSSProperties = { minHeight: 46, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '12px 18px', fontWeight: 750, display: 'inline-flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%', cursor: busy ? 'wait' : 'pointer', background: theme.surfaceGlass, color: theme.text, boxSizing: 'border-box', boxShadow: theme.mode === 'dark' ? 'inset 0 1px rgba(255,255,255,.13), 0 4px 14px rgba(0,0,0,.22)' : 'inset 0 1px rgba(255,255,255,.48), 0 4px 14px rgba(30,30,30,.10)', backdropFilter: 'blur(12px) saturate(125%)', WebkitBackdropFilter: 'blur(12px) saturate(125%)' };
   const input: React.CSSProperties = { width: '100%', minHeight: 48, boxSizing: 'border-box', borderRadius: 13, border: `1px solid ${theme.border}`, background: theme.surface, color: theme.text, padding: '12px 14px', fontSize: 15, outline: 'none' };
@@ -259,6 +342,26 @@ const SigninPage = () => {
             </div>}
             <button type="button" onClick={resetAccount} style={{ border: 0, background: 'transparent', color: theme.primary, padding: 8, fontWeight: 700, cursor: 'pointer' }}>Cancel request</button>
           </section>}
+          <div style={{ ...glass, borderRadius: 16, padding: 14, marginTop: 16, display: 'grid', gap: 10, textAlign: 'left' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 800 }}>Signing in on a device without KingsHall?</p>
+              <p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>Approve this device from your signed-in KingsHall account. No saved KingsHall account or Access Code is needed on this device.</p>
+            </div>
+            {!externalLogin && <button type="button" style={button} disabled={busy || externalLoginBusy || !!challengeToken} onClick={() => void startExternalLogin()}>{externalLoginBusy ? <LoadingDots /> : 'Use external-device login'}</button>}
+            {externalLogin && <>
+              <p style={{ margin: 0, color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>In KingsHall, open External Login and scan this QR code, or enter the code below. This request expires in five minutes.</p>
+              <div style={{ justifySelf: 'center', background: '#fff', padding: 10, borderRadius: 14 }}>
+                <QRCodeSVG value={JSON.stringify({ type: 'kingshall-external-login-v1', requestId: externalLogin.requestId, qrToken: externalLogin.qrToken, appName: 'CryBots' })} size={196} level="M" includeMargin />
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ margin: '3px 0 6px', color: theme.textMuted, fontSize: 12 }}>ONE-TIME LOGIN CODE</p>
+                <div aria-label={'One-time login code ' + externalLogin.loginCode} style={{ fontSize: 27, letterSpacing: '.2em', fontWeight: 900, overflowWrap: 'anywhere' }}>{externalLogin.loginCode}</div>
+                <p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: 11 }}>Expires {new Date(externalLogin.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              </div>
+              <p role="status" style={{ margin: 0, color: theme.textMuted, fontSize: 12 }}>Waiting for approval from KingsHall…</p>
+              <button type="button" style={{ ...button, background: 'transparent' }} disabled={externalLoginBusy} onClick={() => void cancelExternalLogin()}>Cancel external login</button>
+            </>}
+          </div>
           {notice && <p role="status" style={{ margin: '16px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{notice}</p>}
           {error && <p role="alert" style={{ margin: '16px 0 0', padding: '11px 13px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 13, lineHeight: 1.5 }}>{error}</p>}
           <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
