@@ -7,8 +7,9 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
+import VerificationBadge from './VerificationBadge';
 
-type TicketSummary = { id: string; subject: string; status: string; user?: { email?: string; firstName?: string; lastName?: string } };
+type TicketSummary = { id: string; subject: string; status: string; user?: { email?: string; firstName?: string; lastName?: string; verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected' } };
 
 type TicketResponse = { tickets: TicketSummary[] };
 
@@ -50,7 +51,7 @@ const AdminTicketsPage = () => {
             <h2 style={styles.title}>Admin Tickets</h2>
             <p style={styles.description}>Review and respond to users with open support tickets.</p>
           </section>
-          {error ? <NotificationBanner tone="error" title="Unable to load tickets" message={error} /> : loading ? <NotificationBanner title="Loading tickets" message="Loading open support tickets…" /> : tickets.length === 0 ? <NotificationBanner title="No open tickets" message="There are no open user tickets right now." /> : <div style={styles.cardGrid}>{tickets.map((ticket) => <article key={ticket.id} style={styles.card}><div><h3 style={styles.subject}>{ticket.subject}</h3><p style={styles.user}>{[ticket.user?.firstName, ticket.user?.lastName].filter(Boolean).join(' ') || ticket.user?.email || 'Unknown user'} · {ticket.status}</p></div><button type="button" style={styles.button} onClick={() => navigate(`/admin/ticket-stats/${ticket.id}`)}><Eye size={15} /> View</button></article>)}</div>}
+          {error ? <NotificationBanner tone="error" title="Unable to load tickets" message={error} /> : loading ? <NotificationBanner title="Loading tickets" message="Loading open support tickets…" /> : tickets.length === 0 ? <NotificationBanner title="No open tickets" message="There are no open user tickets right now." /> : <div style={styles.cardGrid}>{tickets.map((ticket) => <article key={ticket.id} style={styles.card}><div><h3 style={styles.subject}>{ticket.subject}</h3><p style={styles.user}>{[ticket.user?.firstName, ticket.user?.lastName].filter(Boolean).join(' ') || ticket.user?.email || 'Unknown user'} {ticket.user?.verificationStatus === 'verified' && <VerificationBadge size={16} />} · {ticket.status}</p></div><button type="button" style={styles.button} onClick={() => navigate(`/admin/ticket-stats/${ticket.id}`)}><Eye size={15} /> View</button></article>)}</div>}
         </div>
       </div>
       <NowBar admin />
