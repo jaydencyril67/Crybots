@@ -287,7 +287,7 @@
         100% { transform: translate3d(240%, 0, 0); }
       }
 
-      /* Keep clipboard-pasted and browser-autofilled fields aligned with the selected theme. */
+      /* Keep clipboard-pasted and browser-autofilled fields aligned with the dark theme. */
       html[data-theme='dark'] input:-webkit-autofill,
       html[data-theme='dark'] input:-webkit-autofill:hover,
       html[data-theme='dark'] input:-webkit-autofill:focus,
@@ -309,59 +309,20 @@
         color: #f4f4f4 !important;
         transition: background-color 999999s ease-out 0s !important;
       }
-      html:not([data-theme='dark']) input:-webkit-autofill,
-      html:not([data-theme='dark']) input:-webkit-autofill:hover,
-      html:not([data-theme='dark']) input:-webkit-autofill:focus,
-      html:not([data-theme='dark']) input:-webkit-autofill:active,
-      html:not([data-theme='dark']) textarea:-webkit-autofill,
-      html:not([data-theme='dark']) textarea:-webkit-autofill:hover,
-      html:not([data-theme='dark']) textarea:-webkit-autofill:focus,
-      html:not([data-theme='dark']) select:-webkit-autofill,
-      html:not([data-theme='dark']) select:-webkit-autofill:hover,
-      html:not([data-theme='dark']) select:-webkit-autofill:focus,
-      html:not([data-theme='dark']) input:autofill,
-      html:not([data-theme='dark']) textarea:autofill,
-      html:not([data-theme='dark']) select:autofill {
-        -webkit-text-fill-color: #151515 !important;
-        caret-color: #151515 !important;
-        -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
-        box-shadow: 0 0 0 1000px #ffffff inset !important;
-        background-color: #ffffff !important;
-        color: #151515 !important;
-        transition: background-color 999999s ease-out 0s !important;
-      }
-
     </style>
 
-    <!-- Set theme before the first paint to prevent the splash from flashing light. -->
+    <!-- Keep the app in its dark theme before the first paint. -->
     <script>
-      (() => {
-        const root = document.documentElement;
-        const preferenceKey = 'kingshall_app_theme_preference';
-        const legacyKey = 'kingshall_app_theme';
-        let preference = null;
-
-        try {
-          preference = localStorage.getItem(preferenceKey);
-          if (!preference) {
-            preference = localStorage.getItem(legacyKey);
-          }
-        } catch (error) {
-          // Use the dark default when storage is unavailable (for example, in private browsing).
-        }
-
-        let mode = preference === 'light' || preference === 'dark' ? preference : 'dark';
-        if (preference === 'system') {
-          mode = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-        } else if (preference === 'shift') {
-          const hour = new Date().getHours();
-          mode = hour >= 6 && hour < 18 ? 'light' : 'dark';
-        }
-
-        root.setAttribute('data-theme', mode);
-        root.style.colorScheme = mode;
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', mode === 'dark' ? '#000000' : '#e7e4de');
-      })();
+      const root = document.documentElement;
+      root.setAttribute('data-theme', 'dark');
+      root.style.colorScheme = 'dark';
+      try {
+        localStorage.setItem('kingshall_app_theme_preference', 'dark');
+        localStorage.setItem('kingshall_app_theme', 'dark');
+      } catch (error) {
+        // The app remains dark even when storage is unavailable.
+      }
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#000000');
 
       window.__kingshallRefreshSplash = performance.getEntriesByType('navigation')[0]?.type === 'reload';
 
