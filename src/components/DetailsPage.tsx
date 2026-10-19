@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import api from '../api/axios';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, Coins, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { subscribeBalance, syncBalanceFromBackend } from '../utils/balance';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
@@ -45,6 +45,7 @@ const baseStyles = {
 type ProfileDetails = {
   firstName?: string; lastName?: string; fullName?: string; name?: string; email?: string; username?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string;
   accountStatus?: 'active' | 'disabled' | 'self_excluded' | 'pending_delete';
+  verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected'; verifiedAt?: string | null;
   securityFunctions?: { emailConfirmed?: boolean; securityCode?: boolean; twoFactor?: boolean; passkey?: boolean };
 };
 type MeResponse = { user?: ProfileDetails };
@@ -119,7 +120,7 @@ const DetailsPage = () => {
                 </div>
               </div>
               <div style={styles.rowList}>
-                <div style={styles.row}><p style={styles.infoLabel}><UserRound size={16} /> Display name</p><div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : fullName}</div></div>
+                <div style={styles.row}><p style={styles.infoLabel}><UserRound size={16} /> Display name</p><div style={{ ...styles.infoValue, display: "flex", alignItems: "center", gap: 8 }}>{profileLoading ? <LoadingDots /> : fullName}{!profileLoading && profileDetails?.verificationStatus === "verified" && <span title="Verified by KingsHall" aria-label="Verified by KingsHall" style={{ display: "inline-flex", alignItems: "center", color: theme.primary }}><BadgeCheck size={18} /></span>}</div></div>
                 <div style={styles.row}><p style={styles.infoLabel}><Mail size={16} /> Email</p><div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : email}</div></div>
                 <div style={styles.row}><p style={styles.infoLabel}><ShieldCheck size={16} /> Account status</p><p style={styles.infoValue}>{profileLoading ? <LoadingDots /> : accountStatus}</p></div>
                 <div style={styles.row}><p style={styles.infoLabel}><ShieldCheck size={16} /> KingsHall username</p><div style={styles.infoValue}>{profileLoading ? <LoadingDots /> : username}</div></div>
