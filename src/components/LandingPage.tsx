@@ -72,7 +72,6 @@ const LandingPage = () => {
       <>
         <Helmet>
           <title>CryBots | Crypto Trading Bots</title>
-          <meta name="description" content="CryBots brings automated crypto strategies, bot tools, and digital asset management into one connected workspace." />
         </Helmet>
 
         <main style={{ minHeight: '100vh', background: theme.background, color: theme.text, overflow: 'hidden' }}>
