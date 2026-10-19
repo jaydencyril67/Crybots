@@ -8,6 +8,7 @@ import { useAppTheme } from './AppTheme';
 type UpdateCheckResponse = {
   updateAvailable: boolean;
   latestVersion?: string;
+  installedVersion?: string;
   tag?: string;
   downloadUrl?: string;
   releaseNotes?: string;
@@ -32,7 +33,7 @@ const AppUpdateMonitor = () => {
         params: { installedVersion: appInfo.versionName },
       });
       if (response.data?.updateAvailable && response.data.downloadUrl && response.data.latestVersion) {
-        setUpdate(response.data);
+        setUpdate({ ...response.data, installedVersion: appInfo.versionName });
         setHidden(false);
       } else {
         setUpdate(null);
@@ -127,7 +128,7 @@ const AppUpdateMonitor = () => {
       <div style={{ minWidth: 0 }}>
         <strong style={{ display: 'block', fontSize: '0.9rem', fontWeight: 900 }}>CryBots update available</strong>
         <p style={{ margin: '4px 0 0', color: theme.textMuted, fontSize: '0.8rem', lineHeight: 1.45 }}>
-          Version {update.latestVersion} is ready. Update without uninstalling your current app.
+          Latest APK available: v{update.latestVersion}. Currently installed: v{update.installedVersion || 'unknown'}. Update without uninstalling your current app.
         </p>
         {actionMessage ? <p style={{ margin: '7px 0 0', color: theme.primary, fontSize: '0.78rem', lineHeight: 1.45 }}>{actionMessage}</p> : null}
       </div>
