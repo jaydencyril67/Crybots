@@ -7,8 +7,9 @@ import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 import NowBar from './NowBar';
 import NotificationBanner from './NotificationBanner';
+import VerificationBadge from './VerificationBadge';
 
-type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string };
+type UserSummary = { _id: string; email: string; firstName?: string; lastName?: string; accountStatus?: string; verificationStatus?: 'none' | 'pending' | 'verified' | 'rejected' };
 type UserResponse = { users: UserSummary[]; pagination: { page: number; pages: number; total: number } };
 
 const getStyles = (theme: typeof HYBRID_THEME_TOKENS.dark) => ({
@@ -56,7 +57,7 @@ const AdminAlertPage = () => {
         <div style={styles.search}><Search size={18} color={theme.textMuted} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search users by email" aria-label="Search users by email" style={styles.input} /></div>
         {error ? <NotificationBanner tone="error" title="Unable to load users" message={error} /> : loading ? <NotificationBanner title="Loading users" message="Loading registered user accounts…" /> : <div style={styles.cardGrid}>
           <article style={styles.card}><div><h3 style={styles.title}>Everyone</h3><p style={styles.subtext}>Send to every user in the database</p></div><button type="button" onClick={() => navigate('/admin/alert/send/all')} style={styles.button}><Send size={15} /> Send</button></article>
-          {users.map((user) => <article key={user._id} style={styles.card}><div><h3 style={styles.title}>{user.email}</h3><p style={styles.subtext}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/alert/send/${user._id}`)} style={styles.button}><Send size={15} /> Send</button></article>)}
+          {users.map((user) => <article key={user._id} style={styles.card}><div><h3 style={styles.title}>{user.email}</h3><p style={styles.subtext}>{[user.firstName, user.lastName].filter(Boolean).join(' ') || 'No name'} {user.verificationStatus === 'verified' && <VerificationBadge size={16} />} · {user.accountStatus || 'active'}</p></div><button type="button" onClick={() => navigate(`/admin/alert/send/${user._id}`)} style={styles.button}><Send size={15} /> Send</button></article>)}
         </div>}
       </section>
     </div></div><NowBar admin /></div>
