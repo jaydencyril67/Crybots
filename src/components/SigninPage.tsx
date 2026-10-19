@@ -76,6 +76,8 @@ const SigninPage = () => {
   const [extraCode, setExtraCode] = useState('');
   const [externalLogin, setExternalLogin] = useState<ExternalLoginStart | null>(null);
   const [externalLoginBusy, setExternalLoginBusy] = useState(false);
+  const [externalNotice, setExternalNotice] = useState('');
+  const [externalError, setExternalError] = useState('');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -217,15 +219,15 @@ const SigninPage = () => {
 
   const startExternalLogin = async () => {
     if (busy || externalLoginBusy) return;
-    setExternalLoginBusy(true); setError(''); setNotice('');
+    setExternalLoginBusy(true); setExternalError(''); setExternalNotice('');
     try {
       const agent = navigator.userAgent;
       const deviceLabel = /Windows/i.test(agent) ? 'Windows browser' : /Macintosh|Mac OS/i.test(agent) ? 'Mac browser' : /Android/i.test(agent) ? 'Android browser' : /iPhone|iPad/i.test(agent) ? 'Apple mobile browser' : 'External browser';
       const { data } = await api.post<ExternalLoginStart>('/api/auth/kingshall/external/request', { deviceLabel });
       setExternalLogin(data);
-      setNotice('');
+      setExternalNotice('');
     } catch (e) {
-      setError(messageFromError(e, 'Unable to start external-device login.'));
+      setExternalError(messageFromError(e, 'Unable to start external-device login.'));
     } finally {
       setExternalLoginBusy(false);
     }
@@ -236,12 +238,12 @@ const SigninPage = () => {
     if (!request) return;
     setExternalLogin(null);
     setExternalLoginBusy(true);
-    setError('');
+    setExternalError('');
     try {
       await api.post('/api/auth/kingshall/external/cancel', { requestId: request.requestId });
-      setNotice('External-device login cancelled.');
+      setExternalNotice('External-device login cancelled.');
     } catch (e) {
-      setError(messageFromError(e, 'The external login request could not be cancelled.'));
+      setExternalError(messageFromError(e, 'The external login request could not be cancelled.'));
     } finally {
       setExternalLoginBusy(false);
     }
@@ -268,16 +270,16 @@ const SigninPage = () => {
             setExtraMethods(data.methods);
             setExtraMethod(data.methods.length === 1 ? data.methods[0] : '');
             setExtraCode('');
-            setNotice(data.methods.length > 1 ? 'Device approved. Complete one enabled CryBots security check to finish signing in.' : 'Device approved. Complete the enabled CryBots security check to finish signing in.');
+            setExternalNotice(data.methods.length > 1 ? 'Device approved. Complete one enabled CryBots security check to finish signing in.' : 'Device approved. Complete the enabled CryBots security check to finish signing in.');
             return;
           }
           try { externalAuthCallbacksRef.current.saveSession(data, data.user?.email || ''); }
-          catch (e) { setError((e as Error).message || 'The approved session could not be completed.'); }
+          catch (e) { setExternalError((e as Error).message || 'The approved session could not be completed.'); }
           return;
         }
         if (['denied', 'expired', 'consumed'].includes(String(data.status || ''))) {
           setExternalLogin(null);
-          setError(data.status === 'denied' ? 'The external sign-in request was denied.' : 'The external sign-in request expired. Start again on this device.');
+          setExternalError(data.status === 'denied' ? 'The external sign-in request was denied.' : 'The external sign-in request expired. Start again on this device.');
           return;
         }
       } catch (e) {
@@ -285,7 +287,7 @@ const SigninPage = () => {
         const status = (e as { response?: { status?: number } })?.response?.status;
         if ([400, 401, 404, 409, 410, 423].includes(Number(status))) {
           setExternalLogin(null);
-          setError(externalAuthCallbacksRef.current.messageFromError(e, 'This external sign-in request is no longer valid.'));
+          setExternalError(externalAuthCallbacksRef.current.messageFromError(e, 'This external sign-in request is no longer valid.'));
           return;
         }
       }
@@ -356,6 +358,8 @@ const SigninPage = () => {
               <p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>Approve this device from your signed-in KingsHall account. No saved KingsHall account or Access Code is needed on this device.</p>
             </div>
             {!externalLogin && <button type="button" style={button} disabled={busy || externalLoginBusy || !!challengeToken} onClick={() => void startExternalLogin()}>{externalLoginBusy ? <LoadingDots /> : 'Use external-device login'}</button>}
+            {externalNotice && <p role="status" style={{ margin: 0, padding: '10px 12px', borderRadius: 12, border: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>{externalNotice}</p>}
+            {externalError && <p role="alert" style={{ margin: 0, padding: '10px 12px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 12, lineHeight: 1.5 }}>{externalError}</p>}
             {externalLogin && <>
               <p style={{ margin: 0, color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>In KingsHall, open External Login and scan this QR code, or enter the code below. This request expires in five minutes.</p>
               <div style={{ justifySelf: 'center', background: '#fff', padding: 10, borderRadius: 14 }}>
