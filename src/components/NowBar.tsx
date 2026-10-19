@@ -733,8 +733,12 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                 }}
                 style={{
                   ...styles.button,
-                  ...(buttonColorEnabled ? { borderColor: buttonColor } : {}),
                   ...(isExpanded ? styles.buttonExpanded : {}),
+                  ...(buttonColorEnabled ? {
+                    borderColor: buttonColor,
+                    borderWidth: '1.5px',
+                    boxShadow: `0 0 0 1px ${buttonColor}66, 0 0 10px ${buttonColor}55, inset 0 0 5px ${buttonColor}1f`,
+                  } : {}),
                 }}
               >
                 <span style={styles.iconOnly}>{action.icon || <CircleUserRound style={styles.icon} />}</span>
