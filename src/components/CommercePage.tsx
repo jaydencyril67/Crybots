@@ -5,6 +5,7 @@ import api from '../api/axios';
 import { navigate } from '../utils/navigate';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
+import VerificationBadge from './VerificationBadge';
 import NotificationBanner from './NotificationBanner';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
@@ -22,6 +23,7 @@ type CommerceBot = {
   retainerAmount?: number;
   price?: number;
   sellerName?: string;
+  sellerVerificationStatus?: 'none' | 'pending' | 'verified' | 'rejected';
   sellerId?: string;
   isOwner?: boolean;
   active?: boolean;
@@ -171,7 +173,7 @@ const CommercePage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <h3 style={{ margin: 0, fontSize: '0.94rem', fontWeight: 850, overflowWrap: 'anywhere' }}>{bot.name}</h3>
-            <small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.sellerName ? `Listed by ${bot.sellerName}` : 'Listed by —'}</small>
+            <small style={{ color: theme.textMuted, overflowWrap: 'anywhere' }}>{bot.sellerName ? <>Listed by {bot.sellerName} {bot.sellerVerificationStatus === 'verified' && <VerificationBadge size={14} />}</> : 'Listed by —'}</small>
           </div>
           <button type="button" onClick={() => setExpandedBotId((current) => current === botId ? '' : botId)} style={{ flexShrink: 0, border: `1px solid ${theme.borderGlass}`, borderRadius: 999, padding: '7px 12px', background: theme.surfaceMuted, color: theme.primary, fontWeight: 800, fontSize: '0.78rem', cursor: 'pointer' }}>
             {expanded ? 'Hide' : 'View'}
