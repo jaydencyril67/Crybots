@@ -345,27 +345,10 @@ const SigninPage = () => {
             </div>}
             <button type="button" onClick={resetAccount} style={{ border: 0, background: 'transparent', color: theme.primary, padding: 8, fontWeight: 700, cursor: 'pointer' }}>Cancel request</button>
           </section>}
-          <div style={{ ...glass, borderRadius: 16, padding: 14, marginTop: 16, display: 'grid', gap: 10, textAlign: 'left' }}>
-            <div>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 800 }}>Signing in on a device without KingsHall?</p>
-              <p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>Approve this device from your signed-in KingsHall account. No saved KingsHall account or Access Code is needed on this device.</p>
-            </div>
-            {!externalLogin && <button type="button" style={button} disabled={busy || externalLoginBusy || !!challengeToken} onClick={() => void startExternalLogin()}>{externalLoginBusy ? <LoadingDots /> : 'Use external-device login'}</button>}
-            {externalLogin && <>
-              <p style={{ margin: 0, color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>In KingsHall, open External Login and scan this QR code, or enter the code below. This request expires in five minutes.</p>
-              <div style={{ justifySelf: 'center', background: '#fff', padding: 10, borderRadius: 14 }}>
-                <QRCodeSVG value={JSON.stringify({ type: 'kingshall-external-login-v1', requestId: externalLogin.requestId, qrToken: externalLogin.qrToken, appName: 'CryBots' })} size={196} level="M" includeMargin />
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ margin: '3px 0 6px', color: theme.textMuted, fontSize: 12 }}>ONE-TIME LOGIN CODE</p>
-                <div aria-label={'One-time login code ' + externalLogin.loginCode} style={{ fontSize: 27, letterSpacing: '.2em', fontWeight: 900, overflowWrap: 'anywhere' }}>{externalLogin.loginCode}</div>
-                <p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: 11 }}>Expires {new Date(externalLogin.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-              </div>
-              <p role="status" style={{ margin: 0, color: theme.textMuted, fontSize: 12 }}>Waiting for approval from KingsHall…</p>
-              <button type="button" style={{ ...button, background: 'transparent' }} disabled={externalLoginBusy} onClick={() => void cancelExternalLogin()}>Cancel external login</button>
-            </>}
+          <div style={{ marginTop: 18, display: 'grid', gap: 8 }}>
+            <button type="button" style={button} disabled={busy || externalLoginBusy || !!challengeToken} onClick={() => void startExternalLogin()}>{externalLoginBusy ? <LoadingDots /> : "Use external-device login"}</button>
           </div>
-          {notice && <p role="status" style={{ margin: '16px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{notice}</p>}
+          {external}          {notice && <p role="status" style={{ margin: '16px 0 0', color: theme.textMuted, fontSize: 13, lineHeight: 1.6 }}>{notice}</p>}
           {error && <p role="alert" style={{ margin: '16px 0 0', padding: '11px 13px', borderRadius: 12, background: 'rgba(220,60,60,.10)', border: '1px solid rgba(220,80,80,.28)', color: theme.text, fontSize: 13, lineHeight: 1.5 }}>{error}</p>}
           <p style={{ margin: '22px 0 0', paddingTop: 14, borderTop: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>KingsHall verifies your Access Code. CryBots never stores it.</p>
           <div style={{ marginTop: 14, color: theme.textMuted, fontSize: 12, lineHeight: 1.6 }}>Need an account? <a href={KINGSHALL_SIGNIN} style={{ color: theme.primary, fontWeight: 700, textDecoration: 'none' }}>Create or recover access in KingsHall</a></div>
