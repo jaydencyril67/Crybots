@@ -3,12 +3,11 @@ import { ArrowLeft } from 'lucide-react';
 import HybridTheme, { createHybridCardStyles, HYBRID_THEME_TOKENS } from './HybridTheme';
 import NowBar from './NowBar';
 import api, { forceLogout } from '../api/axios';
-import { navigate } from '../utils/navigate';
 import { useAppTheme } from './AppTheme';
 import LoadingDots from './LoadingDots';
 import NotificationBanner from './NotificationBanner';
 
-type DangerActionKey = 'disable' | 'self-exclude' | 'delete';
+type DangerActionKey = 'disable' | 'self-exclude';
 
 type DangerActionState = {
   securityCode: string;
@@ -145,7 +144,6 @@ const DangerPage = () => {
 
   const [disable, setDisable] = useState<DangerActionState>({ securityCode: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
   const [selfExclude, setSelfExclude] = useState<DangerActionState>({ securityCode: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
-  const [remove, setRemove] = useState<DangerActionState>({ securityCode: '', confirmation: '', reason: '', durationDays: '', status: '', statusTone: 'error', loading: null });
 
   const submitAction = async (
     action: DangerActionKey,
@@ -175,30 +173,6 @@ const DangerPage = () => {
       setState((current) => ({ ...current, status: message, statusTone: 'error' }));
     } finally {
       setState((current) => ({ ...current, loading: null }));
-    }
-  };
-
-  const confirmDeleteAccount = async () => {
-    setRemove((current) => ({ ...current, loading: 'delete', status: '', statusTone: 'error' }));
-
-    try {
-      const headers = { Authorization: `Bearer ${window.localStorage.getItem('token') || ''}` };
-      await api.delete('/api/settings/danger/delete', {
-        headers,
-        data: { securityCode: remove.securityCode, confirmation: remove.confirmation, reason: remove.reason },
-      });
-      window.localStorage.removeItem('token');
-      window.localStorage.removeItem('user');
-      window.localStorage.removeItem('kingshall_user');
-      window.localStorage.removeItem('firstName');
-      window.localStorage.removeItem('kingshall_first_name');
-      window.dispatchEvent(new Event('ke:force-logout'));
-      navigate('/');
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to complete the action.';
-      setRemove((current) => ({ ...current, status: message, statusTone: 'error' }));
-    } finally {
-      setRemove((current) => ({ ...current, loading: null }));
     }
   };
 
@@ -257,29 +231,6 @@ const DangerPage = () => {
               </div>
               {selfExclude.status ? <NotificationBanner tone={selfExclude.statusTone} title={selfExclude.statusTone === 'success' ? 'Action completed' : 'Action required'} message={selfExclude.status} /> : null}
                   </section>
-              </div>
-
-              <div style={styles.outerCard}>
-                <section style={styles.dangerRow}>
-              <h3 style={styles.actionTitle}>Delete Account</h3>
-              <p style={styles.actionText}>This starts a 30-day deletion countdown. Sign-in will be blocked while your account is pending deletion.</p>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-delete-security-code">Security Code</label>
-                <input id="danger-delete-security-code" style={styles.input} type="password" inputMode="numeric" maxLength={6} value={remove.securityCode} onChange={(event) => setRemove((current) => ({ ...current, securityCode: event.target.value.replace(/\D/g, '').slice(0, 6) }))} />
-              </div>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-delete-confirmation">Confirmation</label>
-                <input id="danger-delete-confirmation" style={styles.input} value={remove.confirmation} onChange={(event) => setRemove((current) => ({ ...current, confirmation: event.target.value }))} placeholder="DELETE" />
-              </div>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="danger-delete-reason">Reason</label>
-                <input id="danger-delete-reason" style={styles.input} value={remove.reason} onChange={(event) => setRemove((current) => ({ ...current, reason: event.target.value }))} placeholder="Optional reason for deleting" />
-              </div>
-              <div style={styles.buttonRow}>
-                <button type="button" style={styles.actionButton} onClick={confirmDeleteAccount} disabled={remove.loading !== null}>{remove.loading === 'delete' ? <LoadingDots /> : 'Delete Account'}</button>
-              </div>
-              {remove.status ? <NotificationBanner tone={remove.statusTone} title={remove.statusTone === 'success' ? 'Action completed' : 'Action required'} message={remove.status} /> : null}
-                </section>
               </div>
             </div>
         </div>
