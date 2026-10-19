@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import api from '../api/axios';
 import { notifyAuthChanged } from '../utils/notificationEvents';
@@ -247,6 +247,9 @@ const SigninPage = () => {
     }
   };
 
+  const externalAuthCallbacksRef = useRef({ saveSession, messageFromError });
+  externalAuthCallbacksRef.current = { saveSession, messageFromError };
+
   useEffect(() => {
     if (!externalLogin?.requestId) return;
     let stopped = false;
@@ -268,7 +271,7 @@ const SigninPage = () => {
             setNotice(data.methods.length > 1 ? 'Device approved. Complete one enabled CryBots security check to finish signing in.' : 'Device approved. Complete the enabled CryBots security check to finish signing in.');
             return;
           }
-          try { saveSession(data, data.user?.email || ''); }
+          try { externalAuthCallbacksRef.current.saveSession(data, data.user?.email || ''); }
           catch (e) { setError((e as Error).message || 'The approved session could not be completed.'); }
           return;
         }
@@ -282,7 +285,7 @@ const SigninPage = () => {
         const status = (e as { response?: { status?: number } })?.response?.status;
         if ([400, 401, 404, 409, 410, 423].includes(Number(status))) {
           setExternalLogin(null);
-          setError(messageFromError(e, 'This external sign-in request is no longer valid.'));
+          setError(externalAuthCallbacksRef.current.messageFromError(e, 'This external sign-in request is no longer valid.'));
           return;
         }
       }
