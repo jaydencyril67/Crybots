@@ -100,13 +100,13 @@ const BotInvestmentsPage = () => {
       fontSize: '0.84rem',
     },
     card: {
-      padding: '16px',
-      borderRadius: '22px',
+      padding: '11px 12px',
+      borderRadius: '18px',
       border: `1px solid ${theme.borderGlass}`,
       background: theme.surfaceGlass,
       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
       display: 'grid',
-      gap: '14px',
+      gap: '10px',
       boxSizing: 'border-box' as const,
     },
     row: {
@@ -541,11 +541,11 @@ const BotInvestmentsPage = () => {
                                   setMessage('');
                                 }}
                               >
-                                {busyBotId === bot.botId ? <LoadingDots /> : <><PlayCircle size={15} /> Activate Bot</>}
+                                {busyBotId === bot.botId ? <LoadingDots /> : 'Activate'}
                               </button>
                               {bot.source === 'owned' && Number(bot.efficiency || 0) < 100 && (
                                 <button type="button" style={{ ...styles.button, ...styles.mutedButton }} disabled={busyBotId === bot.botId} onClick={() => void openRecharge(bot)}>
-                                  {busyBotId === bot.botId ? <LoadingDots /> : <><BatteryCharging size={15} /> Recharge Efficiency</>}
+                                  {busyBotId === bot.botId ? <LoadingDots /> : 'Recharge'}
                                 </button>
                               )}
                               </div>
