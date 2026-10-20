@@ -1196,10 +1196,10 @@ jobs:
 
             // Android 11 and below: keep the 92px circle and center the 1.3x artwork image.
             const legacyArtwork = await sharp(artwork).resize(legacyArtworkPx, legacyArtworkPx).png().toBuffer();
-            await sharp({ create: { width: legacyHolderPx, height: legacyHolderPx, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+            await sharp({ create: { width: legacyArtworkPx, height: legacyArtworkPx, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
               .composite([
-                { input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="92" height="92"><circle cx="46" cy="46" r="46" fill="#000000"/></svg>'), left: 0, top: 0 },
-                { input: legacyArtwork, left: Math.round((legacyHolderPx - legacyArtworkPx) / 2), top: Math.round((legacyHolderPx - legacyArtworkPx) / 2) }
+                { input: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="94" height="94"><circle cx="47" cy="47" r="46" fill="#000000"/></svg>'), left: 0, top: 0 },
+                { input: legacyArtwork, left: 0, top: 0 }
               ])
               .png().toFile('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png');
 
@@ -1219,10 +1219,10 @@ jobs:
 
             const audit = await sharp('android/app/src/main/res/drawable-nodpi/crybots_splash_logo.png').ensureAlpha().raw().toBuffer({ resolveWithObject: true });
             const alphaAt = (x, y) => audit.data[(y * audit.info.width + x) * audit.info.channels + 3];
-            if (audit.info.width !== 92 || audit.info.height !== 92 || alphaAt(0, 0) !== 0 || alphaAt(46, 2) === 0 || alphaAt(46, 46) === 0) {
-              throw new Error('CryBots 92px splash composition failed validation.');
+            if (audit.info.width !== 94 || audit.info.height !== 94 || alphaAt(0, 0) !== 0 || alphaAt(47, 2) === 0 || alphaAt(47, 47) === 0) {
+              throw new Error('CryBots 94px artwork canvas / 92px circle splash composition failed validation.');
             }
-            console.log('Created and validated CryBots splash: unchanged 92px circle holder + 1.3x orbital artwork on all Android versions.');
+            console.log('Created and validated CryBots splash: 92px circle holder + 94px orbital artwork on legacy Android; 164px holder + 167px artwork on Android 12+.');
           })().catch(error => { console.error(error); process.exit(1); });
           NODE
 
@@ -1231,8 +1231,8 @@ jobs:
           <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
               <item android:drawable="@color/crybots_splash_background" />
               <item
-                  android:width="92dp"
-                  android:height="92dp"
+                  android:width="94dp"
+                  android:height="94dp"
                   android:gravity="center"
                   android:drawable="@drawable/crybots_splash_logo" />
               <item
