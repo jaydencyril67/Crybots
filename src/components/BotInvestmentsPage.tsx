@@ -446,11 +446,11 @@ const BotInvestmentsPage = () => {
                                 padding: '5px 9px',
                                 fontSize: '0.7rem',
                                 fontWeight: 850,
-                                background: lifecycleStatus === 'active' ? theme.success : theme.surfaceGlass,
-                                color: lifecycleStatus === 'active' ? theme.textInverse : theme.textMuted,
+                                background: lifecycleStatus === 'active' ? theme.success : bot.rechargeStatus === 'recharging' ? theme.primary : theme.surfaceGlass,
+                                color: lifecycleStatus === 'active' || bot.rechargeStatus === 'recharging' ? theme.textInverse : theme.textMuted,
                                 flexShrink: 0,
                               }}>
-                                {lifecycleStatus === 'active' ? 'ACTIVE' : lifecycleStatus === 'activating' ? 'ACTIVATING' : lifecycleStatus === 'deactivating' ? 'DEACTIVATING' : 'READY'}
+                                {bot.rechargeStatus === 'recharging' ? 'RECHARGING' : lifecycleStatus === 'active' ? 'ACTIVE' : lifecycleStatus === 'activating' ? 'ACTIVATING' : lifecycleStatus === 'deactivating' ? 'DEACTIVATING' : 'READY'}
                               </span>
                             </div>
 
