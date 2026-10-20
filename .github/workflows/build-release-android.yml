@@ -1113,6 +1113,7 @@ jobs:
 
           permissions = [
               "android.permission.INTERNET",
+              "android.permission.CAMERA",
               "android.permission.READ_MEDIA_IMAGES",
               "android.permission.READ_EXTERNAL_STORAGE",
               "android.permission.RECORD_AUDIO",
@@ -1142,6 +1143,23 @@ jobs:
 
       - name: Sync Capacitor
         run: npx cap sync android
+
+      - name: Ensure Android QR scanner camera permission
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("android/app/src/main/AndroidManifest.xml")
+          text = path.read_text(encoding="utf-8")
+          permission = 'android.permission.CAMERA'
+          if f'android:name="{permission}"' not in text:
+              text = text.replace('</manifest>', f'    <uses-permission android:name="{permission}" />\\n</manifest>', 1)
+          if f'android:name="{permission}"' not in text:
+              raise SystemExit('AndroidManifest.xml is missing CAMERA permission after Capacitor sync')
+          path.write_text(text, encoding="utf-8")
+          print('Verified CAMERA permission in the final Android manifest. Capacitor BridgeWebChromeClient handles the runtime permission prompt for WebView camera access.')
+          PY
 
       - name: Match CryBots APK launcher icons to the PWA master icon
         env:
