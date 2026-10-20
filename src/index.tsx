@@ -106,6 +106,7 @@ const InitialSplashCleanup = () => {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       document.getElementById('initial-splash')?.remove();
+      document.getElementById('seo-fallback')?.remove();
     }, 3000);
 
     return () => window.clearTimeout(timer);
