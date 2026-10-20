@@ -236,6 +236,31 @@
         text-transform: uppercase;
       }
 
+      .seo-fallback,
+      .seo-noscript {
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        box-sizing: border-box;
+        display: grid;
+        align-content: center;
+        gap: 14px;
+        overflow: auto;
+        padding: 28px max(20px, calc((100vw - 760px) / 2));
+        background: #050817;
+        color: #f4f4f4;
+        font-family: "STIX Two Text", serif;
+        line-height: 1.7;
+      }
+      .seo-fallback h1,
+      .seo-noscript h1 { margin: 0; font-size: clamp(26px, 5vw, 40px); line-height: 1.15; }
+      .seo-fallback p,
+      .seo-noscript p { margin: 0; max-width: 720px; color: #c6cad4; }
+      .seo-fallback nav,
+      .seo-noscript nav { display: flex; flex-wrap: wrap; gap: 14px; }
+      .seo-fallback a,
+      .seo-noscript a { color: #f4f4f4; text-underline-offset: 3px; }
+      .seo-noscript { z-index: 10002; }
       .initial-splash-powered {
         position: fixed;
         left: 0;
@@ -352,7 +377,7 @@
 
     <!-- 🐦 Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CryBots" />
+    <meta name="twitter:title" content="CryBots | Crypto Trading Bots" />
     <meta name="twitter:description" content="Explore CryBots tools for automated trading strategies, bot discovery, portfolio tracking, and crypto market activity." />
     <meta name="twitter:image" content="%PUBLIC_URL%/icons/crybots-app-icon.svg?v=7" />
 
@@ -377,7 +402,19 @@
     <!-- End TrustBox script -->
   </head>
   <body style="margin: 0; overflow-x: hidden;">
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <main class="seo-noscript">
+        <h1>CryBots — Crypto trading tools</h1>
+        <p>CryBots brings together tools for discovering automated bot strategies, reviewing portfolio activity, and managing supported digital assets in one workspace.</p>
+        <p>Cryptocurrency markets are volatile. Automated strategies can lose money, and no strategy or platform can guarantee profits. Interface portfolio figures are illustrative only and do not represent live account data or promised returns.</p>
+        <nav aria-label="CryBots public information">
+          <a href="/about">About CryBots</a>
+          <a href="/information">Platform information</a>
+          <a href="/privacy-policy">Privacy policy</a>
+          <a href="/community-standards">Community standards</a>
+        </nav>
+      </main>
+    </noscript>
     <div id="initial-splash" class="initial-splash" aria-label="Loading CryBots">
       <div class="initial-splash-card">
         <div class="initial-splash-logo-circle"><img class="initial-splash-logo" src="%PUBLIC_URL%/icons/ke-foreground.svg?v=1" alt="CryBots" /></div>
@@ -386,6 +423,27 @@
       </div>
       <p class="initial-splash-powered">Powered by KingsHall</p>
     </div>
+    <main id="seo-fallback" class="seo-fallback" aria-label="CryBots platform overview">
+      <h1>CryBots — Crypto trading tools</h1>
+      <p>CryBots brings together tools for discovering automated bot strategies, reviewing portfolio activity, and managing supported digital assets in one workspace. The dashboard is designed to help users understand and organise their activity; strategy availability and results depend on the tools used and changing market conditions.</p>
+      <p><strong>Risk notice:</strong> Cryptocurrency markets are volatile. Automated strategies can lose money, and no strategy or platform can guarantee profits. Portfolio values and percentage changes shown in the interface preview are illustrative only, not live account data or a promise of future performance.</p>
+      <nav aria-label="CryBots public information">
+        <a href="/about">About CryBots</a>
+        <a href="/information">Platform information</a>
+        <a href="/privacy-policy">Privacy policy</a>
+        <a href="/community-standards">Community standards</a>
+      </nav>
+    </main>
     <div id="root" style="min-height: 100vh;"></div>
+    <script>
+      // If the application bundle fails to mount, reveal the real content fallback
+      // instead of leaving visitors on the loading splash indefinitely.
+      window.setTimeout(() => {
+        const root = document.getElementById('root');
+        if (!root || !root.hasChildNodes()) {
+          document.getElementById('initial-splash')?.remove();
+        }
+      }, 8000);
+    </script>
   </body>
 </html>
