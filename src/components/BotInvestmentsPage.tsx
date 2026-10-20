@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowDownToLine, ArrowLeft, Bot, PauseCircle, PlayCircle, TrendingUp } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, BatteryCharging, Bot, PauseCircle, PlayCircle, TrendingUp } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
 import { navigate } from '../utils/navigate';
@@ -28,6 +28,13 @@ type Bot = {
   symbol?: string;
   symbolType?: string;
   efficiency?: number;
+  creationCost?: number;
+  rechargeStatus?: 'recharging' | 'completed';
+  rechargeInitialEfficiency?: number;
+  rechargeTargetEfficiency?: number;
+  rechargeStartedAt?: string;
+  rechargeCompletedAt?: string;
+  rechargePaidAmount?: number;
   tradeDirection?: string;
   minTradeAmount?: number;
   maxTradeAmount?: number;
@@ -53,6 +60,9 @@ const BotInvestmentsPage = () => {
   const [expandedBotId, setExpandedBotId] = useState('');
   const [withdrawBot, setWithdrawBot] = useState<Bot | null>(null);
   const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [rechargeBot, setRechargeBot] = useState<Bot | null>(null);
+  const [rechargePoints, setRechargePoints] = useState(1);
+  const [rechargeQuote, setRechargeQuote] = useState<any>(null);
 
   const styles: Record<string, React.CSSProperties> = {
     page: {
@@ -178,8 +188,8 @@ const BotInvestmentsPage = () => {
     },
   };
 
-  const load = async () => {
-    setLoading(true);
+  const load = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     setError('');
     try {
       const response = await api.get('/api/bot-investments/mine');
@@ -187,11 +197,15 @@ const BotInvestmentsPage = () => {
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to load your bots.');
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    void load();
+    const timer = window.setInterval(() => { void load(false); }, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const activate = async () => {
     if (!selectedBot) return;
@@ -250,6 +264,58 @@ const BotInvestmentsPage = () => {
       await load();
     } catch (requestError: any) {
       setError(requestError?.response?.data?.message || 'Unable to withdraw funds from this bot.');
+    } finally {
+      setBusyBotId('');
+    }
+  };
+
+
+  const openRecharge = async (bot: Bot) => {
+    setError('');
+    setMessage('');
+    setRechargeBot(bot);
+    setRechargeQuote(null);
+    setRechargePoints(1);
+    setBusyBotId(bot.botId);
+    try {
+      const response = await api.get(`/api/bot-investments/${bot.botId}/recharge-quote`);
+      const maxPoints = Math.max(0, Number(response.data?.availablePoints || 0));
+      const initialPoints = Math.min(10, maxPoints) || 1;
+      setRechargePoints(initialPoints);
+      const quote = await api.get(`/api/bot-investments/${bot.botId}/recharge-quote`, { params: { points: initialPoints } });
+      setRechargeQuote({ ...response.data, ...quote.data });
+    } catch (requestError: any) {
+      setRechargeBot(null);
+      setError(requestError?.response?.data?.message || 'Unable to prepare bot recharge.');
+    } finally {
+      setBusyBotId('');
+    }
+  };
+
+  const updateRechargePoints = async (points: number) => {
+    if (!rechargeBot) return;
+    setRechargePoints(points);
+    try {
+      const response = await api.get(`/api/bot-investments/${rechargeBot.botId}/recharge-quote`, { params: { points } });
+      setRechargeQuote((current: any) => ({ ...current, ...response.data }));
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to update recharge cost.');
+    }
+  };
+
+  const startRecharge = async () => {
+    if (!rechargeBot) return;
+    setBusyBotId(rechargeBot.botId);
+    setError('');
+    setMessage('');
+    try {
+      const response = await api.post(`/api/bot-investments/${rechargeBot.botId}/recharge`, { points: rechargePoints });
+      setMessage(response.data?.message || 'Bot recharge started.');
+      setRechargeBot(null);
+      setRechargeQuote(null);
+      await load(false);
+    } catch (requestError: any) {
+      setError(requestError?.response?.data?.message || 'Unable to start bot recharge.');
     } finally {
       setBusyBotId('');
     }
@@ -428,7 +494,15 @@ const BotInvestmentsPage = () => {
                                   ? 'Activation is being processed. The reserved funds are not active in the bot until processing completes.'
                                   : 'Deactivation is being processed. The bot has stopped earning and the return will be credited when processing completes.'}
                               </div>
+                            ) : bot.rechargeStatus === 'recharging' ? (
+                              <div style={{ display: 'grid', gap: 8, padding: 12, borderRadius: 12, border: '1px solid ' + theme.borderGlass, background: theme.surfaceGlass }}>
+                                <p style={{ ...styles.value, fontSize: '0.88rem' }}><BatteryCharging size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />Recharging · {Math.min(Number(bot.rechargeTargetEfficiency || 100), Number(bot.rechargeInitialEfficiency || 0) + Math.max(0, Math.floor((Date.now() - new Date(bot.rechargeStartedAt || Date.now()).getTime()) / 3600000)))}%</p>
+                                <p style={styles.note}>Target {bot.rechargeTargetEfficiency}% · 1% per hour · Paid {money(Number(bot.rechargePaidAmount || 0))}</p>
+                                <p style={styles.note}>Estimated completion: {bot.rechargeStartedAt && bot.rechargeTargetEfficiency !== undefined ? new Date(new Date(bot.rechargeStartedAt).getTime() + Math.max(0, Number(bot.rechargeTargetEfficiency) - Number(bot.rechargeInitialEfficiency || 0)) * 3600000).toLocaleString() : 'Calculating…'}. Trading remains paused.</p>
+                              </div>
                             ) : !active ? (
+                              <div style={{ display: 'grid', gap: 8 }}>
+                              {bot.rechargeStatus === 'completed' && <p style={styles.note}>Recharge complete. Your bot remains inactive; activate it when you are ready.</p>}
                               <button
                                 type="button"
                                 style={styles.button}
@@ -442,6 +516,12 @@ const BotInvestmentsPage = () => {
                               >
                                 {busyBotId === bot.botId ? <LoadingDots /> : <><PlayCircle size={15} /> Activate Bot</>}
                               </button>
+                              {bot.source === 'owned' && Number(bot.efficiency || 0) < 100 && (
+                                <button type="button" style={{ ...styles.button, ...styles.mutedButton }} disabled={busyBotId === bot.botId} onClick={() => void openRecharge(bot)}>
+                                  {busyBotId === bot.botId ? <LoadingDots /> : <><BatteryCharging size={15} /> Recharge Efficiency</>}
+                                </button>
+                              )}
+                              </div>
                             ) : withdrawBot?.botId === bot.botId ? (
                               <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: '1px solid ' + theme.borderGlass, background: theme.surfaceGlass }}>
                                 <div style={{ display: 'grid', gap: 5 }}>
