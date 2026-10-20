@@ -15,7 +15,7 @@ type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email
 type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; message?: string; requiresExtraSecurity?: boolean; challengeToken?: string; methods?: Array<'2fa' | 'biometric'> };
 type ExternalLoginStart = { requestId: string; loginCode: string; qrToken: string; expiresAt: string; appName: 'CryBots' | 'HallsChat'; deviceLabel: string };
 type ExternalLoginStatus = SessionResponse & { status?: string };
-type NativeKingsHallAccountPlugin = { chooseAccount(): Promise<{ email?: string; cancelled?: boolean }> };
+type NativeKingsHallAccountPlugin = { hasAccounts(): Promise<{ hasAccount?: boolean }>; chooseAccount(): Promise<{ email?: string; cancelled?: boolean; noAccount?: boolean }> };
 const configuredAdminEmail = (process.env.REACT_APP_ADMIN_EMAIL || process.env.ADMIN_EMAIL)?.trim().toLowerCase();
 const KINGSHALL_SIGNIN = 'https://kingshall.online/signin';
 const ACCOUNT_HINT_KEY = 'kingshall_account_hint';
@@ -130,10 +130,20 @@ const SigninPage = () => {
     try {
       if (isNativeAndroid()) {
         if (!Capacitor.isPluginAvailable('KingsHallAccount')) throw new Error('This CryBots APK needs an update to use the KingsHall account manager.');
-        // Keep the APK spinner active for at least five seconds across every account-chooser outcome.
-        const result = await DeviceAccount.chooseAccount();
+        // Keep the spinner visible for five seconds while checking the native account store.
+        const availability = await DeviceAccount.hasAccounts();
         const remainingLoadingTime = 5000 - (Date.now() - loadingStartedAt);
         if (remainingLoadingTime > 0) await new Promise(resolve => window.setTimeout(resolve, remainingLoadingTime));
+        if (!availability.hasAccount) {
+          setShowNoAccountModal(true);
+          return;
+        }
+        // Only open Android's account picker after the five-second loading state has completed.
+        const result = await DeviceAccount.chooseAccount();
+        if (result.noAccount) {
+          setShowNoAccountModal(true);
+          return;
+        }
         if (result.cancelled) {
           setNotice('Choose a KingsHall account to continue. If none appears, sign in to KingsHall first.');
           return;
