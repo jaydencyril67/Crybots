@@ -8,9 +8,9 @@ import { isAdminToken } from '../utils/adminAuth';
 import { navigate } from '../utils/navigate';
 
 const stats = [
-  { value: '$2.4B+', label: '24h trading volume' },
-  { value: '140+', label: 'global markets' },
-  { value: '99.98%', label: 'platform uptime' },
+  { value: 'Bot strategies', label: 'Explore automated strategy tools' },
+  { value: 'Portfolio tools', label: 'Review activity in one workspace' },
+  { value: 'Account controls', label: 'Manage your account and settings' },
 ];
 
 const features = [
@@ -251,6 +251,22 @@ const LandingPage = () => {
                   </article>;
                 })}
               </div>
+            </section>
+
+            <section aria-labelledby="cb-about-heading" style={{ ...card, padding: 'clamp(20px, 3vw, 30px)', display: 'grid', gap: 12 }}>
+              <p className="cb-prism-section-kicker" style={{ margin: 0 }}>About the platform</p>
+              <h2 id="cb-about-heading" className="cb-prism-section-title">Crypto trading tools, in one workspace.</h2>
+              <p style={{ color: theme.textMuted, fontSize: 14, lineHeight: 1.75, margin: 0 }}>
+                CryBots brings together tools for discovering automated bot strategies, reviewing portfolio activity, and managing supported digital assets. The dashboard is designed to help users understand and organise their activity; strategy availability and results depend on the tools used and changing market conditions.
+              </p>
+              <p style={{ color: theme.textMuted, fontSize: 13, lineHeight: 1.7, margin: 0 }}>
+                <strong style={{ color: theme.text }}>Risk notice:</strong> Cryptocurrency markets are volatile. Automated strategies can lose money, and no strategy or platform can guarantee profits. Any portfolio values and percentage changes shown in the interface preview are illustrative only, not live account data or a promise of future performance.
+              </p>
+              <nav aria-label="CryBots public information" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 13 }}>
+                <a href="/about" style={{ color: theme.text, textDecoration: 'underline', textUnderlineOffset: 3 }}>About CryBots</a>
+                <a href="/privacy-policy" style={{ color: theme.text, textDecoration: 'underline', textUnderlineOffset: 3 }}>Privacy policy</a>
+                <a href="/community-standards" style={{ color: theme.text, textDecoration: 'underline', textUnderlineOffset: 3 }}>Community standards</a>
+              </nav>
             </section>
 
             <section className="cb-prism-how" style={card}>
