@@ -274,7 +274,20 @@ const SigninPage = () => {
     if (!externalLogin?.requestId) return;
     let stopped = false;
     let timer: number | undefined;
+    let expiryTimer: number | undefined;
     const requestId = externalLogin.requestId;
+    const expireLocally = () => {
+      if (stopped) return;
+      stopped = true;
+      if (timer !== undefined) window.clearTimeout(timer);
+      setExternalLogin(null);
+      setExternalNotice('');
+      setExternalError('The external sign-in request expired. Start again on this device.');
+    };
+    const expiresAt = new Date(externalLogin.expiresAt).getTime();
+    if (Number.isFinite(expiresAt)) {
+      expiryTimer = window.setTimeout(expireLocally, Math.max(0, expiresAt - Date.now()));
+    }
     const poll = async () => {
       try {
         const { data } = await api.post<ExternalLoginStatus>('/api/auth/kingshall/external/status', { requestId });
@@ -312,7 +325,11 @@ const SigninPage = () => {
       if (!stopped) timer = window.setTimeout(() => { void poll(); }, 1800);
     };
     timer = window.setTimeout(() => { void poll(); }, 1500);
-    return () => { stopped = true; if (timer !== undefined) window.clearTimeout(timer); };
+    return () => {
+      stopped = true;
+      if (timer !== undefined) window.clearTimeout(timer);
+      if (expiryTimer !== undefined) window.clearTimeout(expiryTimer);
+    };
   }, [externalLogin?.requestId]);
 
   const glass: React.CSSProperties = { border: `1px solid ${theme.borderGlass}`, background: theme.surfaceGlass, boxShadow: 'inset 0 1px 0 rgba(255,255,255,.06)' };
