@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowDownToLine, ArrowLeft, BatteryCharging, Bot, PauseCircle, PlayCircle, TrendingUp } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import api from '../api/axios';
@@ -63,6 +63,8 @@ const BotInvestmentsPage = () => {
   const [rechargeBot, setRechargeBot] = useState<Bot | null>(null);
   const [rechargePoints, setRechargePoints] = useState(1);
   const [rechargeQuote, setRechargeQuote] = useState<any>(null);
+  const rechargeQuoteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rechargeQuoteRequest = useRef(0);
 
   const styles: Record<string, React.CSSProperties> = {
     page: {
@@ -292,15 +294,26 @@ const BotInvestmentsPage = () => {
     }
   };
 
-  const updateRechargePoints = async (points: number) => {
+  const updateRechargePoints = (points: number) => {
     if (!rechargeBot) return;
+
+    // Keep dragging entirely local; request a fresh quote only after the user pauses.
     setRechargePoints(points);
-    try {
-      const response = await api.get(`/api/bot-investments/${rechargeBot.botId}/recharge-quote`, { params: { points } });
-      setRechargeQuote((current: any) => ({ ...current, ...response.data }));
-    } catch (requestError: any) {
-      setError(requestError?.response?.data?.message || 'Unable to update recharge cost.');
-    }
+    if (rechargeQuoteTimer.current) clearTimeout(rechargeQuoteTimer.current);
+    const requestId = ++rechargeQuoteRequest.current;
+    const botId = rechargeBot.botId;
+    rechargeQuoteTimer.current = setTimeout(async () => {
+      try {
+        const response = await api.get(`/api/bot-investments/${botId}/recharge-quote`, { params: { points } });
+        if (requestId === rechargeQuoteRequest.current) {
+          setRechargeQuote((current: any) => ({ ...current, ...response.data }));
+        }
+      } catch (requestError: any) {
+        if (requestId === rechargeQuoteRequest.current) {
+          setError(requestError?.response?.data?.message || 'Unable to update recharge cost.');
+        }
+      }
+    }, 180);
   };
 
   const startRecharge = async () => {
@@ -499,7 +512,7 @@ const BotInvestmentsPage = () => {
                                   <label style={{ ...styles.note, fontWeight: 700 }} htmlFor="recharge-points">
                                     Efficiency to restore: {rechargePoints}% · Target: {Number(rechargeQuote.currentEfficiency || bot.efficiency || 0) + rechargePoints}%
                                   </label>
-                                  <input id="recharge-points" type="range" min="1" max={Math.max(1, Number(rechargeQuote.availablePoints || 1))} step="1" value={Math.min(rechargePoints, Math.max(1, Number(rechargeQuote.availablePoints || 1)))} onChange={(event) => void updateRechargePoints(Number(event.target.value))} style={{ width: '100%', accentColor: theme.primary, cursor: 'grab' }} />
+                                  <input id="recharge-points" type="range" min="1" max={Math.max(1, Number(rechargeQuote.availablePoints || 1))} step="1" value={Math.min(rechargePoints, Math.max(1, Number(rechargeQuote.availablePoints || 1)))} onChange={(event) => updateRechargePoints(Number(event.target.value))} style={{ width: '100%', accentColor: theme.primary, cursor: 'grab', touchAction: 'pan-y' }} />
                                   <div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>1%</span><span>{Number(rechargeQuote.availablePoints || 0)}% max</span></div>
                                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
                                     <div><p style={styles.label}>Recharge cost</p><p style={{ ...styles.value, marginTop: 5 }}>{money(Number(rechargeQuote.cost ?? (Number(rechargeQuote.costPerPoint || 0.01) * rechargePoints)))}</p></div>
