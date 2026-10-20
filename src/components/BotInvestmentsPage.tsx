@@ -487,6 +487,33 @@ const BotInvestmentsPage = () => {
                             <p style={styles.note}>Rental ends {new Date(bot.rentalExpiresAt).toLocaleString()}</p>
                           ) : null}
 
+
+                          {rechargeBot?.botId === bot.botId && (
+                            <div style={{ display: 'grid', gap: 10, padding: 12, borderRadius: 12, border: '1px solid ' + theme.borderGlass, background: theme.surfaceGlass }}>
+                              <div style={{ display: 'grid', gap: 5 }}>
+                                <p style={{ ...styles.value, fontSize: '0.9rem' }}><BatteryCharging size={16} style={{ verticalAlign: 'middle', marginRight: 6 }} />Recharge {bot.name}</p>
+                                <p style={styles.note}>Recharge restores 1 percentage point per hour. The bot must stay inactive, and it will not automatically reactivate.</p>
+                              </div>
+                              {rechargeQuote ? (
+                                <>
+                                  <label style={{ ...styles.note, fontWeight: 700 }} htmlFor="recharge-points">
+                                    Efficiency to restore: {rechargePoints}% · Target: {Number(rechargeQuote.currentEfficiency || bot.efficiency || 0) + rechargePoints}%
+                                  </label>
+                                  <input id="recharge-points" type="range" min="1" max={Math.max(1, Number(rechargeQuote.availablePoints || 1))} step="1" value={Math.min(rechargePoints, Math.max(1, Number(rechargeQuote.availablePoints || 1)))} onChange={(event) => void updateRechargePoints(Number(event.target.value))} style={{ width: '100%', accentColor: theme.primary, cursor: 'grab' }} />
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', color: theme.textMuted, fontSize: '0.72rem' }}><span>1%</span><span>{Number(rechargeQuote.availablePoints || 0)}% max</span></div>
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
+                                    <div><p style={styles.label}>Recharge cost</p><p style={{ ...styles.value, marginTop: 5 }}>{money(Number(rechargeQuote.cost ?? (Number(rechargeQuote.costPerPoint || 0.01) * rechargePoints)))}</p></div>
+                                    <div><p style={styles.label}>Time required</p><p style={{ ...styles.value, marginTop: 5 }}>{rechargePoints} hour{rechargePoints === 1 ? '' : 's'}</p></div>
+                                  </div>
+                                  <p style={styles.note}>Cost is based on the bot's original creation cost. Available efficiency: {Number(rechargeQuote.currentEfficiency ?? bot.efficiency ?? 0)}% to 100%.</p>
+                                </>
+                              ) : <LoadingDots />}
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+                                <button type="button" disabled={busyBotId === bot.botId} onClick={() => { setRechargeBot(null); setRechargeQuote(null); }} style={{ ...styles.button, ...styles.mutedButton, borderRadius: 10 }}>Cancel</button>
+                                <button type="button" disabled={busyBotId === bot.botId || !rechargeQuote || Number(rechargeQuote.cost ?? 0) <= 0} onClick={() => void startRecharge()} style={{ ...styles.button, borderRadius: 10 }}>{busyBotId === bot.botId ? <LoadingDots /> : 'Pay & Recharge'}</button>
+                              </div>
+                            </div>
+                          )}
                           <div style={{ display: 'grid', width: '100%', marginTop: 2 }}>
                             {lifecycleStatus === 'activating' || lifecycleStatus === 'deactivating' ? (
                               <div style={{ ...styles.note, padding: '10px 12px', borderRadius: 10, border: '1px solid ' + theme.borderGlass, background: theme.surfaceGlass }}>
