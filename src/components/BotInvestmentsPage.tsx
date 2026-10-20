@@ -401,7 +401,7 @@ const BotInvestmentsPage = () => {
             {selectedBot ? (
               renderActivation()
             ) : (
-              <div style={styles.card}>
+              <div style={{ display: 'grid', gap: 14, width: '100%', minWidth: 0 }}>
                 {error && <NotificationBanner tone="error" title="Bot action unavailable" message={error} />}
                 {message && <NotificationBanner tone="success" title="Bot updated" message={message} />}
 
@@ -421,7 +421,7 @@ const BotInvestmentsPage = () => {
                       const profit = Number(investment?.totalProfit || 0) - Number(investment?.totalLoss || 0);
 
                       return (
-                        <article key={bot.botId} style={styles.row}>
+                        <article key={bot.botId} style={styles.card}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                             <Bot size={20} color={theme.primary} />
                             <div style={{ minWidth: 0, flex: 1 }}>
@@ -528,8 +528,8 @@ const BotInvestmentsPage = () => {
                                 <p style={styles.note}>Estimated completion: {bot.rechargeStartedAt && bot.rechargeTargetEfficiency !== undefined ? new Date(new Date(bot.rechargeStartedAt).getTime() + Math.max(0, Number(bot.rechargeTargetEfficiency) - Number(bot.rechargeInitialEfficiency || 0)) * 3600000).toLocaleString() : 'Calculating…'}. Trading remains paused.</p>
                               </div>
                             ) : !active ? (
-                              <div style={{ display: 'grid', gap: 8 }}>
-                              {bot.rechargeStatus === 'completed' && <p style={styles.note}>Recharge complete. Your bot remains inactive; activate it when you are ready.</p>}
+                              <div style={{ display: 'grid', gridTemplateColumns: bot.source === 'owned' && Number(bot.efficiency || 0) < 100 ? 'repeat(2, minmax(0, 1fr))' : 'minmax(0, 1fr)', gap: 8 }}>
+                              {bot.rechargeStatus === 'completed' && <p style={{ ...styles.note, gridColumn: '1 / -1' }}>Recharge complete. Your bot remains inactive; activate it when you are ready.</p>}
                               <button
                                 type="button"
                                 style={styles.button}
