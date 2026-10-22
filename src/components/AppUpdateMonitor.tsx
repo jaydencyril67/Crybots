@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import api from '../api/axios';
 import { NativeAppUpdate } from '../utils/nativeAppUpdate';
+import { openCrownStoreApp } from '../utils/crownStore';
 import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import { useAppTheme } from './AppTheme';
 
@@ -10,7 +11,6 @@ type UpdateCheckResponse = {
   latestVersion?: string;
   installedVersion?: string;
   tag?: string;
-  downloadUrl?: string;
   releaseNotes?: string;
 };
 
@@ -20,7 +20,6 @@ const AppUpdateMonitor = () => {
   const [update, setUpdate] = useState<UpdateCheckResponse | null>(null);
   const [hidden, setHidden] = useState(false);
   const [actionMessage, setActionMessage] = useState('');
-  const [installing, setInstalling] = useState(false);
 
   const checkForUpdate = useCallback(async () => {
     if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
@@ -32,7 +31,7 @@ const AppUpdateMonitor = () => {
       const response = await api.get<UpdateCheckResponse>('/api/notifications/app-update-check', {
         params: { installedVersion: appInfo.versionName },
       });
-      if (response.data?.updateAvailable && response.data.downloadUrl && response.data.latestVersion) {
+      if (response.data?.updateAvailable && response.data.latestVersion) {
         setUpdate({ ...response.data, installedVersion: appInfo.versionName });
         setHidden(false);
       } else {
@@ -62,42 +61,9 @@ const AppUpdateMonitor = () => {
     };
   }, [checkForUpdate]);
 
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android' || !NativeAppUpdate.addListener) return;
-    let listenerHandle: { remove: () => Promise<void> } | undefined;
-    void NativeAppUpdate.addListener('downloadError', (event) => {
-      setInstalling(false);
-      setActionMessage(event.message || 'The APK download or installer could not complete.');
-    }).then((handle) => {
-      listenerHandle = handle;
-    }).catch(() => {
-      // The native listener is optional; update checks and the download button remain usable.
-    });
-    return () => {
-      if (listenerHandle) void listenerHandle.remove();
-    };
-  }, []);
-
-  const startUpdate = async () => {
-    if (!update?.downloadUrl || installing) return;
-    setInstalling(true);
-    setActionMessage('Preparing the update…');
-    try {
-      const result = await NativeAppUpdate.downloadAndInstall({ url: update.downloadUrl });
-      if (result.requiresPermission) {
-        setInstalling(false);
-        setActionMessage('Allow CryBots to install unknown apps in Android settings, return here, then tap Update now again.');
-      } else {
-        // Keep the panel in downloading state while Android handles the background APK download.
-        setActionMessage('The APK is downloading. Android will ask you to approve the update when it finishes.');
-      }
-    } catch {
-      setInstalling(false);
-      setActionMessage('The in-app installer could not start. You can download the APK from the Download page.');
-      window.setTimeout(() => {
-        if (update.downloadUrl) window.open(update.downloadUrl, '_blank', 'noopener,noreferrer');
-      }, 500);
-    }
+  const startUpdate = () => {
+    if (!update?.latestVersion) return;
+    openCrownStoreApp('crybots', setActionMessage);
   };
 
   if (!update || hidden) return null;
@@ -133,24 +99,13 @@ const AppUpdateMonitor = () => {
         {actionMessage ? <p style={{ margin: '7px 0 0', color: theme.primary, fontSize: '0.78rem', lineHeight: 1.45 }}>{actionMessage}</p> : null}
       </div>
       <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-        {installing ? (
-          <div
-            role="status"
-            aria-live="polite"
-            style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', border: `1px solid ${theme.borderGlass}`, borderRadius: '999px', padding: '9px 12px', background: theme.surfaceMuted, color: theme.text, fontWeight: 850, fontSize: '0.82rem' }}
-          >
-            <span aria-hidden="true" style={{ width: '13px', height: '13px', border: `2px solid ${theme.borderGlass}`, borderTopColor: theme.primary, borderRadius: '50%', animation: 'kh-update-spin 0.8s linear infinite' }} />
-            APK downloading…
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => void startUpdate()}
-            style={{ flex: 1, border: `1px solid ${theme.primary}`, borderRadius: '999px', padding: '9px 12px', background: theme.primary, color: theme.textInverse, fontWeight: 850, fontSize: '0.82rem', cursor: 'pointer' }}
-          >
-            Update now
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={startUpdate}
+          style={{ flex: 1, border: `1px solid ${theme.primary}`, borderRadius: '999px', padding: '9px 12px', background: theme.primary, color: theme.textInverse, fontWeight: 850, fontSize: '0.82rem', cursor: 'pointer' }}
+        >
+          Open CrownStore to update
+        </button>
         <button
           type="button"
           onClick={() => setHidden(true)}
