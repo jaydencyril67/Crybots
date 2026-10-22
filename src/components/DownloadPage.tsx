@@ -1,6 +1,5 @@
 import React from 'react';
-import { Capacitor } from '@capacitor/core';
-import { NativeAppUpdate, type NativeAppUpdateEvent } from '../utils/nativeAppUpdate';
+import { openCrownStoreApp } from '../utils/crownStore';
 import { ArrowLeft } from 'lucide-react';
 import InstallAppButton from './InstallAppButton';
 import HybridTheme, { HYBRID_THEME_TOKENS } from './HybridTheme';
@@ -10,14 +9,9 @@ import { useAppTheme } from './AppTheme';
 
 const downloadOptions = [
   {
-    title: 'KingsStore',
-    description: 'Your home for KingsHall apps. The store is coming soon.',
-    url: '',
-  },
-  {
-    title: 'Android APK',
-    description: 'Download the latest signed CryBots APK. Android will guide you through updating the installed app.',
-    url: 'https://crybots.kingshall.online/downloads/CryBots.apk',
+    title: 'CrownStore',
+    description: 'Download CryBots for the first time or update your installed version from the official CrownStore catalogue.',
+    url: 'https://crownstore.kingshall.online/?app=crybots',
   },
 ];
 
@@ -25,43 +19,11 @@ const DownloadPage = () => {
   const { themeMode } = useAppTheme();
   const [apkActionMessage, setApkActionMessage] = React.useState('');
 
-  const handleDownloadClick = async (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    option: typeof downloadOptions[number],
-  ) => {
-    if (option.title !== 'Android APK' || !Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
-
+  const handleDownloadClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    setApkActionMessage('Preparing the APK update…');
-    try {
-      const result = await NativeAppUpdate.downloadAndInstall({ url: option.url });
-      if (result.requiresPermission) {
-        setApkActionMessage('Allow CryBots to install unknown apps in Android settings, return here, then tap Download / Update again.');
-      } else {
-        setApkActionMessage('The APK is downloading. Android will ask you to approve the update when it finishes.');
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      setApkActionMessage('The in-app installer could not start: ' + message + '. Opening the direct APK download instead.');
-      window.setTimeout(() => window.open(option.url, '_blank', 'noopener,noreferrer'), 500);
-    }
+    openCrownStoreApp('crybots', setApkActionMessage);
   };
   const theme = HYBRID_THEME_TOKENS[themeMode];
-
-  React.useEffect(() => {
-    if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android' || !NativeAppUpdate.addListener) return;
-    let errorHandle: { remove: () => Promise<void> } | undefined;
-    void NativeAppUpdate.addListener('downloadError', (event: NativeAppUpdateEvent) => {
-      setApkActionMessage(event.message || 'The APK download or installer could not complete.');
-    }).then((handle) => {
-      errorHandle = handle;
-    }).catch(() => {
-      // The download page remains usable if native event registration is unavailable.
-    });
-    return () => {
-      if (errorHandle) void errorHandle.remove();
-    };
-  }, []);
 
   const styles = {
     page: {
@@ -172,24 +134,22 @@ const DownloadPage = () => {
                   <p style={styles.description}>{option.description}</p>
                   <a
                     href={option.url || undefined}
-                    target={option.url ? '_blank' : undefined}
-                    rel={option.url ? 'noopener noreferrer' : undefined}
                     aria-disabled={!option.url}
                     onClick={(event) => {
                       if (!option.url) {
                         event.preventDefault();
                         return;
                       }
-                      void handleDownloadClick(event, option);
+                      handleDownloadClick(event);
                     }}
                     style={{
                       ...styles.downloadButton,
                       ...(option.url ? {} : { opacity: 0.55, cursor: 'not-allowed' }),
                     }}
                   >
-                    {option.title === 'Android APK' ? 'Download / Update' : 'Coming soon'}
+                    Download / Update in CrownStore
                   </a>
-                  {option.title === 'Android APK' && apkActionMessage ? (
+                  {option.title === 'CrownStore' && apkActionMessage ? (
                     <p role="status" style={styles.description}>{apkActionMessage}</p>
                   ) : null}
 
