@@ -737,6 +737,7 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
                   ...(buttonColorEnabled ? {
                     borderColor: buttonColor,
                     borderWidth: '1.5px',
+                    color: buttonColor,
                     boxShadow: `0 0 0 1px ${buttonColor}66, 0 0 10px ${buttonColor}55, inset 0 0 5px ${buttonColor}1f`,
                   } : {}),
                 }}
