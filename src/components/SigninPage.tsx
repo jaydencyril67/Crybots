@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Capacitor, registerPlugin } from '@capacitor/core';
-import api from '../api/axios';
+import api, { API_BASE_URL } from '../api/axios';
 import { notifyAuthChanged } from '../utils/notificationEvents';
 import { Helmet } from 'react-helmet-async';
 import { ShieldCheck, LoaderCircle, KeyRound, Fingerprint } from 'lucide-react';
@@ -304,61 +304,50 @@ const SigninPage = () => {
   useEffect(() => {
     if (!externalLogin?.requestId) return;
     let stopped = false;
-    let timer: number | undefined;
     let expiryTimer: number | undefined;
     const requestId = externalLogin.requestId;
-    const expireLocally = () => {
+    const source = new EventSource(API_BASE_URL + '/api/auth/kingshall/external/events/' + encodeURIComponent(requestId));
+    const onStatus = (event: Event) => {
       if (stopped) return;
+      let data: ExternalLoginStatus;
+      try { data = JSON.parse((event as MessageEvent).data) as ExternalLoginStatus; } catch { return; }
+      if (data.status === 'approved') {
+        setExternalApproved(true);
+        setExternalNotice('Device approved. Enter the KingsHall Access Code for that account to finish signing in.');
+        return;
+      }
+      if (['denied', 'expired', 'consumed', 'authenticated'].includes(String(data.status || ''))) {
+        stopped = true;
+        source.close();
+        if (expiryTimer !== undefined) window.clearTimeout(expiryTimer);
+        setExternalLogin(null);
+        setExternalApproved(false);
+        setExternalAccessCode('');
+        setExternalError(data.status === 'denied' ? 'The external sign-in request was denied.' : 'The external sign-in request expired or was already handled. Start again on this device.');
+      }
+    };
+    source.addEventListener('status', onStatus);
+    source.onerror = () => {
+      if (stopped || source.readyState !== EventSource.CLOSED) return;
       stopped = true;
-      if (timer !== undefined) window.clearTimeout(timer);
+      if (expiryTimer !== undefined) window.clearTimeout(expiryTimer);
       setExternalLogin(null);
-      setExternalApproved(false); setExternalAccessCode('');
-      setExternalNotice('');
-      setExternalError('The external sign-in request expired. Start again on this device.');
+      setExternalError('The live external sign-in connection closed. Start again on this device.');
     };
     const expiresAt = new Date(externalLogin.expiresAt).getTime();
-    if (Number.isFinite(expiresAt)) {
-      expiryTimer = window.setTimeout(expireLocally, Math.max(0, expiresAt - Date.now()));
-    }
-    const poll = async () => {
-      try {
-        const { data } = await api.post<ExternalLoginStatus>('/api/auth/kingshall/external/status', { requestId });
-        if (stopped) return;
-        if (data.status === 'approved') {
-          if (timer !== undefined) window.clearTimeout(timer);
-          setExternalApproved(true);
-          setExternalNotice('Device approved. Enter the KingsHall Access Code for that account to finish signing in.');
-          return;
-        }
-        if (data.status === 'authenticated') {
-          stopped = true;
-          if (timer !== undefined) window.clearTimeout(timer);
-          if (expiryTimer !== undefined) window.clearTimeout(expiryTimer);
-          setExternalLogin(null);
-          setExternalApproved(false);
-          setExternalError('This external sign-in request must be restarted. Enter the Access Code after approving the device in KingsHall.');
-          return;
-        }
-        if (['denied', 'expired', 'consumed'].includes(String(data.status || ''))) {
-          setExternalLogin(null);
-          setExternalError(data.status === 'denied' ? 'The external sign-in request was denied.' : 'The external sign-in request expired. Start again on this device.');
-          return;
-        }
-      } catch (e) {
-        if (stopped) return;
-        const status = (e as { response?: { status?: number } })?.response?.status;
-        if ([400, 401, 404, 409, 410, 423].includes(Number(status))) {
-          setExternalLogin(null);
-          setExternalError(externalAuthCallbacksRef.current.messageFromError(e, 'This external sign-in request is no longer valid.'));
-          return;
-        }
-      }
-      if (!stopped) timer = window.setTimeout(() => { void poll(); }, 1800);
-    };
-    timer = window.setTimeout(() => { void poll(); }, 1500);
+    if (Number.isFinite(expiresAt)) expiryTimer = window.setTimeout(() => {
+      if (stopped) return;
+      stopped = true;
+      source.close();
+      setExternalLogin(null);
+      setExternalApproved(false);
+      setExternalAccessCode('');
+      setExternalNotice('');
+      setExternalError('The external sign-in request expired. Start again on this device.');
+    }, Math.max(0, expiresAt - Date.now()));
     return () => {
       stopped = true;
-      if (timer !== undefined) window.clearTimeout(timer);
+      source.close();
       if (expiryTimer !== undefined) window.clearTimeout(expiryTimer);
     };
   }, [externalLogin?.requestId]);
