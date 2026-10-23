@@ -325,7 +325,7 @@ const SigninPage = () => {
         const { data } = await api.post<ExternalLoginStatus>('/api/auth/kingshall/external/status', { requestId });
         if (stopped) return;
         if (data.status === 'approved') {
-                    if (timer !== undefined) window.clearTimeout(timer);
+          if (timer !== undefined) window.clearTimeout(timer);
           setExternalApproved(true);
           setExternalNotice('Device approved. Enter the KingsHall Access Code for that account to finish signing in.');
           return;
