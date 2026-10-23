@@ -896,7 +896,7 @@ const SecurityPage = () => {
                 <p style={styles.rowValue}>{biometricEnabled ? 'Biometric sign-in enabled' : 'Biometric sign-in disabled'} · {passkeys.length} bound passkey{passkeys.length === 1 ? '' : 's'}</p>
                 <p style={styles.note}>Binding a passkey does not turn on login enforcement. Only the enabled switch makes biometric verification required during sign-in.</p>
                 <div style={styles.buttonRow}>
-                  <button type="button" style={styles.button} onClick={() => void handleBindBiometric()} disabled={savingBiometric}>{savingBiometric ? <LoadingDots /> : 'Bind passkey'}</button>
+                  {passkeys.length === 0 && <button type="button" style={styles.button} onClick={() => void handleBindBiometric()} disabled={savingBiometric}>{savingBiometric ? <LoadingDots /> : 'Bind passkey'}</button>}
                   <button type="button" style={styles.button} onClick={() => void handleToggleBiometric()} disabled={savingBiometric || (!biometricEnabled && !passkeys.length)}>{savingBiometric ? <LoadingDots /> : biometricEnabled ? 'Disable biometric sign-in' : 'Enable biometric sign-in'}</button>
                 </div>
                 {passkeys.map((passkey, index) => <div key={passkey.id} style={{ ...styles.row, padding: '8px 0', borderBottom: index < passkeys.length - 1 ? `1px solid ${theme.border}` : 'none' }}>
