@@ -83,6 +83,8 @@ const SigninPage = () => {
   const [extraMethod, setExtraMethod] = useState<'2fa' | 'biometric' | ''>('');
   const [extraCode, setExtraCode] = useState('');
   const [externalLogin, setExternalLogin] = useState<ExternalLoginStart | null>(null);
+  const [externalApproved, setExternalApproved] = useState(false);
+  const [externalAccessCode, setExternalAccessCode] = useState('');
   const [externalLoginBusy, setExternalLoginBusy] = useState(false);
   const [externalNotice, setExternalNotice] = useState('');
   const [externalError, setExternalError] = useState('');
@@ -237,6 +239,7 @@ const SigninPage = () => {
 
   const startExternalLogin = async () => {
     if (busy || externalLoginBusy) return;
+    setExternalApproved(false); setExternalAccessCode('');
     setExternalLoginBusy(true); setExternalError(''); setExternalNotice('');
     try {
       const agent = navigator.userAgent;
@@ -255,6 +258,7 @@ const SigninPage = () => {
     const request = externalLogin;
     if (!request) return;
     setExternalLogin(null);
+    setExternalApproved(false); setExternalAccessCode('');
     setExternalLoginBusy(true);
     setExternalError('');
     try {
@@ -270,6 +274,33 @@ const SigninPage = () => {
   const externalAuthCallbacksRef = useRef({ saveSession, messageFromError });
   externalAuthCallbacksRef.current = { saveSession, messageFromError };
 
+  const verifyExternalAccessCode = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const request = externalLogin;
+    if (!request || !externalApproved || externalAccessCode.length !== 6 || externalLoginBusy) return;
+    setExternalLoginBusy(true); setExternalError(''); setExternalNotice('');
+    try {
+      const { data } = await api.post<SessionResponse>('/api/auth/kingshall/external/verify-access-code', {
+        requestId: request.requestId,
+        accessCode: externalAccessCode
+      });
+      setExternalLogin(null);
+      setExternalApproved(false);
+      setExternalAccessCode('');
+      saveSession(data, data.user?.email || '');
+    } catch (e) {
+      setExternalError(messageFromError(e, 'KingsHall could not verify the Access Code.'));
+      const status = (e as { response?: { status?: number } })?.response?.status;
+      if ([409, 410, 423].includes(Number(status))) {
+        setExternalLogin(null);
+        setExternalApproved(false);
+      }
+    } finally {
+      setExternalLoginBusy(false);
+      setExternalAccessCode('');
+    }
+  };
+
   useEffect(() => {
     if (!externalLogin?.requestId) return;
     let stopped = false;
@@ -281,6 +312,7 @@ const SigninPage = () => {
       stopped = true;
       if (timer !== undefined) window.clearTimeout(timer);
       setExternalLogin(null);
+      setExternalApproved(false); setExternalAccessCode('');
       setExternalNotice('');
       setExternalError('The external sign-in request expired. Start again on this device.');
     };
@@ -292,20 +324,20 @@ const SigninPage = () => {
       try {
         const { data } = await api.post<ExternalLoginStatus>('/api/auth/kingshall/external/status', { requestId });
         if (stopped) return;
+        if (data.status === 'approved') {
+          stopped = true;
+          if (timer !== undefined) window.clearTimeout(timer);
+          setExternalApproved(true);
+          setExternalNotice('Device approved. Enter the KingsHall Access Code for that account to finish signing in.');
+          return;
+        }
         if (data.status === 'authenticated') {
+          stopped = true;
+          if (timer !== undefined) window.clearTimeout(timer);
+          if (expiryTimer !== undefined) window.clearTimeout(expiryTimer);
           setExternalLogin(null);
-          if (data.requiresExtraSecurity && data.challengeToken && data.methods?.length) {
-            setIdentity(data.user?.email || '');
-            setAccountDetected(true);
-            setChallengeToken(data.challengeToken);
-            setExtraMethods(data.methods);
-            setExtraMethod(data.methods.length === 1 ? data.methods[0] : '');
-            setExtraCode('');
-            setExternalNotice(data.methods.length > 1 ? 'Device approved. Complete one enabled CryBots security check to finish signing in.' : 'Device approved. Complete the enabled CryBots security check to finish signing in.');
-            return;
-          }
-          try { externalAuthCallbacksRef.current.saveSession(data, data.user?.email || ''); }
-          catch (e) { setExternalError((e as Error).message || 'The approved session could not be completed.'); }
+          setExternalApproved(false);
+          setExternalError('This external sign-in request must be restarted. Enter the Access Code after approving the device in KingsHall.');
           return;
         }
         if (['denied', 'expired', 'consumed'].includes(String(data.status || ''))) {
@@ -390,7 +422,7 @@ const SigninPage = () => {
                   <div style={{ ...glass, borderRadius: 16, padding: 14, marginTop: 16, display: 'grid', gap: 10, textAlign: 'left' }}>
             <div>
               <p style={{ margin: 0, fontSize: 13, fontWeight: 800 }}>Signing in on a device without KingsHall?</p>
-              <p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>Approve this device from your signed-in KingsHall account. No saved KingsHall account or Access Code is needed on this device.</p>
+              <p style={{ margin: '5px 0 0', color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>Approve this device from your signed-in KingsHall account, then enter that account’s six-digit Access Code here to finish signing in.</p>
             </div>
             {!externalLogin && <button type="button" style={button} disabled={busy || externalLoginBusy || !!challengeToken} onClick={() => void startExternalLogin()}>{externalLoginBusy ? <LoadingDots /> : 'Use external-device login'}</button>}
             {externalNotice && <p role="status" style={{ margin: 0, padding: '10px 12px', borderRadius: 12, border: `1px solid ${theme.borderGlass}`, color: theme.textMuted, fontSize: 12, lineHeight: 1.55 }}>{externalNotice}</p>}
@@ -405,7 +437,11 @@ const SigninPage = () => {
                 <div aria-label={'One-time login code ' + externalLogin.loginCode} style={{ fontSize: 27, letterSpacing: '.2em', fontWeight: 900, overflowWrap: 'anywhere' }}>{externalLogin.loginCode}</div>
                 <p style={{ margin: '6px 0 0', color: theme.textMuted, fontSize: 11 }}>Expires {new Date(externalLogin.expiresAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
               </div>
-              <p role="status" style={{ margin: 0, color: theme.textMuted, fontSize: 12 }}>Waiting for approval from KingsHall…</p>
+              {!externalApproved ? <p role="status" style={{ margin: 0, color: theme.textMuted, fontSize: 12 }}>Waiting for approval from KingsHall…</p> : <form onSubmit={verifyExternalAccessCode} style={{ display: 'grid', gap: 10, textAlign: 'left' }}>
+                <label htmlFor="crybots-external-access-code" style={{ fontSize: 12, fontWeight: 800 }}>KingsHall Access Code</label>
+                <input id="crybots-external-access-code" type="password" inputMode="numeric" autoComplete="off" pattern="[0-9]{6}" maxLength={6} required value={externalAccessCode} onChange={event => setExternalAccessCode(event.target.value.replace(/\D/g, '').slice(0, 6))} style={input} placeholder="Enter six-digit Access Code" />
+                <button type="submit" style={button} disabled={externalLoginBusy || externalAccessCode.length !== 6}>{externalLoginBusy ? <LoadingDots /> : 'Verify Access Code & Sign in'}</button>
+              </form>}
               <button type="button" style={{ ...button, background: 'transparent' }} disabled={externalLoginBusy} onClick={() => void cancelExternalLogin()}>Cancel external login</button>
             </>}
           </div>
