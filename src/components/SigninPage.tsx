@@ -12,7 +12,7 @@ import { navigate } from '../utils/navigate';
 import { authenticateWithPasskey } from '../utils/webauthn';
 
 type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email?: string; username?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string };
-type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; message?: string; requiresExtraSecurity?: boolean; challengeToken?: string; methods?: Array<'2fa' | 'biometric'> };
+type SessionResponse = { token?: string; user?: KingsHallUser; isAdmin?: boolean; message?: string; requiresExtraSecurity?: boolean; challengeToken?: string; methods?: Array<'2fa' | 'biometric'>; challengeSource?: 'kingshall' | 'app' };
 type ExternalLoginStart = { requestId: string; loginCode: string; qrToken: string; expiresAt: string; appName: 'CryBots' | 'HallsChat'; deviceLabel: string };
 type ExternalLoginStatus = SessionResponse & { status?: string };
 type NativeKingsHallAccountPlugin = { hasAccounts(): Promise<{ hasAccount?: boolean }>; chooseAccount(): Promise<{ email?: string; cancelled?: boolean; noAccount?: boolean }> };
@@ -79,6 +79,7 @@ const SigninPage = () => {
   const [showNoAccountModal, setShowNoAccountModal] = useState(false);
   const [browserAccounts, setBrowserAccounts] = useState<string[]>([]);
   const [challengeToken, setChallengeToken] = useState('');
+  const [challengeSource, setChallengeSource] = useState<'kingshall' | 'app'>('app');
   const [extraMethods, setExtraMethods] = useState<Array<'2fa' | 'biometric'>>([]);
   const [extraMethod, setExtraMethod] = useState<'2fa' | 'biometric' | ''>('');
   const [extraCode, setExtraCode] = useState('');
@@ -187,6 +188,7 @@ const SigninPage = () => {
       const { data } = await api.post<SessionResponse>('/api/auth/kingshall/access-code', { identity, accessCode });
       if (data.requiresExtraSecurity && data.challengeToken && data.methods?.length) {
         setChallengeToken(data.challengeToken);
+        setChallengeSource(data.challengeSource === 'kingshall' ? 'kingshall' : 'app');
         setExtraMethods(data.methods);
         setExtraMethod(data.methods.length === 1 ? data.methods[0] : '');
         setExtraCode('');
@@ -207,7 +209,16 @@ const SigninPage = () => {
     if (busy || !challengeToken || extraCode.length !== 6) return;
     setBusy(true); setError(''); setNotice('');
     try {
-      const { data } = await api.post<SessionResponse>('/api/auth/kingshall/extra-security/verify-2fa', { challengeToken, code: extraCode });
+      const { data } = await api.post<SessionResponse>('/api/auth/kingshall/extra-security/verify-2fa', { challengeToken, code: extraCode, challengeSource });
+      if (data.requiresExtraSecurity && data.challengeToken && data.methods?.length) {
+        setChallengeToken(data.challengeToken);
+        setChallengeSource(data.challengeSource === 'kingshall' ? 'kingshall' : 'app');
+        setExtraMethods(data.methods);
+        setExtraMethod(data.methods.length === 1 ? data.methods[0] : '');
+        setExtraCode('');
+        setNotice(data.methods.length > 1 ? 'KingsHall security verified. Choose an enabled CryBots security method to finish signing in.' : 'KingsHall security verified. Complete the enabled CryBots security check to finish signing in.');
+        return;
+      }
       saveSession(data, identity);
     } catch (e) {
       setError(messageFromError(e, 'The authenticator code could not be verified.'));
@@ -221,9 +232,24 @@ const SigninPage = () => {
     if (busy || !challengeToken) return;
     setBusy(true); setError(''); setNotice('');
     try {
-      const { data: options } = await api.post('/api/webauthn/authenticate/options', { challengeToken });
+      const optionsPath = challengeSource === 'kingshall'
+        ? '/api/auth/kingshall/extra-security/biometric/options'
+        : '/api/webauthn/authenticate/options';
+      const verifyPath = challengeSource === 'kingshall'
+        ? '/api/auth/kingshall/extra-security/biometric/verify'
+        : '/api/webauthn/authenticate/verify';
+      const { data: options } = await api.post(optionsPath, { challengeToken, challengeSource });
       const credential = await authenticateWithPasskey(options);
-      const { data } = await api.post<SessionResponse>('/api/webauthn/authenticate/verify', { challengeToken, ...credential });
+      const { data } = await api.post<SessionResponse>(verifyPath, { challengeToken, challengeSource, ...credential });
+      if (data.requiresExtraSecurity && data.challengeToken && data.methods?.length) {
+        setChallengeToken(data.challengeToken);
+        setChallengeSource(data.challengeSource === 'kingshall' ? 'kingshall' : 'app');
+        setExtraMethods(data.methods);
+        setExtraMethod(data.methods.length === 1 ? data.methods[0] : '');
+        setExtraCode('');
+        setNotice(data.methods.length > 1 ? 'KingsHall security verified. Choose an enabled CryBots security method to finish signing in.' : 'KingsHall security verified. Complete the enabled CryBots security check to finish signing in.');
+        return;
+      }
       saveSession(data, identity);
     } catch (e) {
       setError(messageFromError(e, 'Biometric verification failed. Please try again.'));
@@ -234,7 +260,7 @@ const SigninPage = () => {
 
   const resetAccount = () => {
     setIdentity(''); setAccessCode(''); setAccountDetected(false); setError(''); setNotice('');
-    setChallengeToken(''); setExtraMethods([]); setExtraMethod(''); setExtraCode('');
+    setChallengeToken(''); setChallengeSource('app'); setExtraMethods([]); setExtraMethod(''); setExtraCode('');
   };
 
   const startExternalLogin = async () => {
