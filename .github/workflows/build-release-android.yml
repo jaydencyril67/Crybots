@@ -1107,6 +1107,9 @@ jobs:
           path.write_text(text)
           PY
 
+      - name: Install native ecosystem APK launcher
+        run: python3 scripts/install-android-cross-app-launcher.py com.kingshall.exchange
+
       - name: Build signed CryBots production APK
         working-directory: android
         run: ./gradlew --no-daemon --stacktrace assembleRelease
