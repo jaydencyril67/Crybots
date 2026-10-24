@@ -92,14 +92,25 @@ const SigninPage = () => {
   const [externalError, setExternalError] = useState('');
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-    const returnedEmail = params.get('kingshall_account') || hashParams.get('kingshall_account');
-    if (returnedEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(returnedEmail)) {
-      localStorage.setItem(ACCOUNT_HINT_KEY, returnedEmail.trim().toLowerCase());
-      window.history.replaceState({}, '', window.location.pathname + window.location.search);
+    const consumeReturnedAccount = () => {
+      const params = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const returnedEmail = (params.get('kingshall_account') || hashParams.get('kingshall_account') || '').trim().toLowerCase();
+      if (!returnedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(returnedEmail)) return;
+      localStorage.setItem(ACCOUNT_HINT_KEY, returnedEmail);
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('kingshall_account');
+      if (hashParams.has('kingshall_account')) cleanUrl.hash = '';
+      window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
       setNotice('KingsHall account saved on this browser. Press the button to continue.');
-    }
+    };
+    consumeReturnedAccount();
+    window.addEventListener('popstate', consumeReturnedAccount);
+    window.addEventListener('hashchange', consumeReturnedAccount);
+    return () => {
+      window.removeEventListener('popstate', consumeReturnedAccount);
+      window.removeEventListener('hashchange', consumeReturnedAccount);
+    };
   }, []);
 
   const saveSession = (data: SessionResponse, fallbackIdentity = identity) => {
