@@ -52,8 +52,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
       const selection = cropSelectionRef.current;
       if (!pending || !selection) return;
       // Paint the moving box directly: avoid a React render on every touch frame.
-      selection.style.left = `${pending.x}px`;
-      selection.style.top = `${pending.y}px`;
+      selection.style.transform = `translate3d(${pending.x}px, ${pending.y}px, 0)`;
       selection.style.width = `${pending.width}px`;
       selection.style.height = `${pending.height}px`;
     });
@@ -304,7 +303,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
 .social-story-crop-stage{display:flex;flex:1 1 auto;min-height:0;align-items:center;justify-content:center;overflow:auto;overscroll-behavior:contain;padding:12px}
 .social-story-crop-frame{position:relative;flex:0 0 auto;overflow:hidden;background:${theme.surfaceMuted};touch-action:none;overscroll-behavior:contain;user-select:none;-webkit-user-select:none;isolation:isolate;box-shadow:0 0 0 1px ${theme.borderStrong},0 12px 48px rgba(0,0,0,.30)}
 .social-story-crop-frame>img{position:absolute;left:0;top:0;display:block;max-width:none;object-fit:fill;transform-origin:top left;will-change:transform;width:auto;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;pointer-events:none;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.social-story-crop-selection{position:absolute;z-index:2;box-sizing:border-box;border:2px solid ${theme.text};box-shadow:0 0 0 9999px rgba(0,0,0,.56),0 0 0 1px ${theme.primary};cursor:move;touch-action:none;user-select:none;-webkit-user-select:none}
+.social-story-crop-selection{position:absolute;left:0;top:0;z-index:2;will-change:transform,width,height;backface-visibility:hidden;box-sizing:border-box;border:2px solid ${theme.text};box-shadow:0 0 0 9999px rgba(0,0,0,.56),0 0 0 1px ${theme.primary};cursor:move;touch-action:none;user-select:none;-webkit-user-select:none}
 .social-story-crop-grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.15%,${theme.borderStrong} 33.33%,transparent 33.5%,transparent 66.5%,${theme.borderStrong} 66.67%,transparent 66.85%),linear-gradient(to bottom,transparent 33.15%,${theme.borderStrong} 33.33%,transparent 33.5%,transparent 66.5%,${theme.borderStrong} 66.67%,transparent 66.85%)}
 .social-story-crop-handle{position:absolute;z-index:3;display:block;width:16px;height:16px;border:2px solid ${theme.text};border-radius:5px;background:${theme.primary};box-shadow:0 2px 9px rgba(0,0,0,.45);touch-action:none}
 .social-story-crop-handle.nw{top:-8px;left:-8px;cursor:nwse-resize}.social-story-crop-handle.n{top:-8px;left:calc(50% - 8px);cursor:ns-resize}.social-story-crop-handle.ne{top:-8px;right:-8px;cursor:nesw-resize}
@@ -325,7 +324,7 @@ export default function StoryImageCropModal({ imageUrl, onCancel, onDone, title 
           onPointerDown={handleStagePointerDown} onPointerMove={handleStagePointerMove} onPointerUp={handleStagePointerUp} onPointerCancel={handleStagePointerUp}>
           <img ref={imageRef} src={imageUrl} alt="Selected photo crop" onLoad={handleImageLoad} draggable={false}
             style={{ width: ready && imageRef.current?.naturalWidth ? imageRef.current.naturalWidth * baseScale() : '100%', height: ready && imageRef.current?.naturalHeight ? imageRef.current.naturalHeight * baseScale() : '100%', transform: `translate3d(${offsetRef.current.x}px, ${offsetRef.current.y}px, 0) scale(${zoomRef.current})` }} />
-          {ready && <div ref={cropSelectionRef} className="social-story-crop-selection" style={{ left: crop.x, top: crop.y, width: crop.width, height: crop.height }}
+          {ready && <div ref={cropSelectionRef} className="social-story-crop-selection" style={{ left: 0, top: 0, transform: `translate3d(${crop.x}px, ${crop.y}px, 0)`, width: crop.width, height: crop.height, willChange: "transform, width, height" }}
             onPointerDown={event => handleCropPointerDown(event, 'move')} onPointerMove={handleCropPointerMove} onPointerUp={handleCropPointerUp} onPointerCancel={handleCropPointerUp}>
             <div className="social-story-crop-grid" aria-hidden="true" />
             {handles.map(({ key, className }) => <span key={key} className={`social-story-crop-handle ${className}`}
