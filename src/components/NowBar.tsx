@@ -708,7 +708,7 @@ const NowBar = ({ actions, admin = false }: NowBarProps) => {
         {view === 'title' ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e5eefc', width: '100%', justifyContent: 'center', padding: '2px 4px' }}>
             <span style={styles.orb} />
-            <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.02em' }}>{currentPageTitle}</span>
+            <span style={{ fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.02em', ...(buttonColorEnabled ? { color: buttonColor, textShadow: `0 0 6px ${buttonColor}aa, 0 0 14px ${buttonColor}66` } : {}) }}>{currentPageTitle}</span>
             <ChevronDown size={16} style={{ opacity: 0.8 }} />
           </div>
         ) : (
