@@ -84,6 +84,7 @@ import AppHeader from './components/AppHeader';
 import { HYBRID_THEME_TOKENS } from './components/HybridTheme';
 import api, { API_BASE_URL, forceLogout } from './api/axios';
 import { getScheduledLogout, isScheduledLogoutDue, setScheduledLogout } from './utils/scheduledLogout';
+import { listenForNativeLaunchUrls } from './utils/crossAppLauncher';
 
 const DEFAULT_IDLE_LOGOUT_MINUTES = 10;
 
@@ -98,6 +99,22 @@ if ('serviceWorker' in navigator) {
 const container = document.getElementById('root');
 if (!container) throw new Error('Root container missing in index.html');
 const root = ReactDOM.createRoot(container);
+
+function handleNativeCryBotsLaunch(value: string) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'crybots:' || url.hostname !== 'signin') return;
+    const params = new URLSearchParams(url.hash.replace(/^#/, ''));
+    const email = (params.get('kingshall_account') || '').trim().toLowerCase();
+    const route = '/signin' + (email ? '#kingshall_account=' + encodeURIComponent(email) : '');
+    window.history.replaceState({}, '', route);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  } catch {
+    // Ignore unrelated or malformed Android launch intents.
+  }
+}
+
+listenForNativeLaunchUrls(handleNativeCryBotsLaunch);
 
 const getPathname = () => window.location.pathname;
 const getHash = () => window.location.hash;
