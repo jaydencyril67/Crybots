@@ -9,6 +9,7 @@ import { HYBRID_THEME_TOKENS } from './HybridTheme';
 import LoadingDots from './LoadingDots';
 import { useAppTheme } from './AppTheme';
 import { navigate } from '../utils/navigate';
+import { openEcosystemApp } from '../utils/crossAppLauncher';
 import { authenticateWithPasskey } from '../utils/webauthn';
 
 type KingsHallUser = { id?: string; firstName?: string; lastName?: string; email?: string; username?: string; usdtBalance?: number; profilePicture?: string; coverPhoto?: string };
@@ -119,10 +120,22 @@ const SigninPage = () => {
   };
 
   const redirectToKingsHall = () => {
-    const returnTo = window.location.origin + '/signin';
+    const returnTo = 'https://crybots.kingshall.online/signin';
     const url = new URL(KINGSHALL_SIGNIN);
     url.searchParams.set('app', 'crybots');
     url.searchParams.set('returnTo', returnTo);
+
+    // In the APK, launch the real KingsHall application. If it is missing,
+    // the native launcher opens its CrownStore detail page (or the web store).
+    if (isNativeAndroid() && Capacitor.isPluginAvailable('CrossAppLauncher')) {
+      const launchUrl = new URL('kingshall://signin');
+      launchUrl.searchParams.set('app', 'crybots');
+      launchUrl.searchParams.set('returnTo', returnTo);
+      void openEcosystemApp('kingshall', 'kingshall', launchUrl.toString(), setNotice);
+      return;
+    }
+
+    // Web and PWA sign-in keeps the established HTTPS account handoff.
     window.location.assign(url.toString());
   };
 
