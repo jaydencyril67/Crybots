@@ -146,7 +146,7 @@ const DepositPage = () => {
   const [recentDeposits, setRecentDeposits] = useState<DepositPayment[]>([]);
   const [recentLoading, setRecentLoading] = useState(true);
   const [depositNotice, setDepositNotice] = useState<{ tone: 'info' | 'success' | 'error'; title: string; message: string } | null>(null);
-  const [usdTestAmount, setUsdTestAmount] = useState('1.00');
+  const [usdTestAmount, setUsdTestAmount] = useState('2.00');
   const [paystackTestLoading, setPaystackTestLoading] = useState(false);
   const [paystackTestNotice, setPaystackTestNotice] = useState<{ tone: 'info' | 'success' | 'error'; title: string; message: string } | null>(null);
 
@@ -312,11 +312,11 @@ const DepositPage = () => {
   const startPaystackUsdTest = async () => {
     setPaystackTestNotice(null);
     const value = Number(usdTestAmount);
-    if (!Number.isFinite(value) || value < 1 || value > 100 || Math.abs(value * 100 - Math.round(value * 100)) > 0.000001) {
+    if (!Number.isFinite(value) || value < 2 || value > 100 || Math.abs(value * 100 - Math.round(value * 100)) > 0.000001) {
       setPaystackTestNotice({
         tone: 'error',
         title: 'Check the test amount',
-        message: 'Enter an amount between $1.00 and $100.00 with no more than two decimal places.',
+        message: 'Enter an amount between $2.00 and $100.00 with no more than two decimal places.',
       });
       return;
     }
@@ -485,7 +485,7 @@ const DepositPage = () => {
                 id="paystack-usd-test-amount"
                 style={styles.input}
                 type="number"
-                min="1"
+                min="2"
                 max="100"
                 step="0.01"
                 inputMode="decimal"
