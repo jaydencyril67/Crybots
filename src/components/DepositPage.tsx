@@ -240,13 +240,13 @@ const DepositPage = () => {
         setPaystackLiveNotice({
           tone: 'success',
           title: 'Paystack USD payment verified',
-          message: `Paystack verified a successful USD Live payment of $${Number(response.data.amount || 0).toFixed(2)}. This was a test transaction; no CryBots wallet balance was credited.`,
+          message: `Paystack verified ${Number(response.data.amount || 0).toFixed(2)} and credited the same amount in USDT to your wallet (1:1).`,
         });
       } else {
         setPaystackLiveNotice({
           tone: 'info',
           title: 'USD payment still pending',
-          message: 'Paystack has not reported this test payment as successful yet. No wallet balance was changed.',
+          message: 'Paystack has not reported this payment as successful yet. No wallet balance was changed.',
         });
       }
     }).catch((error: any) => {
@@ -254,7 +254,7 @@ const DepositPage = () => {
       setPaystackLiveNotice({
         tone: 'error',
         title: 'USD payment could not be verified',
-        message: error?.response?.data?.message || 'The backend could not verify this Paystack test transaction. No wallet balance was changed.',
+        message: error?.response?.data?.message || 'The backend could not verify this Paystack transaction. No wallet balance was changed.',
       });
     }).finally(() => {
       cleanReturnUrl();
@@ -315,7 +315,7 @@ const DepositPage = () => {
     if (!Number.isFinite(value) || value < 2 || value > 100 || Math.abs(value * 100 - Math.round(value * 100)) > 0.000001) {
       setPaystackLiveNotice({
         tone: 'error',
-        title: 'Check the test amount',
+        title: 'Check the payment amount',
         message: 'Enter an amount between $2.00 and $100.00 with no more than two decimal places.',
       });
       return;
@@ -329,7 +329,7 @@ const DepositPage = () => {
       );
       const authorizationUrl = response.data.authorizationUrl || '';
       if (!authorizationUrl.startsWith('https://checkout.paystack.com/')) {
-        throw new Error('Paystack did not return a valid Live checkout link.');
+        throw new Error('Paystack did not return a valid checkout link.');
       }
       window.location.assign(authorizationUrl);
     } catch (error: any) {
