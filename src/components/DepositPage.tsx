@@ -146,9 +146,9 @@ const DepositPage = () => {
   const [recentDeposits, setRecentDeposits] = useState<DepositPayment[]>([]);
   const [recentLoading, setRecentLoading] = useState(true);
   const [depositNotice, setDepositNotice] = useState<{ tone: 'info' | 'success' | 'error'; title: string; message: string } | null>(null);
-  const [usdTestAmount, setUsdTestAmount] = useState('2.00');
-  const [paystackTestLoading, setPaystackTestLoading] = useState(false);
-  const [paystackTestNotice, setPaystackTestNotice] = useState<{ tone: 'info' | 'success' | 'error'; title: string; message: string } | null>(null);
+  const [usdLiveAmount, setUsdLiveAmount] = useState('2.00');
+  const [paystackLiveLoading, setPaystackLiveLoading] = useState(false);
+  const [paystackLiveNotice, setPaystackLiveNotice] = useState<{ tone: 'info' | 'success' | 'error'; title: string; message: string } | null>(null);
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -210,19 +210,19 @@ const DepositPage = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('paystack_test') !== '1') return;
+    if (params.get('paystack_usd') !== '1') return;
 
     const reference = params.get('reference') || params.get('trxref') || '';
     const cleanReturnUrl = () => {
       const url = new URL(window.location.href);
-      ['paystack_test', 'reference', 'trxref', 'status'].forEach((key) => url.searchParams.delete(key));
+      ['paystack_usd', 'reference', 'trxref', 'status'].forEach((key) => url.searchParams.delete(key));
       window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
     };
 
     if (!reference) {
-      setPaystackTestNotice({
+      setPaystackLiveNotice({
         tone: 'error',
-        title: 'USD test not verified',
+        title: 'USD payment not verified',
         message: 'Paystack returned without a transaction reference. No wallet balance was changed.',
       });
       cleanReturnUrl();
@@ -230,35 +230,35 @@ const DepositPage = () => {
     }
 
     let active = true;
-    setPaystackTestLoading(true);
+    setPaystackLiveLoading(true);
     api.post<{ verified: boolean; status?: string; currency?: string; amount?: number; walletCredited?: boolean }>(
-      '/api/deposits/paystack/test/verify',
+      '/api/deposits/paystack/usd/verify',
       { reference },
     ).then((response) => {
       if (!active) return;
       if (response.data.verified) {
-        setPaystackTestNotice({
+        setPaystackLiveNotice({
           tone: 'success',
-          title: 'Paystack USD test verified',
-          message: `Paystack verified a successful USD sandbox payment of $${Number(response.data.amount || 0).toFixed(2)}. This was a test transaction; no CryBots wallet balance was credited.`,
+          title: 'Paystack USD payment verified',
+          message: `Paystack verified a successful USD Live payment of $${Number(response.data.amount || 0).toFixed(2)}. This was a test transaction; no CryBots wallet balance was credited.`,
         });
       } else {
-        setPaystackTestNotice({
+        setPaystackLiveNotice({
           tone: 'info',
-          title: 'USD test still pending',
+          title: 'USD payment still pending',
           message: 'Paystack has not reported this test payment as successful yet. No wallet balance was changed.',
         });
       }
     }).catch((error: any) => {
       if (!active) return;
-      setPaystackTestNotice({
+      setPaystackLiveNotice({
         tone: 'error',
-        title: 'USD test could not be verified',
+        title: 'USD payment could not be verified',
         message: error?.response?.data?.message || 'The backend could not verify this Paystack test transaction. No wallet balance was changed.',
       });
     }).finally(() => {
       cleanReturnUrl();
-      if (active) setPaystackTestLoading(false);
+      if (active) setPaystackLiveLoading(false);
     });
 
     return () => { active = false; };
@@ -309,11 +309,11 @@ const DepositPage = () => {
     }
   };
 
-  const startPaystackUsdTest = async () => {
-    setPaystackTestNotice(null);
-    const value = Number(usdTestAmount);
+  const startPaystackUsdLive = async () => {
+    setPaystackLiveNotice(null);
+    const value = Number(usdLiveAmount);
     if (!Number.isFinite(value) || value < 2 || value > 100 || Math.abs(value * 100 - Math.round(value * 100)) > 0.000001) {
-      setPaystackTestNotice({
+      setPaystackLiveNotice({
         tone: 'error',
         title: 'Check the test amount',
         message: 'Enter an amount between $2.00 and $100.00 with no more than two decimal places.',
@@ -321,24 +321,24 @@ const DepositPage = () => {
       return;
     }
 
-    setPaystackTestLoading(true);
+    setPaystackLiveLoading(true);
     try {
       const response = await api.post<{ authorizationUrl?: string }>(
-        '/api/deposits/paystack/test/initialize',
+        '/api/deposits/paystack/usd/initialize',
         { amount: value },
       );
       const authorizationUrl = response.data.authorizationUrl || '';
       if (!authorizationUrl.startsWith('https://checkout.paystack.com/')) {
-        throw new Error('Paystack did not return a valid sandbox checkout link.');
+        throw new Error('Paystack did not return a valid Live checkout link.');
       }
       window.location.assign(authorizationUrl);
     } catch (error: any) {
-      setPaystackTestNotice({
+      setPaystackLiveNotice({
         tone: 'error',
-        title: 'Unable to start USD test',
-        message: error?.response?.data?.message || error?.message || 'Unable to start the Paystack USD sandbox checkout.',
+        title: 'Unable to start USD payment',
+        message: error?.response?.data?.message || error?.message || 'Unable to start the Paystack USD checkout.',
       });
-      setPaystackTestLoading(false);
+      setPaystackLiveLoading(false);
     }
   };
 
@@ -474,39 +474,39 @@ const DepositPage = () => {
           <div style={styles.outerCard}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
               <strong>USD payments</strong>
-              <span style={{ color: theme.textMuted, fontSize: '0.75rem', fontWeight: 700 }}>Paystack · TEST MODE</span>
+              <span style={{ color: theme.textMuted, fontSize: '0.75rem', fontWeight: 700 }}>Paystack · LIVE MODE</span>
             </div>
             <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.82rem', lineHeight: 1.45 }}>
-              Run a sandbox checkout to see whether Paystack's test API accepts a USD transaction request for this integration.
+              Paystack Live checkout. Successful USD payments are verified server-side and credited 1:1 to your USDT balance for now.
             </p>
             <div>
-              <label style={styles.label} htmlFor="paystack-usd-test-amount">Test amount (USD)</label>
+              <label style={styles.label} htmlFor="paystack-usd-live-amount">Payment amount (USD)</label>
               <input
-                id="paystack-usd-test-amount"
+                id="paystack-usd-live-amount"
                 style={styles.input}
                 type="number"
                 min="2"
                 max="100"
                 step="0.01"
                 inputMode="decimal"
-                value={usdTestAmount}
-                onChange={(event) => setUsdTestAmount(event.target.value)}
-                placeholder="1.00"
+                value={usdLiveAmount}
+                onChange={(event) => setUsdLiveAmount(event.target.value)}
+                placeholder="2.00"
               />
             </div>
-            {paystackTestNotice ? (
-              <NotificationBanner tone={paystackTestNotice.tone} title={paystackTestNotice.title} message={paystackTestNotice.message} />
+            {paystackLiveNotice ? (
+              <NotificationBanner tone={paystackLiveNotice.tone} title={paystackLiveNotice.title} message={paystackLiveNotice.message} />
             ) : null}
             <button
               type="button"
-              style={{ ...styles.primaryButton, ...(paystackTestLoading ? styles.primaryButtonDisabled : {}) }}
-              onClick={() => void startPaystackUsdTest()}
-              disabled={paystackTestLoading}
+              style={{ ...styles.primaryButton, ...(paystackLiveLoading ? styles.primaryButtonDisabled : {}) }}
+              onClick={() => void startPaystackUsdLive()}
+              disabled={paystackLiveLoading}
             >
-              {paystackTestLoading ? <LoadingDots /> : 'Run USD test checkout'}
+              {paystackLiveLoading ? <LoadingDots /> : 'Pay USD'}
             </button>
             <p style={{ margin: 0, color: theme.textMuted, fontSize: '0.74rem', lineHeight: 1.45 }}>
-              Sandbox only. This uses a Paystack TEST secret key, moves no real money, and never credits the CryBots balance. A successful test does not prove that the Live account is approved for USD payments.
+              This is a real Live payment. Successful USD payments credit your USDT balance 1:1 for now. Only proceed when you are ready to make an actual card charge.
             </p>
           </div>
           <div style={styles.outerCard}>
